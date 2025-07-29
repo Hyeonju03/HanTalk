@@ -1,0 +1,14 @@
+package com.example.hantalk;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class HantalkApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(HantalkApplication.class, args);
+		System.out.println("실행 성공");
+	}
+
+}
