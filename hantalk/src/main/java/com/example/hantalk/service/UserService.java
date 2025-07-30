@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -101,9 +101,9 @@ public class UserService {
     }
 
     public void signOut(String userid) {
-        Optional userOpt = userRepository.findByUserId(userid);
+        Optional<User> userOpt = userRepository.findByUserId(userid);
         if (userOpt.isPresent()) {
-            User user = (User)userOpt.get();
+            User user = (User) userOpt.get();
             user.setStatus("SignOut"); // 상태값 변경
             userRepository.save(user);
         }
@@ -165,12 +165,48 @@ public class UserService {
     }
 
     public String findId(String name, String email) {
-        //찾은 아이디 리턴
-        return "작성중";
+        Optional<User> userOpt = userRepository.findByNameAndEmail(name, email); // ✅ 새로운 메서드 필요
+        return userOpt.map(User::getUserId).orElse(null); // 없으면 null 반환
     }
 
     public String findPw(String name, String email, String userid) {
-        //성공하면 임시비번 발급
-        return "작성중";
+        Optional<User> userOpt = userRepository.findByUserId(userid);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (user.getName().equals(name) && user.getEmail().equals(email)) {
+                String tempPw = generateTempPw();
+                user.setPassword(encode(tempPw));
+                userRepository.save(user);
+                return tempPw;
+            }
+        }
+        return null;
+    }
+
+    private String generateTempPw() {
+        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lower = "abcdefghijklmnopqrstuvwxyz";
+        String digits = "0123456789";
+        String allChars = upper + lower + digits;
+
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(upper.charAt(random.nextInt(upper.length())));
+        sb.append(lower.charAt(random.nextInt(lower.length())));
+        sb.append(digits.charAt(random.nextInt(digits.length())));
+
+        for (int i = 3; i < 10; i++) {
+            sb.append(allChars.charAt(random.nextInt(allChars.length())));
+        }
+
+        char[] arr = sb.toString().toCharArray();
+        for (int i = 0; i < arr.length; i++) {
+            int j = random.nextInt(arr.length);
+            char temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+        return new String(arr);
     }
 }
