@@ -13,18 +13,19 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 public class Inc_Note {
-
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private int inc_note_id;
 
     @CreatedDate
-    @Column (name = "create_date", updatable = false)
+    @Column(updatable = false)
     private LocalDateTime create_date;
+
+    //fk
 
     @ManyToOne
     @JoinColumn (name = "user_no")
-    private User user;
+    private Users users;
 
     @ManyToOne
     @JoinColumn (name = "voca_id")
@@ -33,5 +34,4 @@ public class Inc_Note {
     @ManyToOne
     @JoinColumn (name = "sentence_id")
     private Sentence sentence;
-
 }

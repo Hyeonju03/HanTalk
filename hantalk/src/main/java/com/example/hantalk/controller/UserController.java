@@ -1,6 +1,6 @@
 package com.example.hantalk.controller;
 
-import com.example.hantalk.dto.UserDTO;
+import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +23,12 @@ public class UserController {
     }
 
     @PostMapping("/user/signup")
-    public String signUpProc(@ModelAttribute UserDTO userDTO) {
-        if (!isDTOok(userDTO)) {
+    public String signUpProc(@ModelAttribute UsersDTO usersDTO) {
+        if (!isDTOok(usersDTO)) {
             return "회원가입 폐이지";
         }
 
-        boolean isSuccess = service.signUp(userDTO);
+        boolean isSuccess = service.signUp(usersDTO);
         if (isSuccess) {
             return "redirect:/로그인 폐이지";
         } else {
@@ -93,8 +93,8 @@ public class UserController {
     }
 
     @PostMapping("/user/update")
-    public String updateProc(@ModelAttribute UserDTO userDTO) {
-        service.update(userDTO);
+    public String updateProc(@ModelAttribute UsersDTO usersDTO) {
+        service.update(usersDTO);
         return "메인페이지";
     }
 
@@ -150,7 +150,7 @@ public class UserController {
     
     // 입력값 검증 메서드
     // 중복체크 등 DB 관련은 서비스에서 따로 하고 여기선 입력값 검증
-    private boolean isDTOok(UserDTO userdto) {
+    private boolean isDTOok(UsersDTO userdto) {
         if (userdto == null) return false;
         if (userdto.getUserId() == null || userdto.getUserId().length() < 4) return false;
         if (userdto.getPassword() == null || userdto.getPassword().length() < 6) return false;

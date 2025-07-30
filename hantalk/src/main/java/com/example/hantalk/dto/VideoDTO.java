@@ -1,19 +1,16 @@
 package com.example.hantalk.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-
-public class ResourceDTO {
-    private Long resource_id;
+public class VideoDTO { //등록용
+    private int video_id;
     private String title;
     private String content;
-    private String archive;
-    private int view_count;
+    private String video_name;
     private LocalDateTime create_date;
     private LocalDateTime update_date;
 }

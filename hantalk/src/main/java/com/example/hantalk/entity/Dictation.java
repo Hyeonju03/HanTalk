@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Dictation {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int dictation_id;

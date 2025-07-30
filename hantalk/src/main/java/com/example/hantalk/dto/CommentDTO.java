@@ -1,5 +1,7 @@
 package com.example.hantalk.dto;
 
+import com.example.hantalk.entity.Post;
+import com.example.hantalk.entity.Users;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,13 +10,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CommentDTO {
-    private int commentId;
-    private int postId;
-    private int userNo;
+    private int comment_id;
     private String content;
-    private LocalDateTime createDate;
-    private LocalDateTime updateDate;
+    private LocalDateTime create_date;
+    private LocalDateTime update_date;
 
-
-
+    private Post post;
+    private Users users;
 }

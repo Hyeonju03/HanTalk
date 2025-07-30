@@ -18,7 +18,7 @@ public class VideoController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> create(@RequestBody VideoCreateDTO dto) {
+    public ResponseEntity<Long> create(@RequestBody VideoDTO dto) {
         Long id = videoService.createVideo(dto);
         return ResponseEntity.ok(id);
     }

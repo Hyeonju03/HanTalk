@@ -19,7 +19,7 @@ public class VideoService {
     }
 
     @Transactional
-    public Long createVideo(VideoCreateDTO dto) {
+    public Long createVideo(VideoDTO dto) {
         Video video = new Video();
         video.setTitle(dto.getTitle());
         video.setContent(dto.getContent());

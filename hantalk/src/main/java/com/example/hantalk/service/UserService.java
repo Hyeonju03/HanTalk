@@ -1,8 +1,8 @@
 package com.example.hantalk.service;
 
-import com.example.hantalk.dto.UserDTO;
+import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.entity.Admin;
-import com.example.hantalk.entity.User;
+import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.AdminRepository;
 import com.example.hantalk.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -22,23 +21,23 @@ public class UserService {
     @Autowired
     AdminRepository adminRepository;
 
-    public boolean signUp(UserDTO userDTO) {
-        User user = toEntity(userDTO);
+    public boolean signUp(UsersDTO usersDTO) {
+        Users users = toEntity(usersDTO);
         //이미 존재하는 아이디인지 체크
         //-회원체크
-        if (userRepository.existsByUserId(user.getUserId())) {
+        if (userRepository.existsByUserId(users.getUserId())) {
             return false;
         }
         //-관리자체크
-        else if (adminRepository.existsByUserId(user.getUserId())) {
+        else if (adminRepository.existsByUserId(users.getUserId())) {
             return false;
         }
 
         //둘다 통과하면
-        user.setPassword(encode(user.getPassword()));
-        user.setJoinDate(LocalDateTime.now());
+        users.setPassword(encode(users.getPassword()));
+        users.setJoinDate(LocalDateTime.now());
 
-        userRepository.save(user);
+        userRepository.save(users);
 
         return true;
     }
@@ -47,11 +46,11 @@ public class UserService {
         Map<String, Object> result = new HashMap<>();
 
         //회원 체크
-        Optional<User> userOpt = userRepository.findByUserId(userid);
+        Optional<Users> userOpt = userRepository.findByUserId(userid);
         if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (user.getPassword().equals(encode(password))) {
-                if ("active".equalsIgnoreCase(user.getStatus())) {
+            Users users = userOpt.get();
+            if (users.getPassword().equals(encode(password))) {
+                if ("active".equalsIgnoreCase(users.getStatus())) {
                     result.put("isSuccess", true);
                     result.put("role", "USER");
                 } else {
@@ -79,33 +78,33 @@ public class UserService {
         return result;
     }
 
-    public void update(UserDTO userDTO) {
-        Optional<User> userOpt = userRepository.findByUserId(userDTO.getUserId());
+    public void update(UsersDTO usersDTO) {
+        Optional<Users> userOpt = userRepository.findByUserId(usersDTO.getUserId());
         if (userOpt.isPresent()) {
-            User user = userOpt.get();
+            Users users = userOpt.get();
 
-            user.setName(userDTO.getName());
-            user.setEmail(userDTO.getEmail());
-            user.setNickname(userDTO.getNickname());
-            user.setProfileImage(userDTO.getProfileImage());
-            user.setBirth(userDTO.getBirth());
-            user.setStatus(userDTO.getStatus());
-            user.setPoint(userDTO.getPoint());
+            users.setName(usersDTO.getName());
+            users.setEmail(usersDTO.getEmail());
+            users.setNickname(usersDTO.getNickname());
+            users.setProfileImage(usersDTO.getProfileImage());
+            users.setBirth(usersDTO.getBirth());
+            users.setStatus(usersDTO.getStatus());
+            users.setPoint(usersDTO.getPoint());
 
-            if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
-                user.setPassword(encode(userDTO.getPassword()));
+            if (usersDTO.getPassword() != null && !usersDTO.getPassword().isEmpty()) {
+                users.setPassword(encode(usersDTO.getPassword()));
             }
 
-            userRepository.save(user);
+            userRepository.save(users);
         }
     }
 
     public void signOut(String userid) {
-        Optional<User> userOpt = userRepository.findByUserId(userid);
+        Optional<Users> userOpt = userRepository.findByUserId(userid);
         if (userOpt.isPresent()) {
-            User user = (User) userOpt.get();
-            user.setStatus("SignOut"); // 상태값 변경
-            userRepository.save(user);
+            Users users = (Users) userOpt.get();
+            users.setStatus("SignOut"); // 상태값 변경
+            userRepository.save(users);
         }
     }
 
@@ -113,39 +112,39 @@ public class UserService {
         return "ADMIN".equals(role) || targetUserId.equals(sessionUserId);
     }
 
-    private User toEntity(UserDTO dto) {
+    private Users toEntity(UsersDTO dto) {
         if (dto == null) return null;
 
-        User user = new User();
-        user.setUserNo(dto.getUserNo());
-        user.setUserId(dto.getUserId());
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setNickname(dto.getNickname());
-        user.setProfileImage(dto.getProfileImage());
-        user.setJoinDate(dto.getJoinDate());
-        user.setBirth(dto.getBirth());
-        user.setStatus(dto.getStatus());
-        user.setPoint(dto.getPoint());
-        return user;
+        Users users = new Users();
+        users.setUserNo(dto.getUserNo());
+        users.setUserId(dto.getUserId());
+        users.setName(dto.getName());
+        users.setEmail(dto.getEmail());
+        users.setPassword(dto.getPassword());
+        users.setNickname(dto.getNickname());
+        users.setProfileImage(dto.getProfileImage());
+        users.setJoinDate(dto.getJoinDate());
+        users.setBirth(dto.getBirth());
+        users.setStatus(dto.getStatus());
+        users.setPoint(dto.getPoint());
+        return users;
     }
 
-    private UserDTO toDTO(User user) {
-        if (user == null) return null;
+    private UsersDTO toDTO(Users users) {
+        if (users == null) return null;
 
-        UserDTO dto = new UserDTO();
-        dto.setUserNo(user.getUserNo());
-        dto.setUserId(user.getUserId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
-        dto.setNickname(user.getNickname());
-        dto.setProfileImage(user.getProfileImage());
-        dto.setJoinDate(user.getJoinDate());
-        dto.setBirth(user.getBirth());
-        dto.setStatus(user.getStatus());
-        dto.setPoint(user.getPoint());
+        UsersDTO dto = new UsersDTO();
+        dto.setUserNo(users.getUserNo());
+        dto.setUserId(users.getUserId());
+        dto.setName(users.getName());
+        dto.setEmail(users.getEmail());
+        dto.setPassword(users.getPassword());
+        dto.setNickname(users.getNickname());
+        dto.setProfileImage(users.getProfileImage());
+        dto.setJoinDate(users.getJoinDate());
+        dto.setBirth(users.getBirth());
+        dto.setStatus(users.getStatus());
+        dto.setPoint(users.getPoint());
         return dto;
     }
 
@@ -165,18 +164,18 @@ public class UserService {
     }
 
     public String findId(String name, String email) {
-        Optional<User> userOpt = userRepository.findByNameAndEmail(name, email); // ✅ 새로운 메서드 필요
-        return userOpt.map(User::getUserId).orElse(null); // 없으면 null 반환
+        Optional<Users> userOpt = userRepository.findByNameAndEmail(name, email); // ✅ 새로운 메서드 필요
+        return userOpt.map(Users::getUserId).orElse(null); // 없으면 null 반환
     }
 
     public String findPw(String name, String email, String userid) {
-        Optional<User> userOpt = userRepository.findByUserId(userid);
+        Optional<Users> userOpt = userRepository.findByUserId(userid);
         if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (user.getName().equals(name) && user.getEmail().equals(email)) {
+            Users users = userOpt.get();
+            if (users.getName().equals(name) && users.getEmail().equals(email)) {
                 String tempPw = generateTempPw();
-                user.setPassword(encode(tempPw));
-                userRepository.save(user);
+                users.setPassword(encode(tempPw));
+                userRepository.save(users);
                 return tempPw;
             }
         }

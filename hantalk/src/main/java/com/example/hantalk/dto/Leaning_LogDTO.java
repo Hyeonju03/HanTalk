@@ -1,5 +1,6 @@
 package com.example.hantalk.dto;
 
+import com.example.hantalk.entity.Users;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,11 +15,11 @@ import java.time.LocalDateTime;
 @Setter
 public class Leaning_LogDTO {
     private int learning_id;
-    //fk
-    private int user_no;
     private LocalDateTime learning_date;
-    private int learning1_count;
-    private int learning2_count;
-    private int learning3_count;
-    private int learning4_count;
+    private int learning1_count = 0;
+    private int learning2_count = 0;
+    private int learning3_count = 0;
+    private int learning4_count = 0;
+
+    private Users users;
 }

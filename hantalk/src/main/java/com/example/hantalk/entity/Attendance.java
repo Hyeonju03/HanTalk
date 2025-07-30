@@ -3,9 +3,12 @@ package com.example.hantalk.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@EntityListeners(value = {AuditingEntityListener.class})
 @Entity
 @Getter
 @Setter
@@ -13,14 +16,13 @@ public class Attendance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ATTENDANCE_ID")
-    private Integer attendanceId;
+    private int attendance_id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_NO", nullable = false)
-    private User user;
+    @CreatedDate
+    @Column(nullable = false)
+    private LocalDateTime attend_date;
 
-    @Column(name = "ATTEND_DATE", nullable = false)
-    private LocalDateTime attendDate;
-
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Users users;
 }

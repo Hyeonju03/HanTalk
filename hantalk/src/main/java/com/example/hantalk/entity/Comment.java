@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@EntityListeners(value = {AuditingEntityListener.class})
 @Entity
 @Getter
 @Setter
@@ -34,6 +36,6 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "user_no", nullable = false)
-    private User user; // 작성자
+    private Users users; // 작성자
 }
 

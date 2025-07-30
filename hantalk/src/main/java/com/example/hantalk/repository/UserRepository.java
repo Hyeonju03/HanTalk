@@ -1,20 +1,20 @@
 package com.example.hantalk.repository;
 
-import com.example.hantalk.entity.User;
+import com.example.hantalk.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<Users, Integer> {
     boolean existsByUserId(String userId);
 
-    Optional<User> findByUserId(String userid);
+    Optional<Users> findByUserId(String userid);
 
-    Optional<User> findByName(String name);
+    Optional<Users> findByName(String name);
 
-    Optional<User> findByEmail(String email);
+    Optional<Users> findByEmail(String email);
 
-    Optional<User> findByNameAndEmail(String name, String email);
+    Optional<Users> findByNameAndEmail(String name, String email);
 }

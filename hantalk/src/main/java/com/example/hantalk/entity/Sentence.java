@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @EntityListeners(value = {AuditingEntityListener.class})
 @Entity
@@ -24,5 +25,9 @@ public class Sentence {
     private String explain;
 
     @CreatedDate
+    @Column(updatable = false)
     private LocalDateTime create_date;
+
+    @OneToMany(mappedBy = "sentence", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
+    private List<Inc_Note> inc_note_list;
 }

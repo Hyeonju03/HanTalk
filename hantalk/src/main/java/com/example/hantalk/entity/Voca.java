@@ -7,14 +7,13 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-public class
-Voca {
-
+@EntityListeners(value = {AuditingEntityListener.class})
+public class Voca {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private int voca_id;
@@ -29,4 +28,6 @@ Voca {
     @Column (nullable = false)
     private LocalDateTime create_date;
 
+    @OneToMany(mappedBy = "voca", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
+    private List<Inc_Note> inc_note_list;
 }

@@ -2,45 +2,33 @@ package com.example.hantalk.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@EntityListeners(value = {AuditingEntityListener.class})
 @Entity
-@Table(name = "VIDEO")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Video {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "VIDEO_ID")
-    private Long id;
+    private int video_id;
 
-    @Column(name = "TITLE", nullable = false)
+    @Column(length = 200, nullable = false)
     private String title;
 
-    @Column(name = "CONTENT", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "VIDEO_NAME")
-    private String videoName;
+    @Column(length = 200)
+    private String video_name;
 
-    @Column(name = "CREATE_DATE", updatable = false)
-    private LocalDateTime createDate;
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime create_date;
 
-    @Column(name = "UPDATE_DATE")
-    private LocalDateTime updateDate;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createDate = LocalDateTime.now();
-        this.updateDate = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updateDate = LocalDateTime.now();
-    }
+    @CreatedDate
+    private LocalDateTime update_date;
 }
