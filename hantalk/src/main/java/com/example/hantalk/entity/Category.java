@@ -1,8 +1,6 @@
 package com.example.hantalk.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,9 +10,9 @@ import lombok.Setter;
 public class Category {
 
     @Id
-    @Column
-    private int categoryId; //구분
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int category_id; //구분
 
-    @Column
-    private String categoryName; //카테고리명
+    @Column(length = 200)
+    private String category_name; //카테고리명
 }

@@ -16,7 +16,7 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int postId; //구분용
+    private int post_id; //구분용
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -30,10 +30,10 @@ public class Post {
     private User user; // 작성자
 
     @Column(nullable = false)
-    private LocalDateTime createDate; //작성일
+    private LocalDateTime create_date; //작성일
 
     @Column(nullable = false)
-    private LocalDateTime updateDate; //수정일
+    private LocalDateTime update_date; //수정일
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content; //본문
@@ -42,6 +42,6 @@ public class Post {
     private String archive; //첨부파일명과 타입
 
     @Column
-    private int viewCount = 0; // 조회수
+    private int view_count = 0; // 조회수
 
 }

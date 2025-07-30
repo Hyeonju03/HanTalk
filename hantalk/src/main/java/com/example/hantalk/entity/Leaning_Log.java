@@ -17,9 +17,6 @@ public class Leaning_Log {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int learning_id;
 
-    //fk
-    private int user_no;
-
     @CreatedDate
     private LocalDateTime learning_date;
 
@@ -27,4 +24,9 @@ public class Leaning_Log {
     private int learning2_count;
     private int learning3_count;
     private int learning4_count;
+
+    //fk
+    @ManyToOne
+    @JoinColumn (name = "user_no")
+    private User user;
 }

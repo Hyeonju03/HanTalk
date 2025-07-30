@@ -10,10 +10,10 @@ import lombok.Setter;
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int user_no;
+    private int admin_no;
 
     @Column(nullable = false)
-    private String user_id;
+    private String admin_id;
 
     @Column(nullable = false)
     private String email;
@@ -24,4 +24,5 @@ public class Admin {
     @Column(nullable = false)
     private String nickname;
 
+    // id랑 pwd만 있어도 됨. 혹시몰라 추가 되어있음.
 }

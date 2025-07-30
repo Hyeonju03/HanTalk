@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@EntityListeners(value={AuditingEntityListener.class})
+@EntityListeners(value = {AuditingEntityListener.class})
 @Entity
 @Getter
 @Setter
@@ -25,5 +25,6 @@ public class Dictation {
     private String answer;
 
     @CreatedDate
+    @Column(updatable = false)
     private LocalDateTime create_date;
 }

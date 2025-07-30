@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@EntityListeners(value = {AuditingEntityListener.class})
 @Getter
 @Setter
 @Entity
@@ -14,12 +16,11 @@ public class Inc_Note {
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    @Column (name = "inc_note_id")
-    private int incNoteId;
+    private int inc_note_id;
 
     @CreatedDate
-    @Column (name = "create_date", nullable = false)
-    private LocalDateTime createDate;
+    @Column (name = "create_date", updatable = false)
+    private LocalDateTime create_date;
 
     @ManyToOne
     @JoinColumn (name = "user_no")

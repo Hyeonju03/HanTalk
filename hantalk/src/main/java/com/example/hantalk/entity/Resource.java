@@ -1,15 +1,20 @@
 package com.example.hantalk.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "resource")
+@Getter
+@Setter
 public class Resource {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long resourceId;     // RESOURCE_ID
+    private Long resource_id;     // RESOURCE_ID
+
 
     private String title;        // TITLE
 
@@ -18,11 +23,11 @@ public class Resource {
 
     private String archive;      // ARCHIVE
 
-    private int viewCount;       // VIEW_COUNT
+    private int view_count;       // VIEW_COUNT
 
-    private LocalDateTime createDate;  // CREATE_DATE
+    private LocalDateTime create_date;  // CREATE_DATE
 
-    private LocalDateTime updateDate;  // UPDATE_DATE
+    private LocalDateTime update_date;  // UPDATE_DATE
 
     // + 생성자, getter/setter 등 필요시 추가
 }
