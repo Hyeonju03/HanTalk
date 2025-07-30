@@ -6,8 +6,8 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VideoCreateDto { //등록용
+public class VideoCreateDTO { //등록용
     private String title;
     private String content;
-    private String videoName;
+    private String video_name;
 }
