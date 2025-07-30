@@ -1,6 +1,6 @@
 package com.example.hantalk.service;
 
-import com.example.hantalk.dto.*;
+import com.example.hantalk.dto.VideoDTO;
 import com.example.hantalk.entity.Video;
 import com.example.hantalk.repository.VideoRepository;
 import org.springframework.stereotype.Service;
@@ -19,16 +19,13 @@ public class VideoService {
     }
 
     @Transactional
-    public Long createVideo(VideoCreateDTO dto) {
-        Video video = new Video();
-        video.setTitle(dto.getTitle());
-        video.setContent(dto.getContent());
-        video.setVideo_name(dto.getVideo_name());
+    public Long createVideo(VideoDTO dto) {
+        Video video = toEntity(dto);
         return videoRepository.save(video).getVideo_id();
     }
 
     @Transactional
-    public void updateVideo(VideoUpdateDTO dto) {
+    public void updateVideo(VideoDTO dto) {
         Video video = videoRepository.findById(dto.getVideo_id())
                 .orElseThrow(() -> new IllegalArgumentException("영상이 존재하지 않습니다."));
         video.setTitle(dto.getTitle());
@@ -37,22 +34,42 @@ public class VideoService {
     }
 
     @Transactional(readOnly = true)
-    public VideoResponseDTO getVideo(Long id) {
-        return videoRepository.findById(id)
-                .map(VideoResponseDTO::new)
+    public VideoDTO getVideo(Long id) {
+        Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("영상이 존재하지 않습니다."));
+        return toDto(video);
     }
 
     @Transactional(readOnly = true)
-    public List<VideoResponseDTO> getAllVideos() {
+    public List<VideoDTO> getAllVideos() {
         return videoRepository.findAll()
                 .stream()
-                .map(VideoResponseDTO::new)
+                .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public void deleteVideo(Long id) {
         videoRepository.deleteById(id);
+    }
+
+    // 변환 메서드들
+    private VideoDTO toDto(Video video) {
+        return new VideoDTO(
+                video.getVideo_id(),
+                video.getTitle(),
+                video.getContent(),
+                video.getVideo_name(),
+                video.getCreate_date(),
+                video.getUpdate_date()
+        );
+    }
+
+    private Video toEntity(VideoDTO dto) {
+        Video video = new Video();
+        video.setTitle(dto.getTitle());
+        video.setContent(dto.getContent());
+        video.setVideo_name(dto.getVideo_name());
+        return video;
     }
 }

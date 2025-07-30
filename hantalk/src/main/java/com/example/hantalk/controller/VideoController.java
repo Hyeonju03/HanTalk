@@ -1,6 +1,6 @@
 package com.example.hantalk.controller;
 
-import com.example.hantalk.dto.*;
+import com.example.hantalk.dto.VideoDTO;
 import com.example.hantalk.service.VideoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,24 +18,24 @@ public class VideoController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> create(@RequestBody VideoCreateDTO dto) {
+    public ResponseEntity<Long> create(@RequestBody VideoDTO dto) {
         Long id = videoService.createVideo(dto);
         return ResponseEntity.ok(id);
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody VideoUpdateDTO dto) {
+    public ResponseEntity<Void> update(@RequestBody VideoDTO dto) {
         videoService.updateVideo(dto);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VideoResponseDTO> get(@PathVariable Long id) {
+    public ResponseEntity<VideoDTO> get(@PathVariable Long id) {
         return ResponseEntity.ok(videoService.getVideo(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<VideoResponseDTO>> getAll() {
+    public ResponseEntity<List<VideoDTO>> getAll() {
         return ResponseEntity.ok(videoService.getAllVideos());
     }
 
