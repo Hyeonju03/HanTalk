@@ -21,7 +21,7 @@ public class UsersDTO {
     private String profile_image;
     private LocalDateTime join_date;
     private LocalDateTime last_login;
-    private LocalDateTime birth;
+    private int birth;
     private String status;
     private int point = 0;
 

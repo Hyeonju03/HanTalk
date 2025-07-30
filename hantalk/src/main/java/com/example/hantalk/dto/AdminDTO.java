@@ -1,6 +1,7 @@
 package com.example.hantalk.dto;
 
 import com.example.hantalk.entity.Users;
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,8 +10,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class AdminDTO {
-    private int attendance_id;
-    private LocalDateTime attend_date;
-
-    private Users users;
+    private int admin_no;
+    private String admin_id;
+    private String email;
+    private String password;
+    private String nickname;
 }

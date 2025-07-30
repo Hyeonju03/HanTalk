@@ -25,17 +25,17 @@ public class UserService {
         Users users = toEntity(usersDTO);
         //이미 존재하는 아이디인지 체크
         //-회원체크
-        if (userRepository.existsByUserId(users.getUserId())) {
+        if (userRepository.existsByUserId(users.getUser_id())) {
             return false;
         }
         //-관리자체크
-        else if (adminRepository.existsByUserId(users.getUserId())) {
+        else if (adminRepository.existsByUserId(users.getUser_id())) {
             return false;
         }
 
         //둘다 통과하면
         users.setPassword(encode(users.getPassword()));
-        users.setJoinDate(LocalDateTime.now());
+        users.setJoin_date(LocalDateTime.now());
 
         userRepository.save(users);
 
@@ -79,14 +79,14 @@ public class UserService {
     }
 
     public void update(UsersDTO usersDTO) {
-        Optional<Users> userOpt = userRepository.findByUserId(usersDTO.getUserId());
+        Optional<Users> userOpt = userRepository.findByUserId(usersDTO.getUser_id());
         if (userOpt.isPresent()) {
             Users users = userOpt.get();
 
             users.setName(usersDTO.getName());
             users.setEmail(usersDTO.getEmail());
             users.setNickname(usersDTO.getNickname());
-            users.setProfileImage(usersDTO.getProfileImage());
+            users.setProfile_image(usersDTO.getProfile_image());
             users.setBirth(usersDTO.getBirth());
             users.setStatus(usersDTO.getStatus());
             users.setPoint(usersDTO.getPoint());
@@ -116,14 +116,14 @@ public class UserService {
         if (dto == null) return null;
 
         Users users = new Users();
-        users.setUserNo(dto.getUserNo());
-        users.setUserId(dto.getUserId());
+        users.setUser_no(dto.getUser_no());
+        users.setUser_id(dto.getUser_id());
         users.setName(dto.getName());
         users.setEmail(dto.getEmail());
         users.setPassword(dto.getPassword());
         users.setNickname(dto.getNickname());
-        users.setProfileImage(dto.getProfileImage());
-        users.setJoinDate(dto.getJoinDate());
+        users.setProfile_image(dto.getProfile_image());
+        users.setJoin_date(dto.getJoin_date());
         users.setBirth(dto.getBirth());
         users.setStatus(dto.getStatus());
         users.setPoint(dto.getPoint());
@@ -134,14 +134,14 @@ public class UserService {
         if (users == null) return null;
 
         UsersDTO dto = new UsersDTO();
-        dto.setUserNo(users.getUserNo());
-        dto.setUserId(users.getUserId());
+        dto.setUser_no(users.getUser_no());
+        dto.setUser_id(users.getUser_id());
         dto.setName(users.getName());
         dto.setEmail(users.getEmail());
         dto.setPassword(users.getPassword());
         dto.setNickname(users.getNickname());
-        dto.setProfileImage(users.getProfileImage());
-        dto.setJoinDate(users.getJoinDate());
+        dto.setProfile_image(users.getProfile_image());
+        dto.setJoin_date(users.getJoin_date());
         dto.setBirth(users.getBirth());
         dto.setStatus(users.getStatus());
         dto.setPoint(users.getPoint());
@@ -165,7 +165,7 @@ public class UserService {
 
     public String findId(String name, String email) {
         Optional<Users> userOpt = userRepository.findByNameAndEmail(name, email); // ✅ 새로운 메서드 필요
-        return userOpt.map(Users::getUserId).orElse(null); // 없으면 null 반환
+        return userOpt.map(Users::getUser_id).orElse(null); // 없으면 null 반환
     }
 
     public String findPw(String name, String email, String userid) {

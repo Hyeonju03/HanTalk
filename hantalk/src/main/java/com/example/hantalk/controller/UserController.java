@@ -147,12 +147,13 @@ public class UserController {
         }
     }
 
+
     
     // 입력값 검증 메서드
     // 중복체크 등 DB 관련은 서비스에서 따로 하고 여기선 입력값 검증
     private boolean isDTOok(UsersDTO userdto) {
         if (userdto == null) return false;
-        if (userdto.getUserId() == null || userdto.getUserId().length() < 4) return false;
+        if (userdto.getUser_id() == null || userdto.getUser_id().length() < 4) return false;
         if (userdto.getPassword() == null || userdto.getPassword().length() < 6) return false;
         if (userdto.getEmail() == null || !userdto.getEmail().contains("@")) return false;
 

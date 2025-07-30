@@ -47,7 +47,7 @@ public class Users {
     private int birth;
 
     @Column(nullable = false)
-    private int status;
+    private String status;
 
     @Column(nullable = false)
     private int point = 0;
