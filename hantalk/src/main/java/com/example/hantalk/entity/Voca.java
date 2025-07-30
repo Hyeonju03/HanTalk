@@ -12,12 +12,12 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class Voca {
+public class
+Voca {
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    @Column (name = "voca_id")
-    private int vocaId;
+    private int voca_id;
 
     @Column (nullable = false)
     private String vocabulary;
@@ -26,7 +26,7 @@ public class Voca {
     private String explain;
 
     @CreatedDate
-    @Column (name = "create_date", nullable = false)
-    private LocalDateTime createDate;
+    @Column (nullable = false)
+    private LocalDateTime create_date;
 
 }
