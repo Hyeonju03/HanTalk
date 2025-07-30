@@ -1,6 +1,6 @@
 package com.example.hantalk.service;
 
-import com.example.hantalk.dto.*;
+import com.example.hantalk.dto.VideoDTO;
 import com.example.hantalk.entity.Video;
 import com.example.hantalk.repository.VideoRepository;
 import org.springframework.stereotype.Service;
@@ -19,40 +19,58 @@ public class VideoService {
     }
 
     @Transactional
-    public Long createVideo(VideoDTO dto) {
-        Video video = new Video();
-        video.setTitle(dto.getTitle());
-        video.setContent(dto.getContent());
-        video.setVideoName(dto.getVideoName());
-        return videoRepository.save(video).getId();
+    public int createVideo(VideoDTO dto) {
+        Video video = toEntity(dto);
+        return videoRepository.save(video).getVideo_id();
     }
 
     @Transactional
-    public void updateVideo(VideoUpdateDTO dto) {
-        Video video = videoRepository.findById(dto.getId())
+    public void updateVideo(VideoDTO dto) {
+        Video video = videoRepository.findById(dto.getVideo_id())
                 .orElseThrow(() -> new IllegalArgumentException("영상이 존재하지 않습니다."));
         video.setTitle(dto.getTitle());
         video.setContent(dto.getContent());
-        video.setVideoName(dto.getVideoName());
+        video.setVideo_name(dto.getVideo_name());
     }
 
     @Transactional(readOnly = true)
-    public VideoResponseDTO getVideo(Long id) {
-        return videoRepository.findById(id)
-                .map(VideoResponseDTO::new)
+    public VideoDTO getVideo(int id) {
+        Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("영상이 존재하지 않습니다."));
+        return toDto(video);
     }
 
     @Transactional(readOnly = true)
-    public List<VideoResponseDTO> getAllVideos() {
+    public List<VideoDTO> getAllVideos() {
         return videoRepository.findAll()
                 .stream()
-                .map(VideoResponseDTO::new)
+                .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void deleteVideo(Long id) {
+    public void deleteVideo(int id) {
         videoRepository.deleteById(id);
+    }
+
+    // 변환 메서드들
+    private VideoDTO toDto(Video video) {
+        VideoDTO dto = new VideoDTO();
+        dto.setVideo_id(video.getVideo_id());
+        dto.setTitle(video.getTitle());
+        dto.setContent(video.getContent());
+        dto.setVideo_name(video.getVideo_name());
+        dto.setCreate_date(video.getCreate_date());
+        dto.setUpdate_date(video.getUpdate_date();
+
+        return dto;
+    }
+
+    private Video toEntity(VideoDTO dto) {
+        Video video = new Video();
+        video.setTitle(dto.getTitle());
+        video.setContent(dto.getContent());
+        video.setVideo_name(dto.getVideo_name());
+        return video;
     }
 }
