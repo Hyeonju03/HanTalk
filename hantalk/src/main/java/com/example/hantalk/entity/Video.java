@@ -16,7 +16,7 @@ public class Video {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "VIDEO_ID")
-    private Long id;
+    private Long video_id;
 
     @Column(name = "TITLE", nullable = false)
     private String title;
@@ -25,22 +25,22 @@ public class Video {
     private String content;
 
     @Column(name = "VIDEO_NAME")
-    private String videoName;
+    private String video_name;
 
     @Column(name = "CREATE_DATE", updatable = false)
-    private LocalDateTime createDate;
+    private LocalDateTime create_date;
 
     @Column(name = "UPDATE_DATE")
-    private LocalDateTime updateDate;
+    private LocalDateTime update_date;
 
     @PrePersist
     protected void onCreate() {
-        this.createDate = LocalDateTime.now();
-        this.updateDate = LocalDateTime.now();
+        this.create_date = LocalDateTime.now();
+        this.update_date = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.updateDate = LocalDateTime.now();
+        this.update_date = LocalDateTime.now();
     }
 }

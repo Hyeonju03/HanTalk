@@ -23,17 +23,17 @@ public class VideoService {
         Video video = new Video();
         video.setTitle(dto.getTitle());
         video.setContent(dto.getContent());
-        video.setVideoName(dto.getVideoName());
-        return videoRepository.save(video).getId();
+        video.setVideo_name(dto.getVideo_name());
+        return videoRepository.save(video).getVideo_id();
     }
 
     @Transactional
     public void updateVideo(VideoUpdateDTO dto) {
-        Video video = videoRepository.findById(dto.getId())
+        Video video = videoRepository.findById(dto.getVideo_id())
                 .orElseThrow(() -> new IllegalArgumentException("영상이 존재하지 않습니다."));
         video.setTitle(dto.getTitle());
         video.setContent(dto.getContent());
-        video.setVideoName(dto.getVideoName());
+        video.setVideo_name(dto.getVideo_name());
     }
 
     @Transactional(readOnly = true)
