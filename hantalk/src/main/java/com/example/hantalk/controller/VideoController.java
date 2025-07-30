@@ -18,24 +18,24 @@ public class VideoController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> create(@RequestBody VideoCreateDto dto) {
+    public ResponseEntity<Long> create(@RequestBody VideoCreateDTO dto) {
         Long id = videoService.createVideo(dto);
         return ResponseEntity.ok(id);
     }
 
     @PutMapping
-    public ResponseEntity<Void> update(@RequestBody VideoUpdateDto dto) {
+    public ResponseEntity<Void> update(@RequestBody VideoUpdateDTO dto) {
         videoService.updateVideo(dto);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VideoResponseDto> get(@PathVariable Long id) {
+    public ResponseEntity<VideoResponseDTO> get(@PathVariable Long id) {
         return ResponseEntity.ok(videoService.getVideo(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<VideoResponseDto>> getAll() {
+    public ResponseEntity<List<VideoResponseDTO>> getAll() {
         return ResponseEntity.ok(videoService.getAllVideos());
     }
 

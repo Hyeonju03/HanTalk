@@ -19,7 +19,7 @@ public class VideoService {
     }
 
     @Transactional
-    public Long createVideo(VideoCreateDto dto) {
+    public Long createVideo(VideoCreateDTO dto) {
         Video video = new Video();
         video.setTitle(dto.getTitle());
         video.setContent(dto.getContent());
@@ -28,7 +28,7 @@ public class VideoService {
     }
 
     @Transactional
-    public void updateVideo(VideoUpdateDto dto) {
+    public void updateVideo(VideoUpdateDTO dto) {
         Video video = videoRepository.findById(dto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("영상이 존재하지 않습니다."));
         video.setTitle(dto.getTitle());
@@ -37,17 +37,17 @@ public class VideoService {
     }
 
     @Transactional(readOnly = true)
-    public VideoResponseDto getVideo(Long id) {
+    public VideoResponseDTO getVideo(Long id) {
         return videoRepository.findById(id)
-                .map(VideoResponseDto::new)
+                .map(VideoResponseDTO::new)
                 .orElseThrow(() -> new IllegalArgumentException("영상이 존재하지 않습니다."));
     }
 
     @Transactional(readOnly = true)
-    public List<VideoResponseDto> getAllVideos() {
+    public List<VideoResponseDTO> getAllVideos() {
         return videoRepository.findAll()
                 .stream()
-                .map(VideoResponseDto::new)
+                .map(VideoResponseDTO::new)
                 .collect(Collectors.toList());
     }
 

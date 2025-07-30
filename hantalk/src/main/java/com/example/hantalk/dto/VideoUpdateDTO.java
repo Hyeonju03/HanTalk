@@ -6,10 +6,10 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VideoUpdateDto { // 수정용
-    private Long id;
+public class VideoUpdateDTO { // 수정용
+    private Long video_id;
     private String title;
     private String content;
-    private String videoName;
+    private String video_name;
 }
 
