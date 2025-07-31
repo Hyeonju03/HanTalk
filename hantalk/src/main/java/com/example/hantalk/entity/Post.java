@@ -18,18 +18,19 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int post_id; //구분용
+    @Column(name="post_id")
+    private int postId; //구분용
 
     @Column(length = 200, nullable = false)
     private String title; //제목
 
     @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime create_date; //작성일
+    @Column(name="create_date", updatable = false, nullable = false)
+    private LocalDateTime createDate; //작성일
 
     @CreatedDate
-    @Column(nullable = false)
-    private LocalDateTime update_date; //수정일
+    @Column(name="update_date", nullable = false)
+    private LocalDateTime updateDate; //수정일
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content; //본문
@@ -37,7 +38,8 @@ public class Post {
     @Column(length = 200)
     private String archive; //첨부파일명과 타입
 
-    private int view_count = 0; // 조회수
+    @Column(name="view_count")
+    private int viewCount = 0; // 조회수
 
     //fk
 
@@ -52,6 +54,7 @@ public class Post {
     ///////////////////////////////////////////
 
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    private List<Comment> comment_list;
+    @Column(name="comment_list")
+    private List<Comment> commentList;
 
 }
