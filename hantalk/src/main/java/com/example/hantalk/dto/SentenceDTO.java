@@ -10,10 +10,10 @@ import java.util.List;
 @Getter
 @Setter
 public class SentenceDTO {
-    private int sentence_id;
+    private int sentenceId;
     private String munjang;
-    private String explain;
-    private LocalDateTime create_date;
+    private String description;
+    private LocalDateTime createDate;
 
-    private List<Inc_Note> inc_note_list;
+    private List<Inc_Note> incNoteList;
 }
