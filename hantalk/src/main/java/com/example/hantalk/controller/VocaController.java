@@ -18,10 +18,13 @@ public class VocaController {
 
     private final VocaService vocaService;
 
+    // 학습 1번 (단어 맞추기)
     @GetMapping("/learning1")
     public String getFillBlank(@RequestParam(defaultValue = "5") int count, Model model) {
-         List<VocaDTO> problems = vocaService.generateFillBlank(count);
+         List<VocaDTO> problems = vocaService.getFillBlank(count);
          model.addAttribute("problems", problems);
          return "learning/learning1";
     }
+
+    // 학습 3번 (4지선다 객관식)
 }
