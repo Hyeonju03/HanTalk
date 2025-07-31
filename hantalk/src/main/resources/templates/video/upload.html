@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>영상 업로드</title>
+</head>
+<body>
+<h1>영상 업로드</h1>
+<form th:action="@{/video/upload}" method="post" enctype="multipart/form-data">
+  <label>제목: <input type="text" name="title"/></label><br/>
+  <label>설명: <textarea name="content"></textarea></label><br/>
+  <label>영상 파일: <input type="file" name="file" accept="video/mp4"/></label><br/>
+  <button type="submit">업로드</button>
+</form>
+<a th:href="@{/video/list}">← 목록으로</a>
+</body>
+</html>

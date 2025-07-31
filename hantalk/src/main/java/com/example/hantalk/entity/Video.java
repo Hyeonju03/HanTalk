@@ -3,6 +3,7 @@ package com.example.hantalk.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,8 @@ import java.time.LocalDateTime;
 public class Video {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int video_id;
+    @Column(name="video_id")
+    private int videoId;
 
     @Column(length = 200, nullable = false)
     private String title;
@@ -22,13 +24,14 @@ public class Video {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(length = 200)
-    private String video_name;
+    @Column(name="video_name", length = 200)
+    private String videoName;
 
     @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime create_date;
+    @Column(name="create_date", updatable = false)
+    private LocalDateTime createDate;
 
-    @CreatedDate
-    private LocalDateTime update_date;
+    @LastModifiedDate
+    @Column(name="update_date")
+    private LocalDateTime updateDate;
 }

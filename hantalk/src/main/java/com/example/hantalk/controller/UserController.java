@@ -15,46 +15,73 @@ public class UserController {
     @Autowired
     UserService service;
 
+    @GetMapping("/user/test")
+    public String test() {
+
+        return "UserTestPage";
+    }
+
+    public void testUserspawn() {
+        if (!service.isAdminThere()) {
+            service.createDefaultAdmin();
+            System.out.println("✅ 테스트용 기본 관리자 생성 완료");
+            System.out.println("✅ id : admin  / pw : 11111");
+        }
+        if (service.getUserList().isEmpty()) {
+            UsersDTO dto = new UsersDTO();
+            dto.setUserId("user0");
+            dto.setPassword("user1234");
+            dto.setName("유저");
+            dto.setEmail("admin@example.com");
+            dto.setNickname("유저닉네임");
+            dto.setBirth(19900505);          // 테스트용 생년
+            dto.setStatus("ACTIVE");     // 상태 지정
+            dto.setPoint(0);             // 초기 포인트
+
+            dto.setProfileImage(null);
+
+            service.signUp(dto);
+            System.out.println("✅ 테스트용 기본 유저 생성 완료");
+            System.out.println("✅ id : user0  / pw : user1234");
+        }
+    }
+
+
     // 생성
     @GetMapping("/user/signup")
     public String signUp() {
-
-        return "회원가입 페이지";
+        //세션 있는지 체크해서 있으면(로그인상태이면) return 매인폐이지
+        return "UserLoginPage";
     }
 
     @PostMapping("/user/signup")
     public String signUpProc(@ModelAttribute UsersDTO usersDTO) {
         if (!isDTOok(usersDTO)) {
-            return "회원가입 폐이지";
+            return "UserLoginPage";
         }
 
         boolean isSuccess = service.signUp(usersDTO);
-        if (isSuccess) {
-            return "redirect:/로그인 폐이지";
-        } else {
-            return "회원가입 폐이지";
-        }
+        return isSuccess ? "redirect:/user/login" : "UserLoginPage";
     }
 
     //로그인
     @GetMapping("/user/login")
     public String login() {
-        return "redirect:/로그인 페이지";
+        return "UserLoginPage";
     }
 
     @PostMapping("/user/login")
     public String loginProc(@RequestParam String userid, @RequestParam String password) {
         if (!isLoginok(userid, password)) {
-            return "redirect:/로그인 페이지";
+            return "redirect:/user/login";
         }
         Map<String, Object> result = service.login(userid, password);
         boolean success = (boolean) result.get("isSuccess");
         String role = (String) result.get("role");
         if (success) {
-            // 세션 생성
-            return "메인폐이지";
+            return "MainPage"; // ✅ templates/MainPage.html 필요
         } else {
-            return "redirect:/로그인 페이지";
+            return "redirect:/user/login";
         }
     }
 
@@ -63,7 +90,7 @@ public class UserController {
     public String logout() {
         //세션 삭제
         //쿠키 삭제?
-        return "redirect:/로그인 페이지";
+        return "redirect:/user/login";
     }
 
     //리스트와 상세보기
@@ -71,13 +98,13 @@ public class UserController {
     public String list() {
         //service.getAllUser();
         // 검색 등 기능 쓸경우 키워드나 페이지 받을 변수 필요
-        return "유저 목록 페이지";
+        return "UserListPage";
     }
 
     @GetMapping("/user/read")
-    public String view() {
+    public String view(@RequestParam String userId) {
 
-        return "유저 상세정보 페이지";
+        return "UserDetailPage";
     }
 
     //수정
@@ -87,7 +114,7 @@ public class UserController {
         String role = "";
 
         if (service.isRoleok(userid, sessionUserId, role)) {
-            return "유저 정보 수정 페이지";
+            return "UserUpdatePage";
         }
         return "권한 없음 폐이지";
     }
@@ -95,7 +122,7 @@ public class UserController {
     @PostMapping("/user/update")
     public String updateProc(@ModelAttribute UsersDTO usersDTO) {
         service.update(usersDTO);
-        return "메인페이지";
+        return "MainPage";
     }
 
     //삭제
@@ -106,7 +133,7 @@ public class UserController {
         if (service.isRoleok(userid, sessionUserId, role)) {
             service.signOut(userid);
             //세션 삭제
-            return "redirect:/로그인 페이지";
+            return "redirect:/UserLoginPage";
         }
 
         return "권한 없음 페이지";
@@ -118,7 +145,7 @@ public class UserController {
     public ResponseEntity<Map<String, String>> getFindId(@RequestParam String name, @RequestParam String email) {
         String userId = service.findId(name, email);
         Map<String, String> response = new HashMap<>();
-        if(userId != null) {
+        if (userId != null) {
             response.put("status", "success");
             response.put("userId", userId);
             return ResponseEntity.ok(response);
@@ -127,6 +154,7 @@ public class UserController {
             return ResponseEntity.status(404).body(response);
         }
     }
+
     //패스워드찾기
     @PostMapping("/user/findPW")
     public ResponseEntity<Map<String, String>> getFindPw(
@@ -148,12 +176,11 @@ public class UserController {
     }
 
 
-    
     // 입력값 검증 메서드
     // 중복체크 등 DB 관련은 서비스에서 따로 하고 여기선 입력값 검증
     private boolean isDTOok(UsersDTO userdto) {
         if (userdto == null) return false;
-        if (userdto.getUser_id() == null || userdto.getUser_id().length() < 4) return false;
+        if (userdto.getUserId() == null || userdto.getUserId().length() < 4) return false;
         if (userdto.getPassword() == null || userdto.getPassword().length() < 6) return false;
         if (userdto.getEmail() == null || !userdto.getEmail().contains("@")) return false;
 
