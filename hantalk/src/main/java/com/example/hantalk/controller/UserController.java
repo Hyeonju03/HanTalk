@@ -39,7 +39,7 @@ public class UserController {
     //로그인
     @GetMapping("/user/login")
     public String login() {
-        return "redirect:/로그인 페이지";
+        return "로그인 페이지";
     }
 
     @PostMapping("/user/login")
