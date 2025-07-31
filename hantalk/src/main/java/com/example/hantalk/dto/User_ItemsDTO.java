@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class User_ItemsDTO {
-    private int user_item_id; // 구분용
-    private LocalDateTime acquired_at; // 획득일
+    private int userItemId; // 구분용
+    private LocalDateTime acquiredAt; // 획득일
     private Boolean equipped = false; // 착용 여부 (기본값: false)
 
     private Users users;

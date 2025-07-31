@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class AttendanceDTO {
-    private int attendance_id;
-    private LocalDateTime attend_date;
+    private int attendanceId;
+    private LocalDateTime attendDate;
 
     private Users users;
 }

@@ -16,18 +16,20 @@ import java.util.List;
 public class Voca {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private int voca_id;
+    @Column(name="voca_id")
+    private int vocaId;
 
     @Column (nullable = false)
     private String vocabulary;
 
     @Column (nullable = false, columnDefinition = "TEXT")
-    private String explain;
+    private String description;
 
     @CreatedDate
-    @Column (nullable = false)
-    private LocalDateTime create_date;
+    @Column (name="create_date", nullable = false)
+    private LocalDateTime createDate;
 
     @OneToMany(mappedBy = "voca", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    private List<Inc_Note> inc_note_list;
+    @Column(name="inc_note_list")
+    private List<Inc_Note> incNoteList;
 }

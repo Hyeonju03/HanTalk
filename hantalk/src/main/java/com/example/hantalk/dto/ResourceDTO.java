@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 @Setter
 
 public class ResourceDTO {
-    private Long resource_id;
+    private Long resourceId;
     private String title;
     private String content;
     private String archive;
-    private int view_count;
-    private LocalDateTime create_date;
-    private LocalDateTime update_date;
+    private int viewCount;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
 }

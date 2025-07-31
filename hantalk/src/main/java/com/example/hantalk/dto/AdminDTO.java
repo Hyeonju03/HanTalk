@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class AdminDTO {
-    private int admin_no;
-    private String admin_id;
+    private int adminNo;
+    private String adminId;
     private String email;
     private String password;
     private String nickname;

@@ -10,10 +10,10 @@ import java.util.List;
 @Getter
 @Setter
 public class VocaDTO {
-    private int voca_id;
+    private int vocaId;
     private String vocabulary;
-    private String explain;
-    private LocalDateTime create_date;
+    private String description;
+    private LocalDateTime createDate;
 
-    private List<Inc_Note> inc_note_list;
+    private List<Inc_Note> incNoteList;
 }

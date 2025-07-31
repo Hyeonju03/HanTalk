@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CommentDTO {
-    private int comment_id;
+    private int commentId;
     private String content;
-    private LocalDateTime create_date;
-    private LocalDateTime update_date;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
 
     private Post post;
     private Users users;

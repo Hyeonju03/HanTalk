@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Leaning_LogDTO {
-    private int learning_id;
-    private LocalDateTime learning_date;
-    private int learning1_count = 0;
-    private int learning2_count = 0;
-    private int learning3_count = 0;
-    private int learning4_count = 0;
+    private int learningId;
+    private LocalDateTime learningDate;
+    private int learning1Count = 0;
+    private int learning2Count = 0;
+    private int learning3Count = 0;
+    private int learning4Count = 0;
 
     private Users users;
 }

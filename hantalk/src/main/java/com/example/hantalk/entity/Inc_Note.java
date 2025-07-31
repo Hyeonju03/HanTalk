@@ -15,11 +15,12 @@ import java.time.LocalDateTime;
 public class Inc_Note {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private int inc_note_id;
+    @Column(name="inc_note_id")
+    private int incNoteId;
 
     @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime create_date;
+    @Column(name="create_date", updatable = false)
+    private LocalDateTime createDate;
 
     //fk
 

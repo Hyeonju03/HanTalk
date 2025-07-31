@@ -13,9 +13,11 @@ import java.time.LocalDateTime;
 public class User_Items {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int user_item_id; // 구분용
+    @Column(name="user_item_id")
+    private int userItemId; // 구분용
 
-    private LocalDateTime acquired_at; // 획득일
+    @Column(name="acquired_at")
+    private LocalDateTime acquiredAt; // 획득일
 
     @Column(nullable = false)
     private Boolean equipped = false; // 착용 여부 (기본값: false)
