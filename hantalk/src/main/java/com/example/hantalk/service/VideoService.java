@@ -21,16 +21,16 @@ public class VideoService {
     @Transactional
     public int createVideo(VideoDTO dto) {
         Video video = toEntity(dto);
-        return videoRepository.save(video).getVideo_id();
+        return videoRepository.save(video).getVideoId();
     }
 
     @Transactional
     public void updateVideo(VideoDTO dto) {
-        Video video = videoRepository.findById(dto.getVideo_id())
+        Video video = videoRepository.findById(dto.getVideoId())
                 .orElseThrow(() -> new IllegalArgumentException("영상이 존재하지 않습니다."));
         video.setTitle(dto.getTitle());
         video.setContent(dto.getContent());
-        video.setVideo_name(dto.getVideo_name());
+        video.setVideoName(dto.getVideoName());
     }
 
     @Transactional(readOnly = true)
@@ -56,12 +56,12 @@ public class VideoService {
     // 변환 메서드들
     private VideoDTO toDto(Video video) {
         VideoDTO dto = new VideoDTO();
-        dto.setVideo_id(video.getVideo_id());
+        dto.setVideoId(video.getVideoId());
         dto.setTitle(video.getTitle());
         dto.setContent(video.getContent());
-        dto.setVideo_name(video.getVideo_name());
-        dto.setCreate_date(video.getCreate_date());
-        dto.setUpdate_date(video.getUpdate_date();
+        dto.setVideoName(video.getVideoName());
+        dto.setCreateDate(video.getCreateDate());
+        dto.setUpdateDate(video.getUpdateDate());
 
         return dto;
     }
@@ -70,7 +70,7 @@ public class VideoService {
         Video video = new Video();
         video.setTitle(dto.getTitle());
         video.setContent(dto.getContent());
-        video.setVideo_name(dto.getVideo_name());
+        video.setVideoName(dto.getVideoName());
         return video;
     }
 }

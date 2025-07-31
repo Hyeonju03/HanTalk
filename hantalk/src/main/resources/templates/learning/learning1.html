@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>단어 맞추기</title>
+    <script>
+        function checkAnswer(index) {
+            const input = document.getElementById('answer-' + index).value.trim();
+            const correct = document.getElementById('correct-' + index).value;
+            const result = document.getElementById('result-' + index);
+
+            if (input === correct) {
+                result.textContent = "정답!";
+                result.style.color = "green";
+            } else {
+                result.textContent = "오답! 정답은 " + correct;
+                result.style.color = "red";
+            }
+        }
+    </script>
+</head>
+<body>
+<h1>단어 맞추기 학습</h1>
+
+<div th:each="problem, stat : ${problems}">
+    <p>문제 [[${stat.count}]]: [[${problem.description}]]</p>
+
+    <input type="text" id="answer-[[${stat.index}]]" placeholder="정답 입력">
+    <input type="hidden" id="correct-[[${stat.index}]]" th:value="${problem.vocabulary}">
+    <button type="button" onclick="checkAnswer([[${stat.index}]])">확인</button>
+
+    <span id="result-[[${stat.index}]]"></span>
+    <hr>
+</div>
+
+</body>
+</html>
+

@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Inc_NoteDTO {
-    private int inc_note_id;
-    private LocalDateTime create_date;
+    private int incNoteId;
+    private LocalDateTime createDate;
 
     private Users users;
     private Voca voca;
