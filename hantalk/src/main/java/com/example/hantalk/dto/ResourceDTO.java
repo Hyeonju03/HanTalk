@@ -16,4 +16,8 @@ public class ResourceDTO {
     private int view_count;
     private LocalDateTime create_date;
     private LocalDateTime update_date;
+
+    public void setCreateDate(LocalDateTime now) {
+        this.create_date = now;
+    }
 }
