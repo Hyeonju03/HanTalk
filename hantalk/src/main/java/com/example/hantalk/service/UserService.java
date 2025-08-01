@@ -257,4 +257,10 @@ public class UserService {
     public boolean isEmailAvail(String email) {
         return !(userRepository.existsByEmail(email) || adminRepository.existsByEmail(email));
     }
+
+    public Users getUserEntity(String userId) {
+        return userRepository.findByUserId(userId).orElse(null);
+    }
+
+
 }
