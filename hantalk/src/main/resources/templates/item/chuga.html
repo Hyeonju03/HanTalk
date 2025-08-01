@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>아이템 추가</title></head>
+<body>
+<h2>아이템 추가</h2>
+
+<form th:action="@{/item/chugaProc}" method="post" enctype="multipart/form-data">
+  <label>이름: <input type="text" name="itemName" required></label><br>
+  <label>설명: <input type="text" name="itemDescription" required></label><br>
+  <label>가격: <input type="number" name="price" required></label><br>
+  <label>이미지 업로드: <input type="file" name="imageFile" accept="image/*" required></label><br>
+  <button type="submit">추가</button>
+</form>
+
+<a href="/item/admin">← 목록으로</a>
+</body>
+</html>

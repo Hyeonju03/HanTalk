@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>아이템 삭제</title></head>
+<body>
+<h2>아이템 삭제</h2>
+
+<p>정말로 다음 아이템을 삭제하시겠습니까?</p>
+
+<ul>
+  <li><strong>이름:</strong> <span th:text="${item.itemName}"></span></li>
+  <li><strong>가격:</strong> <span th:text="${item.price}"></span></li>
+  <li><strong>설명:</strong> <span th:text="${item.itemDescription}"></span></li>
+</ul>
+
+<form th:action="@{/item/sakjeProc/{id}(id=${item.itemId})}" method="post">
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+  <button type="submit">삭제하기</button>
+</form>
+
+</body>
+</html>

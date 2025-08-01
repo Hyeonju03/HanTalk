@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>아이템 상점</title>
+</head>
+<body>
+<h2>아이템 상점</h2>
+<p>보유 포인트: <span th:text="${point}"></span>pt</p>
+
+<div th:if="${message}" style="color:green;">[[${message}]]</div>
+<div th:if="${error}" style="color:red;">[[${error}]]</div>
+
+<table border="1">
+    <thead>
+    <tr><th>이미지</th><th>이름</th><th>가격</th><th>설명</th><th>구매</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${items}">
+        <td>
+            <img th:src="@{'/images/' + ${item.itemImage}}" alt="아이템 이미지" width="80" height="80">
+        </td>
+        <td th:text="${item.itemName}"></td>
+        <td th:text="${item.price}"></td>
+        <td th:text="${item.itemDescription}"></td>
+        <td>
+            <form th:action="@{/item/purchase}" method="post">
+                <input type="hidden" name="itemId" th:value="${item.itemId}" />
+                <button type="submit">구매</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
