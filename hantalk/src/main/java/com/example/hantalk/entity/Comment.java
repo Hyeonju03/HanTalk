@@ -16,18 +16,19 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int comment_id; // 아이디
+    @Column(name="comment_id")
+    private int commentId; // 아이디
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content; // 내용
 
     @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime create_date; // 작성일
+    @Column(name="create_date", updatable = false, nullable = false)
+    private LocalDateTime createDate; // 작성일
 
     @CreatedDate
-    @Column(nullable = false)
-    private LocalDateTime update_date; // 수정일
+    @Column(name="update_date", nullable = false)
+    private LocalDateTime updateDate; // 수정일
 
     //fk
     @ManyToOne

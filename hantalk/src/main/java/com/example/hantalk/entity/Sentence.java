@@ -16,18 +16,20 @@ import java.util.List;
 public class Sentence {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int sentence_id;
+    @Column(name="sentence_id")
+    private int sentenceId;
 
     @Column(length = 200)
     private String munjang;
 
     @Column(columnDefinition = "TEXT")
-    private String explain;
+    private String description;
 
     @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime create_date;
+    @Column(name="create_date", updatable = false)
+    private LocalDateTime createDate;
 
     @OneToMany(mappedBy = "sentence", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    private List<Inc_Note> inc_note_list;
+    @Column(name="inc_note_list")
+    private List<Inc_Note> incNoteList;
 }
