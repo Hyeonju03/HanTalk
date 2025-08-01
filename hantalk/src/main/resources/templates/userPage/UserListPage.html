@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="kr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 리스트 (관리자)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 30px;
+            text-align: center;
+        }
+        h1 { color: #333; }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) { background: #f9f9f9; }
+        a.action {
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: white;
+        }
+        a.view { background: #007bff; }
+        a.update { background: #ffc107; }
+        a.delete { background: #dc3545; }
+        a:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<h1>회원 리스트 (관리자)</h1>
+<a href="/user/logout">로그아웃</a>
+<table>
+    <thead>
+    <tr>
+        <th>아이디</th>
+        <th>이름</th>
+        <th>닉네임</th>
+        <th>이메일</th>
+        <th>상태</th>
+        <th>포인트</th>
+        <th>액션</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${userList}">
+        <td th:text="${user.userId}">userId</td>
+        <td th:text="${user.name}">name</td>
+        <td th:text="${user.nickname}">nickname</td>
+        <td th:text="${user.email}">email</td>
+        <td th:text="${user.status}">status</td>
+        <td th:text="${user.point}">point</td>
+        <td>
+            <a th:href="@{'/user/admin/read?userId=' + ${user.userId}}" class="action view">상세</a>
+            <a th:href="@{'/user/admin/update?userId=' + ${user.userId}}" class="action update">수정</a>
+            <a th:href="@{'/user/admin/delete?userId=' + ${user.userId}}"
+               class="action delete"
+               onclick="return confirm('정말 이 사용자를 삭제하시겠습니까?');">
+                삭제
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

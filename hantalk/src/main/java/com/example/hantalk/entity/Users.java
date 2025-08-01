@@ -16,10 +16,11 @@ import java.util.List;
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int user_no;
+    @Column(name="user_no")
+    private int userNo;
 
-    @Column(nullable = false, unique = true)
-    private String user_id;
+    @Column(name="user_id", nullable = false, unique = true)
+    private String userId;
 
     @Column(nullable = false)
     private String name;
@@ -33,15 +34,16 @@ public class Users {
     @Column(nullable = false)
     private String nickname;
 
-    @Column(length = 200)
-    private String profile_image;
+    @Column(name="profile_image", length = 200)
+    private String profileImage;
 
     @CreatedDate
-    @Column(nullable = false)
-    private LocalDateTime join_date;
+    @Column(name="join_date", nullable = false)
+    private LocalDateTime joinDate;
     
     //값 직접 입력 필요
-    private LocalDateTime last_login;
+    @Column(name="last_login", nullable = false)
+    private LocalDateTime lastLogin;
 
     @Column(nullable = false)
     private int birth;
