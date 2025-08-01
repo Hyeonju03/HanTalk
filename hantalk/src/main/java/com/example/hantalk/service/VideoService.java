@@ -61,7 +61,7 @@ public class VideoService {
         dto.setContent(video.getContent());
         dto.setVideo_name(video.getVideo_name());
         dto.setCreate_date(video.getCreate_date());
-        dto.setUpdate_date(video.getUpdate_date();
+        dto.setUpdate_date(video.getUpdate_date());
 
         return dto;
     }
