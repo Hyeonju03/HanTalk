@@ -53,4 +53,8 @@ public class CommentService {
         dto.setPostId(comment.getPost().getPostId());
         return dto;
     }
+
+    public void save(CommentDTO commentDTO) {
+
+    }
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -28,7 +29,7 @@ public class Post {
     @Column(name="create_date", updatable = false, nullable = false)
     private LocalDateTime createDate; //작성일
 
-    @CreatedDate
+    @LastModifiedDate
     @Column(name="update_date", nullable = false)
     private LocalDateTime updateDate; //수정일
 
@@ -56,5 +57,6 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
     @Column(name="comment_list")
     private List<Comment> commentList;
+
 
 }

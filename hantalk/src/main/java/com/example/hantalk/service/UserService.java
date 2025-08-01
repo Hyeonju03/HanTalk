@@ -22,6 +22,27 @@ public class UserService {
     @Autowired
     AdminRepository adminRepository;
 
+    public List<UsersDTO> getUserList() {
+        List<Users> users = userRepository.findAll();
+        List<UsersDTO> userList = new ArrayList<UsersDTO>();
+        for (Users user : users) {
+            UsersDTO dto = toDTO(user);
+            userList.add(dto);
+        }
+        return userList;
+    }
+
+    public UsersDTO getUserOne(String userId) {
+        Optional<Users> userOpt = userRepository.findByUserId(userId);
+
+        if (userOpt.isPresent()) {
+            Users user = userOpt.get();
+            return toDTO(user);
+        } else {
+            return null;
+        }
+    }
+
     public boolean signUp(UsersDTO usersDTO) {
         Users users = toEntity(usersDTO);
         //이미 존재하는 아이디인지 체크
@@ -35,6 +56,7 @@ public class UserService {
         }
 
         //둘다 통과하면
+        users.setStatus("ACTIVE");
         users.setPassword(encode(users.getPassword()));
         users.setJoinDate(LocalDateTime.now());
         users.setLastLogin(LocalDateTime.now());
@@ -51,6 +73,9 @@ public class UserService {
         Optional<Users> userOpt = userRepository.findByUserId(userid);
         if (userOpt.isPresent()) {
             Users users = userOpt.get();
+
+            System.out.println(users.getUserId());
+
             if (users.getPassword().equals(encode(password))) {
                 if ("active".equalsIgnoreCase(users.getStatus())) {
                     result.put("isSuccess", true);
@@ -110,9 +135,6 @@ public class UserService {
         }
     }
 
-    public boolean isRoleok(String targetUserId, String sessionUserId, String role) {
-        return "ADMIN".equals(role) || targetUserId.equals(sessionUserId);
-    }
 
     private Users toEntity(UsersDTO dto) {
         if (dto == null) return null;
@@ -151,20 +173,6 @@ public class UserService {
     }
 
 
-    private String encode(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(password.getBytes());
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public String findId(String name, String email) {
         Optional<Users> userOpt = userRepository.findByNameAndEmail(name, email); // ✅ 새로운 메서드 필요
         return userOpt.map(Users::getUserId).orElse(null); // 없으면 null 반환
@@ -182,6 +190,24 @@ public class UserService {
             }
         }
         return null;
+    }
+
+    private String encode(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean isRoleOk(String targetUserId, String sessionUserId, String role) {
+        return "ADMIN".equals(role) || targetUserId.equals(sessionUserId);
     }
 
     private String generateTempPw() {
@@ -211,25 +237,28 @@ public class UserService {
         return new String(arr);
     }
 
-    public List<UsersDTO> getUserList() {
-        List<Users> users = userRepository.findAll();
-        List<UsersDTO> userList = new ArrayList<UsersDTO>();
-        for(Users user : users){
-            UsersDTO dto = toDTO(user);
-            userList.add(dto);
-        }
-        return userList;
-    }
-    public boolean isAdminThere(){
+    public boolean isAdminThere() {
         return adminRepository.count() > 0;
     }
 
-    public void createDefaultAdmin(){
+    public void createDefaultAdmin() {
         Admin admin = new Admin();
         admin.setAdminId("admin");
         admin.setPassword(encode("11111"));
         admin.setNickname("관리자");
         admin.setEmail("admin@ggggg.com");
         adminRepository.save(admin);
+    }
+
+    public boolean isIdAvail(String userId) {
+        return !(userRepository.existsByUserId(userId) || adminRepository.existsByAdminId(userId));
+    }
+
+    public boolean isEmailAvail(String email) {
+        return !(userRepository.existsByEmail(email) || adminRepository.existsByEmail(email));
+    }
+
+    public Optional<Users> findById(Long loggedInUserNo) {
+        return userRepository.findById(Math.toIntExact(loggedInUserNo));
     }
 }

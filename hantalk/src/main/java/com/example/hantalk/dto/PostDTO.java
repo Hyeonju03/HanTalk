@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -19,9 +20,12 @@ public class PostDTO {
     private String content;
     private String archive;
     private int viewCount;
+    private Integer userNo;
 
-    private Users users;
+    private Integer categoryId;
+
     private Category category;
 
     private List<Comment> commentList;
+
 }

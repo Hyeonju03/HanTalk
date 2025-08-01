@@ -1,13 +1,18 @@
 package com.example.hantalk.controller;
 
+import com.example.hantalk.SessionUtil;
 import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -17,8 +22,7 @@ public class UserController {
 
     @GetMapping("/user/test")
     public String test() {
-
-        return "UserTestPage";
+        return "userPage/UserTestPage"; //기능 테스트 폐이지
     }
 
     public void testUserspawn() {
@@ -34,9 +38,9 @@ public class UserController {
             dto.setName("유저");
             dto.setEmail("admin@example.com");
             dto.setNickname("유저닉네임");
-            dto.setBirth(19900505);          // 테스트용 생년
-            dto.setStatus("ACTIVE");     // 상태 지정
-            dto.setPoint(0);             // 초기 포인트
+            dto.setBirth(19900505);
+            dto.setStatus("ACTIVE");
+            dto.setPoint(0);
 
             dto.setProfileImage(null);
 
@@ -46,40 +50,61 @@ public class UserController {
         }
     }
 
-
     // 생성
     @GetMapping("/user/signup")
-    public String signUp() {
-        //세션 있는지 체크해서 있으면(로그인상태이면) return 매인폐이지
-        return "UserLoginPage";
+    public String signUp(HttpSession session) {
+        if (SessionUtil.isLoggedIn(session)) {
+            System.out.println("이미 로그인한 상태입니다.");
+        }
+        return "userPage/UserLoginPage";
     }
 
     @PostMapping("/user/signup")
-    public String signUpProc(@ModelAttribute UsersDTO usersDTO) {
-        if (!isDTOok(usersDTO)) {
-            return "UserLoginPage";
+    public String signUpProc(@ModelAttribute UsersDTO usersDTO, HttpSession session, @RequestParam(value = "profileImageFile", required = false) MultipartFile profileImageFile) {
+        if (SessionUtil.isLoggedIn(session)) {
+            System.out.println("이미 로그인한 상태입니다.");
+            session.invalidate();
+        }
+        if (!isDTOOk(usersDTO)) {
+            return "userPage/UserLoginPage";
+        }
+        if (profileImageFile != null && !profileImageFile.isEmpty()) {
+            String fileName = profileImageFile.getOriginalFilename();
+            usersDTO.setProfileImage(fileName);
         }
 
         boolean isSuccess = service.signUp(usersDTO);
-        return isSuccess ? "redirect:/user/login" : "UserLoginPage";
+
+        return isSuccess ? "redirect:/user/login" : "userPage/UserLoginPage";
     }
 
     //로그인
     @GetMapping("/user/login")
-    public String login() {
-        return "UserLoginPage";
+    public String login(HttpSession session) {
+
+        if (SessionUtil.isLoggedIn(session)) {
+            System.out.println("이미 로그인한 상태입니다.");
+            session.invalidate();
+        }
+        return "userPage/UserLoginPage";
     }
 
     @PostMapping("/user/login")
-    public String loginProc(@RequestParam String userid, @RequestParam String password) {
-        if (!isLoginok(userid, password)) {
+    public String loginProc(@RequestParam String userId, @RequestParam String password, HttpSession session) {
+        if (!isLoginOk(userId, password)) {
             return "redirect:/user/login";
         }
-        Map<String, Object> result = service.login(userid, password);
+        Map<String, Object> result = service.login(userId, password);
         boolean success = (boolean) result.get("isSuccess");
         String role = (String) result.get("role");
         if (success) {
-            return "MainPage"; // ✅ templates/MainPage.html 필요
+            session.setAttribute("userId", userId);
+            if (role.equals("ADMIN")) {
+                session.setAttribute("role", "ADMIN");
+            } else {
+                session.setAttribute("role", "USER");
+            }
+            return "userPage/UserTestPage"; // ✅ templates/MainPage.html 필요
         } else {
             return "redirect:/user/login";
         }
@@ -87,59 +112,80 @@ public class UserController {
 
     //로그아웃
     @GetMapping("/user/logout")
-    public String logout() {
-        //세션 삭제
-        //쿠키 삭제?
+    public String logout(HttpSession session) {
+        session.invalidate();
         return "redirect:/user/login";
     }
 
     //리스트와 상세보기
     @GetMapping("/user/admin/list")
-    public String list() {
-        //service.getAllUser();
-        // 검색 등 기능 쓸경우 키워드나 페이지 받을 변수 필요
-        return "UserListPage";
+    public String list(Model model, HttpSession session) {
+        String userid = "0";
+        String sessionUserId = SessionUtil.getLoginUserId(session);
+        String role = SessionUtil.getRole(session);
+        if (service.isRoleOk(userid, sessionUserId, role)) {
+            List<UsersDTO> userlist = service.getUserList();
+            model.addAttribute("userList", userlist);
+            return "userPage/UserListPage";
+        }
+        return "RoleERROR";
     }
 
-    @GetMapping("/user/read")
-    public String view(@RequestParam String userId) {
+    @GetMapping("/user/admin/read")
+    public String view(@RequestParam String userId, Model model, HttpSession session) {
+        String userid = "0";
+        String sessionUserId = SessionUtil.getLoginUserId(session);
+        String role = SessionUtil.getRole(session);
+        if (service.isRoleOk(userid, sessionUserId, role)) {
+            UsersDTO user = service.getUserOne(userId);
+            model.addAttribute("user", user);
 
-        return "UserDetailPage";
+            return "userPage/UserDetailPage";
+        }
+        return "RoleERROR";
     }
 
     //수정
-    @GetMapping("/user/update")
-    public String update(@RequestParam String userid) {
-        String sessionUserId = "";
-        String role = "";
+    @GetMapping("/user/admin/update")
+    public String update(@RequestParam String userId, HttpSession session, Model model) {
+        String sessionUserId = SessionUtil.getLoginUserId(session);
+        String role = SessionUtil.getRole(session);
 
-        if (service.isRoleok(userid, sessionUserId, role)) {
-            return "UserUpdatePage";
+        if (service.isRoleOk(userId, sessionUserId, role)) {
+            UsersDTO user = service.getUserOne(userId);
+            model.addAttribute("user", user);
+            return "userPage/UserUpdatePage";
         }
-        return "권한 없음 폐이지";
+        return "RoleERROR";
     }
 
-    @PostMapping("/user/update")
+    @PostMapping("/user/admin/update")
     public String updateProc(@ModelAttribute UsersDTO usersDTO) {
         service.update(usersDTO);
-        return "MainPage";
+        return "userPage/UserTestPage";
     }
 
     //삭제
-    @GetMapping("/user/delete")
-    public String delete(@RequestParam String userid) {
-        String sessionUserId = "";
-        String role = "";
-        if (service.isRoleok(userid, sessionUserId, role)) {
-            service.signOut(userid);
-            //세션 삭제
-            return "redirect:/UserLoginPage";
+    @GetMapping("/user/admin/delete")
+    public String delete(@RequestParam String userId, HttpSession session) {
+        String sessionUserId = SessionUtil.getLoginUserId(session);
+        String role = SessionUtil.getRole(session);
+        if (service.isRoleOk(userId, sessionUserId, role)) {
+            service.signOut(userId);
+            session.invalidate();
+            return "redirect:/user/login";
         }
 
-        return "권한 없음 페이지";
+        return "RoleERROR";
     }
 
     //아이디 패스워드 찾기 폐이지
+    //페이지
+    @GetMapping("/user/findIDPW")
+    public String getFind() {
+        return "userPage/UserFindStat";
+    }
+
     //아이디찾기
     @PostMapping("/user/findID")
     public ResponseEntity<Map<String, String>> getFindId(@RequestParam String name, @RequestParam String email) {
@@ -160,9 +206,9 @@ public class UserController {
     public ResponseEntity<Map<String, String>> getFindPw(
             @RequestParam String name,
             @RequestParam String email,
-            @RequestParam String userid) {
+            @RequestParam String userId) {
 
-        String tempPw = service.findPw(name, email, userid);
+        String tempPw = service.findPw(name, email, userId);
         Map<String, String> result = new HashMap<>();
 
         if (tempPw != null) {
@@ -178,18 +224,31 @@ public class UserController {
 
     // 입력값 검증 메서드
     // 중복체크 등 DB 관련은 서비스에서 따로 하고 여기선 입력값 검증
-    private boolean isDTOok(UsersDTO userdto) {
+    private boolean isDTOOk(UsersDTO userdto) {
         if (userdto == null) return false;
         if (userdto.getUserId() == null || userdto.getUserId().length() < 4) return false;
-        if (userdto.getPassword() == null || userdto.getPassword().length() < 6) return false;
+        if (userdto.getPassword() == null || userdto.getPassword().length() < 3) return false;
         if (userdto.getEmail() == null || !userdto.getEmail().contains("@")) return false;
 
         return true;
     }
 
-    private boolean isLoginok(String userid, String password) {
+    private boolean isLoginOk(String userid, String password) {
         if (userid == null || userid.length() < 4) return false;
-        if (password == null || password.length() < 6) return false;
+        if (password == null || password.length() < 3) return false;
         return true;
+    }
+
+    // ======== 비동기처리 =======
+    @GetMapping("/user/isIdAvail")
+    @ResponseBody
+    public boolean isIdAvail(@RequestParam String userId) {
+        return service.isIdAvail(userId);
+    }
+
+    @GetMapping("user/isEmailAvail")
+    @ResponseBody
+    public boolean isEmailAvail(@RequestParam String email) {
+        return service.isEmailAvail(email);
     }
 }

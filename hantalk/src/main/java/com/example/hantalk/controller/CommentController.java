@@ -24,6 +24,13 @@ public class CommentController {
         return "comment/list";
     }
 
+    //댓글 작성
+    @PostMapping("/chuga")
+    public String chuga(@ModelAttribute CommentDTO commentDTO, @RequestParam("postId") Long commentId, Model model){
+        commentService.save(commentDTO);
+        return "redirect:/comments";
+    }
+
     // 댓글 수정 화면 이동
     @GetMapping("/sujung")
     public String sujung(@RequestParam("id") Long commentId, Model model) {
@@ -45,4 +52,7 @@ public class CommentController {
         commentService.setDelete(commentId);
         return "redirect:/comments/list";
     }
+
+
+
 }

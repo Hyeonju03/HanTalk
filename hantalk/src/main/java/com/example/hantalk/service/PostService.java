@@ -1,71 +1,83 @@
 package com.example.hantalk.service;
 
+
 import com.example.hantalk.dto.PostDTO;
 import com.example.hantalk.entity.Post;
 import com.example.hantalk.repository.PostRepository;
-import jakarta.servlet.http.HttpSession;
+import org.hibernate.query.Page;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDateTime;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RequestMapping
+
 @Service
 public class PostService {
 
     private final PostRepository postRepository;
+    private final ModelMapper modelMapper;
 
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, ModelMapper modelMapper) {
         this.postRepository = postRepository;
+        this.modelMapper = modelMapper;
     }
 
-    // 전체 게시글 조회
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<PostDTO> getSelectAll() {
+
+        List<Post> entityList = postRepository.findAll();
+        List<PostDTO> dtoList = new ArrayList<>();
+
+        for (int i = 0; i < entityList.size(); i++) {
+            dtoList.add(modelMapper.map(entityList.get(i), PostDTO.class));
+
+        }
+        return dtoList;
+
+    }
+    public PostDTO getSelectOne(PostDTO dto){
+        Optional<Post> on = postRepository.findById(dto.getPostId());
+        if (!on.isPresent()){
+            return  null;
+        }
+        Post post = on.get();
+        return modelMapper.map(post, PostDTO.class);
     }
 
-    // 게시글 ID로 조회
-    public Optional<Post> getPostById(Long id) {
-        return postRepository.findById(id.intValue()); // Post의 ID가 int일 경우
+    public void setInsert(PostDTO dto){
+        Post post = modelMapper.map(dto, Post.class);
+
+        postRepository.save(modelMapper.map(dto, Post.class));
     }
 
-    // 게시글 등록
-    public void setInsert(PostDTO postDTO) {
-        Post post = new Post();
-        post.setTitle(postDTO.getTitle());
-        post.setContent(postDTO.getContent());
-        post.setUsers(postDTO.getUsers());
-        post.setViewCount(0);
-        post.setCreateDate(LocalDateTime.now());
-        post.setUpdateDate(LocalDateTime.now());
+    public void setUpdate(PostDTO dto){
+        Optional<Post> on = postRepository.findById(dto.getPostId());
+        if (!on.isPresent()) return;
 
-        postRepository.save(post);
-    }
+        Post post = on.get();
 
-    // 게시글 수정
-    public void setUpdate(PostDTO postDTO) {
-        Optional<Post> optionalPost = postRepository.findById(postDTO.getPostId());
-        if (optionalPost.isPresent()) {
-            Post post = optionalPost.get();
-            post.setTitle(postDTO.getTitle());
-            post.setContent(postDTO.getContent());
-            post.setUpdateDate(LocalDateTime.now());
+        String updateTitle = dto.getTitle();
+        if (!updateTitle.contains("(수정)")){
+            updateTitle += "(수정)";
 
-            postRepository.save(post);
+        post.setTitle(updateTitle);
+        post.setContent(dto.getContent());
+        post.setCategory(dto.getCategory());
+
+        postRepository.save((post));
         }
     }
 
-    // 게시글 삭제
-    public void setDelete(PostDTO postDTO, HttpSession session) {
-        postRepository.deleteById(postDTO.getPostId());
+    public void setDelete(PostDTO dto){
+        Post post = modelMapper.map(dto, Post.class);
+
+        postRepository.delete(modelMapper.map(dto, Post.class));
     }
 
-    // 조회수 증가
-    public void increaseViewCount(Post post) {
-        post.setViewCount(post.getViewCount() + 1);
-        postRepository.save(post);
+    public Page getPagePosts(int page, int i) {
+        return null;
     }
 }
+
