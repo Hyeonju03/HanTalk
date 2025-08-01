@@ -73,6 +73,6 @@ public class Users {
     private List<Post> postList;
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    @Column(name="userItemsList")
+    @Column(name="user_items_list")
     private List<User_Items> userItemsList;
 }

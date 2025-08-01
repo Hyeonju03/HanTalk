@@ -47,7 +47,7 @@ public class UserController {
             service.signUp(dto);
             System.out.println("✅ 테스트용 기본 유저 생성 완료");
             System.out.println("✅ id : user0  / pw : user1234");
-        }
+        }     
     }
 
     // 생성
@@ -104,7 +104,7 @@ public class UserController {
                 session.setAttribute("role", "ADMIN");
             } else {
                 UsersDTO user = service.getUserOne(userId);
-                session.setAttribute("userNo", user.getUserNo());
+                session.setAttribute("userNo", user.getUserNo()); 
                 session.setAttribute("role", "USER");
             }
             return "userPage/UserTestPage"; // ✅ templates/MainPage.html 필요
