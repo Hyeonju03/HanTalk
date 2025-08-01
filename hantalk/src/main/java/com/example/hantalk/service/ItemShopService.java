@@ -5,8 +5,9 @@ import com.example.hantalk.entity.User_Items;
 import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.ItemRepository;
 import com.example.hantalk.repository.UserItemRepository;
-import com.example.hantalk.repository.UserRepository;
+import com.example.hantalk.repository.UsersRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,18 +17,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class ItemShopService {
 
     private final ItemRepository itemRepository;
     private final UserItemRepository userItemRepository;
-    private final UserRepository userRepository;
+    private final UsersRepository userRepository;
 
-    public ItemShopService(ItemRepository itemRepository, UserItemRepository userItemRepository, UserRepository userRepository) {
-        this.itemRepository = itemRepository;
-        this.userItemRepository = userItemRepository;
-        this.userRepository = userRepository;
-    }
 
     @Transactional
     public boolean purchaseItem(Users user, int itemId) {

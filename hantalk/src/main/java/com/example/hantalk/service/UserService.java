@@ -4,7 +4,7 @@ import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.entity.Admin;
 import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.AdminRepository;
-import com.example.hantalk.repository.UserRepository;
+import com.example.hantalk.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,25 +17,48 @@ import java.util.*;
 @Service
 public class UserService {
     @Autowired
-    UserRepository userRepository;
+    UsersRepository userRepository;
     @Autowired
     AdminRepository adminRepository;
+
+    public List<UsersDTO> getUserList() {
+        List<Users> users = userRepository.findAll();
+        List<UsersDTO> userList = new ArrayList<UsersDTO>();
+        for (Users user : users) {
+            UsersDTO dto = toDTO(user);
+            userList.add(dto);
+        }
+        return userList;
+    }
+
+    public UsersDTO getUserOne(String userId) {
+        Optional<Users> userOpt = userRepository.findByUserId(userId);
+
+        if (userOpt.isPresent()) {
+            Users user = userOpt.get();
+            return toDTO(user);
+        } else {
+            return null;
+        }
+    }
 
     public boolean signUp(UsersDTO usersDTO) {
         Users users = toEntity(usersDTO);
         //이미 존재하는 아이디인지 체크
         //-회원체크
-        if (userRepository.existsByUserId(users.getUser_id())) {
+        if (userRepository.existsByUserId(users.getUserId())) {
             return false;
         }
         //-관리자체크
-        else if (adminRepository.existsByUserId(users.getUser_id())) {
+        else if (adminRepository.existsByAdminId(users.getUserId())) {
             return false;
         }
 
         //둘다 통과하면
+        users.setStatus("ACTIVE");
         users.setPassword(encode(users.getPassword()));
-        users.setJoin_date(LocalDateTime.now());
+        users.setJoinDate(LocalDateTime.now());
+        users.setLastLogin(LocalDateTime.now());
 
         userRepository.save(users);
 
@@ -49,6 +72,9 @@ public class UserService {
         Optional<Users> userOpt = userRepository.findByUserId(userid);
         if (userOpt.isPresent()) {
             Users users = userOpt.get();
+
+            System.out.println(users.getUserId());
+
             if (users.getPassword().equals(encode(password))) {
                 if ("active".equalsIgnoreCase(users.getStatus())) {
                     result.put("isSuccess", true);
@@ -62,7 +88,7 @@ public class UserService {
         }
 
         // 관리자 체크
-        Optional<Admin> adminOpt = adminRepository.findByUserId(userid);
+        Optional<Admin> adminOpt = adminRepository.findByAdminId(userid);
         if (adminOpt.isPresent()) {
             Admin admin = adminOpt.get();
             if (admin.getPassword().equals(encode(password))) {
@@ -79,14 +105,14 @@ public class UserService {
     }
 
     public void update(UsersDTO usersDTO) {
-        Optional<Users> userOpt = userRepository.findByUserId(usersDTO.getUser_id());
+        Optional<Users> userOpt = userRepository.findByUserId(usersDTO.getUserId());
         if (userOpt.isPresent()) {
             Users users = userOpt.get();
 
             users.setName(usersDTO.getName());
             users.setEmail(usersDTO.getEmail());
             users.setNickname(usersDTO.getNickname());
-            users.setProfile_image(usersDTO.getProfile_image());
+            users.setProfileImage(usersDTO.getProfileImage());
             users.setBirth(usersDTO.getBirth());
             users.setStatus(usersDTO.getStatus());
             users.setPoint(usersDTO.getPoint());
@@ -108,22 +134,19 @@ public class UserService {
         }
     }
 
-    public boolean isRoleok(String targetUserId, String sessionUserId, String role) {
-        return "ADMIN".equals(role) || targetUserId.equals(sessionUserId);
-    }
 
     private Users toEntity(UsersDTO dto) {
         if (dto == null) return null;
 
         Users users = new Users();
-        users.setUser_no(dto.getUser_no());
-        users.setUser_id(dto.getUser_id());
+        users.setUserNo(dto.getUserNo());
+        users.setUserId(dto.getUserId());
         users.setName(dto.getName());
         users.setEmail(dto.getEmail());
         users.setPassword(dto.getPassword());
         users.setNickname(dto.getNickname());
-        users.setProfile_image(dto.getProfile_image());
-        users.setJoin_date(dto.getJoin_date());
+        users.setProfileImage(dto.getProfileImage());
+        users.setJoinDate(dto.getJoinDate());
         users.setBirth(dto.getBirth());
         users.setStatus(dto.getStatus());
         users.setPoint(dto.getPoint());
@@ -134,20 +157,39 @@ public class UserService {
         if (users == null) return null;
 
         UsersDTO dto = new UsersDTO();
-        dto.setUser_no(users.getUser_no());
-        dto.setUser_id(users.getUser_id());
+        dto.setUserNo(users.getUserNo());
+        dto.setUserId(users.getUserId());
         dto.setName(users.getName());
         dto.setEmail(users.getEmail());
         dto.setPassword(users.getPassword());
         dto.setNickname(users.getNickname());
-        dto.setProfile_image(users.getProfile_image());
-        dto.setJoin_date(users.getJoin_date());
+        dto.setProfileImage(users.getProfileImage());
+        dto.setJoinDate(users.getJoinDate());
         dto.setBirth(users.getBirth());
         dto.setStatus(users.getStatus());
         dto.setPoint(users.getPoint());
         return dto;
     }
 
+
+    public String findId(String name, String email) {
+        Optional<Users> userOpt = userRepository.findByNameAndEmail(name, email); // ✅ 새로운 메서드 필요
+        return userOpt.map(Users::getUserId).orElse(null); // 없으면 null 반환
+    }
+
+    public String findPw(String name, String email, String userid) {
+        Optional<Users> userOpt = userRepository.findByUserId(userid);
+        if (userOpt.isPresent()) {
+            Users users = userOpt.get();
+            if (users.getName().equals(name) && users.getEmail().equals(email)) {
+                String tempPw = generateTempPw();
+                users.setPassword(encode(tempPw));
+                userRepository.save(users);
+                return tempPw;
+            }
+        }
+        return null;
+    }
 
     private String encode(String password) {
         try {
@@ -163,23 +205,8 @@ public class UserService {
         }
     }
 
-    public String findId(String name, String email) {
-        Optional<Users> userOpt = userRepository.findByNameAndEmail(name, email); // ✅ 새로운 메서드 필요
-        return userOpt.map(Users::getUser_id).orElse(null); // 없으면 null 반환
-    }
-
-    public String findPw(String name, String email, String userid) {
-        Optional<Users> userOpt = userRepository.findByUserId(userid);
-        if (userOpt.isPresent()) {
-            Users users = userOpt.get();
-            if (users.getName().equals(name) && users.getEmail().equals(email)) {
-                String tempPw = generateTempPw();
-                users.setPassword(encode(tempPw));
-                userRepository.save(users);
-                return tempPw;
-            }
-        }
-        return null;
+    public boolean isRoleOk(String targetUserId, String sessionUserId, String role) {
+        return "ADMIN".equals(role) || targetUserId.equals(sessionUserId);
     }
 
     private String generateTempPw() {
@@ -207,5 +234,26 @@ public class UserService {
             arr[j] = temp;
         }
         return new String(arr);
+    }
+
+    public boolean isAdminThere() {
+        return adminRepository.count() > 0;
+    }
+
+    public void createDefaultAdmin() {
+        Admin admin = new Admin();
+        admin.setAdminId("admin");
+        admin.setPassword(encode("11111"));
+        admin.setNickname("관리자");
+        admin.setEmail("admin@ggggg.com");
+        adminRepository.save(admin);
+    }
+
+    public boolean isIdAvail(String userId) {
+        return !(userRepository.existsByUserId(userId) || adminRepository.existsByAdminId(userId));
+    }
+
+    public boolean isEmailAvail(String email) {
+        return !(userRepository.existsByEmail(email) || adminRepository.existsByEmail(email));
     }
 }

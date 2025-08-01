@@ -1,8 +1,9 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.entity.Users;
-import com.example.hantalk.repository.UserRepository;
+import com.example.hantalk.repository.UsersRepository;
 import com.example.hantalk.service.ItemShopService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,17 +14,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 
+@RequiredArgsConstructor
 @Controller
-@RequestMapping("/shop")
+@RequestMapping("/item")
 public class ItemShopController {
 
     private final ItemShopService itemShopService;
-    private final UserRepository userRepository;
-
-    public ItemShopController(ItemShopService itemShopService, UserRepository usersRepository) {
-        this.itemShopService = itemShopService;
-        this.userRepository = usersRepository;
-    }
+    private final UsersRepository userRepository;
 
     @GetMapping
     public String showShop(Model model, Principal principal) {
