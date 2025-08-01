@@ -99,6 +99,7 @@ public class UserController {
         String role = (String) result.get("role");
         if (success) {
             session.setAttribute("userId", userId);
+
             if (role.equals("ADMIN")) {
                 session.setAttribute("role", "ADMIN");
             } else {

@@ -26,6 +26,7 @@ public class SessionUtil {
         }
         return null;
     }
+  
     // ✅ 로그인 사용자 ID 가져오기
     public static String getLoginUserId(HttpSession session) {
         Object userId = session.getAttribute(LOGIN_USER);

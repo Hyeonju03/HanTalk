@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>마이페이지</title>
+</head>
+<body>
+<h1>마이페이지</h1>
+
+<p><strong>아이디:</strong> <span th:text="${user.userId}">아이디</span></p>
+<p><strong>이름:</strong> <span th:text="${user.name}">이름</span></p>
+<p><strong>닉네임:</strong> <span th:text="${user.nickname}">닉네임</span></p>
+<p><strong>이메일:</strong> <span th:text="${user.email}">이메일</span></p>
+<p><strong>포인트:</strong> <span th:text="${user.point}">0</span></p>
+<p><strong>가입일:</strong> <span th:text="${user.joinDate}">가입일</span></p>
+
+<hr>
+<a href="/user/update">회원정보 수정</a> |
+<a href="/user/delete">회원 탈퇴</a>
+<br>
+<a href="/user/test">로그인 회원가입 테스트 페이지로</a>
+<br>
+<a href="/user/calendar">출석현황</a>
+</body>
+</html>

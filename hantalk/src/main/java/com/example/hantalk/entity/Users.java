@@ -57,17 +57,22 @@ public class Users {
     //////////////////////////////////////////////////
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    private List<Attendance> attendance_list;
+    @Column(name="attendance_list")
+    private List<Attendance> attendanceList;
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    private List<Comment> comment_list;
+    @Column(name="comment_list")
+    private List<Comment> commentList;
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    private List<Leaning_Log> leaning_log_list;
+    @Column(name="leaning_log_list")
+    private List<Leaning_Log> leaningLogList;
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    private List<Post> post_list;
+    @Column(name="post_list")
+    private List<Post> postList;
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    private List<User_Items> user_items_list;
+    @Column(name="userItemsList")
+    private List<User_Items> userItemsList;
 }

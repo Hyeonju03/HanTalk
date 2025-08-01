@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>출석 캘린더</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+
+<div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
+  <h2 class="text-xl font-bold text-center mb-4">출석 캘린더</h2>
+  <div id="calendar" class="grid grid-cols-7 gap-2 text-center text-sm">
+    <!-- 여기에 날짜가 표시될 예정 -->
+  </div>
+</div>
+
+<script>
+  const calendarEl = document.getElementById('calendar');
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth(); // 0-based
+
+  // 1일 요일 및 해당 달의 마지막 날짜 계산
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month + 1, 0).getDate();
+
+  // 서버에서 출석 날짜 목록 요청 (예시 API)
+  axios.get('/attendance/calendar')
+    .then(response => {
+      const attendanceDates = response.data; // ["2025-07-30", "2025-07-31", ...]
+
+      // 달력 렌더링
+      renderCalendar(attendanceDates);
+    })
+    .catch(error => {
+      console.error('출석 정보 불러오기 실패:', error);
+    });
+
+  function renderCalendar(attendanceDates) {
+    // 빈칸 채우기 (1일 전까지)
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement('div');
+      calendarEl.appendChild(empty);
+    }
+
+    for (let day = 1; day <= lastDate; day++) {
+      const cell = document.createElement('div');
+      cell.textContent = day;
+      cell.className = 'py-2 rounded';
+
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+      if (attendanceDates.includes(dateStr)) {
+        cell.classList.add('bg-green-400', 'text-white', 'font-bold');
+      } else {
+        cell.classList.add('bg-gray-200');
+      }
+
+      calendarEl.appendChild(cell);
+    }
+  }
+</script>
+
+</body>
+</html>

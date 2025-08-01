@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 public class Dictation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="comment_id")
+  
+    @Column(name="dictation_id")
     private int dictationId;
 
     @Column(length = 200)
