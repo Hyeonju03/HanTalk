@@ -2,6 +2,7 @@ package com.example.hantalk.controller;
 
 import com.example.hantalk.SessionUtil;
 import com.example.hantalk.dto.UsersDTO;
+import com.example.hantalk.entity.Users;
 import com.example.hantalk.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +100,7 @@ public class UserController {
         String role = (String) result.get("role");
         if (success) {
             session.setAttribute("userId", userId);
+            Users userEntity = service.getUserEntity(userId);
 
             if (role.equals("ADMIN")) {
                 session.setAttribute("role", "ADMIN");
@@ -106,6 +108,7 @@ public class UserController {
                 UsersDTO user = service.getUserOne(userId);
                 session.setAttribute("userNo", user.getUserNo());
                 session.setAttribute("role", "USER");
+                session.setAttribute("loginUser", userEntity);
             }
             return "userPage/UserTestPage"; // ✅ templates/MainPage.html 필요
         } else {
