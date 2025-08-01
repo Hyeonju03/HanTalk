@@ -50,6 +50,17 @@ public class SentenceService {
         return dtoList;
     }
 
+    public SentenceDTO getSelectRandom(){
+        Optional<Sentence> os = repository.findByRandom();
+
+        if(!os.isPresent()){
+            return null;
+        }
+
+        Sentence sentence = os.get();
+        return entityToDto(sentence);
+    }
+
     public SentenceDTO getSelectOne(SentenceDTO sentenceDTO){
         Optional<Sentence> os = repository.findById(sentenceDTO.getSentenceId());
 
