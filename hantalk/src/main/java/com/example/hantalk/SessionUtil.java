@@ -13,11 +13,20 @@ public class SessionUtil {
     }
 
     // ✅ 로그인 사용자 NO 가져오기
-    public static String getLoginUserNo(HttpSession session) {
-        Object userId = session.getAttribute(LOGIN_USER_NO);
-        return (userId != null) ? userId.toString() : null;
+    public static Integer getLoginUserNo(HttpSession session) {
+        Object userNo = session.getAttribute(LOGIN_USER_NO);
+        if (userNo instanceof Integer) {
+            return (Integer) userNo;
+        } else if (userNo != null) {
+            try {
+                return Integer.parseInt(userNo.toString());
+            } catch (NumberFormatException e) {
+                return null; // 변환 실패 시 null 반환
+            }
+        }
+        return null;
     }
-
+  
     // ✅ 로그인 사용자 ID 가져오기
     public static String getLoginUserId(HttpSession session) {
         Object userId = session.getAttribute(LOGIN_USER);
