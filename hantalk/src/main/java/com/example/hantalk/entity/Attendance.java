@@ -16,11 +16,12 @@ public class Attendance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int attendance_id;
+    @Column(name="attendance_id")
+    private int attendanceId;
 
     @CreatedDate
-    @Column(nullable = false)
-    private LocalDateTime attend_date;
+    @Column(name="attend_date", nullable = false)
+    private LocalDateTime attendDate;
 
     @ManyToOne
     @JoinColumn(nullable = false)

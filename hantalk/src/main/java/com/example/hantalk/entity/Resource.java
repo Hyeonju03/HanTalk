@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 public class Resource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int resource_id;     // RESOURCE_ID
+    @Column(name="resource_id")
+    private int resourceId;     // RESOURCE_ID
 
     @Column(length = 200)
     private String title;        // TITLE
@@ -26,36 +27,15 @@ public class Resource {
     @Column(length = 200)
     private String archive;      // ARCHIVE
 
-    private int view_count;       // VIEW_COUNT
+    @Column(name="view_count")
+    private int viewCount = 0;       // VIEW_COUNT
 
     @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime create_date;  // CREATE_DATE
+    @Column(name="create_date", updatable = false)
+    private LocalDateTime createDate;  // CREATE_DATE
 
     @CreatedDate
-    private LocalDateTime update_date;  // UPDATE_DATE
+    @Column(name="update_date")
+    private LocalDateTime updateDate;  // UPDATE_DATE
 
-    public Long getResourceId() {
-        return (long) this.resource_id;
-    }
-
-    public int getViewCount() {
-        return this.view_count;
-    }
-
-    public LocalDateTime getCreateDate() {
-        return this.create_date;
-    }
-
-    public void setResourceId(Long resourceId) {
-        this.resource_id = Math.toIntExact(resourceId);
-    }
-
-    public void setViewCount(int viewCount) {
-        this.view_count = viewCount;
-    }
-
-    public void setCreateDate(LocalDateTime createDate) {
-        this.create_date = createDate;
-    }
 }
