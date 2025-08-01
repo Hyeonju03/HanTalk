@@ -66,7 +66,7 @@ public class Users {
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
     @Column(name="leaning_log_list")
-    private List<Leaning_Log> leaningLogList;
+    private List<Learning_Log> leaningLogList;
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
     @Column(name="post_list")

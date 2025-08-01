@@ -1,19 +1,14 @@
 package com.example.hantalk.dto;
 
 import com.example.hantalk.entity.Users;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class Leaning_LogDTO {
+public class Learning_LogDTO {
     private int learningId;
     private LocalDateTime learningDate;
     private int learning1Count = 0;

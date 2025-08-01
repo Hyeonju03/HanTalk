@@ -40,7 +40,7 @@
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('play-btn').style.display = 'none';
 
-        fetch('/study/api/get-random-sentence') // RequestMapping("/study")를 고려하여 경로 수정
+        fetch('/study/api/get-lesson4-sentence') // RequestMapping("/study")를 고려하여 경로 수정
         .then(response => {
             if (!response.ok) {
                 // 응답이 성공(200 OK)이 아닐 경우 오류 발생
@@ -98,7 +98,7 @@
     document.getElementById('submit-btn').addEventListener('click', function() {
         const userAnswer = document.getElementById('user-answer').value;
 
-        fetch('/study/api/check-answer', {
+        fetch('/study/api/check-lesson4-answer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
