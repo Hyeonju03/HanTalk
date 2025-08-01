@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>아이디 패스워드 찾기</title>
+</head>
+<body>
+<h2>아이디 찾기</h2>
+<input type="text" id="findName" placeholder="이름">
+<input type="text" id="findEmail" placeholder="이메일">
+<button onclick="findId()">아이디 찾기</button>
+<p id="findIdResult"></p>
+
+<h2>비밀번호 찾기</h2>
+<input type="text" id="pwName" placeholder="이름">
+<input type="text" id="pwEmail" placeholder="이메일">
+<input type="text" id="pwUserId" placeholder="아이디">
+<button onclick="findPw()">비밀번호 찾기</button>
+<p id="findPwResult"></p>
+
+<script>
+  function findId() {
+      const name = document.getElementById("findName").value;
+      const email = document.getElementById("findEmail").value;
+
+      fetch("/user/findID", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ name, email })
+      })
+      .then(res => res.json())
+      .then(data => {
+          document.getElementById("findIdResult").textContent =
+              data.status === "success" ? "아이디: " + data.userId : "일치하는 정보가 없습니다.";
+      });
+  }
+
+  function findPw() {
+      const name = document.getElementById("pwName").value;
+      const email = document.getElementById("pwEmail").value;
+      const userId = document.getElementById("pwUserId").value;
+
+      fetch("/user/findPW", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ name, email, userId })
+      })
+      .then(res => res.json())
+      .then(data => {
+          document.getElementById("findPwResult").textContent =
+              data.status === "success" ? "임시 비밀번호: " + data.tempPw : "정보가 일치하지 않습니다.";
+      });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>회원 탈퇴</title>
+</head>
+<body>
+<h1>회원 탈퇴</h1>
+
+<p>정말 탈퇴하시겠습니까? 탈퇴 시 계정은 비활성화되며 복구할 수 없습니다.</p>
+
+<form action="/user/delete" method="post">
+  <button type="submit" onclick="return confirm('정말 탈퇴하시겠습니까?')">탈퇴하기</button>
+</form>
+
+<a href="/user/view">← 돌아가기</a>
+</body>
+</html>

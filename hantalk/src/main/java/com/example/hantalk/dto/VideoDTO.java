@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class VideoDTO { //등록용
-    private int video_id;
+    private int videoId;
     private String title;
     private String content;
-    private String video_name;
-    private LocalDateTime create_date;
-    private LocalDateTime update_date;
+    private String videoName;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
 }

@@ -12,16 +12,16 @@ import java.util.List;
 @Getter
 @Setter
 public class PostDTO {
-    private int post_id;
+    private int postId;
     private String title;
-    private LocalDateTime create_date;
-    private LocalDateTime update_date;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
     private String content;
     private String archive;
-    private int view_count;
+    private int viewCount;
 
     private Users users;
     private Category category;
 
-    private List<Comment> comment_list;
+    private List<Comment> commentList;
 }

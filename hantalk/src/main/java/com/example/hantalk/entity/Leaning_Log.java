@@ -15,16 +15,21 @@ import java.time.LocalDateTime;
 public class Leaning_Log {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int learning_id;
+    @Column(name="learning_id")
+    private int learningId;
 
     @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime learning_date;
+    @Column(name="learning_date", updatable = false)
+    private LocalDateTime learningDate;
 
-    private int learning1_count = 0; // 단어맞추기(단답형)
-    private int learning2_count = 0; // 문장나열
-    private int learning3_count = 0; // 단어맞추기(객관식)
-    private int learning4_count = 0; // 받아쓰기
+    @Column(name="learning1_count")
+    private int learning1Count = 0; // 단어맞추기(단답형)
+    @Column(name="learning2_count")
+    private int learning2Count = 0; // 문장나열
+    @Column(name="learning3_count")
+    private int learning3Count = 0; // 단어맞추기(객관식)
+    @Column(name="learning4_count")
+    private int learning4Count = 0; // 받아쓰기
 
     //fk
     @ManyToOne
