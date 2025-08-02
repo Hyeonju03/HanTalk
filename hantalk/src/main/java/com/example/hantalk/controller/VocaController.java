@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,4 +28,10 @@ public class VocaController {
     }
 
     // 학습 3번 (4지선다 객관식)
+    @GetMapping("/learning3")
+    public String getMultipleChoice(@RequestParam(defaultValue = "5") int count, Model model) {
+        List<Map<String, Object>> questions = vocaService.getMultipleChoice(count);
+        model.addAttribute("questions", questions);
+        return "learning/learning3";
+    }
 }

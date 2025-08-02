@@ -52,6 +52,7 @@ public class VocaService {
             Map<String, Object> question = new HashMap<>();
             question.put("description", description);
             question.put("options", choices);
+            question.put("answer", correct.getVocabulary());
 
             questions.add(question);
         }
