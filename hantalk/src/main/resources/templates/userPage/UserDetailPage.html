@@ -50,6 +50,20 @@
 
 <table>
     <tr>
+        <th>프로필 이미지</th>
+        <td>
+            <div th:if="${user.profileImage != null}">
+                <img th:src="@{'/' + ${user.profileImage}}"
+                     alt="프로필 이미지"
+                     style="max-width:150px; border-radius:8px;">
+            </div>
+            <div th:if="${user.profileImage == null}">
+                프로필 이미지 없음
+            </div>
+        </td>
+    </tr>
+
+    <tr>
         <th>아이디</th>
         <td>[[${user.userId}]]</td>
     </tr>
