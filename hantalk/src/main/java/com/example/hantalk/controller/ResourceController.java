@@ -1,7 +1,6 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.ResourceDTO;
-import com.example.hantalk.service.ResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
