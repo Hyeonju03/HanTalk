@@ -89,5 +89,4 @@ public class ItemShopService {
         user.setPoint(user.getPoint() + amount);
         usersRepository.save(user);
     }
-
 }

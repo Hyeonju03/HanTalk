@@ -18,12 +18,7 @@
         <td th:text="${item.price}"></td>
         <td th:text="${item.itemDescription}"></td>
         <td><a th:href="@{'/item/sujung/' + ${item.itemId}}">수정</a></td>
-        <td>
-            <form th:action="@{'/item/sakje/' + ${item.itemId}}" method="post"
-                  onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                <button type="submit">삭제</button>
-            </form>
-        </td>
+        <td><a th:href="@{'/item/sakje/' + ${item.itemId}}">삭제</a></td>
     </tr>
     </tbody>
 </table>

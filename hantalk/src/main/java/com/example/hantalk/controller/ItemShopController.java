@@ -97,7 +97,8 @@ public class ItemShopController {
             String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
 
             // 저장할 실제 경로
-            String uploadDir = "C:/upload/images/";
+            String uploadDir = System.getProperty("user.dir") + "/images/";
+
             File uploadPath = new File(uploadDir);
             if (!uploadPath.exists()) uploadPath.mkdirs();
 
@@ -106,7 +107,7 @@ public class ItemShopController {
             imageFile.transferTo(saveFile);
 
             // DB에는 상대 경로만 저장
-            item.setItemImage("/images/" + fileName);
+            item.setItemImage(fileName);
         }
 
         itemShopService.addItem(item);
@@ -160,4 +161,5 @@ public class ItemShopController {
         redirectAttributes.addFlashAttribute("message", "아이템이 삭제되었습니다.");
         return "redirect:/item/admin";
     }
+
 }
