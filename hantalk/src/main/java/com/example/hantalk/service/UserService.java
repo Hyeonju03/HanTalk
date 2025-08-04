@@ -48,6 +48,27 @@ public class UserService {
         }
     }
 
+    public List<UsersDTO> getUserList() {
+        List<Users> users = userRepository.findAll();
+        List<UsersDTO> userList = new ArrayList<UsersDTO>();
+        for (Users user : users) {
+            UsersDTO dto = toDTO(user);
+            userList.add(dto);
+        }
+        return userList;
+    }
+
+    public UsersDTO getUserOne(String userId) {
+        Optional<Users> userOpt = userRepository.findByUserId(userId);
+
+        if (userOpt.isPresent()) {
+            Users user = userOpt.get();
+            return toDTO(user);
+        } else {
+            return null;
+        }
+    }
+
     public boolean signUp(UsersDTO usersDTO) {
         Users users = toEntity(usersDTO);
         //이미 존재하는 아이디인지 체크
@@ -200,6 +221,24 @@ public class UserService {
         return "ADMIN".equals(role) || targetUserId.equals(sessionUserId);
     }
 
+    private String encode(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean isRoleOk(String targetUserId, String sessionUserId, String role) {
+        return "ADMIN".equals(role) || targetUserId.equals(sessionUserId);
+    }
+
     private String generateTempPw() {
         String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String lower = "abcdefghijklmnopqrstuvwxyz";
@@ -283,5 +322,4 @@ public class UserService {
         dto.setPoint(users.getPoint());
         return dto;
     }
-
 }

@@ -104,7 +104,6 @@ public class UserController {
         Map<String, Object> result = service.login(userId, password);
         boolean success = (boolean) result.get("isSuccess");
         String role = (String) result.get("role");
-
         if (!success) {
             return "redirect:/user/login";
         }
@@ -292,7 +291,6 @@ public class UserController {
                 return true;
         }
     }
-
     // ======== 비동기처리 =======
     @GetMapping("/user/isIdAvail")
     @ResponseBody
