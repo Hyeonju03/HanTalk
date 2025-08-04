@@ -21,11 +21,8 @@ public class PostDTO {
     private String archive;
     private int viewCount;
     private Integer userNo;
-
     private Integer categoryId;
-
     private Category category;
 
     private List<Comment> commentList;
-
 }

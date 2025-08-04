@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>마이페이지</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center py-10">
+<div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md mx-auto">
+  <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">마이페이지</h1>
+
+  <div class="space-y-3 text-lg mb-8">
+    <p>
+      <strong class="text-gray-700">아이디:</strong>
+      <span th:text="${user.userId}" class="text-gray-900 ml-2">아이디</span>
+    </p>
+    <p>
+      <strong class="text-gray-700">이름:</strong>
+      <span th:text="${user.name}" class="text-gray-900 ml-2">이름</span>
+    </p>
+    <p>
+      <strong class="text-gray-700">닉네임:</strong>
+      <span th:text="${user.nickname}" class="text-gray-900 ml-2">닉네임</span>
+    </p>
+    <p>
+      <strong class="text-gray-700">이메일:</strong>
+      <span th:text="${user.email}" class="text-gray-900 ml-2">이메일</span>
+    </p>
+    <p>
+      <strong class="text-gray-700">포인트:</strong>
+      <span th:text="${user.point}" class="text-green-600 font-semibold ml-2">0</span>
+    </p>
+    <p>
+      <strong class="text-gray-700">가입일:</strong>
+      <span th:text="${user.joinDate}" class="text-gray-900 ml-2">가입일</span>
+    </p>
+  </div>
+
+  <hr class="border-t-2 border-gray-200 my-8">
+
+  <div class="flex flex-col space-y-3">
+    <a href="/user/update"
+       class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
+      회원정보 수정
+    </a>
+    <a href="/user/delete"
+       class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
+      회원 탈퇴
+    </a>
+    <a href="/user/calendar"
+       class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
+      출석현황
+    </a>
+    <a href="/user/test"
+       class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
+      로그인 회원가입 테스트 페이지로
+    </a>
+  </div>
+</div>
+</body>
+</html>

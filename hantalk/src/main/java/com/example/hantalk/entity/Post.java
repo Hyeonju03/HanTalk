@@ -29,7 +29,7 @@ public class Post {
     @Column(name="create_date", updatable = false, nullable = false)
     private LocalDateTime createDate; //작성일
 
-    @LastModifiedDate
+    @CreatedDate
     @Column(name="update_date", nullable = false)
     private LocalDateTime updateDate; //수정일
 
@@ -58,18 +58,4 @@ public class Post {
     @Column(name="comment_list")
     private List<Comment> commentList;
 
-
-    @PrePersist
-    public void prePersist() {
-        if (createDate == null) {
-            createDate = LocalDateTime.now();
-        }
-        if (updateDate == null) {
-            updateDate = LocalDateTime.now();
-        }
-    }
-    @PreUpdate
-    public void preUpdate() {
-        updateDate = LocalDateTime.now();
-    }
 }

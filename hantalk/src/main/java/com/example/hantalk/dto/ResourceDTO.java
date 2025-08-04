@@ -7,13 +7,14 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-
 public class ResourceDTO {
-    private Long resourceId;
+    private int resourceId;
     private String title;
     private String content;
     private String archive;
-    private int viewCount;
+
+    private int viewCount = 0;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+
 }
