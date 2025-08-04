@@ -119,7 +119,7 @@
         <h2>회원가입</h2>
         <form action="/user/signup" method="post" enctype="multipart/form-data" onsubmit="return checkPasswordMatch();">
             <div class="input-group">
-                <input type="text" id="userId" name="userId" placeholder="아이디(5글자 이상)" required>
+                <input type="text" id="userId" name="userId" placeholder="아이디" required>
                 <button type="button" class="check-btn" onclick="checkId()">중복확인</button>
             </div>
             <div id="idMsg" class="msg"></div>
@@ -256,11 +256,6 @@
         const email = getFullEmail();
         document.getElementById("emailHidden").value = email;
     });
-
-    const msg = [[${msg}]];
-    if (msg && msg !== 'null') {
-        alert(msg);
-    }
 </script>
 
 </body>
