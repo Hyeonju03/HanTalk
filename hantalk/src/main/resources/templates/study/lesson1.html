@@ -50,7 +50,31 @@
                     output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
                 }
             }
-            document.body.innerHTML = `<h1>결과</h1>` + output;
+
+            // 결과와 함께 다음 학습 이동 버튼 표시
+            document.body.innerHTML = `
+                <h1>결과</h1>
+                ${output}
+                <div style="position: fixed; bottom: 20px; right: 20px;">
+                    <button onclick="goToLesson3()">다음 학습(3)으로 이동</button>
+                </div>
+            `;
+
+            // 학습 완료 로그 저장 호출 (lesson1 → 1)
+            fetch('/study/complete?lessonNo=1', { method: 'POST' })
+                .then(res => res.text())
+                .then(result => {
+                    if (result === 'success') {
+                        console.log("학습 로그 저장 성공");
+                    } else {
+                        console.log("로그 저장 실패");
+                    }
+                });
+        }
+
+        // lesson3으로 같은 창에서 이동
+        function goToLesson3() {
+            window.location.href = '/study/lesson3';
         }
     </script>
 </head>
@@ -64,4 +88,3 @@
 
 </body>
 </html>
-
