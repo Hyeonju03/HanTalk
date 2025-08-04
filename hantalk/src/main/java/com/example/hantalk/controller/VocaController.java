@@ -14,24 +14,24 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/learning")
+@RequestMapping("/study")
 public class VocaController {
 
     private final VocaService vocaService;
 
     // 학습 1번 (단어 맞추기)
-    @GetMapping("/learning1")
+    @GetMapping("/lesson1")
     public String getFillBlank(@RequestParam(defaultValue = "5") int count, Model model) {
          List<VocaDTO> problems = vocaService.getFillBlank(count);
          model.addAttribute("problems", problems);
-         return "learning/learning1";
+         return "study/lesson1";
     }
 
     // 학습 3번 (4지선다 객관식)
-    @GetMapping("/learning3")
+    @GetMapping("/lesson3")
     public String getMultipleChoice(@RequestParam(defaultValue = "5") int count, Model model) {
         List<Map<String, Object>> questions = vocaService.getMultipleChoice(count);
         model.addAttribute("questions", questions);
-        return "learning/learning3";
+        return "study/lesson3";
     }
 }
