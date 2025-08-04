@@ -15,27 +15,24 @@ import java.time.LocalDateTime;
 public class Resource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="resource_id")
-    private int resourceId;     // RESOURCE_ID
+    private int resourceId;
 
-    @Column(length = 200)
-    private String title;        // TITLE
+    private String title;
 
-    @Column(columnDefinition = "TEXT")
-    private String content;      // CONTENT
+    @Column(length = 2000)
+    private String content;
 
-    @Column(length = 200)
-    private String archive;      // ARCHIVE
+    @Column(name = "original_file_name")
+    private String originalFileName;
 
-    @Column(name="view_count")
-    private int viewCount = 0;       // VIEW_COUNT
+    private String archive;
 
-    @CreatedDate
-    @Column(name="create_date", updatable = false)
-    private LocalDateTime createDate;  // CREATE_DATE
+    private int viewCount;
 
-    @CreatedDate
-    @Column(name="update_date")
-    private LocalDateTime updateDate;  // UPDATE_DATE
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
 
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
+    }
 }

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>관리자 자료실</title>
+  <style>
+    /* 사용자 페이지와 비슷한 스타일 + 추가 버튼 스타일 */
+    body {
+      background: #fefcff;
+      color: #444;
+      font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    nav {
+      width: 200px;
+      background: #f2f6ff;
+      padding: 2rem 1rem;
+      height: 100vh;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      position: fixed;
+      top: 0; left: 0;
+    }
+    nav h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #5e7bb4;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+    nav li {
+      margin-bottom: 0.8rem;
+    }
+    nav a {
+      text-decoration: none;
+      color: #4e6cb2;
+    }
+    main {
+      margin-left: 200px;
+      padding: 2rem;
+      flex: 1;
+    }
+    h1 {
+      text-align: center;
+      color: #5e7bb4;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    /* 등록 버튼 */
+    .btn-register {
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: #4e6cb2;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .btn-register:hover {
+      background: #3b5490;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(180, 200, 255, 0.2);
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e3e8f0;
+      text-align: center;
+    }
+    th {
+      background: #eef3fb;
+      color: #4e6cb2;
+      font-weight: bold;
+    }
+    tr:hover {
+      background-color: #f5f8ff;
+    }
+    .pagination {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .pagination a, .pagination span {
+      display: inline-block;
+      margin: 0 5px;
+      padding: 6px 12px;
+      background: #eef3fb;
+      color: #4e6cb2;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .pagination .current {
+      background: #d8e3ff;
+      font-weight: bold;
+    }
+    /* 수정/삭제 버튼 */
+    .btn-edit, .btn-delete {
+      padding: 5px 10px;
+      margin-left: 5px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: white;
+    }
+    .btn-edit {
+      background-color: #5e7bb4;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-edit:hover {
+      background-color: #4b6699;
+    }
+    .btn-delete {
+      background-color: #e05c5c;
+    }
+    .btn-delete:hover {
+      background-color: #b94444;
+    }
+    /* 검색 폼 스타일 */
+    form.search-form {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    form.search-form input[type="text"] {
+      padding: 6px 10px;
+      font-size: 1rem;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form.search-form button {
+      padding: 6px 14px;
+      font-size: 1rem;
+      background-color: #4e6cb2;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+    form.search-form button:hover {
+      background-color: #3b5490;
+    }
+  </style>
+  <script>
+    function confirmDelete(resourceId) {
+      if (confirm('정말 이 자료를 삭제하시겠습니까?')) {
+        window.location.href = '/resource/delete/' + resourceId;
+      }
+    }
+  </script>
+</head>
+<body>
+
+<nav>
+  <h2>📁 메뉴</h2>
+  <ul>
+    <li><a href="/resource/admin/main">자료 목록</a></li>
+    <li><a href="#">자주 묻는 질문</a></li>
+    <li><a href="#">문의하기</a></li>
+  </ul>
+</nav>
+
+<main>
+  <h1>관리자 자료실
+    <a th:href="@{/resource/chuga}" class="btn-register">자료 등록하기</a>
+  </h1>
+
+  <!-- 검색 폼 추가 -->
+  <form class="search-form" th:action="@{/resource/admin/main}" method="get">
+    <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요" />
+    <button type="submit">검색</button>
+  </form>
+
+  <table>
+    <thead>
+    <tr>
+      <th>번호</th>
+      <th>제목</th>
+      <th>내용</th>
+      <th>파일</th>
+      <th>작성자</th>
+      <th>작성일</th>
+      <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="resource, iterStat : ${resourcePage.content}">
+      <td th:text="${resourcePage.totalElements - (resourcePage.number * resourcePage.size) - iterStat.index}">1</td>
+      <td>
+        <a th:href="@{'/resource/detail/' + ${resource.resourceId}}" th:text="${resource.title}">제목</a>
+      </td>
+      <td th:text="${resource.content.length() > 30} ? ${resource.content.substring(0,30)} + '...' : resource.content">내용</td>
+      <td><a th:href="${resource.archive}" target="_blank">파일보기</a></td>
+      <td>관리자</td>
+      <td th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
+      <td>
+        <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}" class="btn-edit">수정</a>
+        <button type="button" class="btn-delete" th:onclick="'confirmDelete(' + ${resource.resourceId} + ')'" >삭제</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <a th:if="${resourcePage.hasPrevious()}" th:href="@{/resource/admin/main(page=${resourcePage.number - 1}, keyword=${keyword})}">이전</a>
+
+    <span th:each="pageNum : ${#numbers.sequence(0, resourcePage.totalPages - 1)}"
+          th:classappend="${pageNum == resourcePage.number} ? 'current' : ''">
+      <a th:href="@{/resource/admin/main(page=${pageNum}, keyword=${keyword})}" th:text="${pageNum + 1}">1</a>
+    </span>
+
+    <a th:if="${resourcePage.hasNext()}" th:href="@{/resource/admin/main(page=${resourcePage.number + 1}, keyword=${keyword})}">다음</a>
+  </div>
+</main>
+
+</body>
+</html>
