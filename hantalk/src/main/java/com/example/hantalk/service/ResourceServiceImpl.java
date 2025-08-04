@@ -60,23 +60,23 @@ public class ResourceServiceImpl implements ResourceService {
 
     private ResourceDTO convertToDTO(Resource entity) {
         ResourceDTO dto = new ResourceDTO();
-        dto.setResource_id(entity.getResourceId());
+        dto.setResourceId(entity.getResourceId());
         dto.setTitle(entity.getTitle());
         dto.setContent(entity.getContent());
         dto.setArchive(entity.getArchive());
-        dto.setView_count(entity.getViewCount());
-        dto.setCreate_date(entity.getCreateDate());
+        dto.setViewCount(entity.getViewCount());
+        dto.setCreateDate(entity.getCreateDate());
         return dto;
     }
 
     private Resource convertToEntity(ResourceDTO dto) {
         Resource entity = new Resource();
-        entity.setResourceId(dto.getResource_id());
+        entity.setResourceId(dto.getResourceId());
         entity.setTitle(dto.getTitle());
         entity.setContent(dto.getContent());
         entity.setArchive(dto.getArchive());
-        entity.setViewCount(dto.getView_count());
-        entity.setCreateDate(dto.getCreate_date());
+        entity.setViewCount(dto.getViewCount());
+        entity.setCreateDate(dto.getCreateDate());
         return entity;
     }
 }

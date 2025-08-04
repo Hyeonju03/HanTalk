@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ResourceDTO {
-    private Long resourceId;
+    private int resourceId;
     private String title;
     private String content;
     private String archive;

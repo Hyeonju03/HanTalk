@@ -103,24 +103,24 @@ public class UserController {
         Map<String, Object> result = service.login(userId, password);
         boolean success = (boolean) result.get("isSuccess");
         String role = (String) result.get("role");
-        if (success) {
-            session.invalidate();
-            HttpSession newSession = request.getSession(true);
-
-            newSession.setAttribute("userId", userId);
-            if ("ADMIN".equals(role)) {
-                newSession.setAttribute("role", "ADMIN");
-            } else {
-                UsersDTO user = service.getUserOne(userId);
-                newSession.setAttribute("userNo", user.getUserNo());
-                newSession.setAttribute("role", "USER");
-            }
-            newSession.setMaxInactiveInterval(1800); //세션 시간제한 설정
-
-            return "userPage/UserTestPage"; // ✅ templates/MainPage.html 필요
-        } else {
+        if (!success) {
             return "redirect:/user/login";
         }
+        session.invalidate();
+        HttpSession newSession = request.getSession(true);
+
+        newSession.setAttribute("userId", userId);
+        if ("ADMIN".equals(role)) {
+            newSession.setAttribute("role", "ADMIN");
+        } else {
+            UsersDTO user = service.getUserOne(userId);
+            newSession.setAttribute("userNo", user.getUserNo());
+            newSession.setAttribute("role", "USER");
+            service.setLeaningLog(userId);
+        }
+        newSession.setMaxInactiveInterval(1800); //세션 시간제한 설정
+        return "userPage/UserTestPage";
+
     }
 
     //로그아웃
