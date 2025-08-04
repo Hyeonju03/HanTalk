@@ -10,11 +10,13 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class ResourceDTO {
-    private Long resourceId;
+    private int resourceId;
     private String title;
     private String content;
     private String archive;
     private int viewCount;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+    private String originalFileName;
+
 }

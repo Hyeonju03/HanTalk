@@ -15,12 +15,15 @@ import java.time.LocalDateTime;
 public class Resource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long resourceId;
+    private int resourceId;
 
     private String title;
 
     @Column(length = 2000)
     private String content;
+
+    @Column(name = "original_file_name")
+    private String originalFileName;
 
     private String archive;
 

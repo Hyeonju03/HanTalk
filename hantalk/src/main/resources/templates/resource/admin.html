@@ -129,13 +129,34 @@
     .btn-delete:hover {
       background-color: #b94444;
     }
+    /* 검색 폼 스타일 */
+    form.search-form {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    form.search-form input[type="text"] {
+      padding: 6px 10px;
+      font-size: 1rem;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form.search-form button {
+      padding: 6px 14px;
+      font-size: 1rem;
+      background-color: #4e6cb2;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+    form.search-form button:hover {
+      background-color: #3b5490;
+    }
   </style>
   <script>
     function confirmDelete(resourceId) {
       if (confirm('정말 이 자료를 삭제하시겠습니까?')) {
-        // 삭제 컨트롤러로 POST 혹은 GET 요청 보내기
-        // form으로 전송하거나 ajax 요청 가능
-        // 여기서는 간단하게 GET 요청 예시
         window.location.href = '/resource/delete/' + resourceId;
       }
     }
@@ -156,6 +177,12 @@
   <h1>관리자 자료실
     <a th:href="@{/resource/chuga}" class="btn-register">자료 등록하기</a>
   </h1>
+
+  <!-- 검색 폼 추가 -->
+  <form class="search-form" th:action="@{/resource/admin/main}" method="get">
+    <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요" />
+    <button type="submit">검색</button>
+  </form>
 
   <table>
     <thead>
@@ -180,7 +207,7 @@
       <td>관리자</td>
       <td th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
       <td>
-        <a th:href="@{'/resource/update/' + ${resource.resourceId}}" class="btn-edit">수정</a>
+        <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}" class="btn-edit">수정</a>
         <button type="button" class="btn-delete" th:onclick="'confirmDelete(' + ${resource.resourceId} + ')'" >삭제</button>
       </td>
     </tr>
@@ -188,14 +215,14 @@
   </table>
 
   <div class="pagination">
-    <a th:if="${resourcePage.hasPrevious()}" th:href="@{/resource/admin/main(page=${resourcePage.number - 1})}">이전</a>
+    <a th:if="${resourcePage.hasPrevious()}" th:href="@{/resource/admin/main(page=${resourcePage.number - 1}, keyword=${keyword})}">이전</a>
 
     <span th:each="pageNum : ${#numbers.sequence(0, resourcePage.totalPages - 1)}"
           th:classappend="${pageNum == resourcePage.number} ? 'current' : ''">
-      <a th:href="@{/resource/admin/main(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
+      <a th:href="@{/resource/admin/main(page=${pageNum}, keyword=${keyword})}" th:text="${pageNum + 1}">1</a>
     </span>
 
-    <a th:if="${resourcePage.hasNext()}" th:href="@{/resource/admin/main(page=${resourcePage.number + 1})}">다음</a>
+    <a th:if="${resourcePage.hasNext()}" th:href="@{/resource/admin/main(page=${resourcePage.number + 1}, keyword=${keyword})}">다음</a>
   </div>
 </main>
 

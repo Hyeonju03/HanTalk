@@ -3,14 +3,138 @@
 <head>
   <meta charset="UTF-8">
   <title>자료 수정</title>
+  <style>
+    body {
+      background: #fefcff;
+      color: #444;
+      font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    nav {
+      width: 200px;
+      background: #f2f6ff;
+      padding: 2rem 1rem;
+      height: 100vh;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      position: fixed;
+      top: 0; left: 0;
+    }
+
+    nav h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #5e7bb4;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    nav li {
+      margin-bottom: 0.8rem;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #4e6cb2;
+    }
+
+    main {
+      margin-left: 200px;
+      padding: 2rem;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #5e7bb4;
+      margin-bottom: 2rem;
+    }
+
+    form {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(180, 200, 255, 0.2);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-top: 5px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      height: 150px;
+      resize: vertical;
+    }
+
+    button {
+      background: #4e6cb2;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background: #3b5490;
+    }
+  </style>
 </head>
 <body>
-<h1>자료 수정</h1>
-<form th:action="@{'/resource/edit/' + ${resourceDTO.resourceId}}" method="post">
-  <label>제목 <input type="text" name="title" th:value="${resourceDTO.title}" /></label><br>
-  <label>내용 <textarea name="content" th:text="${resourceDTO.content}"></textarea></label><br>
-  <label>자료 링크 <input type="text" name="archive" th:value="${resourceDTO.archive}" /></label><br>
-  <button type="submit">수정</button>
-</form>
+
+<nav>
+  <h2>📁 메뉴</h2>
+  <ul>
+    <li><a href="/resource/admin">자료 목록</a></li>
+    <li><a href="#">자주 묻는 질문</a></li>
+    <li><a href="#">문의하기</a></li>
+  </ul>
+</nav>
+
+<main>
+  <h1>자료 수정</h1>
+  <form th:action="@{'/resource/edit/' + ${resourceDTO.resourceId}}" method="post" enctype="multipart/form-data" th:object="${resourceDTO}">
+    <label>제목
+      <input type="text" th:field="*{title}" required />
+    </label>
+
+    <label>내용
+      <textarea th:field="*{content}" required></textarea>
+    </label>
+
+    <!-- 기존 archive 필드 노출 -->
+    <label>기존 파일명
+      <input type="text" th:field="*{archive}" readonly />
+    </label>
+
+    <!-- 새 파일 업로드 -->
+    <label>파일 업로드 (새 파일 선택 시 기존 파일 대체)
+      <input type="file" name="file" />
+    </label>
+
+    <button type="submit">수정</button>
+  </form>
+</main>
+
 </body>
 </html>

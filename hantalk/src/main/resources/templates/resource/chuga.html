@@ -12,6 +12,7 @@
     }
     h1 {
       color: #2d4d4d;
+      text-align: center;
     }
     form {
       background: #ffffff;
@@ -35,6 +36,15 @@
       box-sizing: border-box;
       margin-top: 5px;
     }
+    input[type="file"] {
+      margin-top: 5px;
+    }
+    .info {
+      font-size: 0.9rem;
+      color: #888;
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
     button {
       background-color: #7ecdc4;
       color: white;
@@ -50,27 +60,36 @@
   </style>
 </head>
 <body>
+
 <h1>📁 자료 추가</h1>
 
-<form th:action="@{/resource/create}" method="post" th:object="${resourceDTO}">
+<form th:action="@{/resource/create}" method="post" enctype="multipart/form-data" th:object="${resourceDTO}">
   <label>
     제목
-    <input type="text" th:field="*{title}" placeholder="제목을 입력하세요" />
+    <input type="text" th:field="*{title}" placeholder="제목을 입력하세요" required />
   </label>
 
   <label>
     내용
-    <textarea th:field="*{content}" rows="5" placeholder="내용을 입력하세요"></textarea>
+    <textarea th:field="*{content}" rows="5" placeholder="내용을 입력하세요" required></textarea>
   </label>
 
   <label>
     자료 링크
     <input type="text" th:field="*{archive}" placeholder="https://..." />
+    <div class="info">※ 파일을 첨부하지 않는 경우에만 외부 링크(URL)를 입력하세요.</div>
+  </label>
+
+  <label>
+    파일 업로드
+    <input type="file" name="file" />
+    <div class="info">※ 파일을 첨부하면 위 링크 대신 업로드된 파일로 저장됩니다.</div>
   </label>
 
   <div style="text-align: center;">
     <button type="submit">등록</button>
   </div>
 </form>
+
 </body>
 </html>

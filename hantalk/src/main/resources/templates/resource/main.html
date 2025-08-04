@@ -44,6 +44,29 @@
       color: #5e7bb4;
       margin-bottom: 2rem;
     }
+    form.search-form {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    form.search-form input[type="text"] {
+      padding: 6px 10px;
+      font-size: 1rem;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form.search-form button {
+      padding: 6px 14px;
+      font-size: 1rem;
+      background-color: #4e6cb2;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+    form.search-form button:hover {
+      background-color: #3b5490;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -98,6 +121,12 @@
 <main>
   <h1>자료실</h1>
 
+  <!-- 검색 폼 -->
+  <form class="search-form" th:action="@{/resource/main}" method="get">
+    <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요" />
+    <button type="submit">검색</button>
+  </form>
+
   <table>
     <thead>
     <tr>
@@ -117,7 +146,12 @@
       </td>
       <td th:text="${resource.content.length() > 30} ? ${resource.content.substring(0,30)} + '...' : resource.content">내용</td>
       <td>
-        <a th:href="${resource.archive}" target="_blank">파일보기</a>
+        <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}">
+          <a th:href="@{'/resource/download/' + ${resource.archive.substring(resource.archive.lastIndexOf('/') + 1)}}"
+             download
+             th:text="${resource.originalFileName}">파일 다운로드</a>
+        </span>
+        <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}">없음</span>
       </td>
       <td>관리자</td>
       <td th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
@@ -126,14 +160,14 @@
   </table>
 
   <div class="pagination">
-    <a th:if="${resourcePage.hasPrevious()}" th:href="@{/resource/main(page=${resourcePage.number - 1})}">이전</a>
+    <a th:if="${resourcePage.hasPrevious()}" th:href="@{/resource/main(page=${resourcePage.number - 1}, keyword=${keyword})}">이전</a>
 
     <span th:each="pageNum : ${#numbers.sequence(0, resourcePage.totalPages - 1)}"
           th:classappend="${pageNum == resourcePage.number} ? 'current' : ''">
-      <a th:href="@{/resource/main(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
+      <a th:href="@{/resource/main(page=${pageNum}, keyword=${keyword})}" th:text="${pageNum + 1}">1</a>
     </span>
 
-    <a th:if="${resourcePage.hasNext()}" th:href="@{/resource/main(page=${resourcePage.number + 1})}">다음</a>
+    <a th:if="${resourcePage.hasNext()}" th:href="@{/resource/main(page=${resourcePage.number + 1}, keyword=${keyword})}">다음</a>
   </div>
 </main>
 

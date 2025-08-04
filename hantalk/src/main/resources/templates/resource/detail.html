@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>자료 상세 보기</title>
+  <style>
+    body {
+      background: #fefcff;
+      color: #444;
+      font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+    nav {
+      width: 200px;
+      background: #f2f6ff;
+      padding: 2rem 1rem;
+      height: 100vh;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      position: fixed;
+      top: 0; left: 0;
+    }
+    nav h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #5e7bb4;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+    nav li {
+      margin-bottom: 0.8rem;
+    }
+    nav a {
+      text-decoration: none;
+      color: #4e6cb2;
+    }
+    main {
+      margin-left: 200px;
+      padding: 2rem;
+      width: 100%;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(180, 200, 255, 0.2);
+      min-height: 100vh;
+    }
+    h1 {
+      color: #5e7bb4;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .detail-item {
+      margin-bottom: 1.2rem;
+      line-height: 1.5;
+      font-size: 1.1rem;
+    }
+    .label {
+      font-weight: bold;
+      color: #4e6cb2;
+      display: inline-block;
+      width: 100px;
+    }
+    .content {
+      display: inline-block;
+      max-width: 70%;
+      word-wrap: break-word;
+      vertical-align: top;
+    }
+    .btn-group {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .btn {
+      background: #4e6cb2;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      margin: 0 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+    .btn:hover {
+      background: #3b5490;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <h2>📁 메뉴</h2>
+  <ul>
+    <li><a href="/resource/admin/main">자료 목록</a></li>
+    <li><a href="#">자주 묻는 질문</a></li>
+    <li><a href="#">문의하기</a></li>
+  </ul>
+</nav>
+
+<main>
+  <h1>자료 상세 보기</h1>
+
+  <div class="detail-item">
+    <span class="label">제목:</span>
+    <span class="content" th:text="${resource.title}">제목이 표시됩니다</span>
+  </div>
+
+  <div class="detail-item">
+    <span class="label">내용:</span>
+    <span class="content" th:text="${resource.content}">내용이 표시됩니다</span>
+  </div>
+
+  <div class="detail-item">
+    <span class="label">파일 링크:</span>
+    <span class="content">
+      <a th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
+         th:href="@{${resource.archive}}"
+         download
+         th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
+      <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}">파일이 없습니다.</span>
+    </span>
+  </div>
+
+  <div class="detail-item">
+    <span class="label">조회수:</span>
+    <span class="content" th:text="${resource.viewCount}">0</span>
+  </div>
+
+  <div class="detail-item">
+    <span class="label">등록일:</span>
+    <span class="content" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
+  </div>
+
+  <!--유저 로그인시 목록-->
+  <div class="btn-group">
+    <a href="/resource/main" class="btn">목록으로</a>
+    <a th:if="${session.loginUser != null and session.loginUser.role == 'ROLE_ADMIN'}"
+       th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
+       class="btn">수정</a>
+  </div>
+
+  <!--관리자 로그인시 목록-->
+  <div class="btn-group">
+    <a href="/resource/admin/main" class="btn"> 관리자 목록으로</a>
+    <a th:if="${session.loginUser != null and session.loginUser.role == 'ROLE_ADMIN'}"
+       th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
+       class="btn">수정</a>
+  </div>
+</main>
+
+</body>
+</html>
