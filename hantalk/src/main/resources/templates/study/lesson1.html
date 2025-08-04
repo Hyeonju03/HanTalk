@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>단어 맞추기</title>
+    <script th:inline="javascript">
+        let problems = /*[[${problems}]]*/ [];
+        let answers = new Array(problems.length).fill(""); // 사용자 답 저장
+        let currentIndex = 0;
+
+        window.onload = function() {
+            showProblem(currentIndex);
+        };
+
+        // 현재 문제 보여주기
+        function showProblem(index) {
+            const problem = problems[index];
+            document.getElementById('description').textContent = problem.description;
+            document.getElementById('answer').value = answers[index] || "";
+            document.getElementById('result').textContent = "";
+
+            // 마지막 문제면 버튼 문구 변경
+            document.getElementById('nextBtn').textContent =
+                (index === problems.length - 1) ? "결과 보기" : "다음으로";
+        }
+
+        // 다음 문제 또는 결과 체크
+        function nextProblem() {
+            // 현재 입력 저장
+            answers[currentIndex] = document.getElementById('answer').value.trim();
+
+            // 마지막 문제면 결과 표시
+            if (currentIndex === problems.length - 1) {
+                showResult();
+            } else {
+                currentIndex++;
+                showProblem(currentIndex);
+            }
+        }
+
+        // 최종 결과 표시
+        function showResult() {
+            let output = "";
+            for (let i = 0; i < problems.length; i++) {
+                let correct = problems[i].vocabulary;
+                let userAnswer = answers[i];
+                if (userAnswer === correct) {
+                    output += `<p>${i + 1}번: 정답! (${correct})</p>`;
+                } else {
+                    output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
+                }
+            }
+            document.body.innerHTML = `<h1>결과</h1>` + output;
+        }
+    </script>
+</head>
+<body>
+<h1>단어 맞추기 학습</h1>
+
+<p id="description"></p>
+<input type="text" id="answer" placeholder="정답 입력">
+<button type="button" id="nextBtn" onclick="nextProblem()">다음으로</button>
+<p id="result"></p>
+
+</body>
+</html>
+
