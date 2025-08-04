@@ -2,6 +2,7 @@ package com.example.hantalk.controller;
 
 import com.example.hantalk.SessionUtil;
 import com.example.hantalk.dto.UsersDTO;
+import com.example.hantalk.entity.Users;
 import com.example.hantalk.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -103,6 +104,7 @@ public class UserController {
         Map<String, Object> result = service.login(userId, password);
         boolean success = (boolean) result.get("isSuccess");
         String role = (String) result.get("role");
+
         if (!success) {
             return "redirect:/user/login";
         }

@@ -1,9 +1,10 @@
 package com.example.hantalk.controller;
 
-import com.example.hantalk.entity.Users;
+import com.example.hantalk.entity.Users; // 이 임포트는 엔티티 클래스 정의를 위해 유지
 import com.example.hantalk.service.AttendanceService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,32 +21,40 @@ public class AttendanceController {
 
     private final AttendanceService attendanceService;
 
-    // 로그인 시 자동 출석 처리 (예: 로그인 성공 후 호출)
     @GetMapping("/check")
     public String checkAttendance(HttpSession session) {
-        Users loginUser = (Users) session.getAttribute("loginUser");
-        if (loginUser != null) {
-            attendanceService.checkAttendance(loginUser);
+        Integer userNo = (Integer) session.getAttribute("userNo"); // 세션에서 Integer로 가져옴
+
+        if (userNo != null) {
+            attendanceService.checkAttendance(userNo.intValue()); // int 타입으로 변환하여 서비스에 전달
         }
-        return "redirect:/attendance/calendar";  // 출석 현황 페이지로 이동
+        return "redirect:/attendance/calendar";
     }
 
-    // 출석 현황 캘린더 조회
     @GetMapping("/calendar")
     public String viewAttendanceCalendar(HttpSession session, Model model) {
-        Users loginUser = (Users) session.getAttribute("loginUser");
-        if (loginUser != null) {
-            List<LocalDate> attendanceDates = attendanceService.getAttendanceDates(loginUser);
+        Integer userNo = (Integer) session.getAttribute("userNo"); // 세션에서 Integer로 가져옴
+
+        if (userNo != null) {
+            List<LocalDate> attendanceDates = attendanceService.getAttendanceDates(userNo.intValue());
             model.addAttribute("attendanceDates", attendanceDates);
         }
-        return "user/calendar"; // Thymeleaf 뷰 이름
+        return "user/calendar";
     }
 
     @GetMapping("/calendar/data")
     @ResponseBody
-    public List<String> getAttendanceDates(HttpSession session) {
-        Users user = (Users) session.getAttribute("loginUser");
-        return attendanceService.getAttendanceDatesAsString(user);
-    }
+    public ResponseEntity<List<String>> getAttendanceDatesJson(HttpSession session) {
+        Integer userNo = (Integer) session.getAttribute("userNo"); // 세션에서 Integer로 가져옴
 
+        if (userNo == null) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        // checkAttendance 로직은 필요에 따라 여기에 두거나 로그인 시에만 실행하도록 조정
+        attendanceService.checkAttendance(userNo.intValue());
+
+        List<String> dateList = attendanceService.getAttendanceDatesAsString(userNo.intValue());
+        return ResponseEntity.ok(dateList);
+    }
 }

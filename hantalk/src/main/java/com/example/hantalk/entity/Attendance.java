@@ -20,10 +20,10 @@ public class Attendance {
     private int attendanceId;
 
     @CreatedDate
-    @Column(name="attend_date", nullable = false)
+    @Column(name="attend_date", nullable = false, updatable = false)
     private LocalDateTime attendDate;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "user_no", nullable = false)
     private Users users;
 }

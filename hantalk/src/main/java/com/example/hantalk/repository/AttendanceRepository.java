@@ -11,7 +11,9 @@ import java.util.List;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Integer> {
+
     boolean existsByUsersAndAttendDateBetween(Users users, LocalDateTime start, LocalDateTime end);
 
-    List<Attendance> findByUsers(Users users);
+    List<Attendance> findByUsers_UserNo(int userNo);
+
 }
