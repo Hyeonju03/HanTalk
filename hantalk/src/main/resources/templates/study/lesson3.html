@@ -55,31 +55,21 @@
         }
     }
 
-function showResult() {
-    let output = "";
-    for (let i = 0; i < questions.length; i++) {
-        let correct = questions[i].answer; // 정답
-        let userAnswer = answers[i];
-        if (userAnswer === correct) {
-            output += `<p>${i + 1}번: 정답! (${correct})</p>`;
-        } else {
-            output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
-        }
-    }
-    document.body.innerHTML = `<h1>결과</h1>` + output;
-
-    // 학습 완료 로그 저장 호출 (lesson3 → 3)
-    fetch('/study/complete?lessonNo=3', { method: 'POST' })
-        .then(res => res.text())
-        .then(result => {
-            if (result === 'success') {
-                console.log("학습 로그 저장 성공 (lesson3)");
+    function showResult() {
+        let output = "";
+        for (let i = 0; i < questions.length; i++) {
+            let correct = questions[i]['answer'];
+            let userAnswer = answers[i];
+            if (userAnswer === correct) {
+                output += `<p>${i + 1}번: 정답! (${correct})</p>`;
+            } else if (userAnswer === "") {
+                output += `<p>${i + 1}번: 미응답 (정답은 ${correct})</p>`;
             } else {
-                console.log("로그 저장 실패 (lesson3)");
+                output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
             }
-        });
-}
-
+        }
+        document.body.innerHTML = `<h1>결과</h1>` + output;
+    }
   </script>
 
 </head>

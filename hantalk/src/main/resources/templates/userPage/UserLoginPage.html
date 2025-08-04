@@ -119,7 +119,7 @@
         <h2>회원가입</h2>
         <form action="/user/signup" method="post" enctype="multipart/form-data" onsubmit="return checkPasswordMatch();">
             <div class="input-group">
-                <input type="text" id="userId" name="userId" placeholder="아이디" required>
+                <input type="text" id="userId" name="userId" placeholder="아이디(5글자 이상)" required>
                 <button type="button" class="check-btn" onclick="checkId()">중복확인</button>
             </div>
             <div id="idMsg" class="msg"></div>
@@ -154,8 +154,7 @@
             <input type="date" id="birth" required>
             <input type="hidden" name="birth" id="birthHidden">
 
-            <input type="file" id="profileImageFile" name="profileImageFile" accept="image/*">
-            <img id="previewImage" src="" alt="이미지 미리보기" style="display:none; width:120px; height:120px; border:1px solid #ccc; margin-top:10px; object-fit:cover;">
+            <input type="file" name="profileImageFile" accept="image/*">
 
             <button type="submit">회원가입</button>
         </form>
@@ -257,24 +256,9 @@
         const email = getFullEmail();
         document.getElementById("emailHidden").value = email;
     });
-    document.getElementById("profileImageFile").addEventListener("change", function(event) {
-        const file = event.target.files[0];
-        const preview = document.getElementById("previewImage");
 
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = "block";
-            };
-            reader.readAsDataURL(file);
-        } else {
-            preview.src = "";
-            preview.style.display = "none";
-        }
-    });
-    const msg = /*[[${msg} == null ? 'null' : '"' + ${msg} + '"']]*/ null;
-    if (msg !== null && msg !== 'null') {
+    const msg = [[${msg}]];
+    if (msg && msg !== 'null') {
         alert(msg);
     }
 </script>

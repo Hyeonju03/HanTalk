@@ -13,8 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,29 +71,13 @@ public class UserController {
             model.addAttribute("msg", "특수문자 혹은 공백이 포함될 수 없습니다.");
             return "userPage/UserLoginPage";
         }
-
         if (profileImageFile != null && !profileImageFile.isEmpty()) {
-            String originalFilename = profileImageFile.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String storedFilename = usersDTO.getUserId()+"Image" + extension;
-
-            if (containForbidChar(originalFilename, "image")) {
+            String fileName = profileImageFile.getOriginalFilename();
+            if (containForbidChar(fileName, "image")) {
                 model.addAttribute("msg", "허용되지 않는 이미지 파일명입니다.");
                 return "userPage/UserLoginPage";
             }
-            String uploadDir = System.getProperty("user.dir") + "/profile/";
-            File destination = new File(uploadDir + storedFilename);
-            if (!destination.getParentFile().exists()) {
-                destination.getParentFile().mkdirs();
-            }
-            try {
-                profileImageFile.transferTo(destination);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            System.out.println("이미지 저장 경로: " + uploadDir);
-            usersDTO.setProfileImage("profile/" + storedFilename);
+            usersDTO.setProfileImage(fileName);
         }
 
         boolean isSuccess = service.signUp(usersDTO);
@@ -136,7 +118,7 @@ public class UserController {
             UsersDTO user = service.getUserOne(userId);
             newSession.setAttribute("userNo", user.getUserNo());
             newSession.setAttribute("role", "USER");
-            service.setLeaningLog(userId, 0);
+            service.setLeaningLog(userId);
         }
         newSession.setMaxInactiveInterval(1800); //세션 시간제한 설정
         return "userPage/UserTestPage";
@@ -253,11 +235,11 @@ public class UserController {
             return ResponseEntity.status(404).body(result);
         }
     }
+
     // 입력값 검증 메서드
     // 중복체크 등 DB 관련은 서비스에서 따로 하고 여기선 입력값 검증
     private boolean isDTOOk(UsersDTO userdto) {
         if (userdto == null) return false;
-
         if (userdto.getUserId() == null || containForbidChar(userdto.getUserId(), "id")) return false;
         if (userdto.getName() == null || containForbidChar(userdto.getName(), "name")) return false;
         if (userdto.getPassword() == null || containForbidChar(userdto.getPassword(), "pw")) return false;
@@ -270,7 +252,6 @@ public class UserController {
     }
 
     private boolean isLoginOk(String userid, String password) {
-
         if (userid == null || containForbidChar(userid, "id"))
             return false;
         if (password == null || containForbidChar(password, "pw"))
@@ -301,23 +282,24 @@ public class UserController {
                 return input.matches(".*" + FORBIDDEN_CHARS + ".*") || !input.toLowerCase().matches(IMAGE_PATTERN);
             case "birth":
                 try {
-                    // yyyyMMdd → yyyy 추출
-                    int birthYear = Integer.parseInt(input.substring(0, 4));
+                    int birthYear = Integer.parseInt(input);
                     int currentYear = java.time.LocalDate.now().getYear();
                     return birthYear < 1900 || birthYear > currentYear;
-                } catch (Exception e) {
-                    return true; // 형식이 잘못되면 실패
+                } catch (NumberFormatException e) {
+                    return true;
                 }
             default:
                 return true;
         }
     }
+
     // ======== 비동기처리 =======
     @GetMapping("/user/isIdAvail")
     @ResponseBody
     public boolean isIdAvail(@RequestParam String userId) {
         return service.isIdAvail(userId);
     }
+
     @GetMapping("/user/isEmailAvail")
     @ResponseBody
     public boolean isEmailAvail(@RequestParam String email) {
