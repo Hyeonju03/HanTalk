@@ -39,19 +39,31 @@
         }
 
         // 최종 결과 표시
-        function showResult() {
-            let output = "";
-            for (let i = 0; i < problems.length; i++) {
-                let correct = problems[i].vocabulary;
-                let userAnswer = answers[i];
-                if (userAnswer === correct) {
-                    output += `<p>${i + 1}번: 정답! (${correct})</p>`;
-                } else {
-                    output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
-                }
-            }
-            document.body.innerHTML = `<h1>결과</h1>` + output;
+function showResult() {
+    let output = "";
+    for (let i = 0; i < problems.length; i++) {
+        let correct = problems[i].vocabulary;
+        let userAnswer = answers[i];
+        if (userAnswer === correct) {
+            output += `<p>${i + 1}번: 정답! (${correct})</p>`;
+        } else {
+            output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
         }
+    }
+    document.body.innerHTML = `<h1>결과</h1>` + output;
+
+    // 학습 완료 로그 저장 호출 (lesson1 → 1)
+    fetch('/study/complete?lessonNo=1', { method: 'POST' })
+        .then(res => res.text())
+        .then(result => {
+            if (result === 'success') {
+                console.log("학습 로그 저장 성공");
+            } else {
+                console.log("로그 저장 실패");
+            }
+        });
+}
+
     </script>
 </head>
 <body>
