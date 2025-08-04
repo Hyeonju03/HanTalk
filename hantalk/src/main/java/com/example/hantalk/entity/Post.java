@@ -59,4 +59,17 @@ public class Post {
     private List<Comment> commentList;
 
 
+    @PrePersist
+    public void prePersist() {
+        if (createDate == null) {
+            createDate = LocalDateTime.now();
+        }
+        if (updateDate == null) {
+            updateDate = LocalDateTime.now();
+        }
+    }
+    @PreUpdate
+    public void preUpdate() {
+        updateDate = LocalDateTime.now();
+    }
 }

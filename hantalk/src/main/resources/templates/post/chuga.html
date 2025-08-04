@@ -7,7 +7,11 @@
 <body>
 <h1>게시글 추가</h1>
 
+
+<p><strong>유저 번호:</strong> <span th:text="${user != null} ? user.userNo : '로그인 필요'">로그인 필요</span></p>
+
 <form th:action="@{/post/chugaProc}" th:object="${postDTO}" method="post">
+
     <p>제목: <input type="text" th:field="*{title}" /></p>
     <p>내용: <textarea th:field="*{content}"></textarea></p>
 

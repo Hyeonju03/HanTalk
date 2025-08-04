@@ -140,7 +140,7 @@ public class UserService {
         if (dto == null) return null;
 
         Users users = new Users();
-        users.setUserNo(dto.getUserNo());
+
         users.setUserId(dto.getUserId());
         users.setName(dto.getName());
         users.setEmail(dto.getEmail());

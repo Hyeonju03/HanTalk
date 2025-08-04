@@ -3,12 +3,17 @@ package com.example.hantalk.service;
 
 import com.example.hantalk.dto.PostDTO;
 import com.example.hantalk.entity.Post;
+import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.PostRepository;
-import org.hibernate.query.Page;
+import com.example.hantalk.repository.UsersRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,9 +24,12 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
+    private final UsersRepository usersRepository;
 
-    public PostService(PostRepository postRepository, ModelMapper modelMapper) {
+
+    public PostService(PostRepository postRepository, ModelMapper modelMapper, UsersRepository userRepository, UsersRepository usersRepository) {
         this.postRepository = postRepository;
+        this.usersRepository = usersRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -47,9 +55,19 @@ public class PostService {
     }
 
     public void setInsert(PostDTO dto){
+        if (dto.getUserNo() == null || dto.getUserNo() == 0) {
+            throw new IllegalArgumentException("userNo가 유효하지 않습니다.");
+        }
+
+        Users user = usersRepository.findById(dto.getUserNo())
+                .orElseThrow(() -> new RuntimeException("해당 유저가 없습니다."));
+
         Post post = modelMapper.map(dto, Post.class);
 
-        postRepository.save(modelMapper.map(dto, Post.class));
+
+        post.setUsers(user);
+
+        postRepository.save(post);
     }
 
     public void setUpdate(PostDTO dto){
@@ -71,13 +89,15 @@ public class PostService {
     }
 
     public void setDelete(PostDTO dto){
-        Post post = modelMapper.map(dto, Post.class);
-
-        postRepository.delete(modelMapper.map(dto, Post.class));
+        Optional<Post> postOpt = postRepository.findById(dto.getPostId());
+        postOpt.ifPresent(post -> postRepository.delete(post));
     }
 
-    public Page getPagePosts(int page, int i) {
-        return null;
+    public Page<PostDTO> getPagePosts(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page postPage = postRepository.findAll(pageable);
+
+        return postPage.map(post -> modelMapper.map(post, PostDTO.class));
     }
 }
 

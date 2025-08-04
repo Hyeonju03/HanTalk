@@ -16,7 +16,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="post : ${posts}">
+    <tr th:each="post : ${list}">
         <td th:text="${post.title}">제목</td>
         <td th:text="${post.content}">내용</td>
     </tr>

@@ -104,7 +104,13 @@ public class UserController {
             } else {
                 session.setAttribute("role", "USER");
             }
-            return "userPage/UserTestPage"; // ✅ templates/MainPage.html 필요
+
+            UsersDTO user = service.getUserOne(userId);  //8.4 lsy 추가
+            if (user != null) {
+                session.setAttribute("userNo", user.getUserNo());
+            }
+
+            return "redirect:/post/chuga"; // ✅ templates/MainPage.html 필요 //8.4 lsy 수정
         } else {
             return "redirect:/user/login";
         }

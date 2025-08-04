@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>게시물 상세보기</title>
+    <title th:text="${returnDTO.title}">게시물 상세보기</title>
 </head>
 <body>
+<h1 th:text="${returnDTO.title}">게시물 제목</h1>
+<p>작성일: <span th:text="${#dates.format(returnDTO.createDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+<div th:text="${returnDTO.content}">게시물 내용</div>
+
+<button th:onclick="|location.href='@{/post/sujung(id=${post.reviewId})}'|">리뷰 수정</button>
+<button th:onclick="|location.href='@{/reviews/sakje(id=${reviews.reviewId})}'|">리뷰 삭제</button>
 
 </body>
 </html>

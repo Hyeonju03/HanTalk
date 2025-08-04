@@ -12,6 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+
+
 @Controller
 @RequestMapping("/post")
 public class PostController {
@@ -55,33 +57,35 @@ public class PostController {
         return "post/view";
     }
 
-    // 게시글 등록 페이지
+    //게시글 등록
     @GetMapping("/chuga")
-    public String chuga(HttpSession session) {
-        AdminDTO loginAdmin = (AdminDTO) session.getAttribute("loginAdmin");
-        if (loginAdmin == null) {
-            return "redirect:/admin/login";
+    public String chuga(Model model, HttpSession session) {
+        Integer userNo = (Integer) session.getAttribute("userNo");
+        System.out.println("chuga 진입, userNo=" + userNo);
+        if (userNo == null || userNo == 0) {
+            System.out.println("userNo 없어서 로그인 페이지로 리다이렉트");
+            return "redirect:/user/login";
         }
+        model.addAttribute("postDTO", new PostDTO());
         return "post/chuga";
     }
 
     // 게시글 등록 처리
     @PostMapping("/chugaProc")
     public String chugaProc(@ModelAttribute PostDTO postDTO, HttpSession session, RedirectAttributes redire) {
-        AdminDTO loginAdmin = (AdminDTO) session.getAttribute("loginAdmin");
-        if (loginAdmin == null) {
-            redire.addFlashAttribute("msg", "관리자만 등록할 수 있습니다.");
-            return "redirect:/post/list";
+        Integer userNo = (Integer) session.getAttribute("userNo");
+        if (userNo == null) {
+            redire.addFlashAttribute("msg", "로그인이 필요합니다.");
+            return "redirect:/user/login";
         }
-
+        postDTO.setUserNo(userNo);
         postService.setInsert(postDTO);
-        redire.addFlashAttribute("msg", "게시글이 등록되었습니다.");
         return "redirect:/post/list";
     }
 
     // 게시글 수정 페이지
     @GetMapping("/sujung/{postId}")
-    public String sujung(@PathVariable("postId") int postId, Model model, HttpSession session) {
+    public String sujung(@PathVariable("postId") int postId, Model model) {
         PostDTO dto = new PostDTO();
         dto.setPostId(postId);
         PostDTO returnDTO = postService.getSelectOne(dto);
@@ -91,13 +95,7 @@ public class PostController {
 
     // 게시글 수정 처리
     @PostMapping("/sujungProc")
-    public String sujungProc(@ModelAttribute PostDTO dto, HttpSession session, RedirectAttributes redire) {
-        AdminDTO loginAdmin = (AdminDTO) session.getAttribute("loginAdmin");
-        if (loginAdmin == null) {
-            redire.addFlashAttribute("msg", "관리자만 수정할 수 있습니다.");
-            return "redirect:/post/list";
-        }
-
+    public String sujungProc(@ModelAttribute PostDTO dto, RedirectAttributes redire) {
         postService.setUpdate(dto);
         redire.addFlashAttribute("msg", "게시글이 수정되었습니다.");
         return "redirect:/post/view/" + dto.getPostId();
@@ -105,12 +103,7 @@ public class PostController {
 
     // 게시글 삭제 페이지
     @GetMapping("/sakje/{postId}")
-    public String sakje(@PathVariable("postId") int postId, Model model, HttpSession session) {
-        AdminDTO loginAdmin = (AdminDTO) session.getAttribute("loginAdmin");
-        if (loginAdmin == null) {
-            return "redirect:/admin/login";
-        }
-
+    public String sakje(@PathVariable("postId") int postId, Model model) {
         PostDTO dto = new PostDTO();
         dto.setPostId(postId);
         PostDTO returnDTO = postService.getSelectOne(dto);
@@ -120,14 +113,7 @@ public class PostController {
 
     // 게시글 삭제 처리
     @PostMapping("/sakjeProc")
-    public String sakjeProc(@ModelAttribute PostDTO dto, HttpSession session, RedirectAttributes redire) {
-        AdminDTO loginAdmin = (AdminDTO) session.getAttribute("loginAdmin");
-
-        if (loginAdmin == null) {
-            redire.addFlashAttribute("msg", "관리자만 삭제할 수 있습니다.");
-            return "redirect:/post/list";
-        }
-
+    public String sakjeProc(@ModelAttribute PostDTO dto, RedirectAttributes redire) {
         postService.setDelete(dto);
         redire.addFlashAttribute("msg", "게시글이 삭제되었습니다.");
         return "redirect:/post/list";
