@@ -118,7 +118,7 @@ public class UserController {
             UsersDTO user = service.getUserOne(userId);
             newSession.setAttribute("userNo", user.getUserNo());
             newSession.setAttribute("role", "USER");
-            service.setLeaningLog(userId);
+            service.setLeaningLog(userId, 0);
         }
         newSession.setMaxInactiveInterval(1800); //세션 시간제한 설정
         return "userPage/UserTestPage";
@@ -235,11 +235,11 @@ public class UserController {
             return ResponseEntity.status(404).body(result);
         }
     }
-
     // 입력값 검증 메서드
     // 중복체크 등 DB 관련은 서비스에서 따로 하고 여기선 입력값 검증
     private boolean isDTOOk(UsersDTO userdto) {
         if (userdto == null) return false;
+
         if (userdto.getUserId() == null || containForbidChar(userdto.getUserId(), "id")) return false;
         if (userdto.getName() == null || containForbidChar(userdto.getName(), "name")) return false;
         if (userdto.getPassword() == null || containForbidChar(userdto.getPassword(), "pw")) return false;
@@ -252,6 +252,7 @@ public class UserController {
     }
 
     private boolean isLoginOk(String userid, String password) {
+
         if (userid == null || containForbidChar(userid, "id"))
             return false;
         if (password == null || containForbidChar(password, "pw"))
@@ -292,14 +293,12 @@ public class UserController {
                 return true;
         }
     }
-
     // ======== 비동기처리 =======
     @GetMapping("/user/isIdAvail")
     @ResponseBody
     public boolean isIdAvail(@RequestParam String userId) {
         return service.isIdAvail(userId);
     }
-
     @GetMapping("/user/isEmailAvail")
     @ResponseBody
     public boolean isEmailAvail(@RequestParam String email) {

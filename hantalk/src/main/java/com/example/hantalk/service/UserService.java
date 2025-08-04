@@ -109,9 +109,8 @@ public class UserService {
         return result;
     }
 
-    public void setLeaningLog(String userId) {
+    public void setLeaningLog(String userId, int lessonNo) {
         Optional<Users> getUserOpt = userRepository.findByUserId(userId);
-        LocalDateTime today = LocalDateTime.now();
         if (getUserOpt.isEmpty()) {
             return;
         }
@@ -121,15 +120,33 @@ public class UserService {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        boolean exists = leaningLogRepository
-                .existsByUsers_UserNoAndLearningDateBetween(user.getUserNo(), startOfDay, endOfDay);
+        Optional<Leaning_Log> logOpt = leaningLogRepository
+                .findByUsers_UserNoAndLearningDateBetween(user.getUserNo(), startOfDay, endOfDay);
 
-        if (!exists) {
-            Leaning_Log log = new Leaning_Log();
+        Leaning_Log log;
+
+        if (logOpt.isPresent()) {
+            log = logOpt.get();
+        } else {
+            log = new Leaning_Log();
             log.setUsers(user);
-            log.setLearningDate(today);
-            leaningLogRepository.save(log);
+            log.setLearningDate(LocalDateTime.now());
+            log.setLearning1Count(0);
+            log.setLearning2Count(0);
+            log.setLearning3Count(0);
+            log.setLearning4Count(0);
         }
+        
+        if (lessonNo != 0) {
+            switch (lessonNo) {
+                case 1 -> log.setLearning1Count(log.getLearning1Count() + 1);
+                case 2 -> log.setLearning2Count(log.getLearning2Count() + 1);
+                case 3 -> log.setLearning3Count(log.getLearning3Count() + 1);
+                case 4 -> log.setLearning4Count(log.getLearning4Count() + 1);
+            }
+        }
+
+        leaningLogRepository.save(log);
     }
 
 
@@ -247,7 +264,6 @@ public class UserService {
     public boolean isEmailAvail(String email) {
         return !(userRepository.existsByEmail(email) || adminRepository.existsByEmail(email));
     }
-
     private Users toEntity(UsersDTO dto) {
         if (dto == null) return null;
 
@@ -283,5 +299,4 @@ public class UserService {
         dto.setPoint(users.getPoint());
         return dto;
     }
-
 }
