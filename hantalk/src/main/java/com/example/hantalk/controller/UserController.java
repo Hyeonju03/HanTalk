@@ -13,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,13 +73,29 @@ public class UserController {
             model.addAttribute("msg", "특수문자 혹은 공백이 포함될 수 없습니다.");
             return "userPage/UserLoginPage";
         }
+
         if (profileImageFile != null && !profileImageFile.isEmpty()) {
-            String fileName = profileImageFile.getOriginalFilename();
-            if (containForbidChar(fileName, "image")) {
+            String originalFilename = profileImageFile.getOriginalFilename();
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String storedFilename = usersDTO.getUserId()+"Image" + extension;
+
+            if (containForbidChar(originalFilename, "image")) {
                 model.addAttribute("msg", "허용되지 않는 이미지 파일명입니다.");
                 return "userPage/UserLoginPage";
             }
-            usersDTO.setProfileImage(fileName);
+            String uploadDir = System.getProperty("user.dir") + "/profile/";
+            File destination = new File(uploadDir + storedFilename);
+            if (!destination.getParentFile().exists()) {
+                destination.getParentFile().mkdirs();
+            }
+            try {
+                profileImageFile.transferTo(destination);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            System.out.println("이미지 저장 경로: " + uploadDir);
+            usersDTO.setProfileImage("profile/" + storedFilename);
         }
 
         boolean isSuccess = service.signUp(usersDTO);
@@ -283,11 +301,12 @@ public class UserController {
                 return input.matches(".*" + FORBIDDEN_CHARS + ".*") || !input.toLowerCase().matches(IMAGE_PATTERN);
             case "birth":
                 try {
-                    int birthYear = Integer.parseInt(input);
+                    // yyyyMMdd → yyyy 추출
+                    int birthYear = Integer.parseInt(input.substring(0, 4));
                     int currentYear = java.time.LocalDate.now().getYear();
                     return birthYear < 1900 || birthYear > currentYear;
-                } catch (NumberFormatException e) {
-                    return true;
+                } catch (Exception e) {
+                    return true; // 형식이 잘못되면 실패
                 }
             default:
                 return true;
