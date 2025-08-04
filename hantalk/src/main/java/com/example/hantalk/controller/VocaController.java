@@ -20,6 +20,12 @@ public class VocaController {
     private final VocaService vocaService;
     private final UserService userService;
 
+    // 학습 공간 페잊지
+    @GetMapping("/main")
+    public String studyMain() {
+        return "study/main";
+    }
+
     // 학습 1번 (단어 맞추기)
     @GetMapping("/lesson1")
     public String getFillBlank(@RequestParam(defaultValue = "5") int count, Model model) {

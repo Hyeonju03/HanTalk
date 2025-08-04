@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>학습 메인</title>
+  <script>
+    function openLesson(url) {
+        // 새 창으로 열기 (크기와 옵션 지정 가능)
+        window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+    }
+  </script>
+</head>
+<body>
+<h1>학습 메뉴</h1>
+
+<div style="margin-top: 20px;">
+  <button onclick="openLesson('/study/lesson1')">Lesson 1 - 단어 맞추기</button>
+  <button onclick="openLesson('/study/lesson3')">Lesson 3 - 객관식 문제</button>
+</div>
+
+</body>
+</html>
