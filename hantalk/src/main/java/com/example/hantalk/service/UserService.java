@@ -3,8 +3,10 @@ package com.example.hantalk.service;
 import com.example.hantalk.dto.AdminDTO;
 import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.entity.Admin;
+import com.example.hantalk.entity.Leaning_Log;
 import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.AdminRepository;
+import com.example.hantalk.repository.Leaning_LogRepository;
 import com.example.hantalk.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -21,6 +24,8 @@ public class UserService {
     UsersRepository userRepository;
     @Autowired
     AdminRepository adminRepository;
+    @Autowired
+    Leaning_LogRepository leaningLogRepository;
 
     public List<UsersDTO> getUserList() {
         List<Users> users = userRepository.findAll();
@@ -87,7 +92,6 @@ public class UserService {
                 return result;
             }
         }
-
         // 관리자 체크
         Optional<Admin> adminOpt = adminRepository.findByAdminId(userid);
         if (adminOpt.isPresent()) {
@@ -104,6 +108,30 @@ public class UserService {
 
         return result;
     }
+
+    public void setLeaningLog(String userId) {
+        Optional<Users> getUserOpt = userRepository.findByUserId(userId);
+        LocalDateTime today = LocalDateTime.now();
+        if (getUserOpt.isEmpty()) {
+            return;
+        }
+
+        Users user = getUserOpt.get();
+
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        boolean exists = leaningLogRepository
+                .existsByUsers_UserNoAndLearningDateBetween(user.getUserNo(), startOfDay, endOfDay);
+
+        if (!exists) {
+            Leaning_Log log = new Leaning_Log();
+            log.setUsers(user);
+            log.setLearningDate(today);
+            leaningLogRepository.save(log);
+        }
+    }
+
 
     public void update(UsersDTO usersDTO) {
         Optional<Users> userOpt = userRepository.findByUserId(usersDTO.getUserId());
@@ -134,44 +162,6 @@ public class UserService {
             userRepository.save(users);
         }
     }
-
-
-    private Users toEntity(UsersDTO dto) {
-        if (dto == null) return null;
-
-        Users users = new Users();
-        users.setUserNo(dto.getUserNo());
-        users.setUserId(dto.getUserId());
-        users.setName(dto.getName());
-        users.setEmail(dto.getEmail());
-        users.setPassword(dto.getPassword());
-        users.setNickname(dto.getNickname());
-        users.setProfileImage(dto.getProfileImage());
-        users.setJoinDate(dto.getJoinDate());
-        users.setBirth(dto.getBirth());
-        users.setStatus(dto.getStatus());
-        users.setPoint(dto.getPoint());
-        return users;
-    }
-
-    private UsersDTO toDTO(Users users) {
-        if (users == null) return null;
-
-        UsersDTO dto = new UsersDTO();
-        dto.setUserNo(users.getUserNo());
-        dto.setUserId(users.getUserId());
-        dto.setName(users.getName());
-        dto.setEmail(users.getEmail());
-        dto.setPassword(users.getPassword());
-        dto.setNickname(users.getNickname());
-        dto.setProfileImage(users.getProfileImage());
-        dto.setJoinDate(users.getJoinDate());
-        dto.setBirth(users.getBirth());
-        dto.setStatus(users.getStatus());
-        dto.setPoint(users.getPoint());
-        return dto;
-    }
-
 
     public String findId(String name, String email) {
         Optional<Users> userOpt = userRepository.findByNameAndEmail(name, email); // ✅ 새로운 메서드 필요
@@ -258,9 +248,40 @@ public class UserService {
         return !(userRepository.existsByEmail(email) || adminRepository.existsByEmail(email));
     }
 
-    public Users getUserEntity(String userId) {
-        return userRepository.findByUserId(userId).orElse(null);
+    private Users toEntity(UsersDTO dto) {
+        if (dto == null) return null;
+
+        Users users = new Users();
+        users.setUserNo(dto.getUserNo());
+        users.setUserId(dto.getUserId());
+        users.setName(dto.getName());
+        users.setEmail(dto.getEmail());
+        users.setPassword(dto.getPassword());
+        users.setNickname(dto.getNickname());
+        users.setProfileImage(dto.getProfileImage());
+        users.setJoinDate(dto.getJoinDate());
+        users.setBirth(dto.getBirth());
+        users.setStatus(dto.getStatus());
+        users.setPoint(dto.getPoint());
+        return users;
     }
 
+    private UsersDTO toDTO(Users users) {
+        if (users == null) return null;
+
+        UsersDTO dto = new UsersDTO();
+        dto.setUserNo(users.getUserNo());
+        dto.setUserId(users.getUserId());
+        dto.setName(users.getName());
+        dto.setEmail(users.getEmail());
+        dto.setPassword(users.getPassword());
+        dto.setNickname(users.getNickname());
+        dto.setProfileImage(users.getProfileImage());
+        dto.setJoinDate(users.getJoinDate());
+        dto.setBirth(users.getBirth());
+        dto.setStatus(users.getStatus());
+        dto.setPoint(users.getPoint());
+        return dto;
+    }
 
 }
