@@ -16,7 +16,6 @@ public class Attendance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="attendance_id")
     private int attendanceId;
 
     @CreatedDate

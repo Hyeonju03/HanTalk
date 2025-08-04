@@ -17,4 +17,8 @@ public class CommentDTO {
 
     private Post post;
     private Users users;
+
+    public void setPostId(int postId) {
+
+    }
 }

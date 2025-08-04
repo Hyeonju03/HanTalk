@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>4지선다 객관식 학습</title>
+  <script th:inline="javascript">
+    let questions = /*[[${questions}]]*/ [];  // description, options, answer 포함
+    let answers = new Array(questions.length).fill(""); // 사용자 선택 저장
+    let currentIndex = 0;
+
+    window.onload = function() {
+        showQuestion(currentIndex);
+    };
+
+    function showQuestion(index) {
+        const question = questions[index];
+
+        document.getElementById('description').textContent = question['description'];
+
+        const optionsContainer = document.getElementById('options');
+        optionsContainer.innerHTML = "";
+        question['options'].forEach(option => {
+            const optionHtml = `
+                <label>
+                    <input type="radio" name="option" value="${option}"
+                        ${answers[index] === option ? 'checked' : ''}>
+                    ${option}
+                </label><br>`;
+            optionsContainer.innerHTML += optionHtml;
+        });
+
+        document.getElementById('nextBtn').textContent =
+            (index === questions.length - 1) ? "결과 보기" : "다음으로";
+    }
+
+    function nextQuestion() {
+        // 현재 선택 저장
+        const selected = document.querySelector('input[name="option"]:checked');
+        answers[currentIndex] = selected ? selected.value : "";
+
+        if (currentIndex === questions.length - 1) {
+            showResult();
+        } else {
+            currentIndex++;
+            showQuestion(currentIndex);
+        }
+    }
+
+    function showResult() {
+        let output = "";
+        for (let i = 0; i < questions.length; i++) {
+            let correct = questions[i]['answer'];
+            let userAnswer = answers[i];
+            if (userAnswer === correct) {
+                output += `<p>${i + 1}번: 정답! (${correct})</p>`;
+            } else if (userAnswer === "") {
+                output += `<p>${i + 1}번: 미응답 (정답은 ${correct})</p>`;
+            } else {
+                output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
+            }
+        }
+        document.body.innerHTML = `<h1>결과</h1>` + output;
+    }
+  </script>
+
+</head>
+<body>
+<h1>학습 3 - 4지선다 객관식</h1>
+
+<p id="description"></p>
+<div id="options"></div>
+<button type="button" id="nextBtn" onclick="nextQuestion()">다음으로</button>
+<p id="result"></p>
+
+</body>
+</html>

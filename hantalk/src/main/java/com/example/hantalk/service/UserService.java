@@ -247,7 +247,6 @@ public class UserService {
     public boolean isEmailAvail(String email) {
         return !(userRepository.existsByEmail(email) || adminRepository.existsByEmail(email));
     }
-
     private Users toEntity(UsersDTO dto) {
         if (dto == null) return null;
 
@@ -283,5 +282,4 @@ public class UserService {
         dto.setPoint(users.getPoint());
         return dto;
     }
-
 }
