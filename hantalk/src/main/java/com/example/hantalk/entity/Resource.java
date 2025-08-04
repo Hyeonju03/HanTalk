@@ -28,7 +28,7 @@ public class Resource {
     private String archive;      // ARCHIVE
 
     @Column(name="view_count")
-    private int viewCount;       // VIEW_COUNT
+    private int viewCount = 0;       // VIEW_COUNT
 
     @CreatedDate
     @Column(name="create_date", updatable = false)
@@ -37,4 +37,5 @@ public class Resource {
     @CreatedDate
     @Column(name="update_date")
     private LocalDateTime updateDate;  // UPDATE_DATE
+
 }

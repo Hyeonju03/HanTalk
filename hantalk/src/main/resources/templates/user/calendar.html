@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>출석 캘린더</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Tailwind CSS가 기본 제공하지 않는 그리드 셀 크기 조정을 위한 추가 스타일 */
+    .calendar-grid-cell {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100px; /* 각 날짜 셀의 최소 높이 80px -> 100px로 증가 */
+      padding: 5px;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-8">
+
+<div class="max-w-5xl mx-auto bg-white rounded border border-gray-300 shadow-lg">
+  <div class="flex items-center justify-between border-b border-gray-300 p-3 text-gray-500 select-none">
+    <button id="prevMonth" class="text-2xl hover:text-blue-500">◀</button>
+    <div id="currentMonth" class="text-xl font-semibold text-gray-700"></div>
+    <button id="nextMonth" class="text-2xl hover:text-blue-500">▶</button>
+  </div>
+
+  <div class="grid grid-cols-7 text-sm text-center text-gray-500 uppercase border-b border-gray-300">
+    <div class="py-2">MON</div>
+    <div class="py-2">TUE</div>
+    <div class="py-2">WED</div>
+    <div class="py-2">THU</div>
+    <div class="py-2">FRI</div>
+    <div class="py-2 text-blue-600">SAT</div>
+    <div class="py-2 text-red-600">SUN</div>
+  </div>
+
+  <div id="calendar" class="grid grid-cols-7 gap-1 p-2 text-center text-base text-gray-700">
+  </div>
+</div>
+
+<div class="text-center mt-6">
+  <a href="/user/view" class="text-blue-600 hover:underline text-lg">마이 페이지로</a>
+</div>
+
+<script>
+  const calendarEl = document.getElementById('calendar');
+  const monthLabel = document.getElementById('currentMonth');
+
+  const today = new Date();
+  let currentYear = today.getFullYear();
+  let currentMonth = today.getMonth(); // 0~11
+
+  // ✅ 캘린더 렌더링 (attendanceDates를 인자로 받음)
+  function renderCalendar(attendanceDates) {
+    calendarEl.innerHTML = ''; // 초기화
+
+    // 현재 월의 첫 날과 마지막 날 정보
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0:일요일 ~ 6:토요일
+    const lastDateOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // 해당 월의 마지막 날짜
+
+    // 헤더에 년월 표시 (이미지처럼 '2025.8' 형식)
+    monthLabel.textContent = `${currentYear}.${currentMonth + 1}`;
+
+    // 캘린더의 첫 요일이 월요일이므로, 'firstDayOfMonth' 값을 조정하여 빈 칸을 채웁니다.
+    // 일요일(0)이면 6개의 빈 칸, 월요일(1)이면 0개의 빈 칸
+    let startDayOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+
+    // 빈 칸 추가
+    for (let i = 0; i < startDayOffset; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'calendar-grid-cell';
+      calendarEl.appendChild(emptyCell);
+    }
+
+    // 날짜 셀 생성
+    for (let day = 1; day <= lastDateOfMonth; day++) {
+      const cell = document.createElement('div');
+      cell.className = 'calendar-grid-cell relative rounded cursor-default';
+
+      // 날짜 텍스트 요소
+      const dayText = document.createElement('div');
+      dayText.textContent = day;
+      dayText.className = 'font-semibold mb-1';
+
+      // 현재 날짜의 요일 계산 (월요일이 0, 일요일이 6)
+      const currentDayOfWeek = new Date(currentYear, currentMonth, day).getDay();
+
+      // 토요일 파랑, 일요일 빨강
+      if (currentDayOfWeek === 6) {
+        dayText.classList.add('text-blue-600');
+      } else if (currentDayOfWeek === 0) {
+        dayText.classList.add('text-red-600');
+      }
+
+      cell.appendChild(dayText);
+
+      // 출석 체크 표시 (PNG 이미지)
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      if (attendanceDates.includes(dateStr)) {
+        const imgIcon = document.createElement('img'); // img 태그 생성
+        imgIcon.src = '/images/bono.png'; // ★ 여기에 PNG 이미지 경로를 입력하세요.
+                                                // 예: 'https://example.com/images/smile_icon.png'
+        imgIcon.alt = '출석 완료'; // 접근성을 위한 alt 텍스트
+        imgIcon.className = 'w-30 h-30 mx-auto'; // Tailwind CSS를 사용하여 이미지 크기 조절
+
+        cell.appendChild(imgIcon);
+      }
+
+      calendarEl.appendChild(cell);
+    }
+  }
+
+  // ✅ 서버에서 출석 데이터 받아오기 및 렌더링
+  function fetchAndRender() {
+    axios.get('/user/calendar/data')
+      .then(response => {
+        renderCalendar(response.data);
+      })
+      .catch(error => {
+        console.error('출석 정보 불러오기 실패:', error);
+        renderCalendar([]);
+      });
+  }
+
+  // ✅ 이전/다음 월 버튼
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    currentMonth--;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
+    }
+    fetchAndRender();
+  });
+
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    currentMonth++;
+    if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    }
+    fetchAndRender();
+  });
+
+  // ✅ 초기 렌더링
+  fetchAndRender();
+</script>
+
+</body>
+</html>
