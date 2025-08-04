@@ -28,7 +28,9 @@ public class MyPageService {
                 .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
         user.setNickname(dto.getNickname());
-        user.setPassword(encode(dto.getPassword()));
+        if(!dto.getPassword().isEmpty()){
+            user.setPassword(encode(dto.getPassword()));
+        }
         user.setEmail(dto.getEmail());
         user.setProfileImage(dto.getProfileImage());
 
