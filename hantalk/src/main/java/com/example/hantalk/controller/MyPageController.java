@@ -80,6 +80,15 @@ public class MyPageController {
         return "redirect:/user/view";
     }
 
+    @PostMapping("/apply-frame")
+    public String applyProfileFrame(@RequestParam("itemId") int itemId, HttpSession session) {
+        Integer userNo = (Integer) session.getAttribute("userNo");
+        if (userNo == null) return "redirect:/user/login";
+
+        myPageService.applyProfileFrame(userNo, itemId);
+        return "redirect:/user/view";
+    }
+
     @GetMapping("/items")
     public String userItems(Model model, HttpSession session) {
         Integer userNo = (Integer) session.getAttribute("userNo");

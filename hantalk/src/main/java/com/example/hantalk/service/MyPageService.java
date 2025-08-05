@@ -122,4 +122,18 @@ public class MyPageService {
                 .orElseThrow(() -> new RuntimeException("사용자 없음"));
         return user.getUserItemsList();
     }
+
+    @Transactional
+    public void applyProfileFrame(int userNo, int itemId) {
+        Users user = usersRepository.findById(userNo)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("아이템 없음"));
+
+        // 프레임 이미지 경로 저장 (파일명만 저장해도 됨)
+        user.setProfileFrame(item.getItemImage()); // 예: "gold_frame.png"
+        usersRepository.save(user);
+    }
+
 }
