@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>파일 미리보기</title>
+  <style>
+    /* 전체 바디 및 레이아웃 */
+    body {
+      background: #f0f4f8;
+      color: #444d6e;
+      font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+    }
+    nav {
+      width: 200px;
+      background: #dbe9ff;
+      padding: 2rem 1rem;
+      height: 100vh;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      position: fixed;
+      top: 0; left: 0;
+      color: #506ab4;
+    }
+    nav h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: #3f5499;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+    nav li {
+      margin-bottom: 0.8rem;
+    }
+    nav a {
+      text-decoration: none;
+      color: #506ab4;
+      font-weight: 600;
+    }
+    nav a:hover {
+      color: #3a4f8a;
+    }
+    main {
+      margin-left: 200px;
+      padding: 2rem;
+      flex: 1;
+      background: #fefcff;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+      color: #506ab4;
+      margin-bottom: 1rem;
+      position: relative;
+      font-weight: 700;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto 4rem auto;
+      background: white;
+      padding: 2rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(180, 200, 255, 0.35);
+      box-sizing: border-box;
+      flex-grow: 1;
+    }
+    iframe, img, pre {
+      width: 100%;
+      height: 600px;
+      border: none;
+      margin-top: 1.5rem;
+      border-radius: 8px;
+      background: #f9fafc;
+      box-shadow: inset 0 0 10px #dbe9ff;
+    }
+    pre {
+      white-space: pre-wrap;
+      background: #f5f7ff;
+      padding: 1.2rem;
+      border-radius: 8px;
+      overflow: auto;
+      max-height: 600px;
+      color: #333a66;
+      font-family: 'Nanum Gothic', monospace, monospace;
+      box-shadow: inset 0 0 6px #c3cde9;
+    }
+    p {
+      text-align: center;
+      font-size: 1rem;
+      color: #6a739c;
+      margin-top: 2rem;
+      font-weight: 600;
+    }
+    p a {
+      color: #506ab4;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    p a:hover {
+      text-decoration: underline;
+      color: #3a4f8a;
+    }
+  </style>
+  <script>
+    function confirmDelete(resourceId) {
+      if (confirm('정말 이 자료를 삭제하시겠습니까?')) {
+        window.location.href = '/resource/delete/' + resourceId;
+      }
+    }
+    function goToDetail(row) {
+      const url = row.getAttribute('data-url');
+      if (url) {
+        window.location.href = url;
+      }
+    }
+  </script>
+</head>
+<body>
+<nav>
+  <h2>자료실 메뉴</h2>
+  <ul>
+    <li><a href="/resource/main">사용자 메인</a></li>
+    <li><a href="/resource/admin/main">관리자 메인</a></li>
+    <li><a href="/resource/chuga">자료 등록</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="container">
+    <h1 th:text="${fileName}">파일명</h1>
+
+    <!-- 이미지 미리보기 -->
+    <img th:if="${isImage}" th:src="@{|/resource/view/file/${fileName}|}" alt="이미지 미리보기" />
+
+    <!-- 오피스 파일 (ppt, doc, xls 등) 구글 Docs 뷰어 iframe 미리보기 -->
+    <iframe th:if="${isOfficeFile}"
+            th:src="@{|https://docs.google.com/gview?url=${'http://localhost:8080/resource/view/file/' + fileName}&embedded=true|}"
+            frameborder="0"
+            width="100%"
+            height="600px"></iframe>
+
+    <!-- PDF 등 직접 iframe으로 미리보기 가능한 문서 -->
+    <iframe th:if="${isDocument and !isOfficeFile and !isText}" th:src="@{|/resource/view/file/${fileName}|}" frameborder="0"></iframe>
+
+    <!-- 텍스트 파일은 내용 그대로 보여주기 -->
+    <pre th:if="${isText}" th:text="${textContent}">텍스트 내용</pre>
+
+    <!-- 미리보기 불가 파일 안내 -->
+    <p th:if="${!isImage and !isDocument and !isText}">
+      미리보기를 지원하지 않는 파일입니다. 다운로드해 주세요.
+    </p>
+
+    <p><a th:href="@{|/resource/download/file/${fileName}|}">파일 다운로드</a></p>
+  </div>
+</main>
+</body>
+</html>
