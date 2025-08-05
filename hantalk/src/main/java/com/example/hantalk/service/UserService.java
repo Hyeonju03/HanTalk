@@ -83,6 +83,9 @@ public class UserService {
                 if ("active".equalsIgnoreCase(users.getStatus())) {
                     result.put("isSuccess", true);
                     result.put("role", "USER");
+
+                    userOpt.get().setLastLogin(LocalDateTime.now());
+                    userRepository.save(userOpt.get());
                 } else {
                     result.put("isSuccess", false);
                     result.put("role", "BLOCKED"); // 상태가 비활성화된 경우 구분 가능
@@ -202,7 +205,7 @@ public class UserService {
     }
 
     public boolean isAdminThere() {
-        return adminRepository.count() > 0;
+        return adminRepository.existsById(1);
     }
 
     public void createDefaultAdmin() {
@@ -256,4 +259,5 @@ public class UserService {
         dto.setPoint(users.getPoint());
         return dto;
     }
+
 }

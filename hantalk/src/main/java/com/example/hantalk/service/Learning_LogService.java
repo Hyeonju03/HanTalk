@@ -23,6 +23,7 @@ public class Learning_LogService {
 
     public void setLearningLog(String userId) {
         Optional<Users> getUserOpt = usersRepository.findByUserId(userId);
+
         if (getUserOpt.isEmpty()) {
             System.out.println("학습 로그 생성 실패: 유저를 찾을 수 없음 (" + userId + ")");
             return;
@@ -82,5 +83,4 @@ public class Learning_LogService {
 
         return dailyCounts;
     }
-
 }
