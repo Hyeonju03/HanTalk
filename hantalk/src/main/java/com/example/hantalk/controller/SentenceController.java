@@ -3,6 +3,7 @@ package com.example.hantalk.controller;
 import com.example.hantalk.dto.SentenceDTO;
 import com.example.hantalk.entity.Learning_Log;
 import com.example.hantalk.entity.Sentence;
+import com.example.hantalk.service.Learning_LogService;
 import com.example.hantalk.service.SentenceService;
 import com.example.hantalk.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -20,7 +21,7 @@ import java.util.*;
 public class SentenceController {
     private static final Logger logger = LoggerFactory.getLogger(SentenceController.class);
     private final SentenceService sentenceService;
-    private final UserService userService;
+    private final Learning_LogService learning_logService;
     String folderName = "study";
 
     @GetMapping("/lesson2")
@@ -79,7 +80,7 @@ public class SentenceController {
 
             String userId = (String) session.getAttribute("userId");
             if(userId != null) {
-                userService.setLearningLog(userId, 2);
+                learning_logService.updateLearning_Log(userId, 2);
             }
 
             String nextSentence = sentenceService.getSelectRandom().getMunjang();
@@ -151,7 +152,7 @@ public class SentenceController {
         String userId = (String) session.getAttribute("userId");
         if (userId != null) {
             if(isCorrect) {
-                userService.setLearningLog(userId, 4);
+                learning_logService.updateLearning_Log(userId, 4);
             }
         }
 
