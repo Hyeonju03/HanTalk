@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,18 +29,45 @@ public class VocaController {
 
     // 학습 1번 (단어 맞추기)
     @GetMapping("/lesson1")
-    public String getFillBlank(@RequestParam(defaultValue = "5") int count, Model model) {
-         List<VocaDTO> problems = vocaService.getFillBlank(count);
+    public String getFillBlank(@RequestParam(defaultValue = "5") int count, HttpSession session, Model model) {
+        List<Integer> solvedIds = (List<Integer>) session.getAttribute("solvedIds_lesson1");
+        if (solvedIds == null) solvedIds = new ArrayList<>();
+
+        List<VocaDTO> problems = vocaService.getFillBlank(solvedIds, count);
+
+        for (VocaDTO dto : problems) {
+            solvedIds.add(dto.getVocaId());
+        }
+        session.setAttribute("solvedIds_lesson1", solvedIds);
+
          model.addAttribute("problems", problems);
          return "study/lesson1";
     }
 
     // 학습 3번 (4지선다 객관식)
     @GetMapping("/lesson3")
-    public String getMultipleChoice(@RequestParam(defaultValue = "5") int count, Model model) {
-        List<Map<String, Object>> questions = vocaService.getMultipleChoice(count);
+    public String getMultipleChoice(@RequestParam(defaultValue = "5") int count, HttpSession session, Model model) {
+        List<Integer> solvedIds = (List<Integer>) session.getAttribute("solvedIds_lesson3");
+        if (solvedIds == null) solvedIds = new ArrayList<>();
+
+        List<Map<String, Object>> questions = vocaService.getMultipleChoice(solvedIds, count);
+
+        for (Map<String, Object> question : questions) {
+            Integer vocaId = (Integer) question.get("vocaId");
+            solvedIds.add(vocaId);
+        }
+
+        session.setAttribute("solvedIds_lesson3", solvedIds);
+
         model.addAttribute("questions", questions);
         return "study/lesson3";
+    }
+
+    @GetMapping("/reset")
+    public String resetSession(HttpSession session) {
+        session.removeAttribute("solvedIds_lesson1");
+        session.removeAttribute("solvedIds_lesson3");
+        return "redirect:/study/lesson1";
     }
 
     @PostMapping("/complete")
