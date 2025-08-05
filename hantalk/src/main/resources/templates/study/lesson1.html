@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <title>단어 맞추기</title>
     <script th:inline="javascript">
+        // 서버에서 전달된 문제 데이터
         let problems = /*[[${problems}]]*/ [];
-        let answers = new Array(problems.length).fill(""); // 사용자 답 저장
+        let answers = new Array(problems.length).fill(""); // 사용자 입력 저장
         let currentIndex = 0;
 
+        // 페이지 로드 시 첫 문제 표시
         window.onload = function() {
             showProblem(currentIndex);
         };
@@ -24,7 +26,7 @@
                 (index === problems.length - 1) ? "결과 보기" : "다음으로";
         }
 
-        // 다음 문제 또는 결과 체크
+        // 다음 문제로 이동하거나 결과 표시
         function nextProblem() {
             // 현재 입력 저장
             answers[currentIndex] = document.getElementById('answer').value.trim();
@@ -51,28 +53,30 @@
                 }
             }
 
-            // 결과와 함께 다음 학습 이동 버튼 표시
+            // 결과와 다음 학습 이동 버튼
             document.body.innerHTML = `
                 <h1>결과</h1>
                 ${output}
                 <div style="position: fixed; bottom: 20px; right: 20px;">
-                    <button onclick="goToLesson3()">다음 학습(3)으로 이동</button>
+                    <button onclick="goToLesson3()">다음 학습으로 이동</button>
                 </div>
             `;
 
-            // 학습 완료 로그 저장 호출 (lesson1 → 1)
-            fetch('/study/complete?lessonNo=1', { method: 'POST' })
-                .then(res => res.text())
-                .then(result => {
-                    if (result === 'success') {
-                        console.log("학습 로그 저장 성공");
-                    } else {
-                        console.log("로그 저장 실패");
-                    }
-                });
+            // 학습 완료 로그 저장 호출 (lesson1 → complete1)
+            fetch('/study/complete1', {
+                method: 'POST'
+            })
+            .then(res => res.text())
+            .then(result => {
+                if (result === 'success') {
+                    console.log("학습 로그 저장 성공");
+                } else {
+                    console.log("로그 저장 실패");
+                }
+            });
         }
 
-        // lesson3으로 같은 창에서 이동
+        // lesson3으로 이동 (같은 팝업 창에서)
         function goToLesson3() {
             window.location.href = '/study/lesson3';
         }
@@ -85,6 +89,5 @@
 <input type="text" id="answer" placeholder="정답 입력">
 <button type="button" id="nextBtn" onclick="nextProblem()">다음으로</button>
 <p id="result"></p>
-
 </body>
 </html>
