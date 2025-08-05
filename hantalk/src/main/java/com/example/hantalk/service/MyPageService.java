@@ -1,19 +1,25 @@
 package com.example.hantalk.service;
 
 import com.example.hantalk.dto.UsersDTO;
+import com.example.hantalk.entity.Item;
+import com.example.hantalk.entity.User_Items;
 import com.example.hantalk.entity.Users;
+import com.example.hantalk.repository.ItemRepository;
 import com.example.hantalk.repository.UsersRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MyPageService {
 
     private final UsersRepository usersRepository;
+    private final ItemRepository itemRepository;
 
     public UsersDTO getMyPageInfo(Integer userNo) {
         Users user = usersRepository.findById(userNo)
@@ -93,5 +99,27 @@ public class MyPageService {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<User_Items> getUserOwnedItems(Integer userNo) {
+        Users user = usersRepository.findById(userNo)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        return user.getUserItemsList();
+    }
+
+    @Transactional
+    public void applyProfileImage(int userNo, int itemId) {
+        Users user = usersRepository.findById(userNo).orElseThrow();
+        Item item = itemRepository.findById(itemId).orElseThrow();
+
+        user.setProfileImage(item.getItemImage());
+        usersRepository.save(user);
+    }
+
+    public List<User_Items> getUserItems(Integer userNo) {
+        Users user = usersRepository.findById(userNo)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+        return user.getUserItemsList();
     }
 }

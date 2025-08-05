@@ -9,9 +9,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 로컬 C:/aaa/HanTalk/hantalk/ 폴더를 /upload/** URL로 매핑
-        registry.addResourceHandler("/upload/**")
-                .addResourceLocations("file:///C:/aaa/HanTalk/hantalk/upload/");
+        // 외부 폴더를 /images/** 경로로 노출
+        registry.addResourceHandler("/images/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/images/");
     }
-
 }

@@ -1,12 +1,15 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.UsersDTO;
+import com.example.hantalk.entity.User_Items;
 import com.example.hantalk.service.MyPageService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/user")
@@ -21,6 +24,11 @@ public class MyPageController {
         Integer userNo = (Integer) session.getAttribute("userNo");
         UsersDTO dto = myPageService.getMyPageInfo(userNo);
         model.addAttribute("user", dto);
+
+        // 구매한 아이템 목록 추가
+        List<User_Items> userItems = myPageService.getUserOwnedItems(userNo);
+        model.addAttribute("userItems", userItems);
+
         return "user/view";
     }
 
@@ -63,4 +71,22 @@ public class MyPageController {
         return "redirect:/user/login"; // 로그인페이지로
     }
 
+    @PostMapping("/apply-profile")
+    public String applyProfileImage(@RequestParam("itemId") int itemId, HttpSession session) {
+        Integer userNo = (Integer) session.getAttribute("userNo");
+        if (userNo == null) return "redirect:/user/login";
+
+        myPageService.applyProfileImage(userNo, itemId);
+        return "redirect:/user/view";
+    }
+
+    @GetMapping("/items")
+    public String userItems(Model model, HttpSession session) {
+        Integer userNo = (Integer) session.getAttribute("userNo");
+        if (userNo == null) return "redirect:/user/login";
+
+        List<User_Items> userItems = myPageService.getUserItems(userNo);
+        model.addAttribute("userItems", userItems);
+        return "user/items";
+    }
 }

@@ -11,38 +11,66 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ItemShopService {
 
     private final ItemRepository itemRepository;
     private final UserItemRepository userItemRepository;
-    private final UsersRepository userRepository;
+    private final UsersRepository usersRepository;
 
+    // 사용자에게 보여줄 전체 아이템 목록 + 보유 여부 체크
+    public List<Item> getAllItemsWithUserInfo(Users user) {
+        List<Item> items = itemRepository.findAll();
+        // 예: 사용자 보유 아이템과 비교하여 마크업 등 가능
+        return items;
+    }
 
+    // 관리자 - 전체 아이템 목록
+    public List<Item> getAllItems() {
+        return itemRepository.findAll();
+    }
+
+    // 단일 아이템 조회
+    public Item getItemById(int id) {
+        return itemRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("해당 아이템이 존재하지 않습니다. ID: " + id));
+    }
+
+    // 아이템 추가
+    public void addItem(Item item) {
+        itemRepository.save(item);
+    }
+
+    // 아이템 수정
+    public void updateItem(Item item) {
+        itemRepository.save(item); // ID가 존재하면 수정
+    }
+
+    // 아이템 삭제
+    public void deleteItem(int id) {
+        itemRepository.deleteById(id);
+    }
+
+    // 아이템 구매 처리
     @Transactional
     public boolean purchaseItem(Users user, int itemId) {
-        Item item = itemRepository.findById((long) itemId)
-                .orElseThrow(() -> new RuntimeException("아이템이 존재하지 않습니다."));
+        Item item = getItemById(itemId);
 
-        // 이미 보유한 아이템인지 확인
-        boolean alreadyOwned = userItemRepository.existsByUsersAndItem(user, item);
-        if (alreadyOwned) return false;
+        if (userItemRepository.existsByUsersAndItem(user, item)) {
+            return false;
+        }
 
-        // 포인트 부족 확인
-        if (user.getPoint() < item.getPrice()) return false;
+        if (user.getPoint() < item.getPrice()) {
+            return false;
+        }
 
         // 포인트 차감
         user.setPoint(user.getPoint() - item.getPrice());
-        userRepository.save(user);
 
-        // User_Items 저장
+        // 아이템 저장
         User_Items userItem = new User_Items();
         userItem.setUsers(user);
         userItem.setItem(item);
@@ -50,22 +78,15 @@ public class ItemShopService {
         userItem.setEquipped(false);
         userItemRepository.save(userItem);
 
+        //  user 저장 추가
+        usersRepository.save(user);
+
         return true;
     }
 
-    public List<Map<String, Object>> getAllItemsWithUserInfo(Users user) {
-        List<Item> allItems = itemRepository.findAll();
-        List<User_Items> ownedItems = userItemRepository.findByUsers(user);
-        Set<Integer> ownedItemIds = ownedItems.stream()
-                .map(ui -> ui.getItem().getItemId())
-                .collect(Collectors.toSet());
-
-        // item + 보유 여부 포함된 구조로 반환
-        return allItems.stream().map(item -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("item", item);
-            map.put("owned", ownedItemIds.contains(item.getItemId()));
-            return map;
-        }).collect(Collectors.toList());
+    @Transactional
+    public void givePointToUser(Users user, int amount) {
+        user.setPoint(user.getPoint() + amount);
+        usersRepository.save(user);
     }
 }

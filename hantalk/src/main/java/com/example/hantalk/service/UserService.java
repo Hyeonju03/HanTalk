@@ -8,6 +8,7 @@ import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.AdminRepository;
 import com.example.hantalk.repository.Leaning_LogRepository;
 import com.example.hantalk.repository.UsersRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +19,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@RequiredArgsConstructor
 @Service
 public class UserService {
-    @Autowired
-    UsersRepository userRepository;
-    @Autowired
-    AdminRepository adminRepository;
-    @Autowired
-    Leaning_LogRepository leaningLogRepository;
+
+    private final UsersRepository userRepository;
+    private final AdminRepository adminRepository;
+    private final Leaning_LogRepository leaningLogRepository;
 
     public List<UsersDTO> getUserList() {
         List<Users> users = userRepository.findAll();
@@ -111,6 +111,7 @@ public class UserService {
 
     public void setLeaningLog(String userId, int lessonNo) {
         Optional<Users> getUserOpt = userRepository.findByUserId(userId);
+        LocalDateTime today = LocalDateTime.now();
         if (getUserOpt.isEmpty()) {
             return;
         }
