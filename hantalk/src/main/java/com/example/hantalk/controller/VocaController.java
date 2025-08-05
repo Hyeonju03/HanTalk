@@ -1,6 +1,7 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.VocaDTO;
+import com.example.hantalk.service.Learning_LogService;
 import com.example.hantalk.service.UserService;
 import com.example.hantalk.service.VocaService;
 import jakarta.servlet.http.HttpSession;
@@ -18,7 +19,7 @@ import java.util.Map;
 public class VocaController {
 
     private final VocaService vocaService;
-    private final UserService userService;
+    private final Learning_LogService learning_logService;
 
     // 학습 공간 페잊지
     @GetMapping("/main")
@@ -47,7 +48,7 @@ public class VocaController {
     public String completeLesson(@RequestParam int lessonNo, HttpSession session) {
         String userId = (String) session.getAttribute("userId");
         if (userId != null) {
-            userService.setLearningLog(userId, lessonNo);
+            learning_logService.updateLearning_Log(userId, lessonNo);
             return "success";
         }
         return "fail";
