@@ -43,6 +43,7 @@
       text-align: center;
       color: #5e7bb4;
       margin-bottom: 2rem;
+      position: relative;
     }
     form.search-form {
       text-align: center;
@@ -79,6 +80,7 @@
       padding: 12px;
       border-bottom: 1px solid #e3e8f0;
       text-align: center;
+      vertical-align: middle;
     }
     th {
       background: #eef3fb;
@@ -87,6 +89,9 @@
     }
     tr:hover {
       background-color: #f5f8ff;
+    }
+    tr {
+      cursor: pointer;
     }
     .pagination {
       text-align: center;
@@ -105,6 +110,30 @@
       background: #d8e3ff;
       font-weight: bold;
     }
+    /* 파일 링크 사이 | 구분자 스타일 */
+    .file-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.95rem;
+    }
+    .file-links a {
+      color: #1a0dab;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .file-links a.preview-link {
+      font-weight: 700;
+      color: #3a6ebd;
+    }
+    .file-links a.preview-link:hover {
+      color: #2a4d8b;
+    }
+    .file-links .separator {
+      color: #888;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -121,7 +150,6 @@
 <main>
   <h1>자료실</h1>
 
-  <!-- 검색 폼 -->
   <form class="search-form" th:action="@{/resource/main}" method="get">
     <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요" />
     <button type="submit">검색</button>
@@ -139,21 +167,27 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="resource, iterStat : ${resourcePage.content}">
+    <tr th:each="resource, iterStat : ${resourcePage.content}"
+        th:attr="data-url=@{'/resource/detail/' + ${resource.resourceId}}"
+        onclick="goToDetail(this)">
       <td th:text="${resourcePage.totalElements - (resourcePage.number * resourcePage.size) - iterStat.index}">1</td>
+      <td th:text="${resource.title}">제목</td>
+      <td th:text="${#strings.length(resource.content) > 30 ? #strings.substring(resource.content, 0, 30) + '...' : resource.content}">내용</td>
       <td>
-        <a th:href="@{'/resource/detail/' + ${resource.resourceId}}" th:text="${resource.title}">제목</a>
-      </td>
-      <td th:text="${resource.content.length() > 30} ? ${resource.content.substring(0,30)} + '...' : resource.content">내용</td>
-      <td>
-        <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}">
-          <a th:href="@{'/resource/download/' + ${resource.archive.substring(resource.archive.lastIndexOf('/') + 1)}}"
-             download
-             th:text="${resource.originalFileName}">파일 다운로드</a>
+        <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}" class="file-links">
+          <a th:href="@{'/resource/preview/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
+             target="_blank"
+             th:title="${resource.originalFileName}"
+             onclick="event.stopPropagation();"
+             class="preview-link">파일 보기</a>
+          <span class="separator">|</span>
+          <a th:href="@{'/resource/download/file/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
+             th:title="${resource.originalFileName}"
+             onclick="event.stopPropagation();">다운로드</a>
         </span>
-        <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}">없음</span>
+        <span th:if="${resource.archive == null or #strings.isEmpty(resource.archive)}">파일 없음</span>
       </td>
-      <td>관리자</td>
+      <td>관리자</td> <!-- 필요하면 작성자 동적으로 바꾸세요 -->
       <td th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
     </tr>
     </tbody>
@@ -170,6 +204,15 @@
     <a th:if="${resourcePage.hasNext()}" th:href="@{/resource/main(page=${resourcePage.number + 1}, keyword=${keyword})}">다음</a>
   </div>
 </main>
+
+<script>
+  function goToDetail(row) {
+    const url = row.getAttribute('data-url');
+    if (url) {
+      window.location.href = url;
+    }
+  }
+</script>
 
 </body>
 </html>

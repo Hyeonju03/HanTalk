@@ -32,7 +32,10 @@ public class Resource {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
+    private String writer;
+
     public void setUpdateDate(LocalDateTime updateDate) {
         this.updateDate = updateDate;
     }
+
 }
