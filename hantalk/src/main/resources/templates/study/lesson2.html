@@ -105,6 +105,7 @@
       document.getElementById('feedback-icon').style.display = 'none';
       document.getElementById('next-problem-button').style.display = 'none';
       document.getElementById('result-message').textContent = '';
+      document.getElementById('check-button').style.display = 'block';
 
       fetch('/study/api/get-lesson2-sentence')
           .then(response => response.json())
@@ -172,17 +173,6 @@
               feedbackIcon.style.display = 'block';
               nextButton.style.display = 'block';
               document.getElementById('check-button').style.display = 'none'; // 정답 확인 버튼 숨기기
-
-              // 학습 완료 로그 저장 호출 (lesson3 → 3)
-              fetch('/study/complete?lessonNo=3', { method: 'POST' })
-                  .then(res => res.text())
-                  .then(result => {
-                      if (result === 'success') {
-                          console.log("학습 로그 저장 성공 (lesson3)");
-                      } else {
-                          console.log("로그 저장 실패 (lesson3)");
-                      }
-                  });
           } else {
               if (data.message.includes('3번 틀렸습니다.')) {
                   feedbackIcon.textContent = 'X';

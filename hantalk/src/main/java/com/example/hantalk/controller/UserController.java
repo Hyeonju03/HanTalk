@@ -19,13 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @Controller
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService service;
     private final Learning_LogService logService;
-
 
     @GetMapping("/user/test")
     public String test() {

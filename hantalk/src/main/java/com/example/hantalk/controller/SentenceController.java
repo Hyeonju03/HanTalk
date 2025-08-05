@@ -82,7 +82,7 @@ public class SentenceController {
 
             String userId = (String) session.getAttribute("userId");
             if(userId != null) {
-                learningLogService.setLearningLog(userId);
+                learningLogService.updateLearning_Log(userId, 2);
             }
 
             String nextSentence = sentenceService.getSelectRandom().getMunjang();
@@ -154,7 +154,7 @@ public class SentenceController {
         String userId = (String) session.getAttribute("userId");
         if (userId != null) {
             if(isCorrect) {
-                learningLogService.setLearningLog(userId);
+                learningLogService.updateLearning_Log(userId, 4);
             }
         }
 

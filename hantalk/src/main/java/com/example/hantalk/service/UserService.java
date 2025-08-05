@@ -23,7 +23,6 @@ public class UserService {
 
     private final UsersRepository userRepository;
     private final AdminRepository adminRepository;
-    private final Learning_LogRepository learningLogRepository;
 
     public List<UsersDTO> getUserList() {
         List<Users> users = userRepository.findAll();

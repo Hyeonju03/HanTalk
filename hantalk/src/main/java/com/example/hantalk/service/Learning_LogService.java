@@ -23,7 +23,6 @@ public class Learning_LogService {
 
     public void setLearningLog(String userId) {
         Optional<Users> getUserOpt = usersRepository.findByUserId(userId);
-
         if (getUserOpt.isEmpty()) {
             System.out.println("학습 로그 생성 실패: 유저를 찾을 수 없음 (" + userId + ")");
             return;
@@ -48,6 +47,38 @@ public class Learning_LogService {
             System.out.println("오늘 이미 학습 로그가 존재: " + userEntity.getUserId());
         }
     }
+
+    public void updateLearning_Log(String userId, int lessonNo) {
+        Optional<Users> ou = usersRepository.findByUserId(userId);
+        if(ou.isEmpty()){
+            System.out.println("학습 로그 업데이트 실패: 유저를 찾을 수 없음 (" + userId + ")");
+            return;
+        }
+
+        if(ou.isPresent()) {
+            Users userEntity = ou.get();
+            LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+            LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+            Optional<Learning_Log> logOpt = learningLogRepository
+                    .findByUsers_UserNoAndLearningDateBetween(userEntity.getUserNo(), startOfDay, endOfDay);
+
+            Learning_Log log = logOpt.get();
+
+            log.setUsers(ou.get());
+
+            if (lessonNo != 0) {
+                switch (lessonNo) {
+                    case 1 -> log.setLearning1Count(log.getLearning1Count() + 1);
+                    case 2 -> log.setLearning2Count(log.getLearning2Count() + 1);
+                    case 3 -> log.setLearning3Count(log.getLearning3Count() + 1);
+                    case 4 -> log.setLearning4Count(log.getLearning4Count() + 1);
+                }
+            }
+
+            learningLogRepository.save(log);
+            System.out.println("학습 로그 업데이트 성공: " + userEntity.getUserId() + ", 레슨 " + lessonNo);
+        }
 
     public int calculateTotalLearningCount(int userNo) {
         // 1. Repository를 통해 모든 Learning_Log 엔티티를 조회
