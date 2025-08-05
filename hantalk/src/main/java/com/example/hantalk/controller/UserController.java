@@ -123,6 +123,7 @@ public class UserController {
             UsersDTO user = service.getUserOne(userId);
             newSession.setAttribute("userNo", user.getUserNo());
             newSession.setAttribute("role", "USER");
+
             // 러닝로그 세팅하는 부분
             logService.setLearningLog(userId);
         }

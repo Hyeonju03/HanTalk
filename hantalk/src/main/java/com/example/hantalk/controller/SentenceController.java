@@ -21,7 +21,9 @@ import java.util.*;
 public class SentenceController {
     private static final Logger logger = LoggerFactory.getLogger(SentenceController.class);
     private final SentenceService sentenceService;
-    private final Learning_LogService learning_logService;
+    private final UserService userService;
+    private final Learning_LogService learningLogService;
+
     String folderName = "study";
 
     @GetMapping("/lesson2")
@@ -80,7 +82,7 @@ public class SentenceController {
 
             String userId = (String) session.getAttribute("userId");
             if(userId != null) {
-                learning_logService.updateLearning_Log(userId, 2);
+                learningLogService.setLearningLog(userId);
             }
 
             String nextSentence = sentenceService.getSelectRandom().getMunjang();
@@ -152,7 +154,7 @@ public class SentenceController {
         String userId = (String) session.getAttribute("userId");
         if (userId != null) {
             if(isCorrect) {
-                learning_logService.updateLearning_Log(userId, 4);
+                learningLogService.setLearningLog(userId);
             }
         }
 

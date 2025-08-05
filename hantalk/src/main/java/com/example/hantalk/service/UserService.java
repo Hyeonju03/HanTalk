@@ -110,7 +110,6 @@ public class UserService {
         return result;
     }
 
-
     public void update(UsersDTO usersDTO) {
         Optional<Users> userOpt = userRepository.findByUserId(usersDTO.getUserId());
         if (userOpt.isPresent()) {
