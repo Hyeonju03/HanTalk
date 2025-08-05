@@ -23,9 +23,4 @@ public class CategoryService {
         return categoryRepository.findById(id).orElse(null);
     }
 
-
-    public Category findById(int categoryId) {
-        return categoryRepository.findById(categoryId).orElse(null);
-    }
 }
-

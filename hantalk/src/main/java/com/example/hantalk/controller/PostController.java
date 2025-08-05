@@ -1,8 +1,10 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.AdminDTO;
+import com.example.hantalk.dto.CommentDTO;
 import com.example.hantalk.dto.PostDTO;
 import com.example.hantalk.service.CategoryService;
+import com.example.hantalk.service.CommentService;
 import com.example.hantalk.service.PostService;
 import com.example.hantalk.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -12,6 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+import java.util.Optional;
 
 
 @Controller
@@ -21,19 +25,33 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
     private final CategoryService categoryService;
+    private final CommentService commentService;
 
-    public PostController(PostService postService, UserService userService, CategoryService categoryService) {
+    public PostController(PostService postService, UserService userService, CategoryService categoryService, CommentService commentService) {
         this.postService = postService;
         this.userService = userService;
         this.categoryService = categoryService;
+        this.commentService = commentService;
     }
 
     // 게시글 목록
     @GetMapping("/list")
-    public String list(@RequestParam(defaultValue = "1") int page, Model model) {
-        int pageSize = 10;
-        Page<PostDTO> postPage = (Page<PostDTO>) postService.getPagePosts(page, pageSize);
+    public String list(@RequestParam(required = false) Integer categoryId,
+                       @RequestParam(defaultValue = "1") int page,
+                       Model model) {
 
+        int pageSize = 10;
+        Page<PostDTO> postPage; // ← Optional 제거
+
+        // 카테고리 필터링 적용
+        if (categoryId != null) {
+            postPage = postService.getPostsByCategory(categoryId, page, pageSize);
+            model.addAttribute("selectedCategoryId", categoryId);
+        } else {
+            postPage = postService.getPagePosts(page, pageSize);
+        }
+
+        // 페이지 처리
         if (postPage.isEmpty() && page > 1) {
             model.addAttribute("noPage", true);
             model.addAttribute("currentPage", page);
@@ -44,18 +62,27 @@ public class PostController {
             model.addAttribute("totalPages", postPage.getTotalPages());
         }
 
+        // 카테고리 목록도 넘기기 (상단 메뉴나 필터용)
+        model.addAttribute("categories", categoryService.getAllCategories());
+
         return "post/list";
     }
+
 
     // 게시글 상세보기
     @GetMapping("/view/{postId}")
     public String view(@PathVariable("postId") int postId, Model model) {
         PostDTO dto = new PostDTO();
         dto.setPostId(postId);
-        PostDTO returnDTO = postService.getSelectOne(dto);
-        model.addAttribute("returnDTO", returnDTO);
+        PostDTO postDTO = postService.getSelectOne(dto);
+        List<CommentDTO> commentList = commentService.getCommentsByPostId(postId);
+
+        model.addAttribute("returnDTO", postDTO);
+        model.addAttribute("commentList", commentList);
+
         return "post/view";
     }
+
 
     //게시글 등록
     @GetMapping("/chuga")
@@ -67,6 +94,9 @@ public class PostController {
             return "redirect:/user/login";
         }
         model.addAttribute("postDTO", new PostDTO());
+
+        model.addAttribute("categories", categoryService.getAllCategories());//카테고리
+
         return "post/chuga";
     }
 
@@ -119,3 +149,4 @@ public class PostController {
         return "redirect:/post/list";
     }
 }
+

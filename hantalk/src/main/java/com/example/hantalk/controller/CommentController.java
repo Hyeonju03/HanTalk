@@ -1,7 +1,9 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.CommentDTO;
+import com.example.hantalk.entity.Users;
 import com.example.hantalk.service.CommentService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,26 +18,26 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    // 댓글 리스트 보기
-    @GetMapping("/list")
-    public String list(Model model) {
-        List<CommentDTO> commentList = commentService.getAllComments();
-        model.addAttribute("commentList", commentList);
-        return "comment/list";
-    }
-
     //댓글 작성
     @PostMapping("/chuga")
-    public String chuga(@ModelAttribute CommentDTO commentDTO, @RequestParam("postId") Long commentId, Model model){
+    public String chuga(@ModelAttribute CommentDTO commentDTO, HttpSession session) {
+        Integer userNo = (Integer) session.getAttribute("userNo");
+        if (userNo == null) {
+            return "redirect:/user/login";
+        }
+        Users user = new Users();
+        user.setUserNo(userNo);
+        commentDTO.setUsers(user);
+
         commentService.save(commentDTO);
-        return "redirect:/comments";
+        return "redirect:/post/view/" + commentDTO.getPost().getPostId();
     }
 
-    // 댓글 수정 화면 이동
+    // 댓글 수정
     @GetMapping("/sujung")
     public String sujung(@RequestParam("id") Long commentId, Model model) {
         CommentDTO commentDTO = commentService.getCommentById(commentId);
-        model.addAttribute("commentDTO", commentDTO); // 단수 형태로 명확하게
+        model.addAttribute("commentDTO", commentDTO);
         return "comment/sujung";
     }
 
@@ -43,16 +45,13 @@ public class CommentController {
     @PostMapping("/sujungProc")
     public String sujungProc(@ModelAttribute CommentDTO commentDTO) {
         commentService.setUpdate(commentDTO);
-        return "redirect:/comments/list";
+        return "redirect:/post/view/" + commentDTO.getPost().getPostId();
     }
 
     // 댓글 삭제
     @GetMapping("/sakje")
-    public String sakje(@RequestParam("id") Long commentId) {
+    public String sakje(@RequestParam("id") Long commentId, @RequestParam("postId") int postId) {
         commentService.setDelete(commentId);
-        return "redirect:/comments/list";
+        return "redirect:/post/view/" + postId;
     }
-
-
-
 }

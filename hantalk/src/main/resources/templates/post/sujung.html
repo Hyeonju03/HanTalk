@@ -1,34 +1,23 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>게시글 수정</title>
+  <meta charset="UTF-8" />
+  <title>게시글 수정</title>
 </head>
 <body>
-<h1> 게시글 수정</h1>
-<form th:action="@{/post/sujungProc}" method="post">
-  <input type="hidden" name="postId" th:value="${returnDTO.postId}">
+<h1>게시글 수정</h1>
 
-  <div>
-    <label for="title">제목:</label>
-    <input type="text" id="title" name="title" th:value="${returnDTO.title}" required />
-  </div>
-
-  <div>
-    <label for="content">내용:</label>
-    <textarea id="content" name="content" rows="10" cols="50" required
-              th:text="${returnDTO.content}"></textarea>
-  </div>
-
-  <div>
-    <label for="category">카테고리:</label>
-    <input type="text" id="category" name="category" th:value="${returnDTO.category}" />
-  </div>
-
-  <div>
-    <button type="submit">수정하기</button>
-    <a th:href="@{'/post/detail/' + ${returnDTO.postId}}">취소</a>
-  </div>
+<form th:action="@{/post/sujungProc}" th:object="${returnDTO}" method="post">
+  <input type="hidden" th:field="*{postId}" />
+  <p>
+    제목: <input type="text" th:field="*{title}" />
+  </p>
+  <p>
+    내용: <textarea th:field="*{content}"></textarea>
+  </p>
+  <button type="submit">수정하기</button>
+  <button type="button" onclick="location.href='/post/list'">취소</button>
 </form>
+
 </body>
 </html>

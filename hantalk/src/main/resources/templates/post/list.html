@@ -17,7 +17,9 @@
     </thead>
     <tbody>
     <tr th:each="post : ${list}">
-        <td th:text="${post.title}">제목</td>
+        <td>
+            <a th:href="@{/post/view/{id}(id=${post.postId})}" th:text="${post.title}">제목</a>
+        </td>
         <td th:text="${post.content}">내용</td>
     </tr>
     </tbody>

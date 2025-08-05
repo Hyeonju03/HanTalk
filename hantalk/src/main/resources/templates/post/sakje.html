@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 삭제</title>
+</head>
+<body>
+<form th:action="@{/post/sakjeProc}" method="post">
+  <input type="hidden" name="postId" th:value="${returnDTO.postId}" />
+  <button type="submit">삭제</button>
+  <a th:href="@{/post/view/{postId}(postId=${returnDTO.postId})}">취소</a>
+</form>
+
+</body>
+</html>
