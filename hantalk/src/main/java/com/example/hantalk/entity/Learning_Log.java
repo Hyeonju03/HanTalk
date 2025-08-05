@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-public class Leaning_Log {
+public class Learning_Log {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="learning_id")

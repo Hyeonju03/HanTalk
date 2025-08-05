@@ -1,15 +1,13 @@
 package com.example.hantalk.service;
 
-import com.example.hantalk.dto.AdminDTO;
 import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.entity.Admin;
-import com.example.hantalk.entity.Leaning_Log;
+import com.example.hantalk.entity.Learning_Log;
 import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.AdminRepository;
-import com.example.hantalk.repository.Leaning_LogRepository;
+import com.example.hantalk.repository.Learning_LogRepository;
 import com.example.hantalk.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
@@ -25,7 +23,7 @@ public class UserService {
 
     private final UsersRepository userRepository;
     private final AdminRepository adminRepository;
-    private final Leaning_LogRepository leaningLogRepository;
+    private final Learning_LogRepository learningLogRepository;
 
     public List<UsersDTO> getUserList() {
         List<Users> users = userRepository.findAll();
@@ -109,7 +107,7 @@ public class UserService {
         return result;
     }
 
-    public void setLeaningLog(String userId, int lessonNo) {
+    public void setLearningLog(String userId, int lessonNo) {
         Optional<Users> getUserOpt = userRepository.findByUserId(userId);
         LocalDateTime today = LocalDateTime.now();
         if (getUserOpt.isEmpty()) {
@@ -121,15 +119,15 @@ public class UserService {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        Optional<Leaning_Log> logOpt = leaningLogRepository
+        Optional<Learning_Log> logOpt = learningLogRepository
                 .findByUsers_UserNoAndLearningDateBetween(user.getUserNo(), startOfDay, endOfDay);
 
-        Leaning_Log log;
+        Learning_Log log;
 
         if (logOpt.isPresent()) {
             log = logOpt.get();
         } else {
-            log = new Leaning_Log();
+            log = new Learning_Log();
             log.setUsers(user);
             log.setLearningDate(LocalDateTime.now());
             log.setLearning1Count(0);
@@ -147,7 +145,7 @@ public class UserService {
             }
         }
 
-        leaningLogRepository.save(log);
+        learningLogRepository.save(log);
     }
 
 

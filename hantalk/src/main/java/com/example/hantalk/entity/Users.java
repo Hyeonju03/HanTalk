@@ -63,7 +63,7 @@ public class Users {
     private List<Comment> commentList;
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    private List<Leaning_Log> leaningLogList;
+    private List<Learning_Log> learningLogList;
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
     private List<Post> postList;

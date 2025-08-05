@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class Leaning_LogDTO {
+public class Learning_LogDTO {
     private int learningId;
     private LocalDateTime learningDate;
     private int learning1Count = 0;

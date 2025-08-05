@@ -1,8 +1,6 @@
 package com.example.hantalk.dto;
 
 import com.example.hantalk.entity.*;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,7 +25,7 @@ public class UsersDTO {
 
     private List<Attendance> attendanceList;
     private List<Comment> commentList;
-    private List<Leaning_Log> leaningLogList;
+    private List<Learning_Log> learningLogList;
     private List<Post> postList;
     private List<User_Items> userItemsList;
 }

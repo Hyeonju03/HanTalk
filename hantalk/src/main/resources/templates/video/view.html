@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>영상 상세 보기</title>
+</head>
+<body>
+<h1>영상 상세 보기</h1>
+<h2 th:text="${video.title}"></h2>
+<video width="600" controls th:src="@{'/upload/' + ${video.videoName}}"></video>
+<p th:text="${video.content}"></p>
+<a th:href="@{/video/list}">← 목록으로</a>
+</body>
+</html>

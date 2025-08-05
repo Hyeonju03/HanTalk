@@ -47,7 +47,7 @@ public class VocaController {
     public String completeLesson(@RequestParam int lessonNo, HttpSession session) {
         String userId = (String) session.getAttribute("userId");
         if (userId != null) {
-            userService.setLeaningLog(userId, lessonNo);
+            userService.setLearningLog(userId, lessonNo);
             return "success";
         }
         return "fail";
