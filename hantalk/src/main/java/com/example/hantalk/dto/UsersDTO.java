@@ -17,6 +17,7 @@ public class UsersDTO {
     private String password;
     private String nickname;
     private String profileImage;
+    private String profileFrame;
     private LocalDateTime joinDate;
     private LocalDateTime lastLogin;
     private int birth;

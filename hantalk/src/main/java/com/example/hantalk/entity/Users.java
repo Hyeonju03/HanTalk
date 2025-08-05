@@ -37,6 +37,9 @@ public class Users {
     @Column(name="profile_image", length = 200)
     private String profileImage;
 
+    @Column(name = "profile_frame", length = 200)
+    private String profileFrame;
+
     @CreatedDate
     @Column(name="join_date", nullable = false)
     private LocalDateTime joinDate;
