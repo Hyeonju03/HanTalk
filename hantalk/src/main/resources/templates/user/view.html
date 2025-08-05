@@ -57,7 +57,7 @@
     </p>
     <p>
       <strong class="text-gray-700">가입일:</strong>
-      <span th:text="${user.joinDate}" class="text-gray-900 ml-2">가입일</span>
+      <span th:text="${#temporals.format(user.JoinDate, 'yyyy-MM-dd')}">2025-08-01</span>
     </p>
   </div>
 
@@ -88,7 +88,10 @@
        class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
       구매한 아이템 목록
     </a>
-
+    <a href="/user/statistics"
+       class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
+      학습 통계
+    </a>
   </div>
 </div>
 </body>

@@ -50,13 +50,13 @@
 <script>
   const calendarEl = document.getElementById('calendar');
   const monthLabel = document.getElementById('currentMonth');
-  const checkInButton = document.getElementById('checkInButton'); // ✅ 버튼 요소 추가
+  const checkInButton = document.getElementById('checkInButton'); // 버튼 요소 추가
 
   const today = new Date();
   let currentYear = today.getFullYear();
   let currentMonth = today.getMonth(); // 0~11
 
-  // ✅ 캘린더 렌더링 (attendanceDates를 인자로 받음)
+  // 캘린더 렌더링 (attendanceDates를 인자로 받음)
   function renderCalendar(attendanceDates) {
     calendarEl.innerHTML = ''; // 초기화
 
@@ -110,19 +110,18 @@
       const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       if (attendanceDates.includes(dateStr)) {
         const imgIcon = document.createElement('img'); // img 태그 생성
-        imgIcon.src = '/images/bono.png'; // ★ 여기에 PNG 이미지 경로를 입력하세요.
-        imgIcon.alt = '출석 완료'; // 접근성을 위한 alt 텍스트
+        imgIcon.src = '/image/bono.png'; // ★ 여기에 PNG 이미지 경로를 입력하세요.
         imgIcon.className = 'w-30 h-30 mx-auto'; // Tailwind CSS를 사용하여 이미지 크기 조절
 
         cell.appendChild(imgIcon);
 
-        // ✅ 오늘 날짜이고 이미 출석한 경우
+        // 오늘 날짜이고 이미 출석한 경우
         if (dateStr === todayStr) {
           hasCheckedInToday = true;
         }
       }
 
-      // ✅ 오늘 날짜에 대한 시각적 표시
+      // 오늘 날짜에 대한 시각적 표시
       // 현재 보고 있는 달력이 오늘 달력일 때만 '오늘' 표시
       if (dateStr === todayStr && currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
         cell.classList.add('border-2', 'border-blue-500', 'bg-blue-50'); // 오늘 날짜 셀에 파란색 테두리와 배경색 추가
@@ -131,7 +130,7 @@
       calendarEl.appendChild(cell);
     }
 
-    // ✅ 출석 버튼 상태 업데이트 (현재 월이 오늘 월과 같고, 오늘 이미 출석했는지 여부에 따라)
+    // 출석 버튼 상태 업데이트 (현재 월이 오늘 월과 같고, 오늘 이미 출석했는지 여부에 따라)
     if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
       if (!hasCheckedInToday) {
         checkInButton.disabled = false;
@@ -153,7 +152,7 @@
     }
   }
 
-  // ✅ 서버에서 출석 데이터 받아오기 및 렌더링
+  // 서버에서 출석 데이터 받아오기 및 렌더링
   function fetchAndRender() {
     axios.get('/user/calendar/data')
       .then(response => {
@@ -166,7 +165,7 @@
       });
   }
 
-  // ✅ 이전/다음 월 버튼
+  // 이전/다음 월 버튼
   document.getElementById('prevMonth').addEventListener('click', () => {
     currentMonth--;
     if (currentMonth < 0) {
@@ -185,7 +184,7 @@
     fetchAndRender(); // 월 변경 후 캘린더 새로고침
   });
 
-  // ✅ 출석하기 버튼 클릭 이벤트 리스너 추가
+  // 출석하기 버튼 클릭 이벤트 리스너 추가
   checkInButton.addEventListener('click', () => {
     // 버튼이 비활성화된 상태에서는 클릭 이벤트가 동작하지 않도록 방어
     if (checkInButton.disabled) {
@@ -207,7 +206,7 @@
       });
   });
 
-  // ✅ 초기 렌더링
+  // 초기 렌더링
   fetchAndRender();
 </script>
 
