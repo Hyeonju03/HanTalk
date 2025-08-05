@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<div>
+  <h1>받아쓰기</h1>
+</div>
+
+<div id="question-container">
+  <p id="sentence">문장을 불러오는 중...</p>
+  <button id="play-btn" style="display: none;">▶️</button>
+</div>
+
+<div id="answer-input">
+  <input type="text" id="user-answer" placeholder="여기에 입력하세요">
+  <button id="submit-btn">제출하기</button>
+</div>
+
+<div id="result-overlay" style="display: none; font-size: 100px;">
+  <h1 id="result-text"></h1>
+</div>
+
+<button id="next-btn" style="display: none;">다음 문제</button>
+
+<script>
+  let currentSentence = '';
+
+  // Web Speech API의 SpeechSynthesis 객체 생성
+  const synth = window.speechSynthesis;
+
+  // 페이지 로드 시, 또는 '다음 문제' 버튼 클릭 시 실행될 함수
+  function fetchAndDisplaySentence() {
+      document.getElementById('sentence').textContent = '문장을 불러오는 중...';
+      document.getElementById('user-answer').value = '';
+      document.getElementById('result-overlay').style.display = 'none';
+      document.getElementById('next-btn').style.display = 'none';
+      document.getElementById('play-btn').style.display = 'none';
+
+      fetch('/study/api/get-lesson4-sentence') // RequestMapping("/study")를 고려하여 경로 수정
+      .then(response => {
+          if (!response.ok) {
+              // 응답이 성공(200 OK)이 아닐 경우 오류 발생
+              throw new Error('네트워크 응답이 실패했습니다: ' + response.statusText);
+          }
+          return response.json();
+      })
+      .then(data => {
+          // 서버에서 받은 데이터에 "sentence" 필드가 있는지 확인
+          if (data && data.sentence) {
+              currentSentence = data.sentence;
+              document.getElementById('sentence').textContent = "문장이 준비되었습니다.";
+              document.getElementById('play-btn').style.display = 'inline-block';
+          } else {
+              // 서버 응답에 'sentence' 필드가 없을 경우
+              throw new Error('서버 응답 형식이 올바르지 않습니다.');
+          }
+      })
+      .catch(error => {
+          console.error('문장을 가져오는 중 오류 발생:', error);
+          document.getElementById('sentence').textContent = '문장 로드 실패';
+      });
+  }
+
+  // 텍스트를 음성으로 읽어주는 함수
+  function speakText(text) {
+      if (synth.speaking) {
+          console.error('현재 다른 음성 재생 중입니다.');
+          return;
+      }
+      if (text !== '') {
+          const utterThis = new SpeechSynthesisUtterance(text);
+
+          utterThis.lang = 'ko-KR';
+
+          utterThis.onend = function(event) {
+              console.log('음성 재생이 종료되었습니다.');
+          };
+
+          utterThis.onerror = function(event) {
+              console.error('음성 재생 중 오류 발생: ' + event.error);
+          };
+
+          synth.speak(utterThis);
+      }
+  }
+
+  // 재생 버튼 이벤트 리스너
+  document.getElementById('play-btn').addEventListener('click', function() {
+      if (currentSentence) {
+          speakText(currentSentence);
+      }
+  });
+
+  document.getElementById('submit-btn').addEventListener('click', function() {
+      const userAnswer = document.getElementById('user-answer').value;
+
+      fetch('/study/api/check-lesson4-answer', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              originalSentence: currentSentence,
+              userAnswer: userAnswer
+          })
+      })
+      .then(response => response.json())
+      .then(data => {
+          const resultOverlay = document.getElementById('result-overlay');
+          const resultText = document.getElementById('result-text');
+
+          if (data.isCorrect) {
+              resultText.textContent = 'O';
+              resultOverlay.style.color = 'green';
+          } else {
+              resultText.textContent = 'X';
+              resultOverlay.style.color = 'red';
+          }
+
+          resultOverlay.style.display = 'flex';
+          document.getElementById('next-btn').style.display = 'block';
+      })
+      .catch(error => console.error('답변 확인 중 오류 발생:', error));
+  });
+
+  document.getElementById('next-btn').addEventListener('click', function() {
+      fetchAndDisplaySentence();
+  });
+
+  window.onload = function() {
+      // 브라우저가 Web Speech API를 지원하는지 확인
+      if ('speechSynthesis' in window) {
+          fetchAndDisplaySentence();
+      } else {
+          alert('이 브라우저는 텍스트 음성 변환을 지원하지 않습니다.');
+      }
+  };
+</script>
+
+</body>
+</html>

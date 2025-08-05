@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>게시글 상세</title>
+</head>
+<body>
+<h1 th:text="${returnDTO.title}">게시글 제목</h1>
+<p>작성일: <span th:text="${#temporals.format(returnDTO.createDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+<p th:text="${returnDTO.content}">내용</p>
+<button th:onclick="|location.href='@{/post/sujung/{postId}(postId=${returnDTO.postId})}'|">게시글 수정</button>
+<button th:onclick="|location.href='@{/post/sakje/{postId}(postId=${returnDTO.postId})}'|">게시글 삭제</button>
+
+
+<div>
+    <h3>댓글 작성</h3>
+    <form th:action="@{/comments/chuga}" method="post">
+        <input type="hidden" name="postId" th:value="${returnDTO.postId}" />
+        <textarea name="content" placeholder="댓글을 입력하세요" required></textarea>
+        <button type="submit">등록</button>
+    </form>
+</div>
+
+<div>
+    <h3>댓글 목록</h3>
+    <div th:if="${#lists.isEmpty(commentList)}">
+        댓글이 없습니다.
+    </div>
+    <div th:each="comment : ${commentList}">
+        <p><strong th:text="${comment.users != null ? comment.users.username : '익명'}">작성자</strong> |
+            <span th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}">작성일</span></p>
+        <p th:text="${comment.content}">댓글 내용</p>
+        <hr/>
+    </div>
+</div>
+
+
+</body>
+</html>

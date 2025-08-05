@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>단어 맞추기</title>
+    <script th:inline="javascript">
+        let problems = /*[[${problems}]]*/ [];
+        let answers = new Array(problems.length).fill(""); // 사용자 답 저장
+        let currentIndex = 0;
+
+        window.onload = function() {
+            showProblem(currentIndex);
+        };
+
+        // 현재 문제 보여주기
+        function showProblem(index) {
+            const problem = problems[index];
+            document.getElementById('description').textContent = problem.description;
+            document.getElementById('answer').value = answers[index] || "";
+            document.getElementById('result').textContent = "";
+
+            // 마지막 문제면 버튼 문구 변경
+            document.getElementById('nextBtn').textContent =
+                (index === problems.length - 1) ? "결과 보기" : "다음으로";
+        }
+
+        // 다음 문제 또는 결과 체크
+        function nextProblem() {
+            // 현재 입력 저장
+            answers[currentIndex] = document.getElementById('answer').value.trim();
+
+            // 마지막 문제면 결과 표시
+            if (currentIndex === problems.length - 1) {
+                showResult();
+            } else {
+                currentIndex++;
+                showProblem(currentIndex);
+            }
+        }
+
+        // 최종 결과 표시
+        function showResult() {
+            let output = "";
+            for (let i = 0; i < problems.length; i++) {
+                let correct = problems[i].vocabulary;
+                let userAnswer = answers[i];
+                if (userAnswer === correct) {
+                    output += `<p>${i + 1}번: 정답! (${correct})</p>`;
+                } else {
+                    output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
+                }
+            }
+
+            // 결과와 함께 다음 학습 이동 버튼 표시
+            document.body.innerHTML = `
+                <h1>결과</h1>
+                ${output}
+                <div style="position: fixed; bottom: 20px; right: 20px;">
+                    <button onclick="goToLesson3()">다음 학습(3)으로 이동</button>
+                </div>
+            `;
+
+            // 학습 완료 로그 저장 호출 (lesson1 → 1)
+            fetch('/study/complete?lessonNo=1', { method: 'POST' })
+                .then(res => res.text())
+                .then(result => {
+                    if (result === 'success') {
+                        console.log("학습 로그 저장 성공");
+                    } else {
+                        console.log("로그 저장 실패");
+                    }
+                });
+        }
+
+        // lesson3으로 같은 창에서 이동
+        function goToLesson3() {
+            window.location.href = '/study/lesson3';
+        }
+    </script>
+</head>
+<body>
+<h1>단어 맞추기 학습</h1>
+
+<p id="description"></p>
+<input type="text" id="answer" placeholder="정답 입력">
+<button type="button" id="nextBtn" onclick="nextProblem()">다음으로</button>
+<p id="result"></p>
+
+</body>
+</html>

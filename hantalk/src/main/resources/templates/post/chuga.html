@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>게시글 추가</title>
+</head>
+<body>
+<h1>게시글 추가</h1>
+
+
+<p><strong>유저 번호:</strong> <span th:text="${user != null} ? user.userNo : '로그인 필요'">로그인 필요</span></p>
+
+<form th:action="@{/post/chugaProc}" th:object="${postDTO}" method="post">
+
+    <p>제목: <input type="text" th:field="*{title}" /></p>
+    <p>내용: <textarea th:field="*{content}"></textarea></p>
+
+    <p>카테고리:
+        <select th:field="*{categoryId}">
+            <option th:each="category : ${categories}"
+                    th:value="${category.categoryId}"
+                    th:text="${category.categoryName}">
+            </option>
+        </select>
+    </p>
+
+
+
+    <button type="submit">등록</button>
+</form>
+
+</body>
+</html>

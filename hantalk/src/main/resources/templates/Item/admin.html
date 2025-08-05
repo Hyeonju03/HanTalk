@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>아이템 관리</title></head>
+<body>
+<h2>관리자 아이템 목록</h2>
+<a href="/item/chuga">➕ 아이템 추가</a>
+
+<div th:if="${message}" style="color:green;">[[${message}]]</div>
+
+<table border="1">
+    <thead>
+    <tr><th>ID</th><th>이름</th><th>가격</th><th>설명</th><th>수정</th><th>삭제</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${items}">
+        <td th:text="${item.itemId}"></td>
+        <td th:text="${item.itemName}"></td>
+        <td th:text="${item.price}"></td>
+        <td th:text="${item.itemDescription}"></td>
+        <td><a th:href="@{'/item/sujung/' + ${item.itemId}}">수정</a></td>
+        <td><a th:href="@{'/item/sakje/' + ${item.itemId}}">삭제</a></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

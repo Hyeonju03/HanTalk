@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>영상 수정</title>
+</head>
+<body>
+<h1>영상 수정</h1>
+
+<!-- ⚠ enctype="multipart/form-data" 없으면 파일 업로드 안 됨 -->
+<form th:action="@{/video/update}" method="post" enctype="multipart/form-data">
+
+  <!-- 영상 ID (필수) -->
+  <input type="hidden" name="videoId" th:value="${video.videoId}"/>
+
+  <!-- 제목 -->
+  <label>제목:
+    <input type="text" name="title" th:value="${video.title}" required />
+  </label><br/>
+
+  <!-- 설명 -->
+  <label>설명:
+    <textarea name="content" required th:text="${video.content}"></textarea>
+  </label><br/>
+
+  <!-- 현재 업로드된 파일명 출력 -->
+  <p>현재 파일명: <b th:text="${video.videoName}">파일이 없습니다</b></p>
+
+  <!-- ✅ 기존 영상 미리보기 -->
+  <video width="300" controls
+         th:if="${video.videoName}"
+         th:src="@{'/upload/' + ${video.videoName}}"></video><br/>
+
+  <!-- ✅ 새 영상 업로드 입력 -->
+  <label>새 영상 파일 (선택):
+    <input type="file" name="file" accept="video/mp4" />
+  </label><br/>
+
+  <button type="submit">수정</button>
+</form>
+
+<a th:href="@{/video/list}">← 목록으로</a>
+</body>
+</html>
