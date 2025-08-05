@@ -50,12 +50,12 @@ public class Learning_LogService {
 
     public void updateLearning_Log(String userId, int lessonNo) {
         Optional<Users> ou = usersRepository.findByUserId(userId);
-        if(ou.isEmpty()){
+        if (ou.isEmpty()) {
             System.out.println("학습 로그 업데이트 실패: 유저를 찾을 수 없음 (" + userId + ")");
             return;
         }
 
-        if(ou.isPresent()) {
+        if (ou.isPresent()) {
             Users userEntity = ou.get();
             LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
             LocalDateTime endOfDay = startOfDay.plusDays(1);
@@ -79,6 +79,7 @@ public class Learning_LogService {
             learningLogRepository.save(log);
             System.out.println("학습 로그 업데이트 성공: " + userEntity.getUserId() + ", 레슨 " + lessonNo);
         }
+    }
 
     public int calculateTotalLearningCount(int userNo) {
         // 1. Repository를 통해 모든 Learning_Log 엔티티를 조회
