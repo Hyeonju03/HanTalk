@@ -118,7 +118,6 @@ public class UserController {
             UsersDTO user = service.getUserOne(userId);
             newSession.setAttribute("userNo", user.getUserNo());
             newSession.setAttribute("role", "USER");
-            service.setLearningLog(userId, 0);
         }
         newSession.setMaxInactiveInterval(1800); //세션 시간제한 설정
         return "userPage/UserTestPage";
