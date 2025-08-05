@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,5 +80,38 @@ public class Learning_LogService {
             System.out.println("학습 로그 업데이트 성공: " + userEntity.getUserId() + ", 레슨 " + lessonNo);
         }
 
+    public int calculateTotalLearningCount(int userNo) {
+        // 1. Repository를 통해 모든 Learning_Log 엔티티를 조회
+        List<Learning_Log> logs = learningLogRepository.findByUsers_UserNoOrderByLearningDateAsc(userNo);
+
+        // 2. 스트림(Stream) API를 사용하여 총 학습량을 계산
+        int totalCount = logs.stream()
+                .mapToInt(log ->
+                        log.getLearning1Count() +
+                                log.getLearning2Count() +
+                                log.getLearning3Count() +
+                                log.getLearning4Count()
+                )
+                .sum();
+
+        return totalCount;
+    }
+
+    public Map<LocalDate, Long> getDailyLearningStatsForPeriod(int userNo, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Learning_Log> logs = learningLogRepository.findByUsers_UserNoAndLearningDateBetweenOrderByLearningDateAsc(userNo, startDate, endDate);
+
+        // 스트림 API와 Collectors.groupingBy를 사용하여 날짜별로 그룹화하고 합계 계산
+        Map<LocalDate, Long> dailyCounts = logs.stream()
+                .collect(Collectors.groupingBy(
+                        log -> log.getLearningDate().toLocalDate(), // 날짜로 그룹화
+                        Collectors.summingLong(log -> // 각 그룹의 학습량을 합산
+                                (long)log.getLearning1Count() +
+                                        log.getLearning2Count() +
+                                        log.getLearning3Count() +
+                                        log.getLearning4Count()
+                        )
+                ));
+
+        return dailyCounts;
     }
 }

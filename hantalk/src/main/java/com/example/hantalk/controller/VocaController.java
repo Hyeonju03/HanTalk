@@ -19,8 +19,7 @@ import java.util.Map;
 public class VocaController {
 
     private final VocaService vocaService;
-    private final Learning_LogService learning_logService;
-    private final UserService userService;
+    private final Learning_LogService learningLogService;
 
     // 학습 공간 페잊지
     @GetMapping("/main")
@@ -49,7 +48,7 @@ public class VocaController {
     public String completeLesson(@RequestParam int lessonNo, HttpSession session) {
         String userId = (String) session.getAttribute("userId");
         if (userId != null) {
-            learning_logService.setLearningLog(userId);
+            learningLogService.setLearningLog(userId);
             return "success";
         }
         return "fail";

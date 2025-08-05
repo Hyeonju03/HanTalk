@@ -18,5 +18,14 @@ public class ResourceDTO {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
     private String originalFileName;
+    private boolean isPreviewAvailable;
+    private String writer;
 
+    public boolean isPreviewAvailable() {
+        return isPreviewAvailable;
+    }
+
+    public void setPreviewAvailable(boolean previewAvailable) {
+        this.isPreviewAvailable = previewAvailable;
+    }
 }
