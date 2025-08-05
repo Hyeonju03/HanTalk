@@ -23,7 +23,6 @@ public class UserService {
 
     private final UsersRepository userRepository;
     private final AdminRepository adminRepository;
-    private final Learning_LogRepository learningLogRepository;
 
     public List<UsersDTO> getUserList() {
         List<Users> users = userRepository.findAll();
@@ -107,46 +106,6 @@ public class UserService {
         return result;
     }
 
-    public void setLearningLog(String userId, int lessonNo) {
-        Optional<Users> getUserOpt = userRepository.findByUserId(userId);
-        LocalDateTime today = LocalDateTime.now();
-        if (getUserOpt.isEmpty()) {
-            return;
-        }
-
-        Users user = getUserOpt.get();
-
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        LocalDateTime endOfDay = startOfDay.plusDays(1);
-
-        Optional<Learning_Log> logOpt = learningLogRepository
-                .findByUsers_UserNoAndLearningDateBetween(user.getUserNo(), startOfDay, endOfDay);
-
-        Learning_Log log;
-
-        if (logOpt.isPresent()) {
-            log = logOpt.get();
-        } else {
-            log = new Learning_Log();
-            log.setUsers(user);
-            log.setLearningDate(LocalDateTime.now());
-            log.setLearning1Count(0);
-            log.setLearning2Count(0);
-            log.setLearning3Count(0);
-            log.setLearning4Count(0);
-        }
-        
-        if (lessonNo != 0) {
-            switch (lessonNo) {
-                case 1 -> log.setLearning1Count(log.getLearning1Count() + 1);
-                case 2 -> log.setLearning2Count(log.getLearning2Count() + 1);
-                case 3 -> log.setLearning3Count(log.getLearning3Count() + 1);
-                case 4 -> log.setLearning4Count(log.getLearning4Count() + 1);
-            }
-        }
-
-        learningLogRepository.save(log);
-    }
 
 
     public void update(UsersDTO usersDTO) {
@@ -244,7 +203,7 @@ public class UserService {
     }
 
     public boolean isAdminThere() {
-        return adminRepository.count() > 0;
+        return adminRepository.existsById(1);
     }
 
     public void createDefaultAdmin() {

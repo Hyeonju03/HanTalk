@@ -3,9 +3,11 @@ package com.example.hantalk.controller;
 import com.example.hantalk.SessionUtil;
 import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.entity.Users;
+import com.example.hantalk.service.Learning_LogService;
 import com.example.hantalk.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,10 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @Controller
 public class UserController {
-    @Autowired
-    UserService service;
+
+    private final UserService service;
+    private final Learning_LogService learning_logService;
 
     @GetMapping("/user/test")
     public String test() {
@@ -118,7 +122,7 @@ public class UserController {
             UsersDTO user = service.getUserOne(userId);
             newSession.setAttribute("userNo", user.getUserNo());
             newSession.setAttribute("role", "USER");
-            service.setLearningLog(userId, 0);
+            learning_logService.setLearningLog(userId);
         }
         newSession.setMaxInactiveInterval(1800); //세션 시간제한 설정
         return "userPage/UserTestPage";
