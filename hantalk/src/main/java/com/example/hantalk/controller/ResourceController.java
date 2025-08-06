@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -204,7 +205,7 @@ public class ResourceController {
 
     // 파일 미리보기 전용 페이지 (텍스트 포함, 외부 뷰어 iframe 처리)
     @GetMapping("/preview/{fileName}")
-    public String previewFile(@PathVariable String fileName, Model model) throws IOException {
+    public String previewFile(@PathVariable String fileName, Model model, Principal principal) throws IOException {
         Path filePath = Paths.get(uploadDir).resolve(fileName);
         if (!Files.exists(filePath)) {
             return "redirect:/resource/admin/main";
@@ -229,6 +230,13 @@ public class ResourceController {
             String text = Files.readString(filePath, StandardCharsets.UTF_8);
             model.addAttribute("textContent", text);
         }
+
+        // isAdmin 체크 예시 (Principal 기반, 실제 권한 로직에 맞게 변경 가능)
+        boolean isAdmin = false;
+        if (principal != null) {
+            isAdmin = principal.getName().equals("admin");
+        }
+        model.addAttribute("isAdmin", isAdmin);
 
         return "resource/preview";
     }
