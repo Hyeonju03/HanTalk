@@ -25,4 +25,7 @@ public class PostDTO {
     private Category category;
 
     private List<Comment> commentList;
+
+
+    
 }

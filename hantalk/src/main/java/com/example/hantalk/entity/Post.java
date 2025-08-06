@@ -58,4 +58,6 @@ public class Post {
     @Column(name="comment_list")
     private List<Comment> commentList;
 
+
+
 }

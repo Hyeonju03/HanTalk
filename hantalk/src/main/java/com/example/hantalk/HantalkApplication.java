@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
 @SpringBootApplication
-public class HantalkApplication {
+public class  HantalkApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(HantalkApplication.class, args);

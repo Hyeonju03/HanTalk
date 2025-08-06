@@ -79,6 +79,13 @@ public class PostService {
             post.setCategory(category);
         }
 
+        if (dto.getArchive() != null) {
+                post.setArchive(dto.getArchive());
+            }
+
+
+
+
         postRepository.save(post);
     }
 
