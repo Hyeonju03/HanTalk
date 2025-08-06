@@ -1,83 +1,155 @@
 package com.example.hantalk.controller;
 
+import com.example.hantalk.SessionUtil;
 import com.example.hantalk.dto.VideoDTO;
+import com.example.hantalk.entity.Video;
+import com.example.hantalk.repository.VideoRepository;
 import com.example.hantalk.service.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
-@RequestMapping("/video")
 @RequiredArgsConstructor
 public class VideoController {
 
     private final VideoService videoService;
 
-    // 🔹 검색 기능 추가
-    @GetMapping("/list")
-    public String list(@RequestParam(value = "keyword", required = false) String keyword,
-                       @RequestParam(value = "searchType", defaultValue = "title") String searchType,
-                       Model model) {
-        List<VideoDTO> videos;
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            switch (searchType) {
-                case "title":
-                    videos = videoService.searchByTitle(keyword);
-                    break;
-                case "content":
-                    videos = videoService.searchByContent(keyword);
-                    break;
-                case "all":
-                    videos = videoService.searchByTitleOrContent(keyword);
-                    break;
-                default:
-                    videos = videoService.getAllVideos(); // fallback
-            }
-        } else {
-            videos = videoService.getAllVideos();
+    // ------------------------------
+    // 👤 사용자 기능 (/video/**)
+    // ------------------------------
+
+    @GetMapping("/video/list")
+    public String list(@RequestParam(value = "page", defaultValue = "0") int page,
+                       @RequestParam(value = "size", defaultValue = "10") int size,
+                       @RequestParam(value = "keyword", required = false) String keyword,
+                       @RequestParam(value = "searchType", defaultValue = "all") String searchType,
+                       Model model,
+                       HttpSession session) {
+
+        // 📌 isAdmin 여부 확인
+        boolean isAdmin = false;
+        Object isAdminAttr = session.getAttribute("isAdmin");
+        if (isAdminAttr instanceof Boolean) {
+            isAdmin = (Boolean) isAdminAttr;
         }
+        model.addAttribute("isAdmin", isAdmin);
 
-        model.addAttribute("videos", videos);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("videoId").descending());
+        Page<Video> videoPage = videoService.getPagedVideos(keyword, searchType, pageable);
+
+        model.addAttribute("videoPage", videoPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("startNumber", page * size + 1); // 번호 표시용
+
         return "video/list";
     }
 
+    @GetMapping("/video/view/{id}")
+    public String view(@PathVariable int id, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("userId") == null) {
+            redirectAttributes.addFlashAttribute("msg", "로그인 후 이용 가능합니다.");
+            return "redirect:/video/list";
+        }
 
-
-    // 영상 상세 보기
-    @GetMapping("/view/{id}")
-    public String view(@PathVariable("id") int id, Model model) {
         VideoDTO video = videoService.getVideo(id);
+        String encodedFileName = URLEncoder.encode(video.getVideoName(), StandardCharsets.UTF_8);
+        video.setVideoName(encodedFileName);
         model.addAttribute("video", video);
+
+        // 🔐 관리자 여부를 직접 체크해서 model에 넣기
+        boolean isAdmin = false;
+        Object isAdminAttr = session.getAttribute("isAdmin");
+        if (isAdminAttr instanceof Boolean) {
+            isAdmin = (Boolean) isAdminAttr;
+        }
+        model.addAttribute("isAdmin", isAdmin);
+
         return "video/view";
     }
 
-    // 영상 등록 폼
-    @GetMapping("/upload")
-    public String uploadForm() {
+    // ------------------------------
+    // 📁 관리자 기능 (/admin/video/**)
+    // ------------------------------
+    @GetMapping("/admin")
+    public String adminHome() {
+        return "video/admin"; // → templates/video/admin.html 로 연결
+    }
+
+    @GetMapping("/admin/video/list")
+    public String adminList(@RequestParam(value = "keyword", required = false) String keyword,
+                            @RequestParam(value = "searchType", defaultValue = "title") String searchType,
+                            @RequestParam(value = "page", defaultValue = "0") int page,
+                            @RequestParam(value = "size", defaultValue = "10") int size,
+                            Model model,
+                            HttpSession session) {
+
+        // 관리자 여부 확인
+        boolean isAdmin = false;
+        Object isAdminAttr = session.getAttribute("isAdmin");
+        if (isAdminAttr instanceof Boolean) {
+            isAdmin = (Boolean) isAdminAttr;
+        }
+        model.addAttribute("isAdmin", isAdmin);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("videoId").descending());
+        Page<Video> videoPage = videoService.getPagedVideos(keyword, searchType, pageable);
+
+        model.addAttribute("videoPage", videoPage); // ✔ Page 객체 전달
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("startNumber", page * size + 1);
+
+        return "video/list"; // 사용자와 같은 템플릿 사용 가능
+    }
+
+    @GetMapping("/admin/video/view/{id}")
+    public String adminView(@PathVariable("id") int id, Model model) {
+        return prepareView(id, model);
+    }
+
+    @GetMapping("/admin/video/upload")
+    public String uploadForm(Model model, HttpSession session) {
+        // 📌 isAdmin 여부 확인
+        boolean isAdmin = false;
+        Object isAdminAttr = session.getAttribute("isAdmin");
+        if (isAdminAttr instanceof Boolean) {
+            isAdmin = (Boolean) isAdminAttr;
+        }
+        model.addAttribute("isAdmin", isAdmin);
+
+        model.addAttribute("video", new VideoDTO());
         return "video/upload";
     }
 
-    // 영상 업로드 처리
-    @PostMapping("/upload")
+    @PostMapping("/admin/video/upload")
     public String uploadVideo(@RequestParam("file") MultipartFile file,
                               @RequestParam("title") String title,
-                              @RequestParam("content") String content,
-                              HttpServletRequest request) throws IOException {
-
-        String uploadDir = request.getServletContext().getRealPath("/upload/");
+                              @RequestParam("content") String content) throws IOException {
+        String uploadDir = System.getProperty("user.dir") + "/uploads/videos";
         File dir = new File(uploadDir);
         if (!dir.exists()) dir.mkdirs();
 
@@ -89,32 +161,38 @@ public class VideoController {
         dto.setTitle(title);
         dto.setContent(content);
         dto.setVideoName(savedFilename);
-
         videoService.createVideo(dto);
-        return "redirect:/video/list";
+
+        return "redirect:/admin/video/list";
     }
 
-    // 수정 폼
-    @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable("id") int id, Model model) {
+    @GetMapping("/admin/video/edit/{id}")
+    public String editForm(@PathVariable int id, Model model, HttpSession session) {
+        // 📌 isAdmin 여부 확인
+        boolean isAdmin = false;
+        Object isAdminAttr = session.getAttribute("isAdmin");
+        if (isAdminAttr instanceof Boolean) {
+            isAdmin = (Boolean) isAdminAttr;
+        }
+        model.addAttribute("isAdmin", isAdmin);
+
         VideoDTO video = videoService.getVideo(id);
         model.addAttribute("video", video);
+
         return "video/edit";
     }
 
-    // 수정 처리
-    @PostMapping("/update")
+    @PostMapping("/admin/video/update")
     public String updateVideo(@RequestParam("videoId") int videoId,
                               @RequestParam("title") String title,
                               @RequestParam("content") String content,
                               @RequestParam(value = "file", required = false) MultipartFile file,
                               HttpServletRequest request) throws IOException {
 
-        String uploadDir = request.getServletContext().getRealPath("/upload/");
+        String uploadDir = System.getProperty("user.dir") + "/uploads/videos";
         File dir = new File(uploadDir);
         if (!dir.exists()) dir.mkdirs();
 
-        // 기존 정보 유지
         VideoDTO existing = videoService.getVideo(videoId);
         VideoDTO dto = new VideoDTO();
         dto.setVideoId(videoId);
@@ -122,29 +200,25 @@ public class VideoController {
         dto.setContent(content);
 
         if (file != null && !file.isEmpty()) {
-            // 새 파일 업로드한 경우만 저장
             String originalFilename = file.getOriginalFilename();
             String savedFilename = getUniqueFileName(uploadDir, originalFilename);
             file.transferTo(new File(uploadDir, savedFilename));
             dto.setVideoName(savedFilename);
         } else {
-            // 기존 파일 유지
             dto.setVideoName(existing.getVideoName());
         }
 
         videoService.updateVideo(dto);
-        return "redirect:/video/view/" + dto.getVideoId();
+        return "redirect:/admin/video/view/" + dto.getVideoId();
     }
 
-    // 기존 Get 방식 삭제 (화면에서 사용 시 필요)
-    @GetMapping("/delete/{id}")
+    @GetMapping("/admin/video/delete/{id}")
     public String deleteVideo(@PathVariable("id") int id) {
         videoService.deleteVideo(id);
-        return "redirect:/video/list";
+        return "redirect:/admin/video/list";
     }
 
-    // Ajax 요청용 삭제 API
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/video/{id}")
     public ResponseEntity<String> deleteVideoAjax(@PathVariable("id") int id) {
         try {
             videoService.deleteVideo(id);
@@ -155,7 +229,31 @@ public class VideoController {
         }
     }
 
-    // 중복 파일명 방지 함수
+    // ------------------------------
+    // 🛠️ 내부 재사용 메서드
+    // ------------------------------
+
+    private List<VideoDTO> getSearchedVideos(String keyword, String searchType) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return switch (searchType) {
+                case "title" -> videoService.searchByTitle(keyword);
+                case "content" -> videoService.searchByContent(keyword);
+                case "all" -> videoService.searchByTitleOrContent(keyword);
+                default -> videoService.getAllVideos();
+            };
+        } else {
+            return videoService.getAllVideos();
+        }
+    }
+
+    private String prepareView(int id, Model model) {
+        VideoDTO video = videoService.getVideo(id);
+        String encodedFileName = URLEncoder.encode(video.getVideoName(), StandardCharsets.UTF_8);
+        video.setVideoName(encodedFileName);
+        model.addAttribute("video", video);
+        return "video/view";
+    }
+
     private String getUniqueFileName(String uploadDir, String originalFilename) {
         String baseName = FilenameUtils.getBaseName(originalFilename);
         String extension = FilenameUtils.getExtension(originalFilename);

@@ -1,13 +1,24 @@
+<!-- templates/video/view.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+  <meta charset="UTF-8">
   <title>영상 상세 보기</title>
 </head>
 <body>
-<h1>영상 상세 보기</h1>
-<h2 th:text="${video.title}"></h2>
-<video width="600" controls th:src="@{'/upload/' + ${video.videoName}}"></video>
+<h1 th:text="${video.title}">제목</h1>
+
+<video width="600" controls>
+  <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4">
+  브라우저가 video 태그를 지원하지 않습니다.
+</video>
+
 <p th:text="${video.content}"></p>
+
 <a th:href="@{/video/list}">← 목록으로</a>
+
+<div th:if="${isAdmin}">
+  <a th:href="@{/video/edit/{id}(id=${video.videoId})}">수정</a>
+</div>
 </body>
 </html>

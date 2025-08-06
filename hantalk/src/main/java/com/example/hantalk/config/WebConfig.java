@@ -12,5 +12,9 @@ public class WebConfig implements WebMvcConfigurer {
         // 외부 폴더를 /images/** 경로로 노출
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/images/");
+
+        String videoPath = "file:" + System.getProperty("user.dir") + "/uploads/videos/";
+        registry.addResourceHandler("/videos/**")
+                .addResourceLocations(videoPath);
     }
 }
