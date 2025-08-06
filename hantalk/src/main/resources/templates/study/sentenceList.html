@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>문장 목록</title>
+</head>
+<body>
+<h1>문장 목록</h1>
+<table>
+    <thead>
+        <tr>
+            <th>순번</th>
+            <th>문장</th>
+            <th>의미</th>
+            <th>등록일</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:if="${dtoList == null || dtoList.size <= 0}">
+            <td colspan="4" rowspan="2">
+                문장 데이터가 존재하지 않습니다.
+            </td>
+        </tr>
+        <tr th:each="sentence, loop : ${dtoList}">
+            <td th:text="${loop.count}"></td>
+            <td th:text="${sentence.munjang.replace('^',' ')}"></td>
+            <td th:text="${sentence.description}"></td>
+            <td th:text="${#temporals.format(sentence.createDate, 'yyyy-MM-dd')}"></td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>

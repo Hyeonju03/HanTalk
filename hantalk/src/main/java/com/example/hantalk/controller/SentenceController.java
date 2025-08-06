@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -21,17 +22,37 @@ import java.util.*;
 public class SentenceController {
     private static final Logger logger = LoggerFactory.getLogger(SentenceController.class);
     private final SentenceService sentenceService;
-    private final UserService userService;
     private final Learning_LogService learningLogService;
 
     String folderName = "study";
+
+    // 문장 목록
+    @GetMapping("/sentenceList")
+    public String sentenceList(Model model) {
+        List<SentenceDTO> dtoList = sentenceService.getSelectAll();
+        model.addAttribute("dtoList", dtoList);
+        return folderName + "/sentenceList";
+    }
+
+    @GetMapping("/sentenceList/admin")
+    public String sentenceAdminList(Model model) {
+        List<SentenceDTO> dtoList = sentenceService.getSelectAll();
+        model.addAttribute("dtoList", dtoList);
+        return folderName + "/sentenceAdmin";
+    }
+
+    @GetMapping("/sentenceUpdate")
+    public String sentenceUpdate(Model model) {
+        List<SentenceDTO> dtoList = sentenceService.getSelectAll();
+        model.addAttribute("dtoList", dtoList);
+        return folderName + "/sentenceSujung";
+    }
 
     @GetMapping("/lesson2")
     public String lesson2() {
         return folderName + "/lesson2";
     }
 
-    // SentenceController.java
     @GetMapping("/api/get-lesson2-sentence")
     @ResponseBody
     public Map<String, Object> getLesson2Sentence(HttpSession session) {
@@ -56,7 +77,6 @@ public class SentenceController {
         return response;
     }
 
-    // SentenceController.java
     @PostMapping("/api/check-lesson2-answer")
     @ResponseBody
     public Map<String, Object> checkLesson2Answer(@RequestBody Map<String, List<String>> payload, HttpSession session) {
@@ -120,13 +140,11 @@ public class SentenceController {
         return response;
     }
 
-    //받아쓰기
     @GetMapping("/lesson4")
     public String lesson4() {
         return folderName + "/lesson4";
     }
 
-    //random문장 가져오기
     @GetMapping("/api/get-lesson4-sentence")
     @ResponseBody
     public Map<String, String> getLesson4Sentence() {
