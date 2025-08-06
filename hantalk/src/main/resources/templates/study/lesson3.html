@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>4지선다 객관식 학습</title>
     <script th:inline="javascript">
         // 서버에서 전달된 문제 데이터
-        let questions = /*[[${questions}]]*/ [];  // description, options, answer 포함
-        let answers = new Array(questions.length).fill(""); // 사용자 선택 저장
+        let questions = /*[[${questions}]]*/ || [];
         let currentIndex = 0;
+        let answered = false; // 제출 여부 체크
 
-        // 페이지 로드 시 첫 문제 표시
         window.onload = function() {
             showQuestion(currentIndex);
         };
@@ -17,82 +16,122 @@
         // 현재 문제 표시
         function showQuestion(index) {
             const question = questions[index];
+            document.getElementById('description').textContent = question.description;
 
-            // 문제 설명 표시
-            document.getElementById('description').textContent = question['description'];
-
-            // 보기 표시
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = "";
-            question['options'].forEach(option => {
+
+            question.options.forEach(option => {
                 const optionHtml = `
                     <label>
-                        <input type="radio" name="option" value="${option}"
-                            ${answers[index] === option ? 'checked' : ''}>
+                        <input type="radio" name="option" value="${option}" onclick="selectOption('${option}')">
                         ${option}
-                    </label><br>`;
+                    </label><br>
+                `;
                 optionsContainer.innerHTML += optionHtml;
             });
 
-            // 마지막 문제면 버튼 문구 변경
-            document.getElementById('nextBtn').textContent =
-                (index === questions.length - 1) ? "결과 보기" : "다음으로";
+            document.getElementById('result').textContent = "";
+            answered = false;
         }
 
-        // 다음 문제로 이동하거나 결과 표시
-        function nextQuestion() {
-            // 현재 선택 저장
-            const selected = document.querySelector('input[name="option"]:checked');
-            answers[currentIndex] = selected ? selected.value : "";
+        let selectedOption = "";
 
-            if (currentIndex === questions.length - 1) {
-                showResult();
+        // 보기 선택 시 값 저장
+        function selectOption(option) {
+            selectedOption = option;
+        }
+
+        // 정답 확인 및 오답노트 처리
+        function submitAnswer() {
+            if (!selectedOption) {
+                alert("답을 선택해주세요.");
+                return;
+            }
+
+            if (answered) return; // 이미 제출했으면 중복 방지
+            answered = true;
+
+            const question = questions[currentIndex];
+            const correctAnswer = question.answer;
+            const targetId = question.vocaId;
+
+            // 결과 표시
+            if (selectedOption === correctAnswer) {
+                document.getElementById('result').textContent = `정답! (${correctAnswer})`;
             } else {
+                document.getElementById('result').textContent = `오답! 정답은 ${correctAnswer}`;
+            }
+
+            // 서버에 오답노트 처리 요청
+            fetch('/study/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    type: 'word',
+                    targetId: targetId,
+                    answer: selectedOption,
+                    correctAnswer: correctAnswer
+                })
+            })
+            .then(res => res.json())
+            .then(isCorrect => {
+                console.log("정답 여부:", isCorrect);
+            })
+            .catch(err => console.error("오답노트 처리 오류:", err));
+        }
+
+        // 다음 문제로 이동
+        function nextQuestion() {
+            if (!answered) {
+                alert("먼저 정답을 제출하세요.");
+                return;
+            }
+
+            if (currentIndex < questions.length - 1) {
                 currentIndex++;
+                selectedOption = "";
                 showQuestion(currentIndex);
+            } else {
+                showCompletionPage();
             }
         }
 
-        // 최종 결과 표시
-        function showResult() {
-            let output = "";
-            for (let i = 0; i < questions.length; i++) {
-                let correct = questions[i].answer; // 정답
-                let userAnswer = answers[i];
-                if (userAnswer === correct) {
-                    output += `<p>${i + 1}번: 정답! (${correct})</p>`;
-                } else {
-                    output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
-                }
-            }
-
-            // 결과 화면 표시
+        // 학습 완료 화면
+        function showCompletionPage() {
             document.body.innerHTML = `
-                <h1>결과</h1>
-                ${output}
+                <h1>학습 완료!</h1>
+                <p>오답노트에서 틀린 단어를 복습해보세요.</p>
+                <div style="position: fixed; bottom: 20px; right: 20px;">
+                    <button onclick="goToMain()">학습 메인으로 이동</button>
+                </div>
             `;
 
-            // 학습 완료 로그 저장 호출 (lesson3 → complete3)
-            fetch('/study/complete3', {
-                method: 'POST'
-            })
-            .then(res => res.text())
-            .then(result => {
-                if (result === 'success') {
-                    console.log("학습 로그 저장 성공 (lesson3)");
-                } else {
-                    console.log("로그 저장 실패 (lesson3)");
-                }
-            });
+            // 학습 로그 저장
+            fetch('/study/complete3', { method: 'POST' })
+                .then(res => res.text())
+                .then(result => {
+                    if (result === 'success') {
+                        console.log("학습 로그 저장 성공");
+                    } else {
+                        console.log("학습 로그 저장 실패");
+                    }
+                });
+        }
+
+        function goToMain() {
+            window.location.href = '/study/main';
         }
     </script>
 </head>
 <body>
-<h1>학습 3 - 4지선다 객관식</h1>
+<h1>4지선다 객관식 학습</h1>
 
 <p id="description"></p>
 <div id="options"></div>
+<button type="button" onclick="submitAnswer()">제출</button>
 <button type="button" id="nextBtn" onclick="nextQuestion()">다음으로</button>
 <p id="result"></p>
+
 </body>
 </html>

@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,19 +33,33 @@ public class VocaController {
     // 학습 1번 (단어 맞추기)
     @GetMapping("/lesson1")
     public String getFillBlank(@RequestParam(defaultValue = "5") int count, HttpSession session, Model model) {
+        // 이미 푼 단어 ID 세션에서 가져오기
         List<Integer> solvedIds = (List<Integer>) session.getAttribute("solvedIds_lesson1");
         if (solvedIds == null) solvedIds = new ArrayList<>();
 
-        List<VocaDTO> problems = vocaService.getFillBlank(solvedIds, count);
+        // 단어 5개 뽑기
+        List<VocaDTO> vocaDTOList = vocaService.getFillBlank(solvedIds, count);
 
-        for (VocaDTO dto : problems) {
+        // Map으로 변환해서 필요한 값만 넘김
+        List<Map<String, Object>> problems = new ArrayList<>();
+        for (VocaDTO dto : vocaDTOList) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("vocaId", dto.getVocaId());
+            map.put("vocabulary", dto.getVocabulary());
+            map.put("description", dto.getDescription());
+            // createDate는 필요 없으면 안 넣어도 됨
+            problems.add(map);
+
+            // solvedIds 업데이트
             solvedIds.add(dto.getVocaId());
         }
-        session.setAttribute("solvedIds_lesson1", solvedIds);
 
-         model.addAttribute("problems", problems);
-         return "study/lesson1";
+        session.setAttribute("solvedIds_lesson1", solvedIds);
+        model.addAttribute("problems", problems);
+
+        return "study/lesson1";
     }
+
 
     // 학습 1번 완료 처리
     @PostMapping("/complete1")

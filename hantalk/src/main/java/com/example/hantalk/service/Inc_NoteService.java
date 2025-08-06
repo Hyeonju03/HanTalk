@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class Inc_NoteService {
@@ -25,20 +27,29 @@ public class Inc_NoteService {
     @Transactional
     public void saveIncorrectNote(int userNo, Integer vocaId, Integer sentenceId) {
         Users user = usersRepository.findById(userNo)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+
+        if (vocaId != null) {
+            boolean exists = incNoteRepository.existsByUsers_UserNoAndVoca_VocaId(userNo, vocaId);
+            if (exists) return;
+        }
+        if (sentenceId != null) {
+            boolean exists = incNoteRepository.existsByUsers_UserNoAndSentence_SentenceId(userNo, sentenceId);
+            if (exists) return;
+        }
 
         Inc_Note note = new Inc_Note();
         note.setUsers(user);
 
         if (vocaId != null) {
             Voca voca = vocaRepository.findById(vocaId)
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 단어입니다."));
+                    .orElseThrow(() -> new IllegalArgumentException("단어 없음"));
             note.setVoca(voca);
         }
 
         if (sentenceId != null) {
             Sentence sentence = sentenceRepository.findById(sentenceId)
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 문장입니다."));
+                    .orElseThrow(() -> new IllegalArgumentException("문장 없음"));
             note.setSentence(sentence);
         }
 
@@ -54,4 +65,10 @@ public class Inc_NoteService {
             incNoteRepository.deleteSentenceNote(userNo, sentenceId);
         }
     }
+
+    @Transactional (readOnly = true)
+    public List<Inc_Note> findNotes(int userNo) {
+        return incNoteRepository.findByUsers_UserNo(userNo);
+    }
+
 }
