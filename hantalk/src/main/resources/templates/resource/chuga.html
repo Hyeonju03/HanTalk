@@ -79,8 +79,11 @@
   <input type="file" name="file" id="file" />
   <div class="info">※ 파일을 첨부하면 위 링크 대신 업로드된 파일로 저장됩니다.</div>
 
-  <div style="text-align: center;">
+  <div style="text-align: center; margin-top: 20px;">
     <button type="submit">등록</button>
+    <a th:href="@{/resource/admin}" style="margin-left: 10px; text-decoration: none;">
+      <button type="button" style="background-color: #ccc; color: #333;">취소</button>
+    </a>
   </div>
 </form>
 
