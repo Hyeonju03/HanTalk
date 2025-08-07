@@ -30,43 +30,23 @@ import java.security.Principal;
 public class ResourceController {
 
     private final ResourceService resourceService;
+    private final String uploadDir = "C:/aaa/HanTalk/hantalk/ResourceFile";
 
-    // 실제 업로드 파일 저장 위치
-    private final String uploadDir = "C:/aaa/HanTalk/hantalk/ResourceFile/";
-
-    // 확장자 추출 메서드
     private String getExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf('.');
-        if (dotIndex == -1) return "";
-        return fileName.substring(dotIndex + 1).toLowerCase();
+        return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1).toLowerCase();
     }
 
     private boolean isImage(String fileName) {
-        if (fileName == null) return false;
-        String ext = getExtension(fileName);
-        return ext.matches("png|jpg|jpeg|gif|bmp|webp");
-    }
-
-    private boolean isPdf(String fileName) {
-        if (fileName == null) return false;
-        String ext = getExtension(fileName);
-        return ext.equals("pdf");
-    }
-
-    private boolean isOfficeFile(String fileName) {
-        if (fileName == null) return false;
-        String ext = getExtension(fileName);
-        return ext.matches("ppt|pptx|doc|docx|xls|xlsx");
+        return getExtension(fileName).matches("png|jpg|jpeg|gif|bmp|webp");
     }
 
     private boolean isTextFile(String fileName) {
-        if (fileName == null) return false;
-        String ext = getExtension(fileName);
-        return ext.matches("txt|csv|log|md|java|xml|json|html|css|js");
+        return getExtension(fileName).matches("txt|csv|log|md|java|xml|json|html|css|js");
     }
 
-    // 사용자용 메인 페이지 (미리보기 가능 여부 세팅 제거하고 항상 true로 세팅)
-    @GetMapping("/main")
+    // 사용자 메인 페이지
+    @GetMapping({"/main", "/list"})
     public String userMainPage(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(defaultValue = "10") int size,
                                @RequestParam(value = "keyword", required = false) String keyword,
@@ -76,17 +56,14 @@ public class ResourceController {
                 ? resourceService.searchResources(keyword.trim(), pageable)
                 : resourceService.getAllResources(pageable);
 
-        // 미리보기 가능 여부 세팅 제거 or 무조건 true로 세팅
-        resourcePage.forEach(resource -> resource.setPreviewAvailable(true));
-
         model.addAttribute("resourcePage", resourcePage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("currentPage", page);
         return "resource/main";
     }
 
-    // 관리자용 메인 페이지
-    @GetMapping({"admin", "admin/main"})
+    // 관리자 메인 페이지
+    @GetMapping({"/admin", "/admin/main"})
     public String adminMainPage(@RequestParam(defaultValue = "0") int page,
                                 @RequestParam(defaultValue = "10") int size,
                                 @RequestParam(value = "keyword", required = false) String keyword,
@@ -98,17 +75,18 @@ public class ResourceController {
 
         model.addAttribute("resourcePage", resourcePage);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("currentPage", page);
         return "resource/admin";
     }
 
-    // 자료 등록 폼
+    // 등록 폼
     @GetMapping("/chuga")
     public String showCreateForm(Model model) {
         model.addAttribute("resourceDTO", new ResourceDTO());
         return "resource/chuga";
     }
 
-    // 자료 등록 처리
+    // 등록 처리
     @PostMapping("/create")
     public String createResource(@ModelAttribute ResourceDTO resourceDTO,
                                  @RequestParam("file") MultipartFile file) {
@@ -116,7 +94,7 @@ public class ResourceController {
         return "redirect:/resource/admin/main";
     }
 
-    // 자료 상세 페이지
+    // 상세 보기
     @GetMapping("/detail/{id}")
     public String viewDetail(@PathVariable int id, Model model) {
         ResourceDTO resource = resourceService.getResourceById(id);
@@ -129,7 +107,7 @@ public class ResourceController {
     @GetMapping("/sujung/{id}")
     public String showEditForm(@PathVariable int id, Model model) {
         ResourceDTO resource = resourceService.getResourceById(id);
-        if (resource == null) return "redirect:/resource/admin";
+        if (resource == null) return "redirect:/resource/admin/main";
         model.addAttribute("resourceDTO", resource);
         return "resource/sujung";
     }
@@ -143,25 +121,19 @@ public class ResourceController {
         return "redirect:/resource/detail/" + id;
     }
 
-    // 삭제 처리 (GET)
+    // 삭제 처리
     @GetMapping("/delete/{id}")
-    public String deleteResourceGet(@PathVariable("id") Long id) {
-        resourceService.deleteResource(id.intValue());
+    public String deleteResource(@PathVariable int id) {
+        resourceService.deleteResource(id);
         return "redirect:/resource/admin/main";
     }
 
-    // 삭제 처리 (POST)
-    @PostMapping("/delete/{id}")
-    public String deleteResourcePost(@PathVariable int id, Model model) {
-        resourceService.deleteResource(id);
-        model.addAttribute("deletedId", id);
-        return "resource/sakje";
-    }
-
-    // 파일 다운로드 : attachment 헤더로 강제 다운로드
+    // 파일 다운로드
     @GetMapping("/download/file/{fileName}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) throws IOException {
-        Path path = Paths.get(uploadDir).resolve(fileName);
+        if (fileName.contains("..")) return ResponseEntity.badRequest().build();
+
+        Path path = Paths.get(uploadDir).resolve(fileName).normalize();
         UrlResource resource = new UrlResource(path.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
@@ -169,9 +141,7 @@ public class ResourceController {
         }
 
         String originalFileName = resourceService.getOriginalFileName(fileName);
-        if (originalFileName == null || originalFileName.isEmpty()) {
-            originalFileName = fileName;
-        }
+        if (originalFileName == null) originalFileName = fileName;
 
         String encodedFileName = UriUtils.encode(originalFileName, StandardCharsets.UTF_8);
         String contentDisposition = "attachment; filename=\"" + originalFileName + "\"; filename*=UTF-8''" + encodedFileName;
@@ -182,62 +152,71 @@ public class ResourceController {
                 .body(resource);
     }
 
-    // 파일 보기 : inline 헤더로 브라우저 내에서 열기 (가능하면 미리보기)
-    @GetMapping("/view/file/{fileName}")
-    public ResponseEntity<Resource> viewFile(@PathVariable String fileName) throws IOException {
-        Path filePath = Paths.get(uploadDir).resolve(fileName);
-        UrlResource resource = new UrlResource(filePath.toUri());
+    // 사용자 파일 미리보기
+    @GetMapping("/preview/{fileName}")
+    public String previewFile(@PathVariable String fileName, Model model, Principal principal) {
+        return handleFilePreview(fileName, model, principal, false);
+    }
+
+    // 관리자 파일 미리보기
+    @GetMapping("/admin/preview/{fileName}")
+    public String adminPreviewFile(@PathVariable String fileName, Model model, Principal principal) {
+        return handleFilePreview(fileName, model, principal, true);
+    }
+
+    // 파일 미리보기 공통 처리
+    private String handleFilePreview(String fileName, Model model, Principal principal, boolean isAdminPath) {
+        try {
+            if (fileName.contains("..")) {
+                return isAdminPath ? "redirect:/resource/admin" : "redirect:/resource/main";
+            }
+
+            Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
+            if (!Files.exists(filePath)) {
+                return isAdminPath ? "redirect:/resource/admin" : "redirect:/resource/main";
+            }
+
+            String ext = getExtension(fileName);
+            model.addAttribute("fileName", fileName);
+            model.addAttribute("isImage", isImage(fileName));
+            model.addAttribute("isDocument", ext.matches("pdf|xls|xlsx|hwp|doc|docx|ppt|pptx"));
+            model.addAttribute("isText", isTextFile(fileName));
+            model.addAttribute("isOfficeFile", ext.matches("ppt|pptx|doc|docx|xls|xlsx"));
+
+            boolean isAdmin = principal != null && principal.getName().toLowerCase().startsWith("admin");
+            model.addAttribute("isAdmin", isAdmin);
+
+            if (isTextFile(fileName)) {
+                try {
+                    String text = Files.readString(filePath, StandardCharsets.UTF_8);
+                    model.addAttribute("textContent", text);
+                } catch (IOException e) {
+                    model.addAttribute("textContent", "텍스트 파일을 읽는 중 오류가 발생했습니다.");
+                }
+            }
+
+            return isAdminPath ? "resource/adminpreview" : "resource/preview";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return isAdminPath ? "redirect:/resource/admin" : "redirect:/resource/main";
+        }
+    }
+
+    // 이미지 출력
+    @GetMapping("/image/{fileName}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveImage(@PathVariable String fileName) throws IOException {
+        Path path = Paths.get(uploadDir).resolve(fileName).normalize();
+        UrlResource resource = new UrlResource(path.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
             return ResponseEntity.notFound().build();
         }
 
-        String contentType = Files.probeContentType(filePath);
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
-
+        String contentType = Files.probeContentType(path);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
-                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .contentType(MediaType.parseMediaType(contentType != null ? contentType : "image/png"))
                 .body(resource);
-    }
-
-    // 파일 미리보기 전용 페이지 (텍스트 포함, 외부 뷰어 iframe 처리)
-    @GetMapping("/preview/{fileName}")
-    public String previewFile(@PathVariable String fileName, Model model, Principal principal) throws IOException {
-        Path filePath = Paths.get(uploadDir).resolve(fileName);
-        if (!Files.exists(filePath)) {
-            return "redirect:/resource/admin/main";
-        }
-
-        String ext = "";
-        int i = fileName.lastIndexOf('.');
-        if (i > 0) ext = fileName.substring(i + 1).toLowerCase();
-
-        boolean isImage = ext.matches("png|jpg|jpeg|gif|bmp|webp");
-        boolean isDocument = ext.matches("pdf|xls|xlsx|hwp|doc|docx|ppt|pptx");
-        boolean isText = ext.matches("txt|csv|log|md|java|xml|json|html|css|js");
-        boolean isOfficeFile = ext.matches("ppt|pptx|doc|docx|xls|xlsx");
-
-        model.addAttribute("fileName", fileName);
-        model.addAttribute("isImage", isImage);
-        model.addAttribute("isDocument", isDocument);
-        model.addAttribute("isText", isText);
-        model.addAttribute("isOfficeFile", isOfficeFile);
-
-        if (isText) {
-            String text = Files.readString(filePath, StandardCharsets.UTF_8);
-            model.addAttribute("textContent", text);
-        }
-
-        // isAdmin 체크 예시 (Principal 기반, 실제 권한 로직에 맞게 변경 가능)
-        boolean isAdmin = false;
-        if (principal != null) {
-            isAdmin = principal.getName().equals("admin");
-        }
-        model.addAttribute("isAdmin", isAdmin);
-
-        return "resource/preview";
     }
 }
