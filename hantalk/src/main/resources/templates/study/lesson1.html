@@ -4,79 +4,96 @@
     <meta charset="UTF-8">
     <title>단어 맞추기</title>
     <script th:inline="javascript">
-        // 서버에서 전달된 문제 데이터
-        let problems = /*[[${problems}]]*/ [];
-        let answers = new Array(problems.length).fill(""); // 사용자 입력 저장
+        let problems = /*[[${problems}]]*/ || [];
         let currentIndex = 0;
+        let answered = false; // 제출 여부 체크
 
-        // 페이지 로드 시 첫 문제 표시
         window.onload = function() {
             showProblem(currentIndex);
         };
 
-        // 현재 문제 보여주기
+        // 문제 표시
         function showProblem(index) {
             const problem = problems[index];
             document.getElementById('description').textContent = problem.description;
-            document.getElementById('answer').value = answers[index] || "";
+            document.getElementById('answer').value = "";
             document.getElementById('result').textContent = "";
-
-            // 마지막 문제면 버튼 문구 변경
-            document.getElementById('nextBtn').textContent =
-                (index === problems.length - 1) ? "결과 보기" : "다음으로";
+            answered = false;
         }
 
-        // 다음 문제로 이동하거나 결과 표시
-        function nextProblem() {
-            // 현재 입력 저장
-            answers[currentIndex] = document.getElementById('answer').value.trim();
+        // 정답 확인 및 오답노트 처리
+        function submitAnswer() {
+            if (answered) return; // 이미 제출했으면 중복 방지
 
-            // 마지막 문제면 결과 표시
-            if (currentIndex === problems.length - 1) {
-                showResult();
+            const problem = problems[currentIndex];
+            const userAnswer = document.getElementById('answer').value.trim();
+            const correctAnswer = problem.vocabulary;
+            const targetId = problem.vocaId;
+
+            // 결과 표시
+            if (userAnswer === correctAnswer) {
+                document.getElementById('result').textContent = `정답! (${correctAnswer})`;
             } else {
+                document.getElementById('result').textContent = `오답! 정답은 ${correctAnswer}`;
+            }
+
+            // 서버에 오답노트 처리 요청
+            fetch('/study/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    type: 'word',             // lesson1은 단어
+                    targetId: targetId,
+                    answer: userAnswer,
+                    correctAnswer: correctAnswer
+                })
+            })
+            .then(res => res.json())
+            .then(isCorrect => {
+                console.log("정답 여부:", isCorrect);
+            })
+            .catch(err => console.error("오답노트 처리 오류:", err));
+
+            answered = true; // 제출 완료 상태로 변경
+        }
+
+        // 다음 문제로 이동
+        function nextProblem() {
+            if (!answered) {
+                alert("먼저 정답을 제출하세요.");
+                return;
+            }
+
+            if (currentIndex < problems.length - 1) {
                 currentIndex++;
                 showProblem(currentIndex);
+            } else {
+                showCompletionPage();
             }
         }
 
-        // 최종 결과 표시
-        function showResult() {
-            let output = "";
-            for (let i = 0; i < problems.length; i++) {
-                let correct = problems[i].vocabulary;
-                let userAnswer = answers[i];
-                if (userAnswer === correct) {
-                    output += `<p>${i + 1}번: 정답! (${correct})</p>`;
-                } else {
-                    output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
-                }
-            }
-
-            // 결과와 다음 학습 이동 버튼
+        // 학습 완료 화면
+        function showCompletionPage() {
             document.body.innerHTML = `
-                <h1>결과</h1>
-                ${output}
+                <h1>학습 완료!</h1>
+                <p>오답노트에서 틀린 단어를 복습해보세요.</p>
                 <div style="position: fixed; bottom: 20px; right: 20px;">
                     <button onclick="goToLesson3()">다음 학습으로 이동</button>
                 </div>
             `;
 
-            // 학습 완료 로그 저장 호출 (lesson1 → complete1)
-            fetch('/study/complete1', {
-                method: 'POST'
-            })
-            .then(res => res.text())
-            .then(result => {
-                if (result === 'success') {
-                    console.log("학습 로그 저장 성공");
-                } else {
-                    console.log("로그 저장 실패");
-                }
-            });
+            // 학습 로그 저장
+            fetch('/study/complete1', { method: 'POST' })
+                .then(res => res.text())
+                .then(result => {
+                    if (result === 'success') {
+                        console.log("학습 로그 저장 성공");
+                    } else {
+                        console.log("학습 로그 저장 실패");
+                    }
+                });
         }
 
-        // lesson3으로 이동 (같은 팝업 창에서)
         function goToLesson3() {
             window.location.href = '/study/lesson3';
         }
@@ -87,6 +104,7 @@
 
 <p id="description"></p>
 <input type="text" id="answer" placeholder="정답 입력">
+<button type="button" onclick="submitAnswer()">제출</button>
 <button type="button" id="nextBtn" onclick="nextProblem()">다음으로</button>
 <p id="result"></p>
 </body>

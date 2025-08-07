@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>오답노트</title>
+</head>
+<body>
+<h2>오답노트</h2>
+
+<div id="notesContainer">
+  <table border="1">
+    <thead>
+    <tr>
+      <th>유형</th>
+      <th>내용</th>
+      <th>뜻/해석</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- notes 리스트를 순회하면서 표시 -->
+    <tr th:each="note : ${notes}">
+      <td th:text="${note.voca != null ? '단어' : '문장'}"></td>
+      <td th:text="${note.voca != null ? note.voca.vocabulary : note.sentence.sentence}"></td>
+      <td th:text="${note.voca != null ? note.voca.description : note.sentence.meaning}"></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- notes가 비어 있을 때 메시지 출력 -->
+  <p th:if="${#lists.isEmpty(notes)}">오답노트가 비어 있습니다.</p>
+</div>
+
+</body>
+</html>
