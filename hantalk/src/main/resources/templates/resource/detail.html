@@ -125,11 +125,6 @@
   </div>
 
   <div class="detail-item">
-    <span class="label">조회수:</span>
-    <span class="content" th:text="${resource.viewCount}">0</span>
-  </div>
-
-  <div class="detail-item">
     <span class="label">등록일:</span>
     <span class="content" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
   </div>

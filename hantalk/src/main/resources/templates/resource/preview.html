@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
-  <title>관리자 파일 미리보기</title>
+  <title>사용자 파일 미리보기</title>
   <style>
     body {
       background: #f0f4f8;
@@ -11,8 +11,9 @@
       margin: 0;
       padding: 0;
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       min-height: 100vh;
+      align-items: center;
     }
     nav {
       width: 200px;
@@ -51,22 +52,15 @@
       background: #fefcff;
       min-height: 100vh;
       box-sizing: border-box;
+      max-width: 900px;
+      width: 100%;
     }
     h1 {
       text-align: center;
       color: #506ab4;
       margin-bottom: 1rem;
       font-weight: 700;
-    }
-    .container {
-      max-width: 900px;
-      margin: 2rem auto 4rem auto;
-      background: white;
-      padding: 2rem 3rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(180, 200, 255, 0.35);
-      box-sizing: border-box;
-      flex-grow: 1;
+      word-break: break-word;
     }
     iframe, img, pre {
       width: 100%;
@@ -119,82 +113,57 @@
       font-weight: bold;
       font-size: 1rem;
       cursor: pointer;
-    }
-    .back-user {
       background: #7ecdc4;
     }
-    .back-user:hover {
+    .back-button:hover {
       background: #5ebcb1;
-    }
-    .back-admin {
-      background: #506ab4;
-    }
-    .back-admin:hover {
-      background: #3a4f8a;
     }
   </style>
 </head>
 <body>
 <nav>
-  <h2>관리자 자료실 메뉴</h2>
+  <h2>자료실 메뉴</h2>
   <ul>
     <li><a href="/resource/main">사용자 메인</a></li>
-    <li><a href="/resource/admin/main">관리자 메인</a></li>
-    <li><a href="/resource/chuga">자료 등록</a></li>
   </ul>
 </nav>
 
 <main>
-  <div class="container">
-    <h1 th:text="${fileName}">파일명</h1>
+  <h1 th:text="${fileName}">파일명</h1>
 
-    <!-- 이미지 미리보기 -->
-    <img th:if="${isImage}" th:src="@{|/resource/view/file/${fileName}|}" alt="이미지 미리보기" />
+  <!-- 이미지 미리보기 -->
+  <img th:if="${isImage}" th:src="@{|/resource/view/file/${fileName}|}" alt="이미지 미리보기" />
 
-    <!-- 오피스 파일 미리보기 -->
-    <iframe th:if="${isOfficeFile}"
-            th:src="@{|https://docs.google.com/gview?url=${'http://localhost:8080/resource/view/file/' + fileName}&embedded=true|}"
-            frameborder="0"></iframe>
+  <!-- 오피스 파일 미리보기 -->
+  <iframe th:if="${isOfficeFile}"
+          th:src="@{|https://docs.google.com/gview?url=${'http://localhost:8080/resource/view/file/' + fileName}&embedded=true|}"
+          frameborder="0"></iframe>
 
-    <!-- PDF 등 직접 미리보기 -->
-    <iframe th:if="${isDocument and !isOfficeFile and !isText}"
-            th:src="@{|/resource/view/file/${fileName}|}"
-            frameborder="0"></iframe>
+  <!-- PDF 등 직접 미리보기 -->
+  <iframe th:if="${isDocument and !isOfficeFile and !isText}"
+          th:src="@{|/resource/view/file/${fileName}|}"
+          frameborder="0"></iframe>
 
-    <!-- 텍스트 파일 -->
-    <pre th:if="${isText}" th:text="${textContent}">텍스트 내용</pre>
+  <!-- 텍스트 파일 -->
+  <pre th:if="${isText}" th:text="${textContent}">텍스트 내용</pre>
 
-    <!-- 미리보기 불가 파일 -->
-    <p th:if="${!isImage and !isDocument and !isText}">
-      미리보기를 지원하지 않는 파일입니다. 다운로드해 주세요.
-    </p>
+  <!-- 미지원 파일 안내 -->
+  <p th:if="${!isImage and !isDocument and !isText}">
+    미리보기를 지원하지 않는 파일입니다. 다운로드해 주세요.
+  </p>
 
-    <!-- 다운로드 -->
-    <p>
-      <a th:href="@{|/resource/download/file/${fileName}|}">파일 다운로드</a>
-    </p>
+  <!-- 다운로드 링크 -->
+  <p><a th:href="@{|/resource/download/file/${fileName}|}">파일 다운로드</a></p>
 
-    <!-- 목록으로 버튼 -->
-    <div class="button-container">
-      <!-- 팝업 닫고 부모창 포커스 주는 JS 버튼 -->
-      <button type="button" class="back-button back-admin" onclick="closePreviewAndFocusParent()">관리자 목록으로</button>
-
-      <!-- 사용자 목록은 그냥 새로 이동 -->
-      <a th:href="@{/resource/main}" style="text-decoration: none;">
-        <button type="button" class="back-button back-user">사용자 목록으로</button>
-      </a>
-    </div>
+  <!-- 뒤로가기 버튼 -->
+  <div class="button-container">
+    <button type="button"
+            class="back-button"
+            th:text="${isAdmin} ? '관리자 목록으로' : '사용자 목록으로'"
+            th:onclick="${isAdmin} ? 'location.href=\'/resource/admin/main\'' : 'location.href=\'/resource/main\''">
+      사용자 목록으로
+    </button>
   </div>
 </main>
-
-<script>
-  function closePreviewAndFocusParent() {
-    if (window.opener && !window.opener.closed) {
-      window.opener.focus();
-    }
-    window.close();
-  }
-</script>
-
 </body>
 </html>
