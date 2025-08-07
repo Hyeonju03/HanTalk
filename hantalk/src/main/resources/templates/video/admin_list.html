@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>영상 목록 (관리자)</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>영상 목록</h1>
+
+<!-- 🔍 검색 폼 -->
+<form method="get" th:action="@{/admin/video/list}">
+  <select name="searchType">
+    <option value="title" th:selected="${searchType} == 'title'">제목</option>
+    <option value="content" th:selected="${searchType} == 'content'">내용</option>
+    <option value="all" th:selected="${searchType} == 'all'">제목 + 내용</option>
+  </select>
+  <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" />
+  <button type="submit">검색</button>
+</form>
+
+<!-- ➕ 새 영상 등록 -->
+<a th:href="@{/admin/video/upload}">➕ 새 영상 등록</a>
+
+<table border="1">
+  <thead>
+  <tr>
+    <th>제목</th>
+    <th>설명</th>
+    <th>등록일</th>
+    <th>수정일</th>
+    <th>관리</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="video : ${videoPage.content}" th:id="'row-' + ${video.videoId}">
+    <td>
+      <a th:href="@{/admin/video/view/{id}(id=${video.videoId})}"
+         th:text="${video.title}">제목</a>
+    </td>
+    <td th:text="${video.content}">내용</td>
+    <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</td>
+    <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}">수정일</td>
+    <td>
+      <a th:href="@{/admin/video/edit/{id}(id=${video.videoId})}">수정</a> |
+      <button type="button"
+              th:attr="data-id=${video.videoId}"
+              onclick="deleteVideo(this)">삭제</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+  <div class="pagination" th:if="${videoPage.totalPages > 1}">
+  <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
+    <a th:href="@{'/' + ${role} + '/video/list'(page=${i})}"
+       th:classappend="${i == videoPage.number} ? 'active' : ''"
+       th:text="${i + 1}">1</a>
+  </span>
+  </div>
+
+<!-- ✅ Ajax 삭제용 스크립트 -->
+<script>
+  function deleteVideo(button) {
+      const videoId = $(button).data("id");
+      if (confirm("정말 삭제하시겠습니까?")) {
+          $.ajax({
+              url: "/admin/video/" + videoId,
+              type: "DELETE",
+              success: function (result) {
+                  alert("삭제되었습니다.");
+                  $("#row-" + videoId).remove(); // DOM에서 해당 행 제거
+              },
+              error: function (xhr) {
+                  const message = xhr.responseText || "삭제 중 오류가 발생했습니다.";
+                  alert(message);
+              }
+          });
+      }
+  }
+</script>
+</body>
+</html>

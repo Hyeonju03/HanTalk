@@ -1,5 +1,6 @@
 package com.example.hantalk.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -13,8 +14,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/images/");
 
-        String videoPath = "file:" + System.getProperty("user.dir") + "/uploads/videos/";
+        String uploadPath = System.getProperty("user.dir") + "/uploads/videos/";
         registry.addResourceHandler("/videos/**")
-                .addResourceLocations(videoPath);
+                .addResourceLocations("file:" + uploadPath);
     }
 }
