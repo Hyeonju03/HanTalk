@@ -67,4 +67,51 @@ public class VocaService {
         }
         return questions;
     }
+
+    public List<VocaDTO> getCompletelyRandomFillBlank(int count) {
+        List<Voca> vocas = vocaRepository.findByRandomVocas(count);
+        List<VocaDTO> result = new ArrayList<>();
+
+        for (Voca v : vocas) {
+            VocaDTO dto = new VocaDTO();
+            dto.setVocaId(v.getVocaId());
+            dto.setVocabulary(v.getVocabulary());
+            dto.setDescription(v.getDescription());
+            dto.setCreateDate(v.getCreateDate());
+
+            dto.setIncNoteList(null);
+
+            result.add(dto);
+        }
+
+        return result;
+    }
+
+    public List<Map<String, Object>> getCompletelyRandomMultipleChoice(int count) {
+        List<Map<String, Object>> questions = new ArrayList<>();
+
+        for (int i = 0; i < count; i++) {
+            List<Voca> options = vocaRepository.findRandomVocas(Collections.emptyList(), 0, 4);
+
+            Voca correct = options.get(0);
+            String description = correct.getDescription();
+
+            List<String> choices = new ArrayList<>();
+            for (Voca v : options) {
+                choices.add(v.getVocabulary());
+            }
+            Collections.shuffle(choices);
+
+            Map<String, Object> question = new HashMap<>();
+            question.put("vocaId", correct.getVocaId());
+            question.put("description", description);
+            question.put("options", choices);
+            question.put("answer", correct.getVocabulary());
+
+            questions.add(question);
+        }
+
+        return questions;
+    }
+
 }

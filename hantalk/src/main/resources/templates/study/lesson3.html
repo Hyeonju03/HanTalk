@@ -3,17 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <title>4지선다 객관식 학습</title>
-    <script th:inline="javascript">
-        // 서버에서 전달된 문제 데이터
-        let questions = /*[[${questions}]]*/ || [];
-        let currentIndex = 0;
-        let answered = false; // 제출 여부 체크
+    <style>
+        #feedback-icon {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 100px;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+        }
 
-        window.onload = function() {
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 8px 16px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        #result {
+            font-size: 18px;
+            margin-top: 15px;
+        }
+
+        #completion-message {
+            font-size: 22px;
+            font-weight: bold;
+            color: #003366;
+            margin-top: 30px;
+            text-align: center;
+        }
+    </style>
+
+    <script th:inline="javascript">
+        let questions = /*[[${questions}]]*/ [];
+        let currentIndex = 0;
+        let answered = false;
+        let selectedOption = "";
+
+        window.onload = function () {
             showQuestion(currentIndex);
         };
 
-        // 현재 문제 표시
         function showQuestion(index) {
             const question = questions[index];
             document.getElementById('description').textContent = question.description;
@@ -32,56 +76,65 @@
             });
 
             document.getElementById('result').textContent = "";
+            document.getElementById('feedback-icon').style.display = 'none';
+            document.getElementById('completion-message').textContent = '';
             answered = false;
         }
 
-        let selectedOption = "";
-
-        // 보기 선택 시 값 저장
         function selectOption(option) {
             selectedOption = option;
         }
 
-        // 정답 확인 및 오답노트 처리
-        function submitAnswer() {
-            if (!selectedOption) {
-                alert("답을 선택해주세요.");
-                return;
-            }
-
-            if (answered) return; // 이미 제출했으면 중복 방지
-            answered = true;
-
-            const question = questions[currentIndex];
-            const correctAnswer = question.answer;
-            const targetId = question.vocaId;
-
-            // 결과 표시
-            if (selectedOption === correctAnswer) {
-                document.getElementById('result').textContent = `정답! (${correctAnswer})`;
-            } else {
-                document.getElementById('result').textContent = `오답! 정답은 ${correctAnswer}`;
-            }
-
-            // 서버에 오답노트 처리 요청
-            fetch('/study/check', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    type: 'word',
-                    targetId: targetId,
-                    answer: selectedOption,
-                    correctAnswer: correctAnswer
-                })
-            })
-            .then(res => res.json())
-            .then(isCorrect => {
-                console.log("정답 여부:", isCorrect);
-            })
-            .catch(err => console.error("오답노트 처리 오류:", err));
+            function submitAnswer() {
+        if (!selectedOption) {
+            alert("답을 선택해주세요.");
+            return;
         }
 
-        // 다음 문제로 이동
+        if (answered) return;
+        answered = true;
+
+        const question = questions[currentIndex];
+        const correctAnswer = question.answer;
+        const targetId = question.vocaId;
+
+        if (selectedOption === correctAnswer) {
+            document.getElementById('result').textContent = `정답! (${correctAnswer})`;
+            showFeedback(true);
+        } else {
+            document.getElementById('result').textContent = `오답! 정답은 ${correctAnswer}`;
+            showFeedback(false);
+        }
+
+        // 오답노트 처리
+        fetch('/study/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                type: 'word',
+                targetId: targetId,
+                answer: selectedOption,
+                correctAnswer: correctAnswer
+            })
+        });
+
+        // ✅ 5번째 문제일 경우에만 학습 완료 로그 저장
+        if (currentIndex === questions.length - 1) {
+            showCompletionMessage(); // 이건 기존에 있던 함수
+            fetch('/study/complete3', { method: 'POST' })
+                .then(res => res.text())
+                .then(result => console.log("학습 로그 저장 결과:", result));
+        }
+    }
+
+
+        function showFeedback(isCorrect) {
+            const icon = document.getElementById('feedback-icon');
+            icon.textContent = isCorrect ? 'O' : 'X';
+            icon.className = isCorrect ? 'correct' : 'incorrect';
+            icon.style.display = 'block';
+        }
+
         function nextQuestion() {
             if (!answered) {
                 alert("먼저 정답을 제출하세요.");
@@ -93,34 +146,38 @@
                 selectedOption = "";
                 showQuestion(currentIndex);
             } else {
-                showCompletionPage();
+                showCompletionMessage();
             }
         }
 
-        // 학습 완료 화면
-        function showCompletionPage() {
-            document.body.innerHTML = `
-                <h1>학습 완료!</h1>
-                <p>오답노트에서 틀린 단어를 복습해보세요.</p>
-                <div style="position: fixed; bottom: 20px; right: 20px;">
-                    <button onclick="goToMain()">학습 메인으로 이동</button>
-                </div>
-            `;
-
-            // 학습 로그 저장
-            fetch('/study/complete3', { method: 'POST' })
-                .then(res => res.text())
-                .then(result => {
-                    if (result === 'success') {
-                        console.log("학습 로그 저장 성공");
-                    } else {
-                        console.log("학습 로그 저장 실패");
-                    }
-                });
+        function showCompletionMessage() {
+            document.getElementById('completion-message').textContent = '학습이 완료되었습니다!';
+            document.getElementById('restartBtn').style.display = 'inline-block';
         }
 
-        function goToMain() {
-            window.location.href = '/study/main';
+        function restartLesson() {
+            fetch('/study/api/lesson3-random')
+                .then(response => {
+                    if (!response.ok) throw new Error("서버 오류");
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data || data.length === 0) {
+                        alert("문제를 불러올 수 없습니다.");
+                        return;
+                    }
+                    questions = data;
+                    currentIndex = 0;
+                    selectedOption = "";
+                    answered = false;
+                    document.getElementById('restartBtn').style.display = 'none';
+                    document.getElementById('completion-message').textContent = '';
+                    showQuestion(currentIndex);
+                })
+                .catch(error => {
+                    console.error("이어하기 오류:", error);
+                    alert("문제 재로딩 중 오류가 발생했습니다.");
+                });
         }
     </script>
 </head>
@@ -130,8 +187,15 @@
 <p id="description"></p>
 <div id="options"></div>
 <button type="button" onclick="submitAnswer()">제출</button>
-<button type="button" id="nextBtn" onclick="nextQuestion()">다음으로</button>
+<button type="button" onclick="nextQuestion()">다음으로</button>
 <p id="result"></p>
 
+<div id="feedback-icon"></div>
+<p id="completion-message"></p>
+
+<div style="position: fixed; bottom: 20px; right: 20px;">
+    <button onclick="window.close()">그만하기</button>
+    <button id="restartBtn" onclick="restartLesson()" style="display: none;">이어하기</button>
+</div>
 </body>
 </html>

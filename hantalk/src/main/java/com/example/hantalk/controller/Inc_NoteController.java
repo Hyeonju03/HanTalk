@@ -58,7 +58,18 @@ public class Inc_NoteController {
         }
 
         List<Inc_Note> notes = incNoteService.findNotes(userNo);
+
+        List<Inc_Note> wordNotes = notes.stream()
+                .filter(n -> n.getVoca() != null)
+                .toList();
+
+        List<Inc_Note> sentenceNotes = notes.stream()
+                .filter(n -> n.getSentence() != null)
+                .toList();
+
         model.addAttribute("notes", notes);
+        model.addAttribute("wordNotes", wordNotes); // 단어만
+        model.addAttribute("sentenceNotes", sentenceNotes); // 문장만
 
         return "study/note";
     }

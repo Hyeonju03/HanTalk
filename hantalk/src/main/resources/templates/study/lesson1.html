@@ -3,61 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <title>단어 맞추기</title>
-    <script th:inline="javascript">
-        let problems = /*[[${problems}]]*/ || [];
-        let currentIndex = 0;
-        let answered = false; // 제출 여부 체크
 
-        window.onload = function() {
+    <style>
+        #feedback-icon {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 100px;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        #answer {
+            font-size: 18px;
+            padding: 8px;
+            width: 300px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 8px 16px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        #result {
+            font-size: 18px;
+            margin-top: 15px;
+        }
+
+        #completion-message {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e90ff;
+            margin-top: 120px;
+            text-align: center;
+        }
+    </style>
+
+    <script th:inline="javascript">
+        let problems = /*[[${problems}]]*/ [];
+        let currentIndex = 0;
+        let answered = false;
+        let problemCount = 0;
+
+        window.onload = function () {
             showProblem(currentIndex);
         };
 
-        // 문제 표시
         function showProblem(index) {
             const problem = problems[index];
             document.getElementById('description').textContent = problem.description;
             document.getElementById('answer').value = "";
             document.getElementById('result').textContent = "";
+            document.getElementById('feedback-icon').style.display = 'none';
+            document.getElementById('completion-message').textContent = "";
             answered = false;
         }
 
-        // 정답 확인 및 오답노트 처리
         function submitAnswer() {
-            if (answered) return; // 이미 제출했으면 중복 방지
+            if (answered) return;
 
             const problem = problems[currentIndex];
             const userAnswer = document.getElementById('answer').value.trim();
             const correctAnswer = problem.vocabulary;
             const targetId = problem.vocaId;
 
-            // 결과 표시
             if (userAnswer === correctAnswer) {
                 document.getElementById('result').textContent = `정답! (${correctAnswer})`;
+                showFeedback(true);
             } else {
                 document.getElementById('result').textContent = `오답! 정답은 ${correctAnswer}`;
+                showFeedback(false);
             }
 
-            // 서버에 오답노트 처리 요청
+            // 오답노트 저장
             fetch('/study/check', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
-                    type: 'word',             // lesson1은 단어
+                    type: 'word',
                     targetId: targetId,
                     answer: userAnswer,
                     correctAnswer: correctAnswer
                 })
-            })
-            .then(res => res.json())
-            .then(isCorrect => {
-                console.log("정답 여부:", isCorrect);
-            })
-            .catch(err => console.error("오답노트 처리 오류:", err));
+            }).then(res => res.json())
+              .then(isCorrect => console.log("정답 여부:", isCorrect))
+              .catch(err => console.error("오답노트 처리 오류:", err));
 
-            answered = true; // 제출 완료 상태로 변경
+            answered = true;
+            problemCount++;
+
+            // 5문제 푼 뒤에는 완료 메시지와 이어하기 버튼 표시
+            if (problemCount === 5) {
+                document.getElementById('completion-message').textContent = "학습이 완료되었습니다!";
+                document.getElementById('restartBtn').style.display = 'inline-block';
+
+                // 학습 로그 저장
+                fetch('/study/complete1', { method: 'POST' })
+                    .then(res => res.text())
+                    .then(result => {
+                        if (result === 'success') {
+                            console.log("학습 로그 저장 성공");
+                        } else {
+                            console.log("학습 로그 저장 실패");
+                        }
+                    });
+            }
         }
 
-        // 다음 문제로 이동
+        function showFeedback(isCorrect) {
+            const icon = document.getElementById('feedback-icon');
+            icon.textContent = isCorrect ? 'O' : 'X';
+            icon.className = isCorrect ? 'correct' : 'incorrect';
+            icon.style.display = 'block';
+        }
+
         function nextProblem() {
             if (!answered) {
                 alert("먼저 정답을 제출하세요.");
@@ -67,35 +139,33 @@
             if (currentIndex < problems.length - 1) {
                 currentIndex++;
                 showProblem(currentIndex);
-            } else {
-                showCompletionPage();
             }
         }
 
-        // 학습 완료 화면
-        function showCompletionPage() {
-            document.body.innerHTML = `
-                <h1>학습 완료!</h1>
-                <p>오답노트에서 틀린 단어를 복습해보세요.</p>
-                <div style="position: fixed; bottom: 20px; right: 20px;">
-                    <button onclick="goToLesson3()">다음 학습으로 이동</button>
-                </div>
-            `;
-
-            // 학습 로그 저장
-            fetch('/study/complete1', { method: 'POST' })
-                .then(res => res.text())
-                .then(result => {
-                    if (result === 'success') {
-                        console.log("학습 로그 저장 성공");
-                    } else {
-                        console.log("학습 로그 저장 실패");
-                    }
-                });
+        function quitLesson() {
+            if (window.opener) {
+                window.close();
+            } else {
+                alert("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.");
+            }
         }
 
-        function goToLesson3() {
-            window.location.href = '/study/lesson3';
+        function restartLesson() {
+            fetch('/study/api/lesson1-random')
+                .then(res => res.json())
+                .then(data => {
+                    problems = data;
+                    currentIndex = 0;
+                    problemCount = 0;
+                    answered = false;
+                    document.getElementById('restartBtn').style.display = 'none';
+                    document.getElementById('completion-message').textContent = '';
+                    showProblem(currentIndex);
+                })
+                .catch(err => {
+                    console.error('문제 재로딩 실패:', err);
+                    alert('새로운 문제를 불러오지 못했습니다.');
+                });
         }
     </script>
 </head>
@@ -104,8 +174,17 @@
 
 <p id="description"></p>
 <input type="text" id="answer" placeholder="정답 입력">
-<button type="button" onclick="submitAnswer()">제출</button>
-<button type="button" id="nextBtn" onclick="nextProblem()">다음으로</button>
+<br>
+<button onclick="submitAnswer()">제출</button>
+<button id="nextBtn" onclick="nextProblem()">다음으로</button>
+
 <p id="result"></p>
+<p id="completion-message"></p>
+<div id="feedback-icon"></div>
+
+<div style="position: fixed; bottom: 20px; right: 20px;">
+    <button id="quitBtn" onclick="quitLesson()">그만하기</button>
+    <button id="restartBtn" onclick="restartLesson()" style="display: none;">이어하기</button>
+</div>
 </body>
 </html>

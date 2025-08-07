@@ -91,4 +91,11 @@ public class SentenceService {
     public void setDelete(SentenceDTO sentenceDTO){
         repository.deleteById(sentenceDTO.getSentenceId());
     }
+
+    // ++ 오답노트 처리를 위한 엔티티 직접 반환 메서드
+    public Sentence getSelectRandomEntity(){
+        Optional<Sentence> os = repository.findByRandom();
+
+        return os.orElse(null);
+    }
 }

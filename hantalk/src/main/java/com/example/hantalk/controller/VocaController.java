@@ -10,10 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -60,6 +57,11 @@ public class VocaController {
         return "study/lesson1";
     }
 
+    @GetMapping("/api/lesson1-random")
+    @ResponseBody
+    public List<VocaDTO> getRandomLesson1Problems() {
+        return vocaService.getCompletelyRandomFillBlank(5);  // 💥 기존 로직에 영향 없음
+    }
 
     // 학습 1번 완료 처리
     @PostMapping("/complete1")
@@ -93,6 +95,13 @@ public class VocaController {
         model.addAttribute("questions", questions);
         return "study/lesson3";
     }
+
+    @GetMapping("/api/lesson3-random")
+    @ResponseBody
+    public List<Map<String, Object>> getLesson3Problems() {
+        return vocaService.getMultipleChoice(Collections.emptyList(), 5);
+    }
+
 
     // 학습 3번 완료 처리
     @PostMapping("/complete3")
