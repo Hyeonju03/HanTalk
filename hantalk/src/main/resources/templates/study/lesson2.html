@@ -80,6 +80,8 @@
 <div id="result-message"></div>
 
 <script>
+  let sentenceId = null; // 모든 함수 위에서 선언
+
   document.addEventListener('DOMContentLoaded', function() {
       loadNewProblem();
 
@@ -114,6 +116,7 @@
                   alert(data.error);
                   return;
               }
+              sentenceId = data.sentenceId; // 전역 변수에 저장
               displayPieces(data.pieces);
           })
           .catch(error => {
@@ -166,6 +169,22 @@
           const feedbackIcon = document.getElementById('feedback-icon');
           const nextButton = document.getElementById('next-problem-button');
           const sortedContainer = document.getElementById('sorted-container');
+
+      // 오답노트 저장 요청 보내기
+      if (!data.isCorrect) {
+          fetch('/study/check', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: new URLSearchParams({
+                  type: 'sentence',
+                  targetId: sentenceId,
+                  answer: userPieces.join('^'),
+                  correctAnswer: data.correctAnswer
+              })
+          });
+      }
 
           if (data.isCorrect) {
               feedbackIcon.textContent = 'O';
