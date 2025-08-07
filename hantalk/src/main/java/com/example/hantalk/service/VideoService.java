@@ -116,9 +116,11 @@ public class VideoService {
                     return videoRepository.findByTitleContaining(keyword, pageable);
                 case "content":
                     return videoRepository.findByContentContaining(keyword, pageable);
+                case "filename":
+                    return videoRepository.findByVideoNameContaining(keyword, pageable);
                 case "all":
                 default:
-                    return videoRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+                    return videoRepository.findByTitleOrContentOrVideoNameContaining(keyword, pageable);
             }
         } else {
             return videoRepository.findAll(pageable);

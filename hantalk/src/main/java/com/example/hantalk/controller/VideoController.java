@@ -50,6 +50,8 @@ public class VideoController {
         boolean isAdmin = "admin".equals(role);
 
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createDate"));
+
+        // 검색 + 페이징 처리하는 부분
         Page<Video> videoPageEntity = videoService.getPagedVideos(keyword, searchType, pageable);
 
         // Entity -> DTO 변환
@@ -69,6 +71,7 @@ public class VideoController {
         model.addAttribute("searchType", searchType);
         model.addAttribute("role", role);
         model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("isEmpty", videoPage.isEmpty());
 
         return "video/" + role + "_list";
     }
@@ -134,7 +137,6 @@ public class VideoController {
         // 상세 페이지로 리다이렉트
         return "redirect:/admin/video/view/" + createdId;
     }
-
 
     // ✅ 수정 폼 (관리자)
     @GetMapping("/edit/{id}")
