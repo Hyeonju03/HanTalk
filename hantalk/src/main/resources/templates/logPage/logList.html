@@ -90,7 +90,7 @@
 <body>
 
 <h1>로그 데이터</h1>
-<a href="/user/test">테스트 페이지로</a>
+<a href="/user/test">테스트 페이지로</a><br>
 <a href="/user/logout">로그아웃</a>
 
 <!-- ✅ 필터 정보 표시 -->
@@ -156,7 +156,8 @@
   <table>
     <thead>
     <tr>
-      <th>사용자 번호</th>
+      <th>사용자ID</th>
+      <th>사용자</th>
       <th>URI</th>
       <th>메서드</th>
       <th>디바이스</th>
@@ -167,7 +168,8 @@
     </thead>
     <tbody>
     <tr th:each="log : ${list}">
-      <td>[[${log.userNo}]]</td>
+      <td>[[${log.user.userId}]]</td>
+      <td>[[${log.user.name}]]</td>
       <td>[[${log.uri}]]</td>
       <td>[[${log.method}]]</td>
       <td>[[${log.device}]]</td>
