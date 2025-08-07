@@ -1,9 +1,11 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.SessionUtil;
+import com.example.hantalk.dto.LogDataDTO;
 import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.entity.Users;
 import com.example.hantalk.service.Learning_LogService;
+import com.example.hantalk.service.LogService;
 import com.example.hantalk.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -15,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +27,8 @@ import java.util.Map;
 public class UserController {
 
     private final UserService service;
-    private final Learning_LogService logService;
+    private final Learning_LogService Learning_LogService;
+    private final LogService logService;
 
     @GetMapping("/user/test")
     public String test() {
@@ -124,7 +128,7 @@ public class UserController {
             newSession.setAttribute("role", "USER");
 
             // 러닝로그 세팅하는 부분
-            logService.setLearningLog(userId);
+            Learning_LogService.setLearningLog(userId);
         }
         newSession.setMaxInactiveInterval(1800); //세션 시간제한 설정
         return "userPage/UserTestPage";
@@ -159,8 +163,9 @@ public class UserController {
         String role = SessionUtil.getRole(session);
         if (service.isRoleOk(userid, sessionUserId, role)) {
             UsersDTO user = service.getUserOne(userId);
+            List<LogDataDTO> logList = logService.getLogToUser(user.getUserNo());
             model.addAttribute("user", user);
-
+            model.addAttribute("logList", logList);
             return "userPage/UserDetailPage";
         }
         return "RoleERROR";
