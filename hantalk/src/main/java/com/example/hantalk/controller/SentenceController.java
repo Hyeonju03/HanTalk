@@ -41,11 +41,19 @@ public class SentenceController {
         return folderName + "/sentenceAdmin";
     }
 
-    @GetMapping("/sentenceUpdate")
-    public String sentenceUpdate(Model model) {
-        List<SentenceDTO> dtoList = sentenceService.getSelectAll();
-        model.addAttribute("dtoList", dtoList);
+    @GetMapping("/sentenceUpdate/{id}")
+    public String sentenceUpdate(Model model, @PathVariable("id") int id) {
+        SentenceDTO searchDTO = new SentenceDTO();
+        searchDTO.setSentenceId(id);
+        SentenceDTO dto = sentenceService.getSelectOne(searchDTO);
+        model.addAttribute("dto", dto);
         return folderName + "/sentenceSujung";
+    }
+
+    @PostMapping("/sentenceUpdateProc")
+    public String sentenceUpdateProc(SentenceDTO sentenceDTO) {
+        sentenceService.setUpdate(sentenceDTO);
+        return "redirect:/study/sentenceList/admin";
     }
 
     @GetMapping("/lesson2")
