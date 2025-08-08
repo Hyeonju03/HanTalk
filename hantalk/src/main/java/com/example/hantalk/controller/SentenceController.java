@@ -41,6 +41,17 @@ public class SentenceController {
         return folderName + "/sentenceAdmin";
     }
 
+    @GetMapping("/sentenceInsert")
+    public String sentenceInsert() {
+        return folderName + "/sentenceChuga";
+    }
+
+    @PostMapping("/sentenceInsertProc")
+    public String sentenceInsertProc(SentenceDTO sentenceDTO) {
+        sentenceService.setInsert(sentenceDTO);
+        return "redirect:/study/sentenceList/admin";
+    }
+
     @GetMapping("/sentenceUpdate/{id}")
     public String sentenceUpdate(Model model, @PathVariable("id") int id) {
         SentenceDTO searchDTO = new SentenceDTO();
@@ -53,6 +64,14 @@ public class SentenceController {
     @PostMapping("/sentenceUpdateProc")
     public String sentenceUpdateProc(SentenceDTO sentenceDTO) {
         sentenceService.setUpdate(sentenceDTO);
+        return "redirect:/study/sentenceList/admin";
+    }
+
+    @GetMapping("/sentenceDelete/{id}")
+    public String sentenceDelete(@PathVariable int id) {
+        SentenceDTO dto = new SentenceDTO();
+        dto.setSentenceId(id);
+        sentenceService.setDelete(dto);
         return "redirect:/study/sentenceList/admin";
     }
 

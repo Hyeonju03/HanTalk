@@ -6,6 +6,7 @@
 </head>
 <body>
 <h1>문장 목록 관리</h1>
+<a th:href="@{'/study/sentenceInsert'}">문장 추가</a>
 <table>
     <thead>
     <tr>
@@ -29,10 +30,25 @@
         <td th:text="${#temporals.format(sentence.createDate, 'yyyy-MM-dd')}"></td>
         <td>
             <a th:href="@{'/study/sentenceUpdate/' + ${sentence.sentenceId}}">수정</a>
-            <button type="button" th:onclick="'event.stopPropagation(); confirmDelete(' + ${sentence.sentenceId} + ');'">삭제</button>
+            <button type="button" class="btn-delete" th:onclick="'event.stopPropagation(); confirmDelete(' + ${sentence.sentenceId} + ');'">삭제</button>
         </td>
     </tr>
     </tbody>
 </table>
+
+<script>
+    function confirmDelete(sentenceId) {
+      if (confirm('정말 이 자료를 삭제하시겠습니까?')) {
+        window.location.href = '/study/sentenceDelete/' + sentenceId;
+      }
+    }
+
+    function goToDetail(row) {
+      const url = row.getAttribute('data-url');
+      if (url) {
+        window.location.href = url;
+      }
+    }
+</script>
 </body>
 </html>

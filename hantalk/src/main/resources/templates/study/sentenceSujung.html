@@ -7,7 +7,7 @@
 <body>
 <h1>문장 수정</h1>
 <form th:action="@{/study/sentenceUpdateProc}" method="post">
-    <input type="text" name="sentenceId" th:value="${dto.sentenceId}">
+    <input type="hidden" name="sentenceId" th:value="${dto.sentenceId}">
     <div class="mb-3">
         <label for="munjang" class="form-label">문장 : </label>
         <input type="text" name="munjang" id="munjang" class="form-control" th:value="${dto.munjang}">
