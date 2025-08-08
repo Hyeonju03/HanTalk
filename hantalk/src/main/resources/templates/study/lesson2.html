@@ -76,11 +76,20 @@
 
 <div id="feedback-icon"></div>
 <button id="next-problem-button" style="display: none;">다음 문제</button>
+<button id="quitBtn" onclick="quitLesson()">그만하기</button>
 
 <div id="result-message"></div>
 
 <script>
   let sentenceId = null; // 모든 함수 위에서 선언
+
+  function quitLesson() {
+      if (window.opener) {
+          window.close();
+      } else {
+          alert("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.");
+      }
+  }
 
   document.addEventListener('DOMContentLoaded', function() {
       loadNewProblem();
