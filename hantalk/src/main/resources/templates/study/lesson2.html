@@ -76,11 +76,20 @@
 
 <div id="feedback-icon"></div>
 <button id="next-problem-button" style="display: none;">다음 문제</button>
+<button id="quitBtn" onclick="quitLesson()">그만하기</button>
 
 <div id="result-message"></div>
 
 <script>
   let sentenceId = null; // 모든 함수 위에서 선언
+
+  function quitLesson() {
+      if (window.opener) {
+          window.close();
+      } else {
+          alert("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.");
+      }
+  }
 
   document.addEventListener('DOMContentLoaded', function() {
       loadNewProblem();
@@ -170,28 +179,16 @@
           const nextButton = document.getElementById('next-problem-button');
           const sortedContainer = document.getElementById('sorted-container');
 
-      // 오답노트 저장 요청 보내기
-      if (!data.isCorrect) {
-          fetch('/study/check', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded'
-              },
-              body: new URLSearchParams({
-                  type: 'sentence',
-                  targetId: sentenceId,
-                  answer: userPieces.join('^'),
-                  correctAnswer: data.correctAnswer
-              })
-          });
-      }
-
           if (data.isCorrect) {
               feedbackIcon.textContent = 'O';
               feedbackIcon.className = 'correct';
               feedbackIcon.style.display = 'block';
               nextButton.style.display = 'block';
               document.getElementById('check-button').style.display = 'none'; // 정답 확인 버튼 숨기기
+              // 다음 문제 id 업데이트
+              if (data.nextSentenceId) {
+                  sentenceId = data.nextSentenceId;
+              }
           } else {
               if (data.message.includes('3번 틀렸습니다.')) {
                   feedbackIcon.textContent = 'X';
@@ -199,6 +196,10 @@
                   feedbackIcon.style.display = 'block';
                   nextButton.style.display = 'block';
                   document.getElementById('check-button').style.display = 'none'; // 정답 확인 버튼 숨기기
+                  // 다음 문제 id 업데이트
+                  if (data.nextSentenceId) {
+                      sentenceId = data.nextSentenceId;
+                  }
               } else {
                   // 2번까지 틀렸을 경우
                   sortedContainer.classList.add('shake');

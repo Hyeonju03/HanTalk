@@ -6,28 +6,53 @@
 </head>
 <body>
 <h1>문장 목록</h1>
+
+<div class="search-container">
+    <form th:action="@{/study/sentenceList}" method="get">
+        <input type="text" name="kw" th:value="${kw}" placeholder="문장 또는 의미 검색">
+        <button type="submit">검색</button>
+    </form>
+</div>
+
 <table>
     <thead>
-        <tr>
-            <th>순번</th>
-            <th>문장</th>
-            <th>의미</th>
-            <th>등록일</th>
-        </tr>
+    <tr>
+        <th>순번</th>
+        <th>문장</th>
+        <th>의미</th>
+        <th>등록일</th>
+    </tr>
     </thead>
     <tbody>
-        <tr th:if="${dtoList == null || dtoList.size <= 0}">
-            <td colspan="4" rowspan="2">
-                문장 데이터가 존재하지 않습니다.
-            </td>
-        </tr>
-        <tr th:each="sentence, loop : ${dtoList}">
-            <td th:text="${loop.count}"></td>
-            <td th:text="${sentence.munjang.replace('^',' ')}"></td>
-            <td th:text="${sentence.description}"></td>
-            <td th:text="${#temporals.format(sentence.createDate, 'yyyy-MM-dd')}"></td>
-        </tr>
+    <tr th:if="${paging == null || paging.content.isEmpty()}">
+        <td colspan="4">
+            문장 데이터가 존재하지 않습니다.
+        </td>
+    </tr>
+    <tr th:each="sentence, loop : ${paging.content}">
+        <td th:text="${paging.number * paging.size + loop.count}"></td>
+        <td th:text="${sentence.munjang.replace('^',' ')}"></td>
+        <td th:text="${sentence.description}"></td>
+        <td th:text="${#temporals.format(sentence.createDate, 'yyyy-MM-dd')}"></td>
+    </tr>
     </tbody>
 </table>
+
+<div th:if="${!paging.isEmpty()}" class="pagination">
+    <ul>
+        <li th:classappend="${!paging.hasPrevious} ? 'disabled'">
+            <a th:href="@{|?page=${paging.number - 1}&kw=${kw}|}">이전</a>
+        </li>
+
+        <li th:each="page: ${#numbers.sequence(0, paging.totalPages - 1)}"
+            th:classappend="${page == paging.number} ? 'active'">
+            <a th:href="@{|?page=${page}&kw=${kw}|}" th:text="${page + 1}"></a>
+        </li>
+
+        <li th:classappend="${!paging.hasNext} ? 'disabled'">
+            <a th:href="@{|?page=${paging.number + 1}&kw=${kw}|}">다음</a>
+        </li>
+    </ul>
+</div>
 </body>
 </html>

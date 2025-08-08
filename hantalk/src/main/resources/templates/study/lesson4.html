@@ -30,8 +30,18 @@
 </div>
 
 <button id="next-btn" style="display: none;">다음 문제</button>
+<button id="quitBtn" onclick="quitLesson()">그만하기</button>
 
 <script>
+
+  function quitLesson() {
+      if (window.opener) {
+          window.close();
+      } else {
+          alert("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.");
+      }
+  }
+
   let currentSentence = '';
 
   // Web Speech API의 SpeechSynthesis 객체 생성
