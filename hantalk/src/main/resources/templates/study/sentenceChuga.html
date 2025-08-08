@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>문장 추가</title>
+</head>
+<body>
+<h1>문장 추가</h1>
+<form th:action="@{/study/sentenceInsertProc}" method="post">
+    <div class="mb-3">
+        <label for="munjang" class="form-label">문장 : </label>
+        <input type="text" name="munjang" id="munjang" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">의미 : </label>
+        <input type="text" name="description" id="description" class="form-control">
+    </div>
+    </div>
+    <button>생성</button>
+    <a href="/study/sentence/admin">취소</a>
+</form>
+</body>
+</html>

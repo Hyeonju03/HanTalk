@@ -6,6 +6,7 @@ import com.example.hantalk.repository.SentenceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +75,7 @@ public class SentenceService {
 
     public void setInsert(SentenceDTO sentenceDTO){
         Sentence sentence = dtoToEntity(sentenceDTO);
+        sentence.setCreateDate(LocalDateTime.now());
         repository.save(sentence);
     }
 
