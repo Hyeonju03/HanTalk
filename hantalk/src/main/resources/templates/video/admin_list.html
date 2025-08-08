@@ -61,7 +61,8 @@
     <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</td>
     <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}">수정일</td>
     <td>
-      <a th:href="@{/admin/video/edit/{id}(id=${video.videoId})}" onclick="event.stopPropagation();">수정</a> |
+      <a th:href="@{/admin/video/edit/{id}(id=${video.videoId}, page=${videoPage.number})}"
+         onclick="event.stopPropagation();">수정</a>
       <button type="button"
               th:attr="data-id=${video.videoId}"
               onclick="event.stopPropagation(); deleteVideo(this);">삭제</button>

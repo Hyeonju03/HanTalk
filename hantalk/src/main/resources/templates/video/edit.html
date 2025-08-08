@@ -10,6 +10,7 @@
 <form th:action="@{'/' + ${role} + '/video/update'}" method="post" enctype="multipart/form-data">
   <!-- 영상 ID -->
   <input type="hidden" name="videoId" th:value="${video.videoId}" />
+  <input type="hidden" name="page" th:value="${param.page}" /> <!-- ✅ 현재 페이지 유지 -->
 
   <!-- 제목 -->
   <label>제목:

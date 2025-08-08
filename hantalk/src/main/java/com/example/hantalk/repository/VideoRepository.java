@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface VideoRepository extends JpaRepository<Video, Integer> {
 
+    boolean existsByVideoName(String videoName);
+
     // 일반 검색 (페이징 없이 사용)
     List<Video> findByTitleContaining(String keyword);
     List<Video> findByContentContaining(String keyword);
@@ -25,5 +27,4 @@ public interface VideoRepository extends JpaRepository<Video, Integer> {
     @Query("SELECT v FROM Video v WHERE " +
             "v.title LIKE %:keyword% OR v.content LIKE %:keyword% OR v.videoName LIKE %:keyword%")
     Page<Video> findByTitleOrContentOrVideoNameContaining(@Param("keyword") String keyword, Pageable pageable);
-
 }

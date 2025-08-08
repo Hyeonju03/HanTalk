@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -89,6 +90,20 @@ public class VideoController {
         return "video/" + role + "_view";
     }
 
+    @PostMapping("/check-filename")
+    @ResponseBody
+    public boolean checkDuplicateFilename(@PathVariable String role,
+                                          @RequestBody Map<String, String> payload) {
+        String filename = payload.get("filename");
+        return videoService.existsByFilename(filename);
+    }
+
+    @ResponseBody
+    public boolean checkDuplicateFilename(@RequestBody Map<String, String> payload) {
+        String filename = payload.get("filename");
+        return videoService.existsByFilename(filename);
+    }
+
     // ✅ 업로드 폼 (관리자 전용)
     @GetMapping("/upload")
     public String showUploadForm(@PathVariable String role, Model model) {
@@ -107,7 +122,6 @@ public class VideoController {
                               @RequestParam("content") String content,
                               Model model) throws IOException {
 
-        // 관리자만 접근 가능
         if (!"admin".equals(role)) return "redirect:/user/video/list";
 
         if (file.isEmpty()) {
@@ -115,26 +129,26 @@ public class VideoController {
             return "video/upload";
         }
 
-        // 저장 디렉토리 설정
         String uploadDir = System.getProperty("user.dir") + "/uploads/videos/";
-        File uploadFolder = new File(uploadDir);
-        if (!uploadFolder.exists()) uploadFolder.mkdirs();
+        String originalFilename = file.getOriginalFilename();
 
-        // ✅ 중복 방지 로직 함수로 통일
-        String newFilename = getUniqueFileName(uploadDir, file.getOriginalFilename());
-        File destination = new File(uploadDir, newFilename);
-        file.transferTo(destination);
+        // ✅ 서버에 이미 동일한 파일명이 존재하면 업로드 막기
+        File checkFile = new File(uploadDir + originalFilename);
+        if (checkFile.exists()) {
+            model.addAttribute("error", "이미 동일한 영상이 업로드되어 있습니다.");
+            return "video/upload";
+        }
 
-        // DTO에 정보 설정
+        // 중복 방지 저장
+        String newFilename = getUniqueFileName(uploadDir, originalFilename);
+        file.transferTo(new File(uploadDir, newFilename));
+
         VideoDTO dto = new VideoDTO();
         dto.setTitle(title);
         dto.setContent(content);
-        dto.setVideoName(newFilename); // ✅ 여기 중요
+        dto.setVideoName(newFilename);
 
-        // DB 저장
         int createdId = videoService.createVideo(dto);
-
-        // 상세 페이지로 리다이렉트
         return "redirect:/admin/video/view/" + createdId;
     }
 
@@ -157,7 +171,9 @@ public class VideoController {
                          @RequestParam("videoId") int videoId,
                          @RequestParam("title") String title,
                          @RequestParam("content") String content,
-                         @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+                         @RequestParam(value = "file", required = false) MultipartFile file,
+                         @RequestParam(value = "page", required = false, defaultValue = "0") int page
+    ) throws IOException {
 
         if (!"admin".equals(role)) return "redirect:/user/video/list";
 
@@ -168,11 +184,25 @@ public class VideoController {
         VideoDTO existing = videoService.getVideo(videoId);
         String savedFilename = existing.getVideoName();
 
+        // 새 파일이 업로드된 경우
         if (file != null && !file.isEmpty()) {
-            savedFilename = getUniqueFileName(uploadDir, file.getOriginalFilename());
-            file.transferTo(new File(uploadDir, savedFilename));
+            // 기존 파일 삭제
+            File oldFile = new File(uploadDir + savedFilename);
+            if (oldFile.exists()) oldFile.delete();
+
+            // 새 파일 저장 (같은 이름이면 덮어쓰기 가능)
+            savedFilename = file.getOriginalFilename();
+
+            File targetFile = new File(uploadDir + savedFilename);
+            if (targetFile.exists()) {
+                // 이름 겹치면 새 이름으로 저장
+                savedFilename = getUniqueFileName(uploadDir, savedFilename);
+            }
+
+            file.transferTo(new File(uploadDir + savedFilename));
         }
 
+        // DB 정보 업데이트
         VideoDTO dto = new VideoDTO();
         dto.setVideoId(videoId);
         dto.setTitle(title);
@@ -180,7 +210,7 @@ public class VideoController {
         dto.setVideoName(savedFilename);
 
         videoService.updateVideo(dto);
-        return "redirect:/admin/video/view/" + videoId;
+        return "redirect:/admin/video/list?page=" + page;
     }
 
     // ✅ Ajax 삭제 처리
@@ -191,6 +221,12 @@ public class VideoController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한 없음");
         }
 
+        VideoDTO video = videoService.getVideo(id);
+        String savedFilename = video.getVideoName();
+
+        File file = new File(UPLOAD_PATH + savedFilename);
+        if (file.exists()) file.delete();// 서버 저장소의 파일 삭제
+
         videoService.deleteVideo(id);
         return ResponseEntity.ok("삭제 성공");
     }
@@ -199,7 +235,8 @@ public class VideoController {
     private String getUniqueFileName(String uploadDir, String originalFilename) {
         String baseName = FilenameUtils.getBaseName(originalFilename);
         String extension = FilenameUtils.getExtension(originalFilename);
-        baseName = baseName.replaceAll("[^a-zA-Z0-9가-힣_\\-]", "_");
+
+        baseName = baseName.replaceAll("[^a-zA-Z0-9가-힣_\\-()]", "_");
 
         String newFilename = baseName + "." + extension;
         int count = 1;
@@ -212,5 +249,5 @@ public class VideoController {
         }
 
         return newFilename;
-        }
+    }
 }

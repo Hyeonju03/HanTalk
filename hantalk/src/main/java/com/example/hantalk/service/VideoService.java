@@ -20,6 +20,10 @@ public class VideoService {
         this.videoRepository = videoRepository;
     }
 
+    public boolean existsByFilename(String filename) {
+        return videoRepository.existsByVideoName(filename);
+    }
+
     // 🔍 제목으로 영상 검색
     @Transactional(readOnly = true)
     public List<VideoDTO> searchByTitle(String keyword) {

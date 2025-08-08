@@ -14,5 +14,5 @@ public class VideoDTO { //등록용
     private String videoName;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
-    private MultipartFile file;
+    /*private MultipartFile file;*/
 }
