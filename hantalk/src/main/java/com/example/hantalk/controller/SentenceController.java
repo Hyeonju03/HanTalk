@@ -1,16 +1,15 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.SentenceDTO;
-import com.example.hantalk.entity.Learning_Log;
 import com.example.hantalk.entity.Sentence;
 import com.example.hantalk.service.Inc_NoteService;
 import com.example.hantalk.service.Learning_LogService;
 import com.example.hantalk.service.SentenceService;
-import com.example.hantalk.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,16 +29,26 @@ public class SentenceController {
 
     // 문장 목록
     @GetMapping("/sentenceList")
-    public String sentenceList(Model model) {
-        List<SentenceDTO> dtoList = sentenceService.getSelectAll();
-        model.addAttribute("dtoList", dtoList);
+    public String sentenceList(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "kw", defaultValue = "") String kw,
+            Model model) {
+
+        Page<SentenceDTO> paging = sentenceService.getSelectAll(page, kw);
+        model.addAttribute("paging", paging); // model에 "paging"이라는 이름으로 객체를 담음
+        model.addAttribute("kw", kw);
         return folderName + "/sentenceList";
     }
 
     @GetMapping("/sentenceList/admin")
-    public String sentenceAdminList(Model model) {
-        List<SentenceDTO> dtoList = sentenceService.getSelectAll();
-        model.addAttribute("dtoList", dtoList);
+    public String sentenceAdminList(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "kw", defaultValue = "") String kw,
+            Model model) {
+
+        Page<SentenceDTO> paging = sentenceService.getSelectAll(page, kw);
+        model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw);
         return folderName + "/sentenceAdmin";
     }
 
@@ -55,26 +64,43 @@ public class SentenceController {
     }
 
     @GetMapping("/sentenceUpdate/{id}")
-    public String sentenceUpdate(Model model, @PathVariable("id") int id) {
+    public String sentenceUpdate(Model model, @PathVariable("id") int id,
+                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                 @RequestParam(value = "kw", defaultValue = "") String kw) {
+
         SentenceDTO searchDTO = new SentenceDTO();
         searchDTO.setSentenceId(id);
         SentenceDTO dto = sentenceService.getSelectOne(searchDTO);
         model.addAttribute("dto", dto);
+        model.addAttribute("page", page); // 페이지 번호를 모델에 추가
+        model.addAttribute("kw", kw);   // 검색어를 모델에 추가
         return folderName + "/sentenceSujung";
     }
 
     @PostMapping("/sentenceUpdateProc")
-    public String sentenceUpdateProc(SentenceDTO sentenceDTO) {
-        sentenceService.setUpdate(sentenceDTO);
-        return "redirect:/study/sentenceList/admin";
+    public String sentenceUpdateProc(SentenceDTO sentenceDTO,
+                                     @RequestParam(value = "page", defaultValue = "0") int page,
+                                     @RequestParam(value = "kw", defaultValue = "") String kw) {
+        try {
+            sentenceService.setUpdate(sentenceDTO);
+            return String.format("redirect:/study/sentenceList/admin?page=%d&kw=%s", page, kw);
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외가 발생하면 콘솔에 출력
+            // 오류 페이지로 리다이렉트하거나, 현재 페이지로 돌아가 오류 메시지를 표시하는 로직을 추가할 수 있습니다.
+            return "redirect:/error"; // 임시 오류 페이지로 리다이렉트
+        }
     }
 
     @GetMapping("/sentenceDelete/{id}")
-    public String sentenceDelete(@PathVariable int id) {
+    public String sentenceDelete(@PathVariable int id,
+                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                 @RequestParam(value = "kw", defaultValue = "") String kw) {
+
         SentenceDTO dto = new SentenceDTO();
         dto.setSentenceId(id);
         sentenceService.setDelete(dto);
-        return "redirect:/study/sentenceList/admin";
+        // 삭제 후 이전 페이지와 검색어를 유지하며 리다이렉트
+        return String.format("redirect:/study/sentenceList/admin?page=%d&kw=%s", page, kw);
     }
 
     @GetMapping("/lesson2")
@@ -85,20 +111,19 @@ public class SentenceController {
     @GetMapping("/api/get-lesson2-sentence")
     @ResponseBody
     public Map<String, Object> getLesson2Sentence(HttpSession session) {
-        Sentence selected = sentenceService.getSelectRandomEntity();  // ✅ 문장 객체 전체
-        String sentence = sentenceService.getSelectRandom().getMunjang();
+        Sentence selected = sentenceService.getSelectRandomEntity();  // ✅ 문장 객체 전체를 한 번만 가져옴
 
-        if (sentence == null) {
+        if (selected == null) {
             return Collections.singletonMap("error", "문장을 불러올 수 없습니다.");
         }
 
         // 세션에 원본 문장과 오답 횟수 저장
-        session.setAttribute("originalSentence", sentence);
-        session.setAttribute("originalSentenceId", selected.getSentenceId());   // ✅ sentenceId 저장
+        session.setAttribute("originalSentence", selected.getMunjang()); // ✅ selected 객체에서 문장을 가져옴
+        session.setAttribute("originalSentenceId", selected.getSentenceId());   // ✅ selected 객체에서 sentenceId 저장
         session.setAttribute("incorrectCount", 0);
 
         // 문장을 ^ 기준으로 분리하고 섞기
-        String[] splitList = sentence.split("\\^");
+        String[] splitList = selected.getMunjang().split("\\^"); // ✅ selected 객체에서 문장을 가져옴
         List<String> shuffleList = Arrays.asList(splitList);
         Collections.shuffle(shuffleList);
 
@@ -113,12 +138,11 @@ public class SentenceController {
     @ResponseBody
     public Map<String, Object> checkLesson2Answer(@RequestBody Map<String, List<String>> payload, HttpSession session) {
         String originalSentenceWithCaret = (String) session.getAttribute("originalSentence");
-        Integer sentenceId = (Integer) session.getAttribute("originalSentenceId");  // ✅ sentenceId 가져오기
+        Integer sentenceId = (Integer) session.getAttribute("originalSentenceId");
         int incorrectCount = (int) session.getAttribute("incorrectCount");
         List<String> userPieces = payload.get("userPieces");
 
         if (originalSentenceWithCaret == null) {
-            // 세션이 만료되었거나 문제가 로드되지 않았을 경우
             return Collections.singletonMap("error", "문제가 로드되지 않았거나 세션이 만료되었습니다.");
         }
 
@@ -129,19 +153,27 @@ public class SentenceController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("isCorrect", isCorrect);
-        response.put("correctAnswer", originalSentenceWithCaret);  // ✅ 오답노트 저장용
-        response.put("sentenceId", sentenceId);                    // ✅ 오답노트 저장용
+        response.put("correctAnswer", originalSentenceWithCaret);
+        response.put("sentenceId", sentenceId);
 
         if (isCorrect) {
-            // 정답일 경우
+            Integer userNo = (Integer) session.getAttribute("userNo");
+            if(userNo!= null && sentenceId != null) {
+                // 정답일 경우, 오답노트에 해당 항목이 있으면 삭제
+                incNoteService.deleteIncorrectNote(userNo, null, sentenceId);
+            }
 
             String userId = (String) session.getAttribute("userId");
             if(userId != null) {
                 learningLogService.updateLearning_Log(userId, 2);
             }
 
-            String nextSentence = sentenceService.getSelectRandom().getMunjang();
+            Sentence nextSelected = sentenceService.getSelectRandomEntity();
+            String nextSentence = nextSelected.getMunjang();
+
+            // 다음 문제의 정보를 세션에 정확히 업데이트
             session.setAttribute("originalSentence", nextSentence);
+            session.setAttribute("originalSentenceId", nextSelected.getSentenceId());
             session.setAttribute("incorrectCount", 0);
 
             List<String> nextPieces = Arrays.asList(nextSentence.split("\\^"));
@@ -149,16 +181,26 @@ public class SentenceController {
 
             response.put("message", "정답입니다! 다음 문제로 넘어갑니다.");
             response.put("nextPieces", nextPieces);
+            response.put("nextSentenceId", nextSelected.getSentenceId());
 
         } else {
-            // 오답일 경우, 오답 횟수 증가
             incorrectCount++;
             session.setAttribute("incorrectCount", incorrectCount);
 
             if (incorrectCount >= 3) {
-                // 3번 이상 틀렸을 경우, 다음 문제 로드
-                String nextSentence = sentenceService.getSelectRandom().getMunjang();
+                // 3번 이상 틀렸을 경우, 오답노트에 저장
+                Integer userNo = (Integer) session.getAttribute("userNo");
+                if (userNo != null && sentenceId != null) {
+                    incNoteService.saveIncorrectNote(userNo, null, sentenceId);
+                }
+
+                // 다음 문제 로드
+                Sentence nextSelected = sentenceService.getSelectRandomEntity();
+                String nextSentence = nextSelected.getMunjang();
+
+                // 다음 문제의 정보를 세션에 정확히 업데이트
                 session.setAttribute("originalSentence", nextSentence);
+                session.setAttribute("originalSentenceId", nextSelected.getSentenceId());
                 session.setAttribute("incorrectCount", 0);
 
                 List<String> nextPieces = Arrays.asList(nextSentence.split("\\^"));
@@ -166,12 +208,11 @@ public class SentenceController {
 
                 response.put("message", "3번 틀렸습니다. 다음 문제로 넘어갑니다.");
                 response.put("nextPieces", nextPieces);
-
+                response.put("nextSentenceId", nextSelected.getSentenceId());
             } else {
                 response.put("message", "오답입니다. 다시 시도하세요.");
             }
         }
-
         return response;
     }
 
