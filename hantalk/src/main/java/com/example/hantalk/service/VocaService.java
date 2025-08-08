@@ -1,6 +1,8 @@
 package com.example.hantalk.service;
 
+import com.example.hantalk.dto.SentenceDTO;
 import com.example.hantalk.dto.VocaDTO;
+import com.example.hantalk.entity.Sentence;
 import com.example.hantalk.entity.Voca;
 import com.example.hantalk.repository.VocaRepository;
 import lombok.RequiredArgsConstructor;
@@ -78,6 +80,9 @@ public class VocaService {
         }
     }
 
+    public void setDelete(VocaDTO vocaDTO){
+        vocaRepository.deleteById(vocaDTO.getVocaId());
+    }
 
     // 중복 방지 랜덤 문제 출제
     private List<Voca> getRandomVocasInternal(List<Integer> excludeIds, int count) {

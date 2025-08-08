@@ -70,6 +70,13 @@ public class VocaController {
         return "redirect:/study/vocaList/admin";
     }
 
+    @GetMapping("/vocaDelete/{id}")
+    public String vocaDelete(@PathVariable int id) {
+        VocaDTO searchDTO = new VocaDTO();
+        searchDTO.setVocaId(id);
+        vocaService.setDelete(searchDTO);
+        return "redirect:/study/vocaList/admin";
+    }
 
     // 학습 1번 (단어 맞추기)
     @GetMapping("/lesson1")
