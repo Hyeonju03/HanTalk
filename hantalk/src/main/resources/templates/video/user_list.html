@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>영상 목록</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 30px;
+        background-color: #f4f4f4;
+    }
+    h1 { color: #333; }
+
+    /* 관리자 테이블 스타일 */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+    }
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    /* 사용자 카드 스타일 */
+    .video-card {
+        background: white;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+    }
+    .video-actions {
+        margin-top: 10px;
+    }
+    .video-actions a, .video-actions button {
+        margin-right: 8px;
+        text-decoration: none;
+        color: #007BFF;
+        border: none;
+        background: none;
+        cursor: pointer;
+    }
+
+    /* 페이징 스타일 */
+    .pagination {
+        margin-top: 20px;
+    }
+    .pagination a {
+        margin: 0 5px;
+        text-decoration: none;
+    }
+    .active-page {
+        font-weight: bold;
+        color: red;
+    }
+
+    /* ✅ 영상 썸네일 형태 */
+.thumbnail-link {
+    position: relative;
+    display: block;
+    width: 200px;
+    height: 112px;
+    overflow: hidden;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.video-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none; /* 영상 클릭 방지 (a태그만 작동) */
+}
+
+/* ✅ 중앙 ▶ 아이콘 오버레이 */
+.play-icon-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 36px;
+    color: white;
+    text-shadow: 0 0 10px black;
+    pointer-events: none;
+}
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>🎬 영상 목록</h1>
+<!-- ⚠️ 로그인 필요 메시지 표시 -->
+<div th:if="${msg}" style="color:red; margin-top:10px;">
+  <strong th:text="${msg}"></strong>
+</div>
+
+<!-- 검색 -->
+<form method="get" th:action="@{/user/video/list}">
+  <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력" />
+  <select name="searchType">
+    <option value="title" th:selected="${searchType == 'title'}">제목</option>
+    <option value="content" th:selected="${searchType == 'content'}">내용</option>
+    <option value="all" th:selected="${searchType == 'all'}">제목 + 내용</option>
+  </select>
+  <button type="submit">검색</button>
+</form>
+<!--
+&lt;!&ndash; 🎯 영상 등록 버튼 (관리자만) &ndash;&gt;
+<a th:if="${isAdmin}" th:href="@{/admin/video/upload}">➕ 새 영상 등록</a>
+
+&lt;!&ndash; ✅ 1. 관리자 화면 (테이블 형식) &ndash;&gt;
+<table th:if="${isAdmin}">
+  <thead>
+  <tr>
+    <th>번호</th>
+    <th>제목</th>
+    <th>설명</th>
+    <th>등록일</th>
+    <th>수정일</th>
+    <th>관리</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="video, stat : ${videoPage.content}" th:id="'row-' + ${video.videoId}">
+    <td th:text="${videoPage.number * videoPage.size + stat.index + 1}">1</td>
+    <td>
+      &lt;!&ndash; 디버깅: ID 확인 &ndash;&gt;
+      <span th:text="'[ID: ' + ${video.videoId} + ']'">[ID]</span>
+
+      &lt;!&ndash; 제목 링크 &ndash;&gt;
+      <a th:href="@{/admin/video/view/{id}(id=${video.videoId})}" th:text="${video.title}">제목</a>
+    </td>
+    <td th:text="${video.content}">내용</td>
+    <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</td>
+    <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}"></td>
+    <td>
+      <a th:href="@{/admin/video/edit/{id}(id=${video.videoId})}">수정</a> |
+      <button type="button" th:attr="data-id=${video.videoId}" onclick="deleteVideo(this)">삭제</button>
+    </td>
+  </tr>
+  </tbody>
+</table>-->
+
+<!-- ✅ 2. 사용자 화면 (카드형 목록) -->
+<div th:if="${!isAdmin}">
+  <div th:each="video, stat : ${videoPage.content}" class="video-card">
+    <div>
+      <strong th:text="${videoPage.number * videoPage.size + stat.index + 1} + '. '">1.</strong>
+      <a th:href="@{/user/video/view/{id}(id=${video.videoId})}" th:text="${video.title}">제목</a>
+    </div>
+
+    <a th:href="@{/user/video/view/{id}(id=${video.videoId})}" class="thumbnail-link">
+      <video class="video-thumbnail" th:src="@{'/videos/' + ${video.videoName}}" muted playsinline preload="metadata"></video>
+      <div class="play-icon-overlay">▶</div>
+    </a>
+
+    <p th:text="${video.content}">설명</p>
+  </div>
+</div>
+
+<!-- ✅ 3. 페이징 -->
+<div class="pagination" th:if="${videoPage.totalPages > 1}">
+  <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
+  <a th:href="@{'/' + ${role} + '/video/list'(page=${i}, keyword=${keyword}, searchType=${searchType})}"
+     th:class="${i == videoPage.number} ? 'active-page' : ''"
+     th:text="${i + 1}">1</a>
+</span>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".video-thumbnail").forEach(video => {
+      video.addEventListener("loadeddata", function () {
+        try {
+          video.currentTime = 0.1; // 썸네일용 0.1초
+          video.pause();
+        } catch (e) {}
+      });
+    });
+  });
+</script>
+<!-- ✅ 4. Ajax 삭제 -->
+<!--<script>
+  function deleteVideo(button) {
+      const videoId = $(button).data("id");
+      if (confirm("정말 삭제하시겠습니까?")) {
+          $.ajax({
+              url: "/admin/video/" + videoId,
+              type: "DELETE",
+              success: function () {
+                  alert("삭제되었습니다.");
+                  location.reload(); // 새로고침으로 동기화
+              },
+              error: function () {
+                  alert("삭제 중 오류 발생");
+              }
+          });
+      }
+  }
+</script>-->
+</body>
+</html>

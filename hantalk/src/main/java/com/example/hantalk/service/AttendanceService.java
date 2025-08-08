@@ -38,6 +38,11 @@ public class AttendanceService {
             attendance.setUsers(user);
             attendance.setAttendDate(LocalDateTime.now());
             attendanceRepository.save(attendance);
+
+            // 포인트 적립 로직
+            user.setPoint(user.getPoint() + 10);
+            usersRepository.save(user); // 변경된 사용자 정보 저장
+
             System.out.println(user.getUserId() + " 님이 " + LocalDate.now() + " 출석했습니다.");
             return true;
         } else {

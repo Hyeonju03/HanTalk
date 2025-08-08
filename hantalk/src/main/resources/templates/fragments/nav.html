@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<nav th:fragment="navFragment" class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">HanTalk</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/view">마이페이지</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/study/main">학습</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/resource/main">커뮤니티</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/item/shop">포인트</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/login">로그인</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/register">회원가입</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+</body>
+</html>

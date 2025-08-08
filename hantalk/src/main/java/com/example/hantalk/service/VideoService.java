@@ -3,6 +3,8 @@ package com.example.hantalk.service;
 import com.example.hantalk.dto.VideoDTO;
 import com.example.hantalk.entity.Video;
 import com.example.hantalk.repository.VideoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,10 @@ public class VideoService {
 
     public VideoService(VideoRepository videoRepository) {
         this.videoRepository = videoRepository;
+    }
+
+    public boolean existsByFilename(String filename) {
+        return videoRepository.existsByVideoName(filename);
     }
 
     // 🔍 제목으로 영상 검색
@@ -106,4 +112,23 @@ public class VideoService {
         video.setVideoName(dto.getVideoName());
         return video;
     }
+
+    public Page<Video> getPagedVideos(String keyword, String searchType, Pageable pageable) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            switch (searchType) {
+                case "title":
+                    return videoRepository.findByTitleContaining(keyword, pageable);
+                case "content":
+                    return videoRepository.findByContentContaining(keyword, pageable);
+                case "filename":
+                    return videoRepository.findByVideoNameContaining(keyword, pageable);
+                case "all":
+                default:
+                    return videoRepository.findByTitleOrContentOrVideoNameContaining(keyword, pageable);
+            }
+        } else {
+            return videoRepository.findAll(pageable);
+        }
+    }
+
 }

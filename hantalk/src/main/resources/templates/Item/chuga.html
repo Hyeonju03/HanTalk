@@ -28,6 +28,16 @@
   </div>
 
   <div>
+    <label>아이템 종류:
+        <select name="itemType" required>
+          <option value="">-- 선택 --</option>
+          <option value="frame" th:selected="${item.itemType == 'frame'}">프레임</option>
+          <option value="image" th:selected="${item.itemType == 'image'}">이미지</option>
+        </select>
+    </label>
+  </div>
+
+  <div>
     <label>이미지 업로드:
       <input type="file" name="imageFile" accept="image/*" required />
     </label>

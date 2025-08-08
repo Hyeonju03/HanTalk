@@ -14,27 +14,27 @@
     <h3>프로필 이미지</h3>
 
     <div class="relative w-28 h-28 mx-auto">
-      <!-- 프로필 이미지 -->
+      <!-- 프로필 이미지 (항상 바닥에 깔림) -->
       <img th:if="${user.profileImage != null}"
            th:src="@{'/images/' + ${user.profileImage}}"
            alt="프로필 이미지"
-           class="rounded-full w-full h-full object-cover"/>
+           class="rounded-full w-full h-full object-cover z-0"/>
 
-      <!-- 프레임 이미지 -->
+      <!-- 프레임 이미지 (프로필 위에 덮임) -->
       <img th:if="${user.profileFrame != null}"
            th:src="@{'/frames/' + ${user.profileFrame}}"
            alt="프레임 이미지"
            class="absolute top-0 left-0 w-full h-full pointer-events-none z-10"/>
 
-      <!-- 아무것도 없을 때 기본 안내 -->
+      <!-- 둘 다 없을 때 -->
       <div th:if="${user.profileImage == null and user.profileFrame == null}"
-           class="text-center text-gray-500 text-sm mt-2">
-        프로필 이미지 및 프레임이 설정되지 않았습니다.
+           class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm text-center z-20 bg-white bg-opacity-80 rounded-full">
+        프로필 이미지 및<br/>프레임이 설정되지 않았습니다.
       </div>
     </div>
 
 
-  <div class="space-y-3 text-lg mb-8">
+    <div class="space-y-3 text-lg mb-8">
     <p>
       <strong class="text-gray-700">아이디:</strong>
       <span th:text="${user.userId}" class="text-gray-900 ml-2">아이디</span>

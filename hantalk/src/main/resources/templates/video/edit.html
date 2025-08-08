@@ -6,11 +6,11 @@
 <body>
 <h1>영상 수정</h1>
 
-<!-- ⚠ enctype="multipart/form-data" 없으면 파일 업로드 안 됨 -->
-<form th:action="@{/video/update}" method="post" enctype="multipart/form-data">
-
-  <!-- 영상 ID (필수) -->
-  <input type="hidden" name="videoId" th:value="${video.videoId}"/>
+<!-- enctype 꼭 있어야 함 -->
+<form th:action="@{'/' + ${role} + '/video/update'}" method="post" enctype="multipart/form-data">
+  <!-- 영상 ID -->
+  <input type="hidden" name="videoId" th:value="${video.videoId}" />
+  <input type="hidden" name="page" th:value="${param.page}" /> <!-- ✅ 현재 페이지 유지 -->
 
   <!-- 제목 -->
   <label>제목:
@@ -28,9 +28,9 @@
   <!-- ✅ 기존 영상 미리보기 -->
   <video width="300" controls
          th:if="${video.videoName}"
-         th:src="@{'/upload/' + ${video.videoName}}"></video><br/>
+         th:src="@{'/videos/' + ${video.videoName}}"></video><br/>
 
-  <!-- ✅ 새 영상 업로드 입력 -->
+  <!-- 새 영상 업로드 -->
   <label>새 영상 파일 (선택):
     <input type="file" name="file" accept="video/mp4" />
   </label><br/>
@@ -38,6 +38,8 @@
   <button type="submit">수정</button>
 </form>
 
-<a th:href="@{/video/list}">← 목록으로</a>
+<!-- ✅ 목록 링크 -->
+<a th:href="@{'/' + ${role} + '/video/list'}">&larr; 목록으로</a>
+
 </body>
 </html>
