@@ -5,8 +5,19 @@
   <title>학습 메인</title>
   <script>
     function openLesson(url) {
-        // 새 창으로 열기 (크기와 옵션 지정 가능)
-        window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+        const popupWidth = 950;
+        const popupHeight = 550;
+
+        // 화면 중앙 정렬 계산
+        const left = (screen.width / 2) - (popupWidth / 2);
+        const top = (screen.height / 2) - (popupHeight / 2);
+
+        // 새 창 열기 (팝업)
+        window.open(
+            url,
+            'lessonPopup', // 창 이름 → 동일 이름이면 같은 팝업 재사용
+            `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=no`
+        );
     }
   </script>
 </head>
@@ -15,7 +26,9 @@
 
 <div style="margin-top: 20px;">
   <button onclick="openLesson('/study/lesson1')">Lesson 1 - 단어 맞추기</button>
+  <button onclick="openLesson('/study/lesson2')">Lesson 2 - 문장 배열하기</button>
   <button onclick="openLesson('/study/lesson3')">Lesson 3 - 객관식 문제</button>
+  <button onclick="openLesson('/study/lesson4')">Lesson 4 - 문장 받아쓰기</button>
 </div>
 
 </body>

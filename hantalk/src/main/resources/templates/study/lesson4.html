@@ -10,6 +10,11 @@
   <h1>받아쓰기</h1>
 </div>
 
+<!-- ✅ 오답 시 정답 표시 영역 -->
+<div id="correct-answer-box" style="display:none; color:gray;">
+  <p>정답: <span id="correct-answer-text"></span></p>
+</div>
+
 <div id="question-container">
   <p id="sentence">문장을 불러오는 중...</p>
   <button id="play-btn" style="display: none;">▶️</button>
@@ -25,8 +30,18 @@
 </div>
 
 <button id="next-btn" style="display: none;">다음 문제</button>
+<button id="quitBtn" onclick="quitLesson()">그만하기</button>
 
 <script>
+
+  function quitLesson() {
+      if (window.opener) {
+          window.close();
+      } else {
+          alert("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.");
+      }
+  }
+
   let currentSentence = '';
 
   // Web Speech API의 SpeechSynthesis 객체 생성
@@ -39,6 +54,7 @@
       document.getElementById('result-overlay').style.display = 'none';
       document.getElementById('next-btn').style.display = 'none';
       document.getElementById('play-btn').style.display = 'none';
+      document.getElementById('correct-answer-box').style.display = 'none'; // ✅ 정답 박스 숨기기
 
       fetch('/study/api/get-lesson4-sentence') // RequestMapping("/study")를 고려하여 경로 수정
       .then(response => {
@@ -116,9 +132,13 @@
           if (data.isCorrect) {
               resultText.textContent = 'O';
               resultOverlay.style.color = 'green';
+              document.getElementById('correct-answer-box').style.display = 'none'; // ✅ 정답이면 박스 숨김
           } else {
               resultText.textContent = 'X';
               resultOverlay.style.color = 'red';
+              // ✅ 오답일 경우 정답 문장 표시
+              document.getElementById('correct-answer-box').style.display = 'block';
+              document.getElementById('correct-answer-text').textContent = currentSentence;
           }
 
           resultOverlay.style.display = 'flex';

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>오답노트</title>
+  <style>
+    .note-section-wrapper {
+      display: flex;
+      gap: 20px;
+    }
+
+    .note-box {
+      width: 50%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+<h2>오답노트</h2>
+
+<div class="note-section-wrapper">
+
+  <!-- ✅ 단어 오답 -->
+  <div class="note-box">
+    <h3>📘 단어 오답</h3>
+    <table border="1" th:if="${!#lists.isEmpty(wordNotes)}">
+      <thead>
+      <tr><th>단어</th><th>뜻</th></tr>
+      </thead>
+      <tbody>
+      <tr th:each="note : ${wordNotes}">
+        <td th:text="${note.voca.vocabulary}"></td>
+        <td th:text="${note.voca.description}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ✅ 문장 오답 -->
+  <div class="note-box">
+    <h3>📙 문장 오답</h3>
+    <table border="1" th:if="${!#lists.isEmpty(sentenceNotes)}">
+      <thead>
+      <tr><th>문장</th><th>해석</th></tr>
+      </thead>
+      <tbody>
+      <tr th:each="note : ${sentenceNotes}">
+        <td th:text="${note.sentence.munjang.replace('^', ' ')}"></td>
+        <td th:text="${note.sentence.description.replace('^', ' ')}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- 전체 오답노트가 비어 있을 경우 -->
+<p th:if="${#lists.isEmpty(notes)}">오답노트가 비어 있습니다.</p>
+
+</body>
+</html>

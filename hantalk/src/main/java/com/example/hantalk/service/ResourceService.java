@@ -23,10 +23,9 @@ public class ResourceService {
 
     private final ResourceRepository resourceRepository;
 
-    // 업로드할 파일을 저장할 서버 내 디렉터리 경로
-    private final String uploadDir = "C:\\aaa\\HanTalk\\hantalk\\upload";
+    // 실제 서버 파일 저장 경로 (컨트롤러와 동일)
+    private final String uploadDir = "C:/aaa/HanTalk/hantalk/ResourceFile";
 
-    // 파일 업로드 없이 자료 등록
     public void createResource(ResourceDTO dto) {
         Resource resource = new Resource();
         resource.setTitle(dto.getTitle());
@@ -39,19 +38,16 @@ public class ResourceService {
         resourceRepository.save(resource);
     }
 
-    // ID로 자료 조회
     public ResourceDTO getResourceById(int id) {
         Optional<Resource> optional = resourceRepository.findById(id);
         return optional.map(this::toDTO).orElse(null);
     }
 
-    // 전체 목록 페이직 조회
     public Page<ResourceDTO> getAllResources(Pageable pageable) {
         return resourceRepository.findAll(pageable)
                 .map(this::toDTO);
     }
 
-    // 파일 업로드 없이 자료 수정
     public void updateResource(int id, ResourceDTO dto) {
         resourceRepository.findById(id).ifPresent(resource -> {
             resource.setTitle(dto.getTitle());
@@ -63,12 +59,10 @@ public class ResourceService {
         });
     }
 
-    // 자료 삭제
     public void deleteResource(int id) {
         resourceRepository.deleteById(id);
     }
 
-    // Entity → DTO 변환
     private ResourceDTO toDTO(Resource resource) {
         ResourceDTO dto = new ResourceDTO();
         dto.setResourceId(resource.getResourceId());
@@ -79,11 +73,10 @@ public class ResourceService {
         dto.setViewCount(resource.getViewCount());
         dto.setCreateDate(resource.getCreateDate());
         dto.setUpdateDate(resource.getUpdateDate());
-        dto.setOriginalFileName(resource.getOriginalFileName());
+        dto.setWriter(resource.getWriter());
         return dto;
     }
 
-    // 파일 포함 자료 등록
     public void createResourceWithFile(ResourceDTO dto, MultipartFile file) {
         Resource resource = new Resource();
         resource.setTitle(dto.getTitle());
@@ -95,7 +88,8 @@ public class ResourceService {
         if (file != null && !file.isEmpty()) {
             String savedFileName = saveFile(file);
             if (savedFileName != null) {
-                resource.setArchive("/upload/" + savedFileName);
+                // 뷰에서 사용할 경로는 /ResourceFile/파일명 으로 맞춤 (uploadDir 절대경로와 분리)
+                resource.setArchive("/ResourceFile/" + savedFileName);
                 resource.setOriginalFileName(file.getOriginalFilename());
             } else {
                 resource.setArchive(null);
@@ -109,7 +103,6 @@ public class ResourceService {
         resourceRepository.save(resource);
     }
 
-    // 파일 포함 자료 수정
     public void updateResourceWithFile(int id, ResourceDTO dto, MultipartFile file) {
         resourceRepository.findById(id).ifPresent(resource -> {
             resource.setTitle(dto.getTitle());
@@ -119,7 +112,7 @@ public class ResourceService {
             if (file != null && !file.isEmpty()) {
                 String savedFileName = saveFile(file);
                 if (savedFileName != null) {
-                    resource.setArchive("/upload/" + savedFileName);
+                    resource.setArchive("/ResourceFile/" + savedFileName);
                     resource.setOriginalFileName(file.getOriginalFilename());
                 }
             } else {
@@ -131,7 +124,6 @@ public class ResourceService {
         });
     }
 
-    // 실제 파일 저장 메서드 (UUID)
     private String saveFile(MultipartFile file) {
         try {
             Path uploadPath = Paths.get(uploadDir);
@@ -158,7 +150,6 @@ public class ResourceService {
         }
     }
 
-    // 저장된 파일명으로 originalFileName 조회
     public String getOriginalFileName(String storedFileName) {
         return resourceRepository.findByArchiveEndingWith(storedFileName)
                 .map(Resource::getOriginalFileName)
@@ -167,11 +158,11 @@ public class ResourceService {
 
     public Page<ResourceDTO> searchResources(String keyword, Pageable pageable) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            // 검색어가 없으면 전체 조회
             return getAllResources(pageable);
         }
         String trimmedKeyword = keyword.trim();
         return resourceRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(trimmedKeyword, trimmedKeyword, pageable)
                 .map(this::toDTO);
     }
+
 }

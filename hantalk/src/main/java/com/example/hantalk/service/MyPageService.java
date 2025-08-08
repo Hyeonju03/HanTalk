@@ -81,6 +81,7 @@ public class MyPageService {
         dto.setPassword(users.getPassword());
         dto.setNickname(users.getNickname());
         dto.setProfileImage(users.getProfileImage());
+        dto.setProfileFrame(users.getProfileFrame());
         dto.setJoinDate(users.getJoinDate());
         dto.setBirth(users.getBirth());
         dto.setStatus(users.getStatus());
@@ -108,18 +109,18 @@ public class MyPageService {
         return user.getUserItemsList();
     }
 
-    @Transactional
-    public void applyProfileImage(int userNo, int itemId) {
-        Users user = usersRepository.findById(userNo).orElseThrow();
-        Item item = itemRepository.findById(itemId).orElseThrow();
-
-        user.setProfileImage(item.getItemImage());
-        usersRepository.save(user);
-    }
 
     public List<User_Items> getUserItems(Integer userNo) {
         Users user = usersRepository.findById(userNo)
                 .orElseThrow(() -> new RuntimeException("사용자 없음"));
         return user.getUserItemsList();
+    }
+
+    public void applyProfileImageByImageName(int userNo, String imageName) {
+        usersRepository.updateProfileImage(userNo, imageName);
+    }
+
+    public void applyProfileFrameByImageName(int userNo, String frameName) {
+        usersRepository.updateProfileFrame(userNo, frameName);
     }
 }

@@ -6,13 +6,12 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Tailwind CSS가 기본 제공하지 않는 그리드 셀 크기 조정을 위한 추가 스타일 */
     .calendar-grid-cell {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 100px; /* 각 날짜 셀의 최소 높이 80px -> 100px로 증가 */
+      min-height: 100px;
       padding: 5px;
     }
   </style>
@@ -27,13 +26,13 @@
   </div>
 
   <div class="grid grid-cols-7 text-sm text-center text-gray-500 uppercase border-b border-gray-300">
+    <div class="py-2 text-red-600">SUN</div>
     <div class="py-2">MON</div>
     <div class="py-2">TUE</div>
     <div class="py-2">WED</div>
     <div class="py-2">THU</div>
     <div class="py-2">FRI</div>
     <div class="py-2 text-blue-600">SAT</div>
-    <div class="py-2 text-red-600">SUN</div>
   </div>
 
   <div id="calendar" class="grid grid-cols-7 gap-1 p-2 text-center text-base text-gray-700">
@@ -50,28 +49,23 @@
 <script>
   const calendarEl = document.getElementById('calendar');
   const monthLabel = document.getElementById('currentMonth');
-  const checkInButton = document.getElementById('checkInButton'); // ✅ 버튼 요소 추가
+  const checkInButton = document.getElementById('checkInButton');
 
   const today = new Date();
   let currentYear = today.getFullYear();
   let currentMonth = today.getMonth(); // 0~11
 
-  // ✅ 캘린더 렌더링 (attendanceDates를 인자로 받음)
+  // 캘린더 렌더링 (attendanceDates를 인자로 받음)
   function renderCalendar(attendanceDates) {
-    calendarEl.innerHTML = ''; // 초기화
+    calendarEl.innerHTML = '';
 
-    // 현재 월의 첫 날과 마지막 날 정보
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0:일요일 ~ 6:토요일
-    const lastDateOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // 해당 월의 마지막 날짜
+    const lastDateOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-    // 헤더에 년월 표시 (이미지처럼 '2025.8' 형식)
     monthLabel.textContent = `${currentYear}.${currentMonth + 1}`;
 
-    // 캘린더의 첫 요일이 월요일이므로, 'firstDayOfMonth' 값을 조정하여 빈 칸을 채웁니다.
-    // Date.getDay()는 일요일 0, 월요일 1 ... 토요일 6
-    // 우리가 원하는 요일 순서는 월요일 0, 화요일 1 ... 일요일 6
-    // 따라서 (firstDayOfMonth + 6) % 7 로 조정하면 월요일부터 시작하는 요일 인덱스를 얻을 수 있습니다.
-    let startDayOffset = (firstDayOfMonth + 6) % 7; // 월요일(1)이면 0개 빈 칸, 일요일(0)이면 6개 빈 칸
+    // ✅ 시작 요일이 일요일이므로, Date.getDay()의 0~6 인덱스를 그대로 사용합니다.
+    const startDayOffset = firstDayOfMonth;
 
     // 빈 칸 추가
     for (let i = 0; i < startDayOffset; i++) {
@@ -80,58 +74,49 @@
       calendarEl.appendChild(emptyCell);
     }
 
-    // 오늘 날짜 문자열 (YYYY-MM-DD 형식)
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    let hasCheckedInToday = false; // 오늘 이미 출석했는지 여부
+    let hasCheckedInToday = false;
 
     // 날짜 셀 생성
     for (let day = 1; day <= lastDateOfMonth; day++) {
       const cell = document.createElement('div');
       cell.className = 'calendar-grid-cell relative rounded cursor-default';
 
-      // 날짜 텍스트 요소
       const dayText = document.createElement('div');
       dayText.textContent = day;
       dayText.className = 'font-semibold mb-1';
 
-      // 현재 날짜의 요일 계산 (Date.getDay() 사용)
-      const currentDayOfWeek = new Date(currentYear, currentMonth, day).getDay(); // 0:일, 1:월, ..., 6:토
+      const currentDayOfWeek = new Date(currentYear, currentMonth, day).getDay();
 
-      // 토요일 파랑, 일요일 빨강
-      if (currentDayOfWeek === 6) { // 토요일
-        dayText.classList.add('text-blue-600');
-      } else if (currentDayOfWeek === 0) { // 일요일
+      // ✅ 토요일 파랑, 일요일 빨강
+      if (currentDayOfWeek === 0) { // 일요일
         dayText.classList.add('text-red-600');
+      } else if (currentDayOfWeek === 6) { // 토요일
+        dayText.classList.add('text-blue-600');
       }
 
       cell.appendChild(dayText);
 
-      // 출석 체크 표시 (PNG 이미지)
       const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       if (attendanceDates.includes(dateStr)) {
-        const imgIcon = document.createElement('img'); // img 태그 생성
-        imgIcon.src = '/images/bono.png'; // ★ 여기에 PNG 이미지 경로를 입력하세요.
-        imgIcon.alt = '출석 완료'; // 접근성을 위한 alt 텍스트
-        imgIcon.className = 'w-30 h-30 mx-auto'; // Tailwind CSS를 사용하여 이미지 크기 조절
+        const imgIcon = document.createElement('img');
+        imgIcon.src = '/image/bono.png';
+        imgIcon.className = 'w-30 h-30 mx-auto';
 
         cell.appendChild(imgIcon);
 
-        // ✅ 오늘 날짜이고 이미 출석한 경우
         if (dateStr === todayStr) {
           hasCheckedInToday = true;
         }
       }
 
-      // ✅ 오늘 날짜에 대한 시각적 표시
-      // 현재 보고 있는 달력이 오늘 달력일 때만 '오늘' 표시
       if (dateStr === todayStr && currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
-        cell.classList.add('border-2', 'border-blue-500', 'bg-blue-50'); // 오늘 날짜 셀에 파란색 테두리와 배경색 추가
+        cell.classList.add('border-2', 'border-blue-500', 'bg-blue-50');
       }
 
       calendarEl.appendChild(cell);
     }
 
-    // ✅ 출석 버튼 상태 업데이트 (현재 월이 오늘 월과 같고, 오늘 이미 출석했는지 여부에 따라)
     if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
       if (!hasCheckedInToday) {
         checkInButton.disabled = false;
@@ -145,7 +130,6 @@
         checkInButton.classList.add('bg-gray-400', 'cursor-not-allowed');
       }
     } else {
-      // 현재 보고 있는 달력이 오늘 달력이 아니면 버튼 비활성화
       checkInButton.disabled = true;
       checkInButton.textContent = '출석할 수 없습니다';
       checkInButton.classList.remove('bg-blue-500', 'hover:bg-blue-700');
@@ -153,7 +137,6 @@
     }
   }
 
-  // ✅ 서버에서 출석 데이터 받아오기 및 렌더링
   function fetchAndRender() {
     axios.get('/user/calendar/data')
       .then(response => {
@@ -161,19 +144,18 @@
       })
       .catch(error => {
         console.error('출석 정보 불러오기 실패:', error);
-        alert('출석 정보를 불러오는데 실패했습니다.'); // 사용자에게 알림 추가
-        renderCalendar([]); // 실패 시 빈 캘린더 렌더링
+        alert('출석 정보를 불러오는데 실패했습니다.');
+        renderCalendar([]);
       });
   }
 
-  // ✅ 이전/다음 월 버튼
   document.getElementById('prevMonth').addEventListener('click', () => {
     currentMonth--;
     if (currentMonth < 0) {
       currentMonth = 11;
       currentYear--;
     }
-    fetchAndRender(); // 월 변경 후 캘린더 새로고침
+    fetchAndRender();
   });
 
   document.getElementById('nextMonth').addEventListener('click', () => {
@@ -182,21 +164,19 @@
       currentMonth = 0;
       currentYear++;
     }
-    fetchAndRender(); // 월 변경 후 캘린더 새로고침
+    fetchAndRender();
   });
 
-  // ✅ 출석하기 버튼 클릭 이벤트 리스너 추가
   checkInButton.addEventListener('click', () => {
-    // 버튼이 비활성화된 상태에서는 클릭 이벤트가 동작하지 않도록 방어
     if (checkInButton.disabled) {
         return;
     }
 
-    axios.post('/user/checkTodayAttendance') // 백엔드 POST 엔드포인트 호출
+    axios.post('/user/checkTodayAttendance')
       .then(response => {
         if (response.data.success) {
           alert(response.data.message || '출석 완료! 10 포인트가 적립되었습니다.');
-          fetchAndRender(); // 출석 성공 후 캘린더 새로고침
+          fetchAndRender();
         } else {
           alert(response.data.message || '출석에 실패했습니다.');
         }
@@ -207,7 +187,6 @@
       });
   });
 
-  // ✅ 초기 렌더링
   fetchAndRender();
 </script>
 

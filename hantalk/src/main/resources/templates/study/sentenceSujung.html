@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>문장 수정</title>
+</head>
+<body>
+<h1>문장 수정</h1>
+<form th:action="@{/study/sentenceUpdateProc}" th:object="${dto}" method="post">
+    <input type="hidden" th:field="*{sentenceId}">
+
+    <input type="hidden" name="page" th:value="${page}">
+    <input type="hidden" name="kw" th:value="${kw}">
+
+    <div>
+        <label for="munjang">문장:</label>
+        <input type="text" id="munjang" th:field="*{munjang}">
+    </div>
+    <div>
+        <label for="description">의미:</label>
+        <textarea id="description" th:field="*{description}"></textarea>
+    </div>
+    <button type="submit">수정</button>
+    <a th:href="@{/study/sentenceList/admin(page=${page}, kw=${kw})}">돌아가기</a>
+</form>
+</body>
+</html>

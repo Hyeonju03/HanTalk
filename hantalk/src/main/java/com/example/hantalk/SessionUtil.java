@@ -40,8 +40,10 @@ public class SessionUtil {
     }
 
     // ✅ 특정 역할(Role) 보유 여부 확인
+    //사용법 SessionUtil.hasRole(session, "ADMIN") → 관리자 권한 확인
     public static boolean hasRole(HttpSession session, String requiredRole) {
         Object role = session.getAttribute(LOGIN_ROLE);
         return (role != null) && role.equals(requiredRole);
     }
+
 }

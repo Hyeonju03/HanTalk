@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>문장 목록 관리</title>
+</head>
+<body>
+<h1>문장 목록 관리</h1>
+<a th:href="@{'/study/sentenceInsert'}">문장 추가</a>
+
+<div class="search-container">
+    <form th:action="@{/study/sentenceList/admin}" method="get">
+        <input type="text" name="kw" th:value="${kw}" placeholder="문장 또는 의미 검색">
+        <button type="submit">검색</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>순번</th>
+        <th>문장</th>
+        <th>의미</th>
+        <th>등록일</th>
+        <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${paging.content == null || paging.content.isEmpty()}">
+        <td colspan="5">
+            문장 데이터가 존재하지 않습니다.
+        </td>
+    </tr>
+    <tr th:each="sentence, loop : ${paging.content}">
+        <td th:text="${paging.number * paging.size + loop.count}"></td>
+        <td th:text="${sentence.munjang.replace('^',' ')}"></td>
+        <td th:text="${sentence.description}"></td>
+        <td th:text="${#temporals.format(sentence.createDate, 'yyyy-MM-dd')}"></td>
+        <td>
+            <a th:href="@{'/study/sentenceUpdate/' + ${sentence.sentenceId}(page=${paging.number}, kw=${kw})}">수정</a>
+            <button type="button" class="btn-delete"
+                    th:data-sentence-id="${sentence.sentenceId}"
+                    th:data-page="${paging.number}"
+                    th:data-kw="${kw}">삭제</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:if="${!paging.isEmpty()}" class="pagination">
+    <ul>
+        <li th:classappend="${!paging.hasPrevious} ? 'disabled'">
+            <a th:href="@{|?page=${paging.number - 1}&kw=${kw}|}">이전</a>
+        </li>
+
+        <li th:each="page: ${#numbers.sequence(0, paging.totalPages - 1)}"
+            th:classappend="${page == paging.number} ? 'active'">
+            <a th:href="@{|?page=${page}&kw=${kw}|}" th:text="${page + 1}"></a>
+        </li>
+
+        <li th:classappend="${!paging.hasNext} ? 'disabled'">
+            <a th:href="@{|?page=${paging.number + 1}&kw=${kw}|}">다음</a>
+        </li>
+    </ul>
+</div>
+
+<script>
+    function confirmDelete(sentenceId, page, kw) {
+      if (confirm('정말 이 자료를 삭제하시겠습니까?')) {
+        window.location.href = '/study/sentenceDelete/' + sentenceId + '?page=' + page + '&kw=' + kw;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const sentenceId = this.getAttribute('data-sentence-id');
+                const page = this.getAttribute('data-page');
+                const kw = this.getAttribute('data-kw');
+                confirmDelete(sentenceId, page, kw);
+            });
+        });
+    });
+</script>
+</body>
+</html>

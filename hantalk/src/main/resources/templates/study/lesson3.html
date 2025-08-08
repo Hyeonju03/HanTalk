@@ -1,95 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html><!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>4지선다 객관식 학습</title>
-  <script th:inline="javascript">
-    let questions = /*[[${questions}]]*/ [];  // description, options, answer 포함
-    let answers = new Array(questions.length).fill(""); // 사용자 선택 저장
-    let currentIndex = 0;
+    <meta charset="UTF-8">
+    <title>4지선다 객관식 학습</title>
+    <style>
+        #feedback-icon {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 100px;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+        }
 
-    window.onload = function() {
-        showQuestion(currentIndex);
-    };
+        .correct {
+            color: green;
+        }
 
-    function showQuestion(index) {
-        const question = questions[index];
+        .incorrect {
+            color: red;
+        }
 
-        document.getElementById('description').textContent = question['description'];
+        button {
+            font-size: 16px;
+            padding: 8px 16px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
 
-        const optionsContainer = document.getElementById('options');
-        optionsContainer.innerHTML = "";
-        question['options'].forEach(option => {
-            const optionHtml = `
-                <label>
-                    <input type="radio" name="option" value="${option}"
-                        ${answers[index] === option ? 'checked' : ''}>
-                    ${option}
-                </label><br>`;
-            optionsContainer.innerHTML += optionHtml;
-        });
+        input[type="radio"] {
+            margin-right: 8px;
+        }
 
-        document.getElementById('nextBtn').textContent =
-            (index === questions.length - 1) ? "결과 보기" : "다음으로";
-    }
+        #result {
+            font-size: 18px;
+            margin-top: 15px;
+        }
 
-    function nextQuestion() {
-        // 현재 선택 저장
-        const selected = document.querySelector('input[name="option"]:checked');
-        answers[currentIndex] = selected ? selected.value : "";
+        #completion-message {
+            font-size: 22px;
+            font-weight: bold;
+            color: #003366;
+            margin-top: 30px;
+            text-align: center;
+        }
+    </style>
 
-        if (currentIndex === questions.length - 1) {
-            showResult();
-        } else {
-            currentIndex++;
+    <script th:inline="javascript">
+        let questions = /*[[${questions}]]*/ [];
+        let currentIndex = 0;
+        let answered = false;
+        let selectedOption = "";
+
+        window.onload = function () {
             showQuestion(currentIndex);
-        }
-    }
+        };
 
-function showResult() {
-    let output = "";
-    for (let i = 0; i < questions.length; i++) {
-        let correct = questions[i].answer; // 정답
-        let userAnswer = answers[i];
-        if (userAnswer === correct) {
-            output += `<p>${i + 1}번: 정답! (${correct})</p>`;
+        function showQuestion(index) {
+            const question = questions[index];
+            document.getElementById('description').textContent = question.description;
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = "";
+
+            question.options.forEach(option => {
+                const optionHtml = `
+                    <label>
+                        <input type="radio" name="option" value="${option}" onclick="selectOption('${option}')">
+                        ${option}
+                    </label><br>
+                `;
+                optionsContainer.innerHTML += optionHtml;
+            });
+
+            document.getElementById('result').textContent = "";
+            document.getElementById('feedback-icon').style.display = 'none';
+            document.getElementById('completion-message').textContent = '';
+            answered = false;
+        }
+
+        function selectOption(option) {
+            selectedOption = option;
+        }
+
+            function submitAnswer() {
+        if (!selectedOption) {
+            alert("답을 선택해주세요.");
+            return;
+        }
+
+        if (answered) return;
+        answered = true;
+
+        const question = questions[currentIndex];
+        const correctAnswer = question.answer;
+        const targetId = question.vocaId;
+
+        if (selectedOption === correctAnswer) {
+            document.getElementById('result').textContent = `정답! (${correctAnswer})`;
+            showFeedback(true);
         } else {
-            output += `<p>${i + 1}번: 오답 (정답은 ${correct})</p>`;
+            document.getElementById('result').textContent = `오답! 정답은 ${correctAnswer}`;
+            showFeedback(false);
+        }
+
+        // 오답노트 처리
+        fetch('/study/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                type: 'word',
+                targetId: targetId,
+                answer: selectedOption,
+                correctAnswer: correctAnswer
+            })
+        });
+
+        // ✅ 5번째 문제일 경우에만 학습 완료 로그 저장
+        if (currentIndex === questions.length - 1) {
+            showCompletionMessage(); // 이건 기존에 있던 함수
+            fetch('/study/complete3', { method: 'POST' })
+                .then(res => res.text())
+                .then(result => console.log("학습 로그 저장 결과:", result));
         }
     }
-    document.body.innerHTML = `<h1>결과</h1>` + output;
 
-    // 학습 완료 로그 저장 호출 (lesson3 → 3)
-    fetch('/study/complete?lessonNo=3', { method: 'POST' })
-        .then(res => res.text())
-        .then(result => {
-            if (result === 'success') {
-                console.log("학습 로그 저장 성공 (lesson3)");
-            } else {
-                console.log("로그 저장 실패 (lesson3)");
+
+        function showFeedback(isCorrect) {
+            const icon = document.getElementById('feedback-icon');
+            icon.textContent = isCorrect ? 'O' : 'X';
+            icon.className = isCorrect ? 'correct' : 'incorrect';
+            icon.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            if (!answered) {
+                alert("먼저 정답을 제출하세요.");
+                return;
             }
-        });
-}
 
-  </script>
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                selectedOption = "";
+                showQuestion(currentIndex);
+            } else {
+                showCompletionMessage();
+            }
+        }
 
+        function showCompletionMessage() {
+            document.getElementById('completion-message').textContent = '학습이 완료되었습니다!';
+            document.getElementById('restartBtn').style.display = 'inline-block';
+        }
+
+        function restartLesson() {
+            fetch('/study/api/lesson3-random')
+                .then(response => {
+                    if (!response.ok) throw new Error("서버 오류");
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data || data.length === 0) {
+                        alert("문제를 불러올 수 없습니다.");
+                        return;
+                    }
+                    questions = data;
+                    currentIndex = 0;
+                    selectedOption = "";
+                    answered = false;
+                    document.getElementById('restartBtn').style.display = 'none';
+                    document.getElementById('completion-message').textContent = '';
+                    showQuestion(currentIndex);
+                })
+                .catch(error => {
+                    console.error("이어하기 오류:", error);
+                    alert("문제 재로딩 중 오류가 발생했습니다.");
+                });
+        }
+    </script>
 </head>
 <body>
-<h1>학습 3 - 4지선다 객관식</h1>
+<h1>4지선다 객관식 학습</h1>
 
 <p id="description"></p>
 <div id="options"></div>
-<button type="button" id="nextBtn" onclick="nextQuestion()">다음으로</button>
+<button type="button" onclick="submitAnswer()">제출</button>
+<button type="button" onclick="nextQuestion()">다음으로</button>
 <p id="result"></p>
 
+<div id="feedback-icon"></div>
+<p id="completion-message"></p>
+
+<div style="position: fixed; bottom: 20px; right: 20px;">
+    <button onclick="window.close()">그만하기</button>
+    <button id="restartBtn" onclick="restartLesson()" style="display: none;">이어하기</button>
+</div>
 </body>
 </html>

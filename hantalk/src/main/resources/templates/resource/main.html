@@ -11,6 +11,8 @@
       margin: 0;
       padding: 0;
       display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     nav {
       width: 200px;
@@ -18,6 +20,8 @@
       padding: 2rem 1rem;
       height: 100vh;
       box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      position: fixed;
+      top: 0; left: 0;
     }
     nav h2 {
       font-size: 1.2rem;
@@ -35,14 +39,88 @@
       text-decoration: none;
       color: #4e6cb2;
     }
+    nav a:hover {
+      text-decoration: underline;
+    }
     main {
-      flex: 1;
+      margin-left: 200px;
       padding: 2rem;
+      flex: 1;
+      box-sizing: border-box;
+      background: #fefcff;
+      min-height: 100vh;
     }
     h1 {
       text-align: center;
       color: #5e7bb4;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      font-weight: 700;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(180, 200, 255, 0.2);
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e3e8f0;
+      text-align: center;
+    }
+    th {
+      background: #eef3fb;
+      color: #4e6cb2;
+      font-weight: bold;
+    }
+    tr:hover {
+      background-color: #f5f8ff;
+    }
+    tr {
+      cursor: pointer;
+    }
+    .file-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.95rem;
+    }
+    .file-links a {
+      color: #4e6cb2;
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .file-links a.preview-link {
+      font-weight: 700;
+      color: #3a4f8a;
+    }
+    .file-links a.preview-link:hover {
+      color: #2a3d6b;
+    }
+    .file-links .separator {
+      color: #888;
+      user-select: none;
+    }
+    .pagination {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .pagination a, .pagination span {
+      display: inline-block;
+      margin: 0 5px;
+      padding: 6px 12px;
+      background: #eef3fb;
+      color: #4e6cb2;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .pagination .current {
+      background: #d8e3ff;
+      font-weight: bold;
     }
     form.search-form {
       text-align: center;
@@ -67,44 +145,6 @@
     form.search-form button:hover {
       background-color: #3b5490;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(180, 200, 255, 0.2);
-    }
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #e3e8f0;
-      text-align: center;
-    }
-    th {
-      background: #eef3fb;
-      color: #4e6cb2;
-      font-weight: bold;
-    }
-    tr:hover {
-      background-color: #f5f8ff;
-    }
-    .pagination {
-      text-align: center;
-      margin-top: 2rem;
-    }
-    .pagination a, .pagination span {
-      display: inline-block;
-      margin: 0 5px;
-      padding: 6px 12px;
-      background: #eef3fb;
-      color: #4e6cb2;
-      text-decoration: none;
-      border-radius: 4px;
-    }
-    .pagination .current {
-      background: #d8e3ff;
-      font-weight: bold;
-    }
   </style>
 </head>
 <body>
@@ -112,18 +152,18 @@
 <nav>
   <h2>📁 메뉴</h2>
   <ul>
-    <li><a href="/resource/main">자료 목록</a></li>
-    <li><a href="#">자주 묻는 질문</a></li>
-    <li><a href="#">문의하기</a></li>
+    <li><a href="/resource/main">사용자 메인</a></li>
+    <li><a href="/resource/admin/main">관리자 메인</a></li>
   </ul>
 </nav>
 
 <main>
-  <h1>자료실</h1>
+  <h1>
+    자료실 목록
+  </h1>
 
-  <!-- 검색 폼 -->
-  <form class="search-form" th:action="@{/resource/main}" method="get">
-    <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요" />
+  <form class="search-form" th:action="@{/resource/list}" method="get">
+    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword}" />
     <button type="submit">검색</button>
   </form>
 
@@ -139,19 +179,25 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="resource, iterStat : ${resourcePage.content}">
+    <tr th:each="resource, iterStat : ${resourcePage.content}"
+        th:attr="data-url=@{'/resource/detail/' + ${resource.resourceId}}"
+        onclick="goToDetail(this)">
       <td th:text="${resourcePage.totalElements - (resourcePage.number * resourcePage.size) - iterStat.index}">1</td>
+      <td th:text="${resource.title}">제목</td>
+      <td th:text="${#strings.length(resource.content) > 30 ? #strings.substring(resource.content, 0, 30) + '...' : resource.content}">내용</td>
       <td>
-        <a th:href="@{'/resource/detail/' + ${resource.resourceId}}" th:text="${resource.title}">제목</a>
-      </td>
-      <td th:text="${resource.content.length() > 30} ? ${resource.content.substring(0,30)} + '...' : resource.content">내용</td>
-      <td>
-        <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}">
-          <a th:href="@{'/resource/download/' + ${resource.archive.substring(resource.archive.lastIndexOf('/') + 1)}}"
-             download
-             th:text="${resource.originalFileName}">파일 다운로드</a>
-        </span>
-        <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}">없음</span>
+          <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}" class="file-links">
+            <a href="#"
+               th:attr="data-filename=${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}"
+               onclick="handlePreviewClick(event)"
+               class="preview-link"
+               th:title="${resource.originalFileName}">파일 보기</a>
+            <span class="separator">|</span>
+            <a th:href="@{'/resource/download/file/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
+               th:title="${resource.originalFileName}"
+               onclick="event.stopPropagation();">다운로드</a>
+          </span>
+        <span th:if="${resource.archive == null or #strings.isEmpty(resource.archive)}">파일 없음</span>
       </td>
       <td>관리자</td>
       <td th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
@@ -160,16 +206,38 @@
   </table>
 
   <div class="pagination">
-    <a th:if="${resourcePage.hasPrevious()}" th:href="@{/resource/main(page=${resourcePage.number - 1}, keyword=${keyword})}">이전</a>
-
-    <span th:each="pageNum : ${#numbers.sequence(0, resourcePage.totalPages - 1)}"
-          th:classappend="${pageNum == resourcePage.number} ? 'current' : ''">
-      <a th:href="@{/resource/main(page=${pageNum}, keyword=${keyword})}" th:text="${pageNum + 1}">1</a>
+    <span th:if="${resourcePage.hasPrevious()}">
+      <a th:href="@{|/resource/list?page=${resourcePage.number - 1}&keyword=${keyword}|}">이전</a>
     </span>
-
-    <a th:if="${resourcePage.hasNext()}" th:href="@{/resource/main(page=${resourcePage.number + 1}, keyword=${keyword})}">다음</a>
+    <span th:each="i : ${#numbers.sequence(0, resourcePage.totalPages -1)}">
+      <a th:if="${i != resourcePage.number}" th:href="@{|/resource/list?page=${i}&keyword=${keyword}|}" th:text="${i + 1}">1</a>
+      <span th:if="${i == resourcePage.number}" class="current" th:text="${i + 1}">1</span>
+    </span>
+    <span th:if="${resourcePage.hasNext()}">
+      <a th:href="@{|/resource/list?page=${resourcePage.number + 1}&keyword=${keyword}|}">다음</a>
+    </span>
   </div>
 </main>
+
+<script>
+  function goToDetail(row) {
+    const url = row.getAttribute('data-url');
+    if (url) {
+      window.location.href = url;
+    }
+  }
+
+  function handlePreviewClick(event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const target = event.currentTarget;
+    const filename = target.getAttribute('data-filename');
+    if (filename) {
+      window.location.href = '/resource/preview/' + filename;
+    }
+  }
+</script>
 
 </body>
 </html>

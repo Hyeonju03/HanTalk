@@ -1,11 +1,15 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.SessionUtil;
+import com.example.hantalk.dto.LogDataDTO;
 import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.entity.Users;
+import com.example.hantalk.service.Learning_LogService;
+import com.example.hantalk.service.LogService;
 import com.example.hantalk.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,14 +17,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Controller
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    UserService service;
+
+    private final UserService service;
+    private final Learning_LogService Learning_LogService;
+    private final LogService logService;
 
     @GetMapping("/user/test")
     public String test() {
@@ -118,10 +126,12 @@ public class UserController {
             UsersDTO user = service.getUserOne(userId);
             newSession.setAttribute("userNo", user.getUserNo());
             newSession.setAttribute("role", "USER");
-            service.setLearningLog(userId, 0);
+
+            // 러닝로그 세팅하는 부분
+            Learning_LogService.setLearningLog(userId);
         }
         newSession.setMaxInactiveInterval(1800); //세션 시간제한 설정
-        return "userPage/UserTestPage";
+        return "redirect:/";
 
     }
 
@@ -153,8 +163,9 @@ public class UserController {
         String role = SessionUtil.getRole(session);
         if (service.isRoleOk(userid, sessionUserId, role)) {
             UsersDTO user = service.getUserOne(userId);
+            List<LogDataDTO> logList = logService.getLogToUser(user.getUserNo());
             model.addAttribute("user", user);
-
+            model.addAttribute("logList", logList);
             return "userPage/UserDetailPage";
         }
         return "RoleERROR";
@@ -238,18 +249,39 @@ public class UserController {
     // 입력값 검증 메서드
     // 중복체크 등 DB 관련은 서비스에서 따로 하고 여기선 입력값 검증
     private boolean isDTOOk(UsersDTO userdto) {
-        if (userdto == null) return false;
-
-        if (userdto.getUserId() == null || containForbidChar(userdto.getUserId(), "id")) return false;
-        if (userdto.getName() == null || containForbidChar(userdto.getName(), "name")) return false;
-        if (userdto.getPassword() == null || containForbidChar(userdto.getPassword(), "pw")) return false;
-        if (userdto.getEmail() == null || containForbidChar(userdto.getEmail(), "email")) return false;
-        if (containForbidChar(String.valueOf(userdto.getBirth()), "birth")) return false;
+        if (userdto == null) {
+            System.out.println("[검증 실패] DTO가 null입니다.");
+            return false;
+        }
+        if (userdto.getUserId() == null || containForbidChar(userdto.getUserId(), "id")) {
+            System.out.println("[검증 실패] 잘못된 ID: " + userdto.getUserId());
+            return false;
+        }
+        if (userdto.getName() == null || containForbidChar(userdto.getName(), "name")) {
+            System.out.println("[검증 실패] 잘못된 이름: " + userdto.getName());
+            return false;
+        }
+        if (userdto.getPassword() == null || containForbidChar(userdto.getPassword(), "pw")) {
+            System.out.println("[검증 실패] 잘못된 비밀번호");
+            return false;
+        }
+        if (userdto.getEmail() == null || containForbidChar(userdto.getEmail(), "email")) {
+            System.out.println("[검증 실패] 잘못된 이메일: " + userdto.getEmail());
+            return false;
+        }
+        if (containForbidChar(String.valueOf(userdto.getBirth()), "birth")) {
+            System.out.println("[검증 실패] 잘못된 생년월일: " + userdto.getBirth());
+            return false;
+        }
         if (userdto.getProfileImage() != null && !userdto.getProfileImage().isEmpty()) {
-            if (containForbidChar(userdto.getProfileImage(), "image")) return false;
+            if (containForbidChar(userdto.getProfileImage(), "image")) {
+                System.out.println("[검증 실패] 잘못된 프로필 이미지 경로: " + userdto.getProfileImage());
+                return false;
+            }
         }
         return true;
     }
+
 
     private boolean isLoginOk(String userid, String password) {
 
@@ -264,8 +296,8 @@ public class UserController {
         if (input == null) return true;
 
         final String FORBIDDEN_CHARS = "[\\s'\";\\\\%#&<>]";
-        final String ID_PATTERN = "^[a-zA-Z0-9_]{2,}$";
-        final String NAME_PATTERN = "^[가-힣a-zA-Z]{4,}$";
+        final String ID_PATTERN = "^[a-zA-Z0-9_]{3,}$";
+        final String NAME_PATTERN = "^[가-힣a-zA-Z]{2,}$";
         final String PW_PATTERN = "^[a-zA-Z0-9_!@#$%^&*]{3,}$";
         final String EMAIL_PATTERN = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         final String IMAGE_PATTERN = "^[a-zA-Z0-9._-]+\\.(jpg|jpeg|png)$";
@@ -283,8 +315,10 @@ public class UserController {
                 return input.matches(".*" + FORBIDDEN_CHARS + ".*") || !input.toLowerCase().matches(IMAGE_PATTERN);
             case "birth":
                 try {
-                    int birthYear = Integer.parseInt(input);
+                    String yearStr = input.length() >= 4 ? input.substring(0, 4) : input;
+                    int birthYear = Integer.parseInt(yearStr);
                     int currentYear = java.time.LocalDate.now().getYear();
+
                     return birthYear < 1900 || birthYear > currentYear;
                 } catch (NumberFormatException e) {
                     return true;
