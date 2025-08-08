@@ -28,6 +28,9 @@ public class Item {
     @Column(name="item_image", length = 200)
     private String itemImage; // 상품이미지 (이미지 경로)
 
+    @Column(name="item_type", length=50)
+    private String itemType; // 예: "frame", "profile", "background" 등
+
     private int price; // 가격
 
     @CreatedDate
@@ -38,9 +41,11 @@ public class Item {
     @Column(name="update_date")
     private LocalDateTime updateDate; // 수정일
 
+
     /// ////////////////////////////////////////
 
     @OneToMany(mappedBy = "item", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
     @Column(name="user_items_list")
     private List<User_Items> userItemsList;
+
 }

@@ -13,6 +13,7 @@ public class HantalkApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HantalkApplication.class, args);
 		System.out.println("실행 성공");
+
 	}
 
 }
