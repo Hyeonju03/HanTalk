@@ -84,6 +84,7 @@ public class ItemShopService {
         return true;
     }
 
+
     @Transactional
     public void givePointToUser(Users user, int amount) {
         user.setPoint(user.getPoint() + amount);

@@ -18,6 +18,7 @@ public class ItemDTO {
     private int price; // 가격
     private LocalDateTime createDate; // 등록일
     private LocalDateTime updateDate; // 수정일
+    private String itemType; //아이템 타입 (frame, profile, background 등)
 
     private List<User_Items> userItemsList;
 }

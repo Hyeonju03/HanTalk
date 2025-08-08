@@ -1,11 +1,14 @@
 package com.example.hantalk.controller;
 
+import com.example.hantalk.dto.ProfileUpdateRequestDTO;
 import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.entity.User_Items;
 import com.example.hantalk.service.Learning_LogService;
 import com.example.hantalk.service.MyPageService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -107,23 +110,27 @@ public class MyPageController {
         return "redirect:/user/login"; // 로그인페이지로
     }
 
-    @PostMapping("/apply-profile")
-    public String applyProfileImage(@RequestParam("itemId") int itemId, HttpSession session) {
+    @PostMapping("/apply-setting")
+    @ResponseBody
+    public ResponseEntity<?> applyProfileAndFrame(@RequestBody ProfileUpdateRequestDTO request, HttpSession session) {
         Integer userNo = (Integer) session.getAttribute("userNo");
-        if (userNo == null) return "redirect:/user/login";
+        if (userNo == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-        myPageService.applyProfileImage(userNo, itemId);
-        return "redirect:/user/view";
+        // 프로필 이미지가 있다면 적용
+        if (request.getProfileImage() != null) {
+            myPageService.applyProfileImageByImageName(userNo, request.getProfileImage());
+        }
+
+        // 프레임 이미지가 있다면 적용
+        if (request.getProfileFrame() != null) {
+            myPageService.applyProfileFrameByImageName(userNo, request.getProfileFrame());
+        }
+
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/apply-frame")
-    public String applyProfileFrame(@RequestParam("itemId") int itemId, HttpSession session) {
-        Integer userNo = (Integer) session.getAttribute("userNo");
-        if (userNo == null) return "redirect:/user/login";
-
-        myPageService.applyProfileFrame(userNo, itemId);
-        return "redirect:/user/view";
-    }
 
     @GetMapping("/items")
     public String userItems(Model model, HttpSession session) {
@@ -131,7 +138,22 @@ public class MyPageController {
         if (userNo == null) return "redirect:/user/login";
 
         List<User_Items> userItems = myPageService.getUserItems(userNo);
-        model.addAttribute("userItems", userItems);
+
+        List<String> profileImages = userItems.stream()
+                .filter(ui -> "profile".equals(ui.getItem().getItemType()))
+                .map(ui -> ui.getItem().getItemImage())
+                .toList();
+
+        List<String> frameImages = userItems.stream()
+                .filter(ui -> "frame".equals(ui.getItem().getItemType()))
+                .map(ui -> ui.getItem().getItemImage())
+                .toList();
+
+        model.addAttribute("profileImages", profileImages);
+        model.addAttribute("frameImages", frameImages);
+        model.addAttribute("userItems", userItems); // 혹시 필요하면 유지
+
         return "user/items";
     }
+
 }

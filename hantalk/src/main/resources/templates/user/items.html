@@ -7,58 +7,90 @@
 </head>
 <body class="bg-gray-100 min-h-screen py-10">
 <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-md">
-  <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">구매한 아이템 목록</h1>
 
-  <div th:if="${userItems != null and !#lists.isEmpty(userItems)}">
-    <ul class="space-y-4">
-      <li th:each="userItem : ${userItems}" class="flex items-center space-x-4 border-b pb-4">
-        <img th:src="@{'/images/' + ${userItem.item.itemImage}}" alt="아이템 이미지" class="w-20 h-20 object-cover rounded">
-        <div class="flex-1">
-          <p class="font-semibold text-gray-800" th:text="${userItem.item.itemName}">아이템 이름</p>
-          <!-- 프로필 이미지 또는 프레임 아이템 구분 -->
-          <div class="flex-1">
-            <p class="font-semibold text-gray-800" th:text="${userItem.item.itemName}">아이템 이름</p>
+  <h2 class="text-2xl font-bold mb-4">구매한 아이템</h2>
 
-            <!-- 프로필 이미지 설정 버튼 -->
-            <form th:if="${!userItem.item.itemImage.contains('frame')}"
-                  th:action="@{/user/apply-profile}" method="post" class="inline-block mt-2">
-              <input type="hidden" name="itemId" th:value="${userItem.item.itemId}">
-              <button type="submit"
-                      class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded transition">
-                프로필 이미지로 설정
-              </button>
-              <span th:if="${userItem.equipped}" class="text-green-600 font-semibold ml-2">(현재 프로필)</span>
-            </form>
-
-            <!-- 프레임 설정 버튼 -->
-            <form th:if="${userItem.item.itemImage.contains('frame')}"
-                  th:action="@{/user/apply-frame}" method="post" class="inline-block mt-2">
-              <input type="hidden" name="itemId" th:value="${userItem.item.itemId}">
-              <button type="submit"
-                      class="bg-purple-500 hover:bg-purple-600 text-white text-sm font-bold py-2 px-4 rounded transition">
-                프레임으로 설정
-              </button>
-              <span th:if="${user.profileFrame == userItem.item.itemImage}"
-                    class="text-purple-600 font-semibold ml-2">(현재 프레임)</span>
-            </form>
-          </div>
-
-          <span th:if="${userItem.equipped}" class="text-green-600 font-semibold ml-2">(현재 프로필)</span>
-        </div>
-      </li>
-    </ul>
+  <!-- 프로필 이미지 목록 -->
+  <h3 class="text-xl font-semibold mt-6 mb-2">프로필 이미지 선택</h3>
+  <div class="grid grid-cols-4 gap-2">
+    <img th:each="img : ${profileImages}"
+         th:src="@{'/images/' + ${img}}"
+         th:attr="data-img=${img}"
+         class="cursor-pointer border rounded-full hover:ring w-20 h-20 object-cover"
+         onclick="selectProfileImage(this)">
   </div>
 
-  <div th:if="${userItems == null or #lists.isEmpty(userItems)}" class="text-center text-gray-600 mt-6">
-    <p>보유한 아이템이 없습니다.</p>
+  <!-- 프레임 이미지 목록 -->
+  <h3 class="text-xl font-semibold mt-6 mb-2">프레임 이미지 선택</h3>
+  <div class="grid grid-cols-4 gap-2">
+    <img th:each="frame : ${frameImages}"
+         th:src="@{'/frames/' + ${frame}}"
+         th:attr="data-frame=${frame}"
+         class="cursor-pointer border hover:ring w-20 h-20 object-cover"
+         onclick="selectFrameImage(this)">
   </div>
 
-  <div class="text-center mt-8">
-    <a href="/user/view"
-       class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded transition duration-150">
-      마이페이지로 돌아가기
-    </a>
+  <!-- 미리보기 -->
+  <h3 class="text-xl font-semibold mt-6 mb-2">미리보기</h3>
+  <div class="relative w-28 h-28 mx-auto mb-4">
+    <img id="preview-profile" class="rounded-full object-cover absolute top-1.5 left-1.5 w-[85%] h-[85%] z-0"/>
+    <img id="preview-frame" class="absolute top-0 left-0 w-full h-full pointer-events-none z-10"/>
   </div>
+
+  <!-- 설정 버튼 -->
+  <button onclick="confirmSetting()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+    설정하기
+  </button>
+
+  <!-- 뒤로가기 버튼 -->
+  <button onclick="history.back()"
+          class="mt-4 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded">
+    뒤로가기
+  </button>
+
+  <script>
+    let selectedProfileImage = null;
+    let selectedFrameImage = null;
+
+    function selectProfileImage(el) {
+      selectedProfileImage = el.getAttribute("data-img");
+      document.getElementById("preview-profile").src = "/images/" + selectedProfileImage;
+    }
+
+    function selectFrameImage(el) {
+      selectedFrameImage = el.getAttribute("data-frame");
+      document.getElementById("preview-frame").src = "/frames/" + selectedFrameImage;
+    }
+
+    function confirmSetting() {
+      if (!selectedProfileImage && !selectedFrameImage) {
+        alert("프로필 또는 프레임 이미지를 선택해주세요.");
+        return;
+      }
+
+      const confirmed = confirm("이대로 설정하시겠습니까?");
+      if (confirmed) {
+        fetch("/user/apply-setting", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            profileImage: selectedProfileImage,
+            profileFrame: selectedFrameImage
+          })
+        }).then(res => {
+          if (res.ok) {
+            alert("프로필이 설정되었습니다!");
+            location.href = "/user/view"; // 마이페이지로 이동
+          } else {
+            alert("설정 실패");
+          }
+        });
+      }
+    }
+  </script>
+
 </div>
 </body>
 </html>

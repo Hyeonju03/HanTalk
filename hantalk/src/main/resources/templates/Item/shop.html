@@ -17,8 +17,9 @@
     </a>
 </p>
 
-<!-- 보유 포인트 표시 -->
-<p>보유 포인트: <span th:text="${point}"></span> pt</p>
+<!-- 포인트 or 관리자 여부 -->
+<p th:if="${isAdmin}">관리자입니다. 구매는 불가능합니다.</p>
+<p th:unless="${isAdmin}">보유 포인트: <span th:text="${point}"></span> pt</p>
 
 <!-- 메시지 -->
 <div th:if="${message}" style="color:green;">[[${message}]]</div>
@@ -38,16 +39,25 @@
     <tbody>
     <tr th:each="item : ${items}">
         <td>
-            <img th:src="@{'/images/' + ${item.itemImage}}" alt="아이템 이미지" width="80" height="80">
+            <img th:if="${item.itemType == 'frame'}"
+                 th:src="@{'/frames/' + ${item.itemImage}}"
+                 alt="아이템 이미지" width="80" height="80" />
+            <img th:unless="${item.itemType == 'frame'}"
+                 th:src="@{'/images/' + ${item.itemImage}}"
+                 alt="아이템 이미지" width="80" height="80" />
         </td>
         <td th:text="${item.itemName}">이름</td>
         <td th:text="${item.price}">0</td>
         <td th:text="${item.itemDescription}">설명</td>
         <td>
-            <form th:action="@{/item/purchase}" method="post">
-                <input type="hidden" name="itemId" th:value="${item.itemId}" />
-                <button type="submit">구매</button>
-            </form>
+            <!-- 관리자일 경우 구매 버튼 숨김 -->
+            <div th:unless="${isAdmin}">
+                <form th:action="@{/item/purchase}" method="post">
+                    <input type="hidden" name="itemId" th:value="${item.itemId}" />
+                    <button type="submit">구매</button>
+                </form>
+            </div>
+            <span th:if="${isAdmin}">-</span>
         </td>
     </tr>
     </tbody>
