@@ -131,7 +131,7 @@ public class UserController {
             Learning_LogService.setLearningLog(userId);
         }
         newSession.setMaxInactiveInterval(1800); //세션 시간제한 설정
-        return "userPage/UserTestPage";
+        return "redirect:/";
 
     }
 
