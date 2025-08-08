@@ -170,8 +170,8 @@
           const nextButton = document.getElementById('next-problem-button');
           const sortedContainer = document.getElementById('sorted-container');
 
-      // 오답노트 저장 요청 보내기
-      if (!data.isCorrect) {
+      // 3번째 오답일 때만 오답노트 저장
+          if (!data.isCorrect && data.message.includes("3번 틀렸")) {
           fetch('/study/check', {
               method: 'POST',
               headers: {

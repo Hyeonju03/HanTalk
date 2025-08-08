@@ -12,14 +12,9 @@ import java.util.Optional;
 @Repository
 public interface VocaRepository extends JpaRepository<Voca, Integer> {
 
-    Optional<Voca> findByVocabulary (String Vocabulary);
-
     @Query
     (value = "SELECT * FROM voca v WHERE v.voca_id NOT IN :excludeIds ORDER BY RAND() LIMIT :count", nativeQuery = true)
     List<Voca> findRandomVocas(@Param("excludeIds") List<Integer> excludeIds,
                                @Param("excludeSize") int excludeSize,
                                @Param("count") int count);  // 랜덤 추출 (중복 방지)
-
-    @Query(value = "SELECT * FROM voca ORDER BY RAND() LIMIT :count", nativeQuery = true)
-    List<Voca> findByRandomVocas(@Param("count") int count);
 }

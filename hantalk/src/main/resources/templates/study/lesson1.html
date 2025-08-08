@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>단어 맞추기</title>
-
     <style>
         #feedback-icon {
             position: fixed;
@@ -16,13 +15,8 @@
             z-index: 100;
         }
 
-        .correct {
-            color: green;
-        }
-
-        .incorrect {
-            color: red;
-        }
+        .correct { color: green; }
+        .incorrect { color: red; }
 
         #answer {
             font-size: 18px;
@@ -50,77 +44,65 @@
             margin-top: 120px;
             text-align: center;
         }
+
+        #bottom-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
     </style>
 
     <script th:inline="javascript">
         let problems = /*[[${problems}]]*/ [];
-        let currentIndex = 0;
         let answered = false;
-        let problemCount = 0;
 
         window.onload = function () {
-            showProblem(currentIndex);
+            if (problems.length > 0) {
+                showProblem(problems[0]);
+            } else {
+                document.getElementById('description').textContent = "";
+                document.getElementById('completion-message').textContent = "더 이상 풀 문제는 없습니다.";
+            }
         };
 
-        function showProblem(index) {
-            const problem = problems[index];
+        function showProblem(problem) {
             document.getElementById('description').textContent = problem.description;
             document.getElementById('answer').value = "";
             document.getElementById('result').textContent = "";
             document.getElementById('feedback-icon').style.display = 'none';
-            document.getElementById('completion-message').textContent = "";
             answered = false;
         }
 
         function submitAnswer() {
             if (answered) return;
 
-            const problem = problems[currentIndex];
+            const problem = problems[0];
             const userAnswer = document.getElementById('answer').value.trim();
             const correctAnswer = problem.vocabulary;
-            const targetId = problem.vocaId;
+            const vocaId = problem.vocaId;
+            const isCorrect = userAnswer === correctAnswer;
 
-            if (userAnswer === correctAnswer) {
-                document.getElementById('result').textContent = `정답! (${correctAnswer})`;
-                showFeedback(true);
-            } else {
-                document.getElementById('result').textContent = `오답! 정답은 ${correctAnswer}`;
-                showFeedback(false);
-            }
+            // 정답 피드백 표시
+            document.getElementById('result').textContent = isCorrect
+                ? `정답! (${correctAnswer})`
+                : `오답! 정답은 ${correctAnswer}`;
+            showFeedback(isCorrect);
 
-            // 오답노트 저장
-            fetch('/study/check', {
+            // 정답 체크 API 호출 (오답노트 저장 + 로그 기록)
+            fetch('/study/lesson1/check', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
-                    type: 'word',
-                    targetId: targetId,
+                    vocaId: vocaId,
                     answer: userAnswer,
                     correctAnswer: correctAnswer
                 })
-            }).then(res => res.json())
-              .then(isCorrect => console.log("정답 여부:", isCorrect))
-              .catch(err => console.error("오답노트 처리 오류:", err));
+            })
+            .then(res => res.json())
+            .then(result => console.log("정답 여부:", result))
+            .catch(err => console.error("정답 체크 오류:", err));
 
             answered = true;
-            problemCount++;
-
-            // 5문제 푼 뒤에는 완료 메시지와 이어하기 버튼 표시
-            if (problemCount === 5) {
-                document.getElementById('completion-message').textContent = "학습이 완료되었습니다!";
-                document.getElementById('restartBtn').style.display = 'inline-block';
-
-                // 학습 로그 저장
-                fetch('/study/complete1', { method: 'POST' })
-                    .then(res => res.text())
-                    .then(result => {
-                        if (result === 'success') {
-                            console.log("학습 로그 저장 성공");
-                        } else {
-                            console.log("학습 로그 저장 실패");
-                        }
-                    });
-            }
         }
 
         function showFeedback(isCorrect) {
@@ -135,11 +117,7 @@
                 alert("먼저 정답을 제출하세요.");
                 return;
             }
-
-            if (currentIndex < problems.length - 1) {
-                currentIndex++;
-                showProblem(currentIndex);
-            }
+            location.reload(); // 새로운 문제 받기
         }
 
         function quitLesson() {
@@ -148,24 +126,6 @@
             } else {
                 alert("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.");
             }
-        }
-
-        function restartLesson() {
-            fetch('/study/api/lesson1-random')
-                .then(res => res.json())
-                .then(data => {
-                    problems = data;
-                    currentIndex = 0;
-                    problemCount = 0;
-                    answered = false;
-                    document.getElementById('restartBtn').style.display = 'none';
-                    document.getElementById('completion-message').textContent = '';
-                    showProblem(currentIndex);
-                })
-                .catch(err => {
-                    console.error('문제 재로딩 실패:', err);
-                    alert('새로운 문제를 불러오지 못했습니다.');
-                });
         }
     </script>
 </head>
@@ -176,15 +136,15 @@
 <input type="text" id="answer" placeholder="정답 입력">
 <br>
 <button onclick="submitAnswer()">제출</button>
-<button id="nextBtn" onclick="nextProblem()">다음으로</button>
+<button onclick="nextProblem()">다음으로</button>
 
 <p id="result"></p>
 <p id="completion-message"></p>
 <div id="feedback-icon"></div>
 
-<div style="position: fixed; bottom: 20px; right: 20px;">
-    <button id="quitBtn" onclick="quitLesson()">그만하기</button>
-    <button id="restartBtn" onclick="restartLesson()" style="display: none;">이어하기</button>
+<!-- ✅ 하단 고정 그만하기 버튼 -->
+<div id="bottom-buttons">
+    <button onclick="quitLesson()">그만하기</button>
 </div>
 </body>
 </html>
