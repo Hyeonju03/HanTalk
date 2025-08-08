@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/css/**", "/js/**", "/images/**","/user/test","/user/findIDPW");
+                .excludePathPatterns("/css/**", "/js/**", "/images/**","/user/test","/user/findIDPW", "/");
         registry.addInterceptor(adminInterceptor)
                 .addPathPatterns("/admin/**","/**/admin/**", "/**/admin")
                 .excludePathPatterns("/css/**", "/js/**", "/images/**");
