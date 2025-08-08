@@ -1,5 +1,6 @@
 package com.example.hantalk.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import com.example.hantalk.config.interceptor.AdminInterceptor;
 import com.example.hantalk.config.interceptor.UserInterceptor;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,10 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/images/");
 
+        String uploadPath = System.getProperty("user.dir") + "/uploads/videos/";
+        registry.addResourceHandler("/videos/**")
+                .addResourceLocations("file:" + uploadPath);
+      
         // 프레임 이미지 경로
         registry.addResourceHandler("/frames/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/frames/");

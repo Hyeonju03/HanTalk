@@ -35,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# 폴더는 유지하고, 내부 파일만 무시
+*.mp4
+/uploads
+uploads/videos/*
+!uploads/videos/.gitkeep

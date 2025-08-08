@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>영상 목록 (관리자)</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>영상 목록</h1>
+<!-- ➕ 새 영상 등록 -->
+<a th:href="@{/admin/video/upload}">➕ 새 영상 등록</a>
+<br>
+
+<!-- 🔍 검색 폼 -->
+<form method="get" th:action="@{/admin/video/list}" id="searchForm">
+  <select name="searchType" id="searchType">
+    <option value="title" th:selected="${searchType} == 'title'">제목</option>
+    <option value="content" th:selected="${searchType} == 'content'">내용</option>
+    <option value="filename" th:selected="${searchType} == 'filename'">파일명</option>
+    <option value="all" th:selected="${searchType} == 'all'">제목 + 내용 + 파일명</option>
+  </select>
+  <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" id="keyword"/>
+  <button type="submit">검색</button>
+  <button type="button" onclick="resetSearch()">초기화</button>
+</form>
+<br>
+
+<!-- 검색 결과 없을 때 -->
+<p th:if="${#lists.isEmpty(videoPage.content)}">
+  <span th:if="${not #strings.isEmpty(param.keyword)}">
+    "<span th:text="${param.keyword}"></span>"에 대한 검색 결과가 없습니다.
+  </span>
+  <span th:unless="${not #strings.isEmpty(param.keyword)}">
+    등록된 영상이 없습니다.
+  </span>
+</p>
+
+<!-- 결과가 있을 때 테이블 출력 -->
+<table border="1" th:if="${not #lists.isEmpty(videoPage.content)}">
+  <thead>
+  <tr>
+    <th>번호</th>
+    <th>제목</th>
+    <th>설명</th>
+    <th>파일명</th>
+    <th>등록일</th>
+    <th>수정일</th>
+    <th>관리</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="video, stat : ${videoPage.content}"
+      th:id="'row-' + ${video.videoId}"
+      th:data-id="${video.videoId}"
+      class="clickable-row"
+      style="cursor:pointer;">
+    <td th:text="${videoPage.number * videoPage.size + stat.index + 1}">1</td>
+    <td th:text="${video.title}">제목</td>
+    <td th:text="${video.content}">설명</td>
+    <td th:text="${video.videoName}">파일명</td>
+    <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</td>
+    <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}">수정일</td>
+    <td>
+      <a th:href="@{/admin/video/edit/{id}(id=${video.videoId}, page=${videoPage.number})}"
+         onclick="event.stopPropagation();">수정</a>
+      <button type="button"
+              th:attr="data-id=${video.videoId}"
+              onclick="event.stopPropagation(); deleteVideo(this);">삭제</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<div class="pagination" th:if="${videoPage.totalPages > 1}">
+  <!-- 이전 버튼 -->
+  <a th:if="${videoPage.number > 0}"
+     th:href="@{'/' + ${role} + '/video/list'(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}">
+    이전
+  </a>
+  <span th:unless="${videoPage.number > 0}">이전</span>
+
+  <!-- 페이지 번호 -->
+  <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
+    <a th:href="@{'/' + ${role} + '/video/list'(page=${i}, searchType=${searchType}, keyword=${keyword})}"
+       th:classappend="${i == videoPage.number} ? 'active' : ''"
+       th:text="${i + 1}">1</a>
+  </span>
+
+  <!-- 다음 버튼 -->
+  <a th:if="${videoPage.number < videoPage.totalPages - 1}"
+     th:href="@{'/' + ${role} + '/video/list'(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}">
+    다음
+  </a>
+  <span th:unless="${videoPage.number < videoPage.totalPages - 1}">다음</span>
+</div>
+
+
+
+<!-- ✅ Ajax 삭제용 스크립트 -->
+<script>
+  function resetSearch() {
+     document.getElementById('searchType').value = 'title';  // 기본 검색조건
+     document.getElementById('keyword').value = '';
+     document.getElementById('searchForm').submit(); // 초기화 후 바로 재검색
+   }
+
+  function deleteVideo(button) {
+     const videoId = $(button).data("id");
+     if (confirm("정말 삭제하시겠습니까?")) {
+         $.ajax({
+             url: "/admin/video/" + videoId,
+             type: "DELETE",
+             success: function (result) {
+                 alert("삭제되었습니다.");
+                 $("#row-" + videoId).remove(); // DOM에서 해당 행 제거
+             },
+             error: function (xhr) {
+                 const message = xhr.responseText || "삭제 중 오류가 발생했습니다.";
+                 alert(message);
+             }
+         });
+     }
+  }
+
+  // tr 클릭 시 상세 페이지로 이동 (수정, 삭제 클릭 제외)
+  $(document).ready(function() {
+   $(".clickable-row").click(function(e) {
+     // 클릭한 태그가 수정/삭제/아이콘이면 이동 막기
+     if ($(e.target).closest("a, button").length === 0) {
+       const videoId = $(this).data("id");
+       if (videoId) {
+         window.location.href = "/admin/video/view/" + videoId;
+       }
+     }
+   });
+  });
+
+
+</script>
+</body>
+</html>
