@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>단어 목록</title>
+</head>
+<body>
+<h1>단어 목록</h1>
+<table>
+  <thead>
+  <tr>
+    <th>순번</th>
+    <th>단어</th>
+    <th>뜻</th>
+    <th>등록일</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:if="${dtoList == null || dtoList.size() <= 0}">
+    <td colspan="4">단어 데이터가 존재하지 않습니다.</td>
+  </tr>
+  <tr th:each="voca, loop : ${dtoList}">
+    <td th:text="${loop.count}"></td>
+    <td th:text="${voca.vocabulary}"></td>
+    <td th:text="${voca.description}"></td>
+    <td th:text="${#temporals.format(voca.createDate, 'yyyy-MM-dd')}"></td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

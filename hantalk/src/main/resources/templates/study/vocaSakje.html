@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>단어 삭제</title>
+</head>
+<body>
+<h1>단어 삭제</h1>
+<form th:action="@{/study/vocaDeleteProc}" method="post">
+  <!-- 삭제할 단어 ID -->
+  <input type="hidden" name="vocaId" th:value="${dto.vocaId}">
+
+  <p><strong>단어:</strong> <span th:text="${dto.vocabulary}"></span></p>
+  <p><strong>의미:</strong> <span th:text="${dto.description}"></span></p>
+  <p><strong>등록일:</strong> <span th:text="${#temporals.format(dto.createDate, 'yyyy-MM-dd')}"></span></p>
+
+  <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+  <a href="/study/vocaList/admin">취소</a>
+</form>
+</body>
+</html>

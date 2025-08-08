@@ -1,8 +1,8 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.VocaDTO;
+import com.example.hantalk.service.Inc_NoteService;
 import com.example.hantalk.service.Learning_LogService;
-import com.example.hantalk.service.UserService;
 import com.example.hantalk.service.VocaService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -18,36 +18,83 @@ import java.util.*;
 public class VocaController {
 
     private final VocaService vocaService;
-    private final UserService userService;
     private final Learning_LogService learningLogService;
+    private final Inc_NoteService incNoteService;
 
-    // 학습 공간 페잊지
+    String folderName = "study";
+
+    // 학습 공간 페이지
     @GetMapping("/main")
     public String studyMain() {
         return "study/main";
     }
 
+    // 문장 목록
+    @GetMapping("/vocaList")
+    public String vocaList(Model model) {
+        List<VocaDTO> dtoList = vocaService.getSelectAll();
+        model.addAttribute("dtoList", dtoList);
+        return folderName + "/vocaList";
+    }
+
+    @GetMapping("/vocaList/admin")
+    public String vocaAdminList(Model model) {
+        List<VocaDTO> dtoList = vocaService.getSelectAll();
+        model.addAttribute("dtoList", dtoList);
+        return folderName + "/vocaAdmin";
+    }
+
+    @GetMapping("/vocaInsert")
+    public String vocaInsert() {
+        return folderName + "/vocaChuga";
+    }
+
+    @PostMapping("/vocaInsertProc")
+    public String vocaInsertProc(VocaDTO vocaDTO) {
+        vocaService.setInsert(vocaDTO);
+        return "redirect:/study/vocaList/admin";
+    }
+
+    @GetMapping("/vocaUpdate/{id}")
+    public String vocaUpdate(Model model, @PathVariable("id") int id) {
+        VocaDTO searchDTO = new VocaDTO();
+        searchDTO.setVocaId(id);
+        VocaDTO dto = vocaService.getSelectOne(searchDTO);
+        model.addAttribute("dto", dto);
+        return folderName + "/vocaSujung";
+    }
+
+    @PostMapping("/vocaUpdateProc")
+    public String vocaUpdateProc(VocaDTO vocaDTO) {
+        vocaService.setUpdate(vocaDTO);
+        return "redirect:/study/vocaList/admin";
+    }
+
+    @GetMapping("/vocaDelete/{id}")
+    public String vocaDelete(@PathVariable int id) {
+        VocaDTO searchDTO = new VocaDTO();
+        searchDTO.setVocaId(id);
+        vocaService.setDelete(searchDTO);
+        return "redirect:/study/vocaList/admin";
+    }
+
     // 학습 1번 (단어 맞추기)
     @GetMapping("/lesson1")
-    public String getFillBlank(@RequestParam(defaultValue = "5") int count, HttpSession session, Model model) {
-        // 이미 푼 단어 ID 세션에서 가져오기
+    public String getFillBlank(HttpSession session, Model model) {
+
         List<Integer> solvedIds = (List<Integer>) session.getAttribute("solvedIds_lesson1");
         if (solvedIds == null) solvedIds = new ArrayList<>();
 
-        // 단어 5개 뽑기
-        List<VocaDTO> vocaDTOList = vocaService.getFillBlank(solvedIds, count);
+        List<VocaDTO> vocaDTOList = vocaService.getFillBlank(solvedIds, 1);
 
-        // Map으로 변환해서 필요한 값만 넘김
         List<Map<String, Object>> problems = new ArrayList<>();
         for (VocaDTO dto : vocaDTOList) {
             Map<String, Object> map = new HashMap<>();
             map.put("vocaId", dto.getVocaId());
             map.put("vocabulary", dto.getVocabulary());
             map.put("description", dto.getDescription());
-            // createDate는 필요 없으면 안 넣어도 됨
             problems.add(map);
 
-            // solvedIds 업데이트
             solvedIds.add(dto.getVocaId());
         }
 
@@ -57,33 +104,39 @@ public class VocaController {
         return "study/lesson1";
     }
 
-    @GetMapping("/api/lesson1-random")
+    //  학습 1번 처리 (정답 체크 + 오답노트 + 로그 기록)
+    @PostMapping("/lesson1/check")
     @ResponseBody
-    public List<VocaDTO> getRandomLesson1Problems() {
-        return vocaService.getCompletelyRandomFillBlank(5);  // 💥 기존 로직에 영향 없음
-    }
+    public boolean checkLesson1Answer(@RequestParam int vocaId,
+                                      @RequestParam String answer,
+                                      @RequestParam String correctAnswer,
+                                      HttpSession session) {
 
-    // 학습 1번 완료 처리
-    @PostMapping("/complete1")
-    @ResponseBody
-    public String completeLesson1(HttpSession session) {
         String userId = (String) session.getAttribute("userId");
-        System.out.println("### completeLesson1 호출: userId=" + userId);
+        Integer userNo = (Integer) session.getAttribute("userNo");
+        boolean isCorrect = answer.equals(correctAnswer);
 
         if (userId != null) {
+            if (isCorrect) {
+                incNoteService.deleteIncorrectNote(userNo, vocaId, null);
+            } else {
+                incNoteService.saveIncorrectNote(userNo, vocaId, null);
+            }
+
             learningLogService.updateLearning_Log(userId, 1);
-            return "success";
         }
-        return "fail";
+
+        return isCorrect;
     }
 
     // 학습 3번 (4지선다 객관식)
     @GetMapping("/lesson3")
-    public String getMultipleChoice(@RequestParam(defaultValue = "5") int count, HttpSession session, Model model) {
+    public String getMultipleChoice(HttpSession session, Model model) {
         List<Integer> solvedIds = (List<Integer>) session.getAttribute("solvedIds_lesson3");
         if (solvedIds == null) solvedIds = new ArrayList<>();
 
-        List<Map<String, Object>> questions = vocaService.getMultipleChoice(solvedIds, count);
+        // 중복 제거된 문제 1개 가져오기
+        List<Map<String, Object>> questions = vocaService.getMultipleChoice(solvedIds, 1);
 
         for (Map<String, Object> question : questions) {
             Integer vocaId = (Integer) question.get("vocaId");
@@ -91,37 +144,41 @@ public class VocaController {
         }
 
         session.setAttribute("solvedIds_lesson3", solvedIds);
-
         model.addAttribute("questions", questions);
+
         return "study/lesson3";
     }
 
-    @GetMapping("/api/lesson3-random")
+    //  학습 3번 처리 (정답 체크 + 오답노트 + 로그 기록)
+    @PostMapping("/lesson3/check")
     @ResponseBody
-    public List<Map<String, Object>> getLesson3Problems() {
-        return vocaService.getMultipleChoice(Collections.emptyList(), 5);
-    }
+    public boolean checkLesson3Answer(@RequestParam int vocaId,
+                                      @RequestParam String answer,
+                                      @RequestParam String correctAnswer,
+                                      HttpSession session) {
 
-
-    // 학습 3번 완료 처리
-    @PostMapping("/complete3")
-    @ResponseBody
-    public String completeLesson3(HttpSession session) {
         String userId = (String) session.getAttribute("userId");
-        System.out.println("### completeLesson3 호출: userId=" + userId);
+        Integer userNo = (Integer) session.getAttribute("userNo");
+        boolean isCorrect = answer.equals(correctAnswer);
 
-        if (userId != null) {
+        if (userId != null && userNo != null) {
+            if (isCorrect) {
+                incNoteService.deleteIncorrectNote(userNo, vocaId, null);
+            } else {
+                incNoteService.saveIncorrectNote(userNo, vocaId, null);
+            }
+
             learningLogService.updateLearning_Log(userId, 3);
-            return "success";
         }
-        return "fail";
+
+        return isCorrect;
     }
 
+    // 이전에 푼 문제 목록을 초기화
     @GetMapping("/reset")
     public String resetSession(HttpSession session) {
         session.removeAttribute("solvedIds_lesson1");
         session.removeAttribute("solvedIds_lesson3");
         return "redirect:/study/lesson1";
     }
-
 }
