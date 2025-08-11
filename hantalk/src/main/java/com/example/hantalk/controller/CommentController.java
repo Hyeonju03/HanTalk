@@ -1,8 +1,10 @@
 package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.CommentDTO;
+import com.example.hantalk.dto.PostDTO;
 import com.example.hantalk.entity.Users;
 import com.example.hantalk.service.CommentService;
+import com.example.hantalk.service.PostService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,21 +19,38 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
+    private final PostService postService;
 
     //댓글 작성
     @PostMapping("/chuga")
     public String chuga(@ModelAttribute CommentDTO commentDTO, HttpSession session) {
         Integer userNo = (Integer) session.getAttribute("userNo");
-        if (userNo == null) {
+        Object roleObj = session.getAttribute("role");
+        String role = (roleObj != null) ? roleObj.toString() : "";
+
+        if (userNo == null && !"ADMIN".equalsIgnoreCase(role)) {
             return "redirect:/user/login";
         }
+
+        PostDTO postDTO = postService.getSelectOneById(Math.toIntExact(commentDTO.getPostId()));
+
+        if (postDTO.getCategoryId() == 3 && !"ADMIN".equalsIgnoreCase(role)) {
+            return "redirect:/post/view/" + commentDTO.getPostId() + "?error=not_authorized";
+        }
+
         Users user = new Users();
-        user.setUserNo(userNo);
+        if(userNo != null) {
+            user.setUserNo(userNo);
+        } else {
+
+            user.setUserNo(1);
+        }
         commentDTO.setUsers(user);
 
         commentService.save(commentDTO);
-        return "redirect:/post/view/" + commentDTO.getPost().getPostId();
+        return "redirect:/post/view/" + commentDTO.getPostId();
     }
+
 
     // 댓글 수정
     @GetMapping("/sujung")
@@ -45,7 +64,7 @@ public class CommentController {
     @PostMapping("/sujungProc")
     public String sujungProc(@ModelAttribute CommentDTO commentDTO) {
         commentService.setUpdate(commentDTO);
-        return "redirect:/post/view/" + commentDTO.getPost().getPostId();
+        return "redirect:/post/view/" + commentDTO.getPostId();
     }
 
     // 댓글 삭제

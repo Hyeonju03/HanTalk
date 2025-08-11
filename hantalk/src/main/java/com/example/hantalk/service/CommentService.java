@@ -47,7 +47,7 @@ public class CommentService {
         CommentDTO dto = new CommentDTO();
         dto.setCommentId(comment.getCommentId());
         dto.setContent(comment.getContent());
-        dto.setPostId(comment.getPost().getPostId());
+        dto.setPostId((long) comment.getPost().getPostId());
         return dto;
     }
 
@@ -55,8 +55,9 @@ public class CommentService {
         Comment comment = new Comment();
         comment.setContent(commentDTO.getContent());
 
-        Post post = postRepository.findById(commentDTO.getPost().getPostId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + commentDTO.getPost().getPostId()));
+        // ❗ Post 객체 대신 postId만 사용해서 가져오기
+        Post post = postRepository.findById(Math.toIntExact(commentDTO.getPostId()))
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + commentDTO.getPostId()));
 
         if (commentDTO.getUsers() != null) {
             comment.setUsers(commentDTO.getUsers());

@@ -7,17 +7,28 @@
 <body>
 <h1> 게시판</h1>
 
+<div th:if="${msg}">
+    <p th:text="${msg}" style="color:red;"></p>
+</div>
 
+<div th:if="${param.msg}">
+    <p th:text="${param.msg}" style="color:red;"></p>
+</div>
 
-<a th:href="@{/post/list(categoryId=1)}">공지사항</a>
-<a th:href="@{/post/list(categoryId=2)}">커뮤니티</a>
-<a th:href="@{/post/list(categoryId=3)}">문의사항</a>
+<form action="/post/search" method="get">
+    <input type="text" name="keyword" placeholder="검색어 입력"  required/>
+    <button type="submit">검색하기</button>
+</form>
 
+<a th:href="@{/post/공지사항}">공지사항</a>
+<a th:href="@{/post/커뮤니티}">커뮤니티</a>
+<a th:href="@{/post/문의사항}">문의사항</a>
 
 <table>
     <thead>
     <tr>
         <th>제목</th>
+        <th>작성자</th>
         <th>조회수</th>
         <th>작성일</th>
         <th>첨부파일</th>
@@ -28,6 +39,7 @@
         <td>
             <a th:href="@{/post/view/{id}(id=${post.postId})}" th:text="${post.title}">제목</a>
         </td>
+        <td th:text="${post.userNo}">작성자</td>
         <td th:text="${post.viewCount}">조회수</td>
         <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}">작성일</td>
         <td>
@@ -46,8 +58,19 @@
 <select name="categoryId" onchange="location.href='/post/list' + (this.value ? ('?categoryId=' + this.value) : '')">
     <option value="">전체</option>
     <option th:each="cat : ${categories}"
-            th:value="${cat.id}"
-            th:text="${cat.name}"
-            th:selected="${cat.id} == ${selectedCategoryId}">
+            th:value="${cat.categoryId}"
+            th:text="${cat.categoryName}"
+            th:selected="${cat.categoryId} == ${selectedCategoryId}">
     </option>
 </select>
+
+<div>
+    <div>
+        <button th:if="${selectedCategoryName == '커뮤니티' or selectedCategoryName == '문의사항' or selectedCategoryName == null or selectedCategoryName == ''}">
+           작성하기
+        </button>
+
+    </div>
+</div>
+</body>
+</html>

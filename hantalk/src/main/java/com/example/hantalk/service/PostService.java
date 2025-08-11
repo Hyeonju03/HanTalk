@@ -8,6 +8,7 @@ import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.CategoryRepository;
 import com.example.hantalk.repository.PostRepository;
 import com.example.hantalk.repository.UsersRepository;
+import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -27,16 +25,20 @@ public class PostService {
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
     private final UsersRepository usersRepository;
-    private final CategoryRepository categoryRepository;  // 추가
+    private final CategoryRepository categoryRepository;
 
 
 
-    public PostService(PostRepository postRepository, ModelMapper modelMapper, UsersRepository userRepository, UsersRepository usersRepository, CategoryRepository categoryRepository) {
+
+    public PostService(PostRepository postRepository, ModelMapper modelMapper, UsersRepository usersRepository, CategoryRepository categoryRepository) {
         this.postRepository = postRepository;
         this.usersRepository = usersRepository;
         this.modelMapper = modelMapper;
         this.categoryRepository = categoryRepository;
+
     }
+
+
 
     public List<PostDTO> getSelectAll() {
 
@@ -83,9 +85,6 @@ public class PostService {
                 post.setArchive(dto.getArchive());
             }
 
-
-
-
         postRepository.save(post);
     }
 
@@ -126,6 +125,65 @@ public class PostService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Post> postPage = postRepository.findByCategory_CategoryId(categoryId, pageable);
         return postPage.map(post -> modelMapper.map(post, PostDTO.class));
+    }
+
+    public void increaseViewCount(int postId) {
+        postRepository.findById(postId).ifPresent(post -> {
+            post.setViewCount(post.getViewCount() + 1);
+            postRepository.save(post);
+        });
+
+    }
+
+    public Page<PostDTO> searchPostsByKeyword(String keyword, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        Page<Post> postPage = postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(keyword, keyword, pageable);
+        return postPage.map(post -> modelMapper.map(post, PostDTO.class));
+    }
+
+    public String getOriginalFileName(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return null;
+        }
+        int underscoreIndex = fileName.indexOf("_");
+        if (underscoreIndex == -1) {
+            return fileName;
+        }
+        return fileName.substring(underscoreIndex + 1);
+    }
+
+    public String getStoredFileNameById(String fileId) {
+        return postRepository.findArchiveByFileId(fileId);
+    }
+
+    public String getOriginalFileNameById(String fileId) {
+        return postRepository.findOriginalNameByFileId(fileId);
+    }
+    public Collection<Post> getPostsByCategories(List<Integer> categoryIds) {
+        return postRepository.findByCategoryIdIn(categoryIds);
+    }
+    public List<PostDTO> getPostsByCategoryId(int categoryId) {
+        List<Post> posts = postRepository.findByCategory_CategoryId(categoryId);
+
+        List<PostDTO> dtoList = new ArrayList<>();
+        for (Post post : posts) {
+            PostDTO dto = modelMapper.map(post, PostDTO.class);
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+
+
+    public void deletePostsByIds(List<Long> postIds) {
+    }
+
+    public PostDTO getSelectOneById(int postId) {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        if (optionalPost.isEmpty()) {
+            throw new RuntimeException("해당 게시글을 찾을 수 없습니다.");
+        }
+
+        return modelMapper.map(optionalPost.get(), PostDTO.class);
     }
 }
 
