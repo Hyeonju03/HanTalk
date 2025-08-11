@@ -16,6 +16,7 @@ public class VideoService {
 
     private final VideoRepository videoRepository;
 
+
     public VideoService(VideoRepository videoRepository) {
         this.videoRepository = videoRepository;
     }
@@ -114,21 +115,33 @@ public class VideoService {
     }
 
     public Page<Video> getPagedVideos(String keyword, String searchType, Pageable pageable) {
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            switch (searchType) {
-                case "title":
-                    return videoRepository.findByTitleContaining(keyword, pageable);
-                case "content":
-                    return videoRepository.findByContentContaining(keyword, pageable);
-                case "filename":
-                    return videoRepository.findByVideoNameContaining(keyword, pageable);
-                case "all":
-                default:
-                    return videoRepository.findByTitleOrContentOrVideoNameContaining(keyword, pageable);
-            }
-        } else {
+        if (keyword != null) {
+            keyword = keyword.trim();
+        }
+        if (keyword == null || keyword.isEmpty()) {
             return videoRepository.findAll(pageable);
         }
+        switch (searchType) {
+            case "title":
+                return videoRepository.findByTitleContaining(keyword, pageable);
+            case "content":
+                return videoRepository.findByContentContaining(keyword, pageable);
+            case "filename":
+                return videoRepository.findByVideoNameContaining(keyword, pageable);
+            case "all":
+            default:
+                return videoRepository.findByTitleOrContentOrVideoNameContaining(keyword, pageable);
+        }
     }
+
+    public Page<VideoDTO> searchVideos(String keyword, String searchType, Pageable pageable) {
+        Page<Video> videos = getPagedVideos(keyword, searchType, pageable);
+        return videos.map(this::toDto);  // Entity → DTO 변환
+    }
+
+    public boolean existsByVideoName(String filename) {
+        return videoRepository.existsByVideoName(filename);
+    }
+
 
 }

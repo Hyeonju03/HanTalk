@@ -3,7 +3,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title th:text="${video.title}">영상 상세 보기</title>
+  <title th:text="${video.title}">강의 상세 보기</title>
   <style>
     body {
         font-family: Arial, sans-serif;
@@ -30,6 +30,7 @@
 <body>
 
 <h1>영상 상세 보기</h1>
+
 <h2 th:text="${video.title}">제목</h2>
 
 
@@ -41,13 +42,13 @@
 
 <p th:text="${video.content}">설명</p>
 
-
 <!-- ✅ 이동 및 관리자 기능 -->
 <div class="actions">
-  <a th:href="@{'/' + ${role} + '/video/list'}">&larr; 목록으로</a>
+  <a th:href="@{/video/user/contentList}">← 목록으로</a>
 
   <!-- 관리자만 수정 버튼 노출 -->
-  <a th:if="${isAdmin}" th:href="@{/admin/video/edit/{id}(id=${video.videoId})}">✏️ 수정</a>
+  <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}">✏️ 수정</a>
+
 </div>
 
 </body>

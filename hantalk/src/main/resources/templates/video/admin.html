@@ -2,22 +2,22 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>영상 목록 (관리자)</title>
+  <title>관리자 영상 목록</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <h1>영상 목록</h1>
 <!-- ➕ 새 영상 등록 -->
-<a th:href="@{/admin/video/upload}">➕ 새 영상 등록</a>
+<a th:href="@{/video/admin/chuga}">➕ 새 영상 등록</a>
 <br>
 
 <!-- 🔍 검색 폼 -->
-<form method="get" th:action="@{/admin/video/list}" id="searchForm">
+<form method="get" th:action="@{/video/admin/list}" id="searchForm">
   <select name="searchType" id="searchType">
-    <option value="title" th:selected="${searchType} == 'title'">제목</option>
-    <option value="content" th:selected="${searchType} == 'content'">내용</option>
-    <option value="filename" th:selected="${searchType} == 'filename'">파일명</option>
-    <option value="all" th:selected="${searchType} == 'all'">제목 + 내용 + 파일명</option>
+    <option value="title" th:selected="${searchType == 'title'}">제목</option>
+    <option value="content" th:selected="${searchType == 'content'}">내용</option>
+    <option value="filename" th:selected="${searchType == 'filename'}">파일명</option>
+    <option value="all" th:selected="${searchType == 'all'}">제목 + 내용 + 파일명</option>
   </select>
   <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" id="keyword"/>
   <button type="submit">검색</button>
@@ -61,8 +61,9 @@
     <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</td>
     <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}">수정일</td>
     <td>
-      <a th:href="@{/admin/video/edit/{id}(id=${video.videoId}, page=${videoPage.number})}"
+      <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
          onclick="event.stopPropagation();">수정</a>
+
       <button type="button"
               th:attr="data-id=${video.videoId}"
               onclick="event.stopPropagation(); deleteVideo(this);">삭제</button>
@@ -74,24 +75,24 @@
 <div class="pagination" th:if="${videoPage.totalPages > 1}">
   <!-- 이전 버튼 -->
   <a th:if="${videoPage.number > 0}"
-     th:href="@{'/' + ${role} + '/video/list'(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}">
+     th:href="@{/video/admin/list(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}">
     이전
   </a>
   <span th:unless="${videoPage.number > 0}">이전</span>
 
   <!-- 페이지 번호 -->
   <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
-    <a th:href="@{'/' + ${role} + '/video/list'(page=${i}, searchType=${searchType}, keyword=${keyword})}"
+    <a th:href="@{/video/admin/list(page=${i}, searchType=${searchType}, keyword=${keyword})}"
        th:classappend="${i == videoPage.number} ? 'active' : ''"
        th:text="${i + 1}">1</a>
   </span>
 
   <!-- 다음 버튼 -->
-  <a th:if="${videoPage.number < videoPage.totalPages - 1}"
-     th:href="@{'/' + ${role} + '/video/list'(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}">
+  <a th:if="${videoPage.number + 1 < videoPage.totalPages}"
+     th:href="@{/video/admin/list(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}">
     다음
   </a>
-  <span th:unless="${videoPage.number < videoPage.totalPages - 1}">다음</span>
+  <span th:unless="${videoPage.number + 1 < videoPage.totalPages}">다음</span>
 </div>
 
 
@@ -108,7 +109,7 @@
      const videoId = $(button).data("id");
      if (confirm("정말 삭제하시겠습니까?")) {
          $.ajax({
-             url: "/admin/video/" + videoId,
+             url: "/video/admin/" + videoId,
              type: "DELETE",
              success: function (result) {
                  alert("삭제되었습니다.");
@@ -129,7 +130,7 @@
      if ($(e.target).closest("a, button").length === 0) {
        const videoId = $(this).data("id");
        if (videoId) {
-         window.location.href = "/admin/video/view/" + videoId;
+         window.location.href = "/video/admin/view/" + videoId;
        }
      }
    });
