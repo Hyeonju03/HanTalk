@@ -1,6 +1,8 @@
 package com.example.hantalk.repository;
 
 import com.example.hantalk.entity.Voca;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +19,6 @@ public interface VocaRepository extends JpaRepository<Voca, Integer> {
     List<Voca> findRandomVocas(@Param("excludeIds") List<Integer> excludeIds,
                                @Param("excludeSize") int excludeSize,
                                @Param("count") int count);  // 랜덤 추출 (중복 방지)
+
+    Page<Voca> findByVocabularyContainingOrDescriptionContaining(String kw, String kw2, Pageable pageable);
 }

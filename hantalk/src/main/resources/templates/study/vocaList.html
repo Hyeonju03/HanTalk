@@ -6,6 +6,12 @@
 </head>
 <body>
 <h1>단어 목록</h1>
+
+<form th:action="@{/study/vocaList}" method="get" style="margin-bottom:12px;">
+  <input type="text" name="kw" th:value="${kw}" placeholder="단어 또는 의미 검색">
+  <button type="submit">검색</button>
+</form>
+
 <table>
   <thead>
   <tr>
@@ -16,16 +22,33 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:if="${dtoList == null || dtoList.size() <= 0}">
+  <tr th:if="${paging == null || paging.content.isEmpty()}">
     <td colspan="4">단어 데이터가 존재하지 않습니다.</td>
   </tr>
-  <tr th:each="voca, loop : ${dtoList}">
-    <td th:text="${loop.count}"></td>
+  <tr th:each="voca, loop : ${paging.content}">
+    <td th:text="${paging.number * paging.size + loop.count}"></td>
     <td th:text="${voca.vocabulary}"></td>
     <td th:text="${voca.description}"></td>
     <td th:text="${#temporals.format(voca.createDate, 'yyyy-MM-dd')}"></td>
   </tr>
   </tbody>
 </table>
+
+<div th:if="${paging != null && !paging.isEmpty()}" class="pagination" style="margin-top:12px;">
+  <ul>
+    <li th:classappend="${!paging.hasPrevious} ? 'disabled'">
+      <a th:href="@{|?page=${paging.number - 1}&kw=${kw}|}">이전</a>
+    </li>
+
+    <li th:each="p : ${#numbers.sequence(0, paging.totalPages - 1)}"
+        th:classappend="${p == paging.number} ? 'active'">
+      <a th:href="@{|?page=${p}&kw=${kw}|}" th:text="${p + 1}"></a>
+    </li>
+
+    <li th:classappend="${!paging.hasNext} ? 'disabled'">
+      <a th:href="@{|?page=${paging.number + 1}&kw=${kw}|}">다음</a>
+    </li>
+  </ul>
+</div>
 </body>
 </html>

@@ -1,11 +1,13 @@
 package com.example.hantalk.service;
 
-import com.example.hantalk.dto.SentenceDTO;
 import com.example.hantalk.dto.VocaDTO;
-import com.example.hantalk.entity.Sentence;
 import com.example.hantalk.entity.Voca;
 import com.example.hantalk.repository.VocaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -37,6 +39,20 @@ public class VocaService {
         voca.setCreateDate(dto.getCreateDate());
         voca.setIncNoteList(dto.getIncNoteList());
         return voca;
+    }
+
+    public Page<VocaDTO> getSelectAll(int page, String kw) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createDate")));
+
+        Page<Voca> entityPage;
+
+        if (kw == null || kw.isBlank()) {
+            entityPage = vocaRepository.findAll(pageable);
+        } else {
+            entityPage = vocaRepository.findByVocabularyContainingOrDescriptionContaining(kw, kw, pageable);
+        }
+
+        return entityPage.map(this::entityToDto);
     }
 
     public List<VocaDTO> getSelectAll() {

@@ -6,9 +6,11 @@ import com.example.hantalk.service.Learning_LogService;
 import com.example.hantalk.service.VocaService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 
@@ -31,16 +33,22 @@ public class VocaController {
 
     // 문장 목록
     @GetMapping("/vocaList")
-    public String vocaList(Model model) {
-        List<VocaDTO> dtoList = vocaService.getSelectAll();
-        model.addAttribute("dtoList", dtoList);
+    public String vocaList(Model model,
+                           @RequestParam(value = "page", defaultValue = "0") int page,
+                           @RequestParam(value = "kw", defaultValue = "") String kw) {
+        Page<VocaDTO> paging = vocaService.getSelectAll(page, kw);
+        model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw);
         return folderName + "/vocaList";
     }
 
     @GetMapping("/vocaList/admin")
-    public String vocaAdminList(Model model) {
-        List<VocaDTO> dtoList = vocaService.getSelectAll();
-        model.addAttribute("dtoList", dtoList);
+    public String vocaAdminList(Model model,
+                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                @RequestParam(value = "kw", defaultValue = "") String kw) {
+        Page<VocaDTO> paging = vocaService.getSelectAll(page, kw);
+        model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw);
         return folderName + "/vocaAdmin";
     }
 
@@ -50,7 +58,24 @@ public class VocaController {
     }
 
     @PostMapping("/vocaInsertProc")
-    public String vocaInsertProc(VocaDTO vocaDTO) {
+    public String vocaInsertProc(VocaDTO vocaDTO, RedirectAttributes ra) {
+        String vocab = vocaDTO.getVocabulary();
+        String desc  = vocaDTO.getDescription();
+
+        // 단어: 공백/빈 값 금지
+        if (vocab == null || vocab.trim().isEmpty()) {
+            ra.addFlashAttribute("error", "단어를 입력하세요.");
+            // 필요 시 폼 값 유지
+            ra.addFlashAttribute("dto", vocaDTO);
+            return "redirect:/study/vocaInsert";
+        }
+        // 의미: 완전 빈 값 금지(공백은 허용)
+        if (desc == null || desc.isEmpty()) {
+            ra.addFlashAttribute("error", "의미를 입력하세요.");
+            ra.addFlashAttribute("dto", vocaDTO);
+            return "redirect:/study/vocaInsert";
+        }
+
         vocaService.setInsert(vocaDTO);
         return "redirect:/study/vocaList/admin";
     }
@@ -65,7 +90,21 @@ public class VocaController {
     }
 
     @PostMapping("/vocaUpdateProc")
-    public String vocaUpdateProc(VocaDTO vocaDTO) {
+    public String vocaUpdateProc(VocaDTO vocaDTO, RedirectAttributes ra) {
+        String vocab = vocaDTO.getVocabulary();
+        String desc  = vocaDTO.getDescription();
+
+        // 단어: 공백/빈 값 금지
+        if (vocab == null || vocab.trim().isEmpty()) {
+            ra.addFlashAttribute("error", "단어를 입력하세요.");
+            return "redirect:/study/vocaUpdate/" + vocaDTO.getVocaId();
+        }
+        // 의미: 완전 빈 값 금지(공백은 허용)
+        if (desc == null || desc.isEmpty()) {
+            ra.addFlashAttribute("error", "의미를 입력하세요.");
+            return "redirect:/study/vocaUpdate/" + vocaDTO.getVocaId();
+        }
+
         vocaService.setUpdate(vocaDTO);
         return "redirect:/study/vocaList/admin";
     }
