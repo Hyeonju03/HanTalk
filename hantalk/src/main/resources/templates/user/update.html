@@ -1,45 +1,54 @@
 <!DOCTYPE html>
-
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원정보 수정</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 h-screen flex items-center justify-center">
-<div class="bg-white p-8 rounded-xl shadow-md w-96">
-    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">회원정보 수정</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <form action="/user/update" method="post" class="space-y-4">
-        <div>
-            <label for="nickname" class="block text-gray-700 text-sm font-bold mb-2">닉네임:</label>
-            <input type="text" id="nickname" name="nickname" th:value="${user.nickname}"
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-        </div>
-        <div>
-            <label for="password" class="block text-gray-700 text-sm font-bold mb-2">비밀번호:</label>
-            <input type="password" id="password" name="password"
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-        </div>
-        <div>
-            <label for="passwordCheck" class="block text-gray-700 text-sm font-bold mb-2">비밀번호 확인:</label>
-            <input type="password" id="passwordCheck" name="passwordCheck"
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-        </div>
-        <div>
-            <label for="email" class="block text-gray-700 text-sm font-bold mb-2">이메일:</label>
-            <input type="email" id="email" name="email" th:value="${user.email}"
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-        </div>
-        <button type="submit"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
-            수정하기
-        </button>
-    </form>
+<!-- 헤더 fragments 포함 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-    <div class="mt-4 text-center">
-        <a href="/user/view" class="text-blue-500 hover:underline">← 돌아가기</a>
+<div class="flex-grow flex">
+    <!-- 사이드바 fragments 포함 -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="flex-grow flex items-center justify-center p-8">
+        <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+            <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">회원정보 수정</h1>
+
+            <form action="/user/update" method="post" class="space-y-4">
+                <div>
+                    <label for="nickname" class="block text-gray-700 text-sm font-bold mb-2">닉네임:</label>
+                    <input type="text" id="nickname" name="nickname" th:value="${user.nickname}"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                </div>
+                <div>
+                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">비밀번호:</label>
+                    <input type="password" id="password" name="password"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                </div>
+                <div>
+                    <label for="passwordCheck" class="block text-gray-700 text-sm font-bold mb-2">비밀번호 확인:</label>
+                    <input type="password" id="passwordCheck" name="passwordCheck"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                </div>
+                <div>
+                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">이메일:</label>
+                    <input type="email" id="email" name="email" th:value="${user.email}"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                </div>
+                <button type="submit"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
+                    수정하기
+                </button>
+            </form>
+        </div>
     </div>
 </div>
+
 </body>
 </html>

@@ -1,15 +1,74 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>HanTalk - 홈</title>
+  <!-- Bootstrap CSS를 사용합니다. -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .main-content {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 50px;
+    }
+    .main-left {
+        width: 60%;
+        padding: 20px;
+    }
+    .main-right {
+        width: 30%;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+    }
+    .link-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background-color: #f8f9fa;
+    }
+    .link-card .icon {
+        font-size: 2rem;
+    }
+  </style>
+</head>
 <body>
-<div th:replace="~{layout :: layout(title=~{::title}, content=~{::div.content})}">
 
-  <div th:fragment="title">HanTalk - 홈</div>
+<!-- 헤더 프래그먼트 삽입 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-  <div th:fragment="content">
-    <h1>메인 페이지 내용입니다!</h1>
-    <p>환영합니다!</p>
+<!-- 메인 콘텐츠 영역 -->
+<div class="main-content">
+  <!-- 왼쪽 섹션: 슬라이드 배너 -->
+  <div class="main-left">
+    <div th:replace="~{fragments/slide :: slideFragment}"></div>
   </div>
 
+  <!-- 오른쪽 섹션: 링크 카드 -->
+  <div class="main-right">
+    <div class="link-card">
+      <h4>한글 학습</h4>
+      <span class="icon">&rarr;</span>
+    </div>
+    <div class="link-card">
+      <h4>단어장</h4>
+      <span class="icon">&rarr;</span>
+    </div>
+    <div class="link-card">
+      <h4>커뮤니티</h4>
+      <span class="icon">&rarr;</span>
+    </div>
+  </div>
 </div>
+
+<!-- 푸터 프래그먼트 삽입 -->
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
