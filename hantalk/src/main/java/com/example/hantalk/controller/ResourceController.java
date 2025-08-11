@@ -30,7 +30,7 @@ import java.security.Principal;
 public class ResourceController {
 
     private final ResourceService resourceService;
-    private final String uploadDir = "C:/aaa/HanTalk/hantalk/ResourceFile";
+    private final String uploadDir = System.getProperty("user.dir") + "/uploads/ResourceFile";
 
     private String getExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf('.');

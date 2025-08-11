@@ -24,7 +24,7 @@ public class ResourceService {
     private final ResourceRepository resourceRepository;
 
     // 실제 서버 파일 저장 경로 (컨트롤러와 동일)
-    private final String uploadDir = "C:/aaa/HanTalk/hantalk/ResourceFile";
+    private final String uploadDir = System.getProperty("user.dir") + "/uploads/ResourceFile";
 
     public void createResource(ResourceDTO dto) {
         Resource resource = new Resource();
@@ -89,7 +89,7 @@ public class ResourceService {
             String savedFileName = saveFile(file);
             if (savedFileName != null) {
                 // 뷰에서 사용할 경로는 /ResourceFile/파일명 으로 맞춤 (uploadDir 절대경로와 분리)
-                resource.setArchive("/ResourceFile/" + savedFileName);
+                resource.setArchive("/uploads/ResourceFile/" + savedFileName);
                 resource.setOriginalFileName(file.getOriginalFilename());
             } else {
                 resource.setArchive(null);
@@ -112,7 +112,7 @@ public class ResourceService {
             if (file != null && !file.isEmpty()) {
                 String savedFileName = saveFile(file);
                 if (savedFileName != null) {
-                    resource.setArchive("/ResourceFile/" + savedFileName);
+                    resource.setArchive("/uploads/ResourceFile/" + savedFileName);
                     resource.setOriginalFileName(file.getOriginalFilename());
                 }
             } else {

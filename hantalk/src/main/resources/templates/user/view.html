@@ -16,13 +16,13 @@
     <div class="relative w-28 h-28 mx-auto">
       <!-- 프로필 이미지 (항상 바닥에 깔림) -->
       <img th:if="${user.profileImage != null}"
-           th:src="@{'/images/' + ${user.profileImage}}"
+           th:src="@{'/uploads/images/' + ${user.profileImage}}"
            alt="프로필 이미지"
            class="rounded-full w-full h-full object-cover z-0"/>
 
       <!-- 프레임 이미지 (프로필 위에 덮임) -->
       <img th:if="${user.profileFrame != null}"
-           th:src="@{'/frames/' + ${user.profileFrame}}"
+           th:src="@{'/uploads/frames/' + ${user.profileFrame}}"
            alt="프레임 이미지"
            class="absolute top-0 left-0 w-full h-full pointer-events-none z-10"/>
 
