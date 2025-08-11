@@ -1,90 +1,200 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>보유 아이템 목록</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 프로필 이미지와 프레임이 겹쳐 보이도록 z-index 설정 */
+    .profile-container {
+      position: relative;
+      width: 112px;
+      height: 112px;
+      margin: 0 auto;
+    }
+    .profile-image-preview, .profile-frame-preview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen py-10">
-<div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-md">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-  <h2 class="text-2xl font-bold mb-4">구매한 아이템</h2>
+<!-- 헤더 fragments 포함 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-  <!-- 프로필 이미지 목록 -->
-  <h3 class="text-xl font-semibold mt-6 mb-2">프로필 이미지 선택</h3>
-  <div class="grid grid-cols-4 gap-2">
-    <img th:each="img : ${profileImages}"
-         th:src="@{'/uploads/images/' + ${img}}"
-         th:attr="data-img=${img}"
-         class="cursor-pointer border rounded-full hover:ring w-20 h-20 object-cover"
-         onclick="selectProfileImage(this)">
+<!-- 헤더 아래에 사이드바와 메인 콘텐츠가 오도록 flex 컨테이너 추가 -->
+<div class="flex-grow flex">
+  <!-- 사이드바 fragments를 포함시킵니다. -->
+  <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+  <div class="flex-grow p-8">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-md">
+
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">구매한 아이템</h1>
+
+      <!-- 프로필 이미지 목록 -->
+      <h3 class="text-xl font-semibold mt-6 mb-2">프로필 이미지 선택</h3>
+      <div class="grid grid-cols-4 gap-2">
+        <img th:each="img : ${profileImages}"
+             th:src="@{'/images/' + ${img}}"
+             th:attr="data-img=${img}"
+             class="item-profile-img cursor-pointer border rounded-full hover:ring-2 ring-offset-2 ring-blue-500 w-20 h-20 object-cover"
+             onclick="selectProfileImage(this)">
+      </div>
+
+      <!-- 프레임 이미지 목록 -->
+      <h3 class="text-xl font-semibold mt-6 mb-2">프레임 이미지 선택</h3>
+      <div class="grid grid-cols-4 gap-2">
+        <img th:each="frame : ${frameImages}"
+             th:src="@{'/frames/' + ${frame}}"
+             th:attr="data-frame=${frame}"
+             class="item-frame-img cursor-pointer border hover:ring-2 ring-offset-2 ring-blue-500 w-20 h-20 object-cover"
+             onclick="selectFrameImage(this)">
+      </div>
+
+      <!-- 미리보기 -->
+      <h3 class="text-xl font-semibold mt-6 mb-2">미리보기</h3>
+      <div class="profile-container w-28 h-28 mx-auto mb-4">
+        <img id="preview-profile" class="profile-image-preview rounded-full object-cover absolute top-1.5 left-1.5 w-[85%] h-[85%] z-0"/>
+        <img id="preview-frame" class="profile-frame-preview pointer-events-none z-10"/>
+      </div>
+
+      <!-- 설정 버튼 -->
+      <button id="applyButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg w-full transition duration-150 ease-in-out">
+        설정하기
+      </button>
+    </div>
   </div>
+</div>
 
-  <!-- 프레임 이미지 목록 -->
-  <h3 class="text-xl font-semibold mt-6 mb-2">프레임 이미지 선택</h3>
-  <div class="grid grid-cols-4 gap-2">
-    <img th:each="frame : ${frameImages}"
-         th:src="@{'/uploads/frames/' + ${frame}}"
-         th:attr="data-frame=${frame}"
-         class="cursor-pointer border hover:ring w-20 h-20 object-cover"
-         onclick="selectFrameImage(this)">
+<!-- 커스텀 모달 UI -->
+<!-- 경고 모달 -->
+<div id="alertModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
+  <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+    <p id="alertMessage" class="text-gray-700 mb-4"></p>
+    <button id="alertCloseButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">확인</button>
   </div>
+</div>
 
-  <!-- 미리보기 -->
-  <h3 class="text-xl font-semibold mt-6 mb-2">미리보기</h3>
-  <div class="relative w-28 h-28 mx-auto mb-4">
-    <img id="preview-profile" class="rounded-full w-full h-full object-cover"/>
-    <img id="preview-frame" class="absolute top-0 left-0 w-full h-full pointer-events-none z-10"/>
+<!-- 확인 모달 -->
+<div id="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
+  <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+    <p id="confirmMessage" class="text-gray-700 mb-4"></p>
+    <div class="flex justify-around">
+      <button id="confirmOkButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">확인</button>
+      <button id="confirmCancelButton" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg">취소</button>
+    </div>
   </div>
+</div>
 
-  <!-- 설정 버튼 -->
-  <button onclick="confirmSetting()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-    설정하기
-  </button>
+<script>
+  let selectedProfileImage = null;
+  let selectedFrameImage = null;
 
-  <script>
-    let selectedProfileImage = null;
-    let selectedFrameImage = null;
+  // 모달 관련 요소 가져오기
+  const alertModal = document.getElementById('alertModal');
+  const alertMessage = document.getElementById('alertMessage');
+  const alertCloseButton = document.getElementById('alertCloseButton');
 
-    function selectProfileImage(el) {
-      selectedProfileImage = el.getAttribute("data-img");
-      document.getElementById("preview-profile").src = "/uploads/images/" + selectedProfileImage;
+  const confirmModal = document.getElementById('confirmModal');
+  const confirmMessage = document.getElementById('confirmMessage');
+  const confirmOkButton = document.getElementById('confirmOkButton');
+  const confirmCancelButton = document.getElementById('confirmCancelButton');
+
+  // 경고 모달 표시 함수
+  function showAlert(message) {
+    alertMessage.textContent = message;
+    alertModal.classList.remove('hidden');
+  }
+
+  // 확인 모달 표시 함수 (Promise를 사용하여 동기적으로 동작)
+  function showConfirm(message) {
+    return new Promise(resolve => {
+      confirmMessage.textContent = message;
+      confirmModal.classList.remove('hidden');
+
+      confirmOkButton.onclick = () => {
+        confirmModal.classList.add('hidden');
+        resolve(true);
+      };
+
+      confirmCancelButton.onclick = () => {
+        confirmModal.classList.add('hidden');
+        resolve(false);
+      };
+    });
+  }
+
+  // 선택된 아이템에 시각적 효과 추가
+  function selectItem(selector, element, dataAttribute, value) {
+    document.querySelectorAll(selector).forEach(item => {
+      item.classList.remove('ring-4', 'ring-blue-500');
+    });
+    element.classList.add('ring-4', 'ring-blue-500');
+    return value;
+  }
+
+  // 프로필 이미지 선택
+  function selectProfileImage(el) {
+    selectedProfileImage = selectItem('.item-profile-img', el, 'data-img', el.getAttribute("data-img"));
+    document.getElementById("preview-profile").src = "/images/" + selectedProfileImage;
+  }
+
+  // 프레임 이미지 선택
+  function selectFrameImage(el) {
+    selectedFrameImage = selectItem('.item-frame-img', el, 'data-frame', el.getAttribute("data-frame"));
+    document.getElementById("preview-frame").src = "/frames/" + selectedFrameImage;
+  }
+
+  // 설정 버튼 클릭 이벤트 핸들러
+  document.getElementById("applyButton").addEventListener('click', async () => {
+    if (!selectedProfileImage && !selectedFrameImage) {
+      showAlert("프로필 또는 프레임 이미지를 선택해주세요.");
+      return;
     }
 
-    function selectFrameImage(el) {
-      selectedFrameImage = el.getAttribute("data-frame");
-      document.getElementById("preview-frame").src = "/uploads/frames/" + selectedFrameImage;
+    const confirmed = await showConfirm("이대로 설정하시겠습니까?");
+
+    if (confirmed) {
+      fetch("/user/apply-setting", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          profileImage: selectedProfileImage,
+          profileFrame: selectedFrameImage
+        })
+      }).then(res => {
+        if (res.ok) {
+          showAlert("프로필이 설정되었습니다!");
+          // 모달이 닫힌 후 마이페이지로 이동
+          alertCloseButton.onclick = () => {
+              alertModal.classList.add('hidden');
+              location.href = "/user/view";
+          };
+        } else {
+          showAlert("설정 실패");
+        }
+      }).catch(error => {
+          console.error('Error:', error);
+          showAlert("설정 중 오류가 발생했습니다.");
+      });
     }
+  });
 
-    function confirmSetting() {
-      if (!selectedProfileImage && !selectedFrameImage) {
-        alert("프로필 또는 프레임 이미지를 선택해주세요.");
-        return;
-      }
+  // 경고 모달 닫기
+  alertCloseButton.addEventListener('click', () => {
+    alertModal.classList.add('hidden');
+  });
 
-      const confirmed = confirm("이대로 설정하시겠습니까?");
-      if (confirmed) {
-        fetch("/user/apply-setting", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            profileImage: selectedProfileImage,
-            profileFrame: selectedFrameImage
-          })
-        }).then(res => {
-          if (res.ok) {
-            alert("프로필이 설정되었습니다!");
-            location.href = "/user/view"; // 마이페이지로 이동
-          } else {
-            alert("설정 실패");
-          }
-        });
-      }
-    }
-  </script>
-
+</script>
+</div>
 </div>
 </body>
 </html>

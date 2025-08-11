@@ -1,36 +1,56 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
 <body>
 
-<nav th:fragment="navFragment" class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">HanTalk</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/view">마이페이지</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/study/main">학습</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/resource/main">커뮤니티</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/item/shop">포인트</a>
-                </li>
-            </ul>
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/login">로그인</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/register">회원가입</a>
-                </li>
-            </ul>
+<nav th:fragment="navFragment" class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- flex-grow를 사용해 중앙 링크들이 공간을 유연하게 차지하도록 수정 -->
+        <div class="flex justify-between h-16 items-center">
+            <!-- HanTalk 로고 (왼쪽 끝) -->
+            <div class="flex-shrink-0 flex items-center">
+                <a href="/" class="text-2xl font-bold text-blue-600">
+                    HanTalk
+                </a>
+            </div>
+
+            <!-- 주요 내비게이션 링크 (가운데) -->
+            <div class="flex-grow flex justify-center space-x-4 lg:space-x-8">
+                <a href="/user/view" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                    마이페이지
+                </a>
+                <a href="/study/main" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                    학습
+                </a>
+                <a href="/resource/main" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                    커뮤니티
+                </a>
+                <a href="/item/shop" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                    포인트상점
+                </a>
+            </div>
+
+            <!-- 로그인 상태에 따라 링크를 조건부로 렌더링 -->
+            <div class="flex-shrink-0 flex items-center space-x-4">
+                <!-- 로그인하지 않은 경우 -->
+                <div th:unless="${session.user}">
+                    <a href="/user/login" class="text-sm font-medium text-gray-500 hover:text-gray-900">
+                        로그인
+                    </a>
+                    <a href="/user/register" class="text-sm font-medium text-blue-600 hover:text-blue-500">
+                        회원가입
+                    </a>
+                </div>
+
+                <!-- 로그인한 경우 -->
+                <div th:if="${session.user}">
+                    <a href="/user/logout" class="text-sm font-medium text-gray-500 hover:text-gray-900">
+                        로그아웃
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </nav>
