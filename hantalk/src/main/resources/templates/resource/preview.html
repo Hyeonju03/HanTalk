@@ -132,11 +132,11 @@
   <h1 th:text="${fileName}">파일명</h1>
 
   <!-- 이미지 미리보기 -->
-  <img th:if="${isImage}" th:src="@{|/resource/view/file/${fileName}|}" alt="이미지 미리보기" />
+  <img th:if="${isImage}" th:src="@{|/resource/image/${fileName}|}" alt="이미지 미리보기" />
 
-  <!-- 오피스 파일 미리보기 -->
+  <!-- 오피스 파일 미리보기 (구글 문서 뷰어) -->
   <iframe th:if="${isOfficeFile}"
-          th:src="@{|https://docs.google.com/gview?url=${'http://localhost:8080/resource/view/file/' + fileName}&embedded=true|}"
+          th:src="@{${googleViewerUrl}}"
           frameborder="0"></iframe>
 
   <!-- PDF 등 직접 미리보기 -->
@@ -161,7 +161,7 @@
             class="back-button"
             th:text="${isAdmin} ? '관리자 목록으로' : '사용자 목록으로'"
             th:onclick="${isAdmin} ? 'location.href=\'/resource/admin/main\'' : 'location.href=\'/resource/main\''">
-      사용자 목록으로
+      목록으로
     </button>
   </div>
 </main>

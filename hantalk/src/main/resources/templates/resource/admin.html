@@ -229,18 +229,18 @@
     </thead>
     <tbody>
     <tr th:each="resource, iterStat : ${resourcePage.content}"
-        th:attr="data-url=@{'/resource/detail/' + ${resource.resourceId}}"
+        th:attr="data-url=@{'/resource/admin/detail/' + ${resource.resourceId}}"
         onclick="goToDetail(this)">
-      <td th:text="${resourcePage.totalElements - (resourcePage.number * resourcePage.size) - iterStat.index}">1</td>
+      <td th:text="${resourcePage.number * resourcePage.size + iterStat.index + 1}">1</td>
       <td th:text="${resource.title}">제목</td>
       <td th:text="${#strings.length(resource.content) > 30} ? ${#strings.substring(resource.content, 0, 30)} + '...' : ${resource.content}">내용</td>
       <td>
         <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}">
-         <a th:href="@{'/resource/admin/preview/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
-            th:title="${resource.originalFileName}"
-            onclick="event.stopPropagation();">
-          파일 보기
-         </a>
+          <a th:href="@{'/resource/admin/preview/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
+             th:title="${resource.originalFileName}"
+             onclick="event.stopPropagation();">
+            파일 보기
+          </a>
           |
           <a th:href="@{'/resource/download/file/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
              th:title="${resource.originalFileName}"
@@ -265,16 +265,20 @@
   </table>
 
   <div class="pagination">
-    <a th:if="${resourcePage.hasPrevious()}" th:href="@{/resource/admin/main(page=${resourcePage.number - 1}, keyword=${keyword})}">이전</a>
+    <span th:if="${resourcePage.hasPrevious()}">
+      <a th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}">이전</a>
+    </span>
 
     <span th:each="pageNum : ${#numbers.sequence(0, resourcePage.totalPages - 1)}"
           th:classappend="${pageNum == resourcePage.number} ? 'current' : ''">
-      <a th:href="@{/resource/admin/main(page=${pageNum}, keyword=${keyword})}" th:text="${pageNum + 1}">1</a>
+      <a th:href="@{|/resource/admin/main?page=${pageNum}&keyword=${keyword}|}" th:text="${pageNum + 1}">1</a>
     </span>
 
-    <a th:if="${resourcePage.hasNext()}" th:href="@{/resource/admin/main(page=${resourcePage.number + 1}, keyword=${keyword})}">다음</a>
+    <span th:if="${resourcePage.hasNext()}">
+      <a th:href="@{|/resource/admin/main?page=${resourcePage.number + 1}&keyword=${keyword}|}">다음</a>
+    </span>
   </div>
-</main>
 
+</main>
 </body>
 </html>

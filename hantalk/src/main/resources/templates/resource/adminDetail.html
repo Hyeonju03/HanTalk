@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
-  <title>사용자 자료 상세 보기</title>
+  <title>관리자 자료 상세 보기</title>
   <style>
     body {
       background: #fefcff;
@@ -94,9 +94,8 @@
 <nav>
   <h2>📁 메뉴</h2>
   <ul>
-    <li><a href="/resource/admin/main">자료 목록</a></li>
-    <li><a href="#">자주 묻는 질문</a></li>
-    <li><a href="#">문의하기</a></li>
+    <li><a href="/resource/admin/main">관리자 목록</a></li>
+    <li><a href="/resource/main">사용자 메인</a></li>
   </ul>
 </nav>
 
@@ -117,7 +116,7 @@
     <span class="label">파일 링크:</span>
     <span class="content">
       <a th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
-         th:href="@{${resource.archive}}"
+         th:href="@{/resource/download/file/{fileName}(fileName=${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)})}"
          download
          th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
       <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}">파일이 없습니다.</span>
@@ -129,13 +128,11 @@
     <span class="content" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
   </div>
 
-  <!--유저 로그인시 목록-->
   <div class="btn-group">
-    <a href="/resource/main" class="btn">목록으로</a>
-    <a th:if="${session.loginUser != null and session.loginUser.role == 'ROLE_ADMIN'}"
-       th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
-       class="btn">수정</a>
+    <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}" class="btn">수정</a>
+    <a href="/resource/admin/main" class="btn">관리자 목록으로</a>
   </div>
 </main>
+
 </body>
 </html>
