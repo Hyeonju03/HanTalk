@@ -8,6 +8,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,37 +46,52 @@ public class ResourceController {
         return getExtension(fileName).matches("txt|csv|log|md|java|xml|json|html|css|js");
     }
 
-    // 사용자 메인 페이지
+    // 사용자 메인 페이지 (최신순, page 0부터 시작)
     @GetMapping({"/main", "/list"})
-    public String userMainPage(@RequestParam(defaultValue = "0") int page,
-                               @RequestParam(defaultValue = "10") int size,
+    public String userMainPage(Principal principal,
+                               @RequestParam(value = "page", defaultValue = "0") int page,
+                               @RequestParam(value = "size", defaultValue = "10") int size,
                                @RequestParam(value = "keyword", required = false) String keyword,
                                Model model) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ResourceDTO> resourcePage = (keyword != null && !keyword.trim().isEmpty())
-                ? resourceService.searchResources(keyword.trim(), pageable)
-                : resourceService.getAllResources(pageable);
+        if (principal != null && principal.getName().toLowerCase().startsWith("admin")) {
+            return "redirect:/resource/admin/main";
+        }
+
+        if (page < 0) page = 0;
+        if (keyword == null || "null".equals(keyword.trim())) keyword = "";
+        else keyword = keyword.trim();
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
+        Page<ResourceDTO> resourcePage = keyword.isEmpty()
+                ? resourceService.getAllResources(pageable)
+                : resourceService.searchResources(keyword, pageable);
 
         model.addAttribute("resourcePage", resourcePage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("currentPage", page);
+
         return "resource/main";
     }
 
-    // 관리자 메인 페이지
+    // 관리자 메인 페이지 (최신순, page 0부터 시작)
     @GetMapping({"/admin", "/admin/main"})
-    public String adminMainPage(@RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "10") int size,
+    public String adminMainPage(@RequestParam(value = "page", defaultValue = "0") int page,
+                                @RequestParam(value = "size", defaultValue = "10") int size,
                                 @RequestParam(value = "keyword", required = false) String keyword,
                                 Model model) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ResourceDTO> resourcePage = (keyword != null && !keyword.trim().isEmpty())
-                ? resourceService.searchResources(keyword.trim(), pageable)
-                : resourceService.getAllResources(pageable);
+        if (page < 0) page = 0;
+        if (keyword == null || "null".equals(keyword.trim())) keyword = "";
+        else keyword = keyword.trim();
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
+        Page<ResourceDTO> resourcePage = keyword.isEmpty()
+                ? resourceService.getAllResources(pageable)
+                : resourceService.searchResources(keyword, pageable);
 
         model.addAttribute("resourcePage", resourcePage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("currentPage", page);
+
         return "resource/admin";
     }
 
@@ -94,13 +110,22 @@ public class ResourceController {
         return "redirect:/resource/admin/main";
     }
 
-    // 상세 보기
+    // 사용자용 상세보기
     @GetMapping("/detail/{id}")
     public String viewDetail(@PathVariable int id, Model model) {
         ResourceDTO resource = resourceService.getResourceById(id);
         if (resource == null) return "redirect:/resource/main";
         model.addAttribute("resource", resource);
         return "resource/detail";
+    }
+
+    // 관리자용 상세보기 (오타 수정함)
+    @GetMapping("/admin/detail/{id}")
+    public String adminViewDetail(@PathVariable int id, Model model) {
+        ResourceDTO resource = resourceService.getResourceById(id);
+        if (resource == null) return "redirect:/resource/admin/main";
+        model.addAttribute("resource", resource);
+        return "resource/adminDetail";  // 오타 수정
     }
 
     // 수정 폼
@@ -112,16 +137,23 @@ public class ResourceController {
         return "resource/sujung";
     }
 
-    // 수정 처리
+    // 수정 처리 (관리자/사용자 구분 리다이렉트)
     @PostMapping("/edit/{id}")
     public String updateResource(@PathVariable int id,
                                  @ModelAttribute ResourceDTO resourceDTO,
-                                 @RequestParam("file") MultipartFile file) {
+                                 @RequestParam("file") MultipartFile file,
+                                 Principal principal) {
         resourceService.updateResourceWithFile(id, resourceDTO, file);
-        return "redirect:/resource/detail/" + id;
+
+        boolean isAdmin = principal != null && principal.getName().toLowerCase().startsWith("admin");
+        if (isAdmin) {
+            return "redirect:/resource/admin/detail/" + id;
+        } else {
+            return "redirect:/resource/detail/" + id;
+        }
     }
 
-    // 삭제 처리
+    // 삭제 처리 - 관리자 목록으로 리다이렉트
     @GetMapping("/delete/{id}")
     public String deleteResource(@PathVariable int id) {
         resourceService.deleteResource(id);
@@ -149,6 +181,27 @@ public class ResourceController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
+    // PDF, 문서 파일 브라우저 내 직접보기
+    @GetMapping("/view/file/{fileName}")
+    public ResponseEntity<Resource> viewFileInline(@PathVariable String fileName) throws IOException {
+        if (fileName.contains("..")) return ResponseEntity.badRequest().build();
+
+        Path path = Paths.get(uploadDir).resolve(fileName).normalize();
+        UrlResource resource = new UrlResource(path.toUri());
+
+        if (!resource.exists() || !resource.isReadable()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String contentType = Files.probeContentType(path);
+        if (contentType == null) contentType = "application/octet-stream";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
+                .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
     }
 
