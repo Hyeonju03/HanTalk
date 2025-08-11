@@ -160,14 +160,14 @@ public class SentenceController {
         response.put("correctAnswer", originalSentenceWithCaret);
         response.put("sentenceId", sentenceId);
 
+        String userId = (String) session.getAttribute("userId"); // userId를 미리 가져옵니다.
+
         if (isCorrect) {
             Integer userNo = (Integer) session.getAttribute("userNo");
             if(userNo!= null && sentenceId != null) {
-                // 정답일 경우, 오답노트에 해당 항목이 있으면 삭제
                 incNoteService.deleteIncorrectNote(userNo, null, sentenceId);
             }
 
-            String userId = (String) session.getAttribute("userId");
             if(userId != null) {
                 learningLogService.updateLearning_Log(userId, 2);
             }
@@ -196,6 +196,10 @@ public class SentenceController {
                 Integer userNo = (Integer) session.getAttribute("userNo");
                 if (userNo != null && sentenceId != null) {
                     incNoteService.saveIncorrectNote(userNo, null, sentenceId);
+                }
+
+                if(userId != null) {
+                    learningLogService.updateLearning_Log(userId, 2);
                 }
 
                 // 다음 문제 로드
@@ -259,15 +263,12 @@ public class SentenceController {
         String rawSentence = (String) session.getAttribute("originalSentence"); // ✅ ^ 포함 원본
         Integer sentenceId = (Integer) session.getAttribute("originalSentenceId");
 
-        // ✅ 정답이면 학습 로그 업데이트
-        if (userId != null && isCorrect) {
-            learningLogService.updateLearning_Log(userId, 4);
-        }
-
         // ✅ 오답이면 오답노트 저장
         if (!isCorrect && userNo != null && sentenceId != null) {
             incNoteService.saveIncorrectNote(userNo, null, sentenceId); // 단어는 null
         }
+
+        learningLogService.updateLearning_Log(userId, 4);
 
         Map<String, Object> response = new HashMap<>();
         response.put("isCorrect", isCorrect);
