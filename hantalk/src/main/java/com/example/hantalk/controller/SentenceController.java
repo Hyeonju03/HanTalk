@@ -99,7 +99,11 @@ public class SentenceController {
         SentenceDTO dto = new SentenceDTO();
         dto.setSentenceId(id);
         sentenceService.setDelete(dto);
-        // 삭제 후 이전 페이지와 검색어를 유지하며 리다이렉트
+
+        if ("null".equals(kw)) {
+            kw = "";
+        }
+
         return String.format("redirect:/study/sentenceList/admin?page=%d&kw=%s", page, kw);
     }
 
