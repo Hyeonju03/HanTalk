@@ -104,8 +104,8 @@ public class UserController {
         return "userPage/UserLoginPage";
     }
 
-    @PostMapping("/user/login")
-    public String loginProc(@RequestParam String userId, @RequestParam String password, HttpSession session, HttpServletRequest request) {
+    @PostMapping("/user/login")//리퀘스트파람 괄호에 아이디와 패스워드 추가
+    public String loginProc(@RequestParam("userId") String userId, @RequestParam("password") String password, HttpSession session, HttpServletRequest request) {
         if (!isLoginOk(userId, password)) {
             return "redirect:/user/login";
         }

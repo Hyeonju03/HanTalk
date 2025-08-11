@@ -1,6 +1,5 @@
 package com.example.hantalk.dto;
 
-import com.example.hantalk.entity.Post;
 import com.example.hantalk.entity.Users;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,10 +14,6 @@ public class CommentDTO {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
-    private Post post;
+    private Long postId;
     private Users users;
-
-    public void setPostId(int postId) {
-
-    }
 }
