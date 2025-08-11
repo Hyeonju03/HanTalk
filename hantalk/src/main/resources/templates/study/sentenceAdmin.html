@@ -49,7 +49,7 @@
 
 <div th:if="${!paging.isEmpty()}" class="pagination">
     <ul>
-        <li th:classappend="${!paging.hasPrevious} ? 'disabled'">
+        <li th:if="${paging.hasPrevious}">
             <a th:href="@{|?page=${paging.number - 1}&kw=${kw}|}">이전</a>
         </li>
 
@@ -58,7 +58,7 @@
             <a th:href="@{|?page=${page}&kw=${kw}|}" th:text="${page + 1}"></a>
         </li>
 
-        <li th:classappend="${!paging.hasNext} ? 'disabled'">
+        <li th:if="${paging.hasNext}">
             <a th:href="@{|?page=${paging.number + 1}&kw=${kw}|}">다음</a>
         </li>
     </ul>
