@@ -40,10 +40,10 @@
     <tr th:each="item : ${items}">
         <td>
             <img th:if="${item.itemType == 'frame'}"
-                 th:src="@{'/frames/' + ${item.itemImage}}"
+                 th:src="@{'/uploads/frames/' + ${item.itemImage}}"
                  alt="아이템 이미지" width="80" height="80" />
             <img th:unless="${item.itemType == 'frame'}"
-                 th:src="@{'/images/' + ${item.itemImage}}"
+                 th:src="@{'/uploads/images/' + ${item.itemImage}}"
                  alt="아이템 이미지" width="80" height="80" />
         </td>
         <td th:text="${item.itemName}">이름</td>
