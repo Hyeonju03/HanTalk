@@ -109,7 +109,6 @@ public class MyPageService {
         return user.getUserItemsList();
     }
 
-
     public List<User_Items> getUserItems(Integer userNo) {
         Users user = usersRepository.findById(userNo)
                 .orElseThrow(() -> new RuntimeException("사용자 없음"));
@@ -123,4 +122,6 @@ public class MyPageService {
     public void applyProfileFrameByImageName(int userNo, String frameName) {
         usersRepository.updateProfileFrame(userNo, frameName);
     }
+
+
 }

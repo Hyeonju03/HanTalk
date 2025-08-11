@@ -138,12 +138,8 @@
 <nav>
   <h2>관리자 자료실 메뉴</h2>
   <ul>
-    <li>
-      <a href="/resource/admin/main">관리자 메인</a>
-    </li>
-    <li>
-      <a href="/resource/chuga">자료 등록</a>
-    </li>
+    <li><a href="/resource/admin/main">관리자 메인</a></li>
+    <li><a href="/resource/chuga">자료 등록</a></li>
   </ul>
 </nav>
 
@@ -151,11 +147,11 @@
   <h1 th:text="${fileName}">파일명</h1>
 
   <!-- 이미지 미리보기 -->
-  <img th:if="${isImage}" th:src="@{|/resource/view/file/${fileName}|}" alt="이미지 미리보기" />
+  <img th:if="${isImage}" th:src="@{|/resource/image/${fileName}|}" alt="이미지 미리보기" />
 
   <!-- 오피스 파일 미리보기 -->
   <iframe th:if="${isOfficeFile}"
-          th:src="@{|https://docs.google.com/gview?url=${'http://localhost:9001/resource/view/file/' + fileName}&embedded=true|}"
+          th:src="@{${googleViewerUrl}}"
           frameborder="0"></iframe>
 
   <!-- PDF 등 직접 미리보기 -->

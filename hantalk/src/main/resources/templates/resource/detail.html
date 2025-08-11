@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
-  <title>자료 상세 보기</title>
+  <title>사용자 자료 상세 보기</title>
   <style>
     body {
       background: #fefcff;
@@ -136,15 +136,6 @@
        th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
        class="btn">수정</a>
   </div>
-
-  <!--관리자 로그인시 목록-->
-  <div class="btn-group">
-    <a href="/resource/admin/main" class="btn"> 관리자 목록으로</a>
-    <a th:if="${session.loginUser != null and session.loginUser.role == 'ROLE_ADMIN'}"
-       th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
-       class="btn">수정</a>
-  </div>
 </main>
-
 </body>
 </html>

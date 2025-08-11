@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>출석 캘린더</title>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,42 +15,123 @@
       min-height: 100px;
       padding: 5px;
     }
+
+    /* 커스텀 모달 스타일 */
+    .modal {
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .close-button {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
   </style>
 </head>
-<body class="bg-gray-100 p-8">
+<body class="bg-gray-100 flex flex-col min-h-screen font-sans">
 
-<div class="max-w-5xl mx-auto bg-white rounded border border-gray-300 shadow-lg">
-  <div class="flex items-center justify-between border-b border-gray-300 p-3 text-gray-500 select-none">
-    <button id="prevMonth" class="text-2xl hover:text-blue-500">◀</button>
-    <div id="currentMonth" class="text-xl font-semibold text-gray-700"></div>
-    <button id="nextMonth" class="text-2xl hover:text-blue-500">▶</button>
-  </div>
+<!-- 헤더 fragments 포함 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-  <div class="grid grid-cols-7 text-sm text-center text-gray-500 uppercase border-b border-gray-300">
-    <div class="py-2 text-red-600">SUN</div>
-    <div class="py-2">MON</div>
-    <div class="py-2">TUE</div>
-    <div class="py-2">WED</div>
-    <div class="py-2">THU</div>
-    <div class="py-2">FRI</div>
-    <div class="py-2 text-blue-600">SAT</div>
-  </div>
+<div class="flex-grow flex">
+  <!-- 사이드바 fragments 포함 -->
+  <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-  <div id="calendar" class="grid grid-cols-7 gap-1 p-2 text-center text-base text-gray-700">
+  <!-- 메인 콘텐츠 영역 -->
+  <div class="flex-grow p-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">출석 캘린더</h1>
+
+    <div class="max-w-5xl mx-auto bg-white rounded border border-gray-300 shadow-lg">
+      <div class="flex items-center justify-between border-b border-gray-300 p-3 text-gray-500 select-none">
+        <button id="prevMonth" class="text-2xl hover:text-blue-500">◀</button>
+        <div id="currentMonth" class="text-xl font-semibold text-gray-700"></div>
+        <button id="nextMonth" class="text-2xl hover:text-blue-500">▶</button>
+      </div>
+
+      <div class="grid grid-cols-7 text-sm text-center text-gray-500 uppercase border-b border-gray-300">
+        <div class="py-2 text-red-600">SUN</div>
+        <div class="py-2">MON</div>
+        <div class="py-2">TUE</div>
+        <div class="py-2">WED</div>
+        <div class="py-2">THU</div>
+        <div class="py-2">FRI</div>
+        <div class="py-2 text-blue-600">SAT</div>
+      </div>
+
+      <div id="calendar" class="grid grid-cols-7 gap-1 p-2 text-center text-base text-gray-700">
+      </div>
+    </div>
+
+    <div class="text-center mt-6">
+      <button id="checkInButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md text-lg">
+        오늘 출석하기
+      </button>
+      <a href="/user/view" class="text-blue-600 hover:underline text-lg block mt-4">마이 페이지로</a>
+    </div>
   </div>
 </div>
 
-<div class="text-center mt-6">
-  <button id="checkInButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md text-lg">
-    오늘 출석하기
-  </button>
-  <a href="/user/view" class="text-blue-600 hover:underline text-lg block mt-4">마이 페이지로</a>
+<!-- 커스텀 알림 모달 -->
+<div id="alertModal" class="modal">
+  <div class="modal-content">
+    <span class="close-button" id="alertCloseBtn">&times;</span>
+    <p id="alertMessage" class="mt-4"></p>
+  </div>
 </div>
 
 <script>
   const calendarEl = document.getElementById('calendar');
   const monthLabel = document.getElementById('currentMonth');
   const checkInButton = document.getElementById('checkInButton');
+
+  // 커스텀 모달 관련 요소
+  const alertModal = document.getElementById('alertModal');
+  const alertCloseBtn = document.getElementById('alertCloseBtn');
+  const alertMessage = document.getElementById('alertMessage');
+
+  // 커스텀 알림 모달 표시 함수 (alert() 대신 사용)
+  function showAlert(message) {
+      alertMessage.textContent = message;
+      alertModal.style.display = 'flex';
+  }
+
+  // 모달 닫기 버튼 이벤트
+  alertCloseBtn.onclick = function() {
+      alertModal.style.display = 'none';
+  }
+
+  window.onclick = function(event) {
+      if (event.target == alertModal) {
+          alertModal.style.display = 'none';
+      }
+  }
 
   const today = new Date();
   let currentYear = today.getFullYear();
@@ -64,10 +146,8 @@
 
     monthLabel.textContent = `${currentYear}.${currentMonth + 1}`;
 
-    // ✅ 시작 요일이 일요일이므로, Date.getDay()의 0~6 인덱스를 그대로 사용합니다.
     const startDayOffset = firstDayOfMonth;
 
-    // 빈 칸 추가
     for (let i = 0; i < startDayOffset; i++) {
       const emptyCell = document.createElement('div');
       emptyCell.className = 'calendar-grid-cell';
@@ -77,7 +157,6 @@
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     let hasCheckedInToday = false;
 
-    // 날짜 셀 생성
     for (let day = 1; day <= lastDateOfMonth; day++) {
       const cell = document.createElement('div');
       cell.className = 'calendar-grid-cell relative rounded cursor-default';
@@ -88,10 +167,9 @@
 
       const currentDayOfWeek = new Date(currentYear, currentMonth, day).getDay();
 
-      // ✅ 토요일 파랑, 일요일 빨강
-      if (currentDayOfWeek === 0) { // 일요일
+      if (currentDayOfWeek === 0) {
         dayText.classList.add('text-red-600');
-      } else if (currentDayOfWeek === 6) { // 토요일
+      } else if (currentDayOfWeek === 6) {
         dayText.classList.add('text-blue-600');
       }
 
@@ -100,7 +178,7 @@
       const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       if (attendanceDates.includes(dateStr)) {
         const imgIcon = document.createElement('img');
-        imgIcon.src = '/image/bono.png';
+        imgIcon.src = '/image/chulsuk4.png';
         imgIcon.className = 'w-30 h-30 mx-auto';
 
         cell.appendChild(imgIcon);
@@ -144,7 +222,7 @@
       })
       .catch(error => {
         console.error('출석 정보 불러오기 실패:', error);
-        alert('출석 정보를 불러오는데 실패했습니다.');
+        showAlert('출석 정보를 불러오는데 실패했습니다.');
         renderCalendar([]);
       });
   }
@@ -175,15 +253,15 @@
     axios.post('/user/checkTodayAttendance')
       .then(response => {
         if (response.data.success) {
-          alert(response.data.message || '출석 완료! 10 포인트가 적립되었습니다.');
+          showAlert(response.data.message || '출석 완료! 10 포인트가 적립되었습니다.');
           fetchAndRender();
         } else {
-          alert(response.data.message || '출석에 실패했습니다.');
+          showAlert(response.data.message || '출석에 실패했습니다.');
         }
       })
       .catch(error => {
         console.error('출석 체크 중 오류 발생:', error);
-        alert('출석 체크 중 오류가 발생했습니다. 다시 시도해 주세요.');
+        showAlert('출석 체크 중 오류가 발생했습니다. 다시 시도해 주세요.');
       });
   });
 

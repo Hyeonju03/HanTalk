@@ -88,7 +88,15 @@ public class MyPageController {
     // 마이페이지 수정
     @PostMapping("/update")
     public String updateProc(@ModelAttribute UsersDTO dto, HttpSession session) {
-        dto.setUserNo((Integer) session.getAttribute("userNo"));
+        Integer userNo = (Integer) session.getAttribute("userNo");
+        dto.setUserNo(userNo);
+
+        // 프로필 이미지가 null인 경우 기존 이미지 정보 유지
+        if (dto.getProfileImage() == null || dto.getProfileImage().isEmpty()) {
+            UsersDTO existingUser = myPageService.getMyPageInfo(userNo);
+            dto.setProfileImage(existingUser.getProfileImage());
+        }
+
         myPageService.updateMyPage(dto);
         return "redirect:/user/view";
     }

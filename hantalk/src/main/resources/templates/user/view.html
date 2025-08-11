@@ -2,97 +2,97 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>마이페이지</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 프로필 이미지와 프레임이 겹쳐 보이도록 z-index 설정 */
+    .profile-container {
+      position: relative;
+      width: 112px; /* 28 * 4px */
+      height: 112px; /* 28 * 4px */
+      margin: 0 auto;
+    }
+    .profile-image, .profile-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center py-10">
-<div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md mx-auto">
-  <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">마이페이지</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-  <!-- 프로필 이미지 + 프레임 -->
-  <div>
-    <h3>프로필 이미지</h3>
+<!-- 헤더 fragments 포함 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-    <div class="relative w-28 h-28 mx-auto">
-      <!-- 프로필 이미지 (항상 바닥에 깔림) -->
-      <img th:if="${user.profileImage != null}"
-           th:src="@{'/images/' + ${user.profileImage}}"
-           alt="프로필 이미지"
-           class="rounded-full w-full h-full object-cover z-0"/>
+<!-- 헤더 아래에 사이드바와 메인 콘텐츠가 오도록 flex 컨테이너 추가 -->
+<div class="flex-grow flex">
+  <!-- 사이드바 fragments 포함 -->
+  <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-      <!-- 프레임 이미지 (프로필 위에 덮임) -->
-      <img th:if="${user.profileFrame != null}"
-           th:src="@{'/frames/' + ${user.profileFrame}}"
-           alt="프레임 이미지"
-           class="absolute top-0 left-0 w-full h-full pointer-events-none z-10"/>
+  <div class="flex-grow p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
 
-      <!-- 둘 다 없을 때 -->
-      <div th:if="${user.profileImage == null and user.profileFrame == null}"
-           class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm text-center z-20 bg-white bg-opacity-80 rounded-full">
-        프로필 이미지 및<br/>프레임이 설정되지 않았습니다.
+      <!-- 프로필 헤더 섹션 -->
+      <div class="flex flex-col md:flex-row items-center p-8 bg-gray-50 border-b border-gray-200 rounded-t-xl">
+        <!-- 프로필 이미지 + 프레임 -->
+        <div class="profile-container mb-4 md:mb-0 md:mr-8 flex-shrink-0">
+          <img th:if="${user.profileImage != null}"
+               th:src="@{'/uploads/images/' + ${user.profileImage}}"
+               alt="프로필 이미지"
+               class="profile-image rounded-full object-cover z-0"/>
+          <img th:if="${user.profileFrame != null}"
+               th:src="@{'/uploads/frames/' + ${user.profileFrame}}"
+               alt="프레임 이미지"
+               class="profile-frame pointer-events-none z-10"/>
+          <div th:if="${user.profileImage == null and user.profileFrame == null}"
+               class="profile-image flex items-center justify-center text-gray-500 text-sm text-center z-20 bg-white bg-opacity-80 rounded-full">
+            프로필 이미지 및<br/>프레임이 설정되지 않았습니다.
+          </div>
+        </div>
+
+        <!-- 사용자 아이디 및 닉네임 정보 -->
+        <div class="text-center md:text-left flex-grow">
+          <h1 class="text-3xl font-bold text-gray-800 mb-1" th:text="${user.nickname}">닉네임</h1>
+          <p class="text-gray-500 text-sm" th:text="${user.userId}">아이디</p>
+        </div>
+      </div>
+
+      <!-- 상세 정보 섹션 -->
+      <div class="p-8">
+        <h2 class="text-xl font-bold text-gray-700 mb-4 border-l-4 border-blue-500 pl-3">상세 정보</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+          <!-- 이름 -->
+          <div>
+            <strong class="block text-sm text-gray-500">이름</strong>
+            <span class="text-lg font-semibold text-gray-900" th:text="${user.name}">이름</span>
+          </div>
+
+          <!-- 이메일 -->
+          <div>
+            <strong class="block text-sm text-gray-500">이메일</strong>
+            <span class="text-lg font-semibold text-gray-900" th:text="${user.email}">이메일</span>
+          </div>
+
+          <!-- 포인트 -->
+          <div>
+            <strong class="block text-sm text-gray-500">포인트</strong>
+            <span class="text-lg font-bold text-green-600" th:text="${user.point}">0</span> pt
+          </div>
+
+          <!-- 가입일 -->
+          <div>
+            <strong class="block text-sm text-gray-500">가입일</strong>
+            <span class="text-lg font-semibold text-gray-900" th:text="${#temporals.format(user.JoinDate, 'yyyy-MM-dd')}">2025-08-01</span>
+          </div>
+        </div>
       </div>
     </div>
-
-
-    <div class="space-y-3 text-lg mb-8">
-    <p>
-      <strong class="text-gray-700">아이디:</strong>
-      <span th:text="${user.userId}" class="text-gray-900 ml-2">아이디</span>
-    </p>
-    <p>
-      <strong class="text-gray-700">이름:</strong>
-      <span th:text="${user.name}" class="text-gray-900 ml-2">이름</span>
-    </p>
-    <p>
-      <strong class="text-gray-700">닉네임:</strong>
-      <span th:text="${user.nickname}" class="text-gray-900 ml-2">닉네임</span>
-    </p>
-    <p>
-      <strong class="text-gray-700">이메일:</strong>
-      <span th:text="${user.email}" class="text-gray-900 ml-2">이메일</span>
-    </p>
-    <p>
-      <strong class="text-gray-700">포인트:</strong>
-      <span th:text="${user.point}" class="text-green-600 font-semibold ml-2">0</span>
-    </p>
-    <p>
-      <strong class="text-gray-700">가입일:</strong>
-      <span th:text="${#temporals.format(user.JoinDate, 'yyyy-MM-dd')}">2025-08-01</span>
-    </p>
-  </div>
-
-  <hr class="border-t-2 border-gray-200 my-8">
-
-  <div class="flex flex-col space-y-3">
-    <a href="/user/update"
-       class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
-      회원정보 수정
-    </a>
-    <a href="/user/delete"
-       class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
-      회원 탈퇴
-    </a>
-    <a href="/user/calendar"
-       class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
-      출석현황
-    </a>
-    <a href="/user/test"
-       class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
-      로그인 회원가입 테스트 페이지로
-    </a>
-    <a href="/item/shop"
-       class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
-      아이템 상점으로 이동
-    </a>
-    <a href="/user/items"
-       class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
-      구매한 아이템 목록
-    </a>
-    <a href="/user/statistics"
-       class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-150 ease-in-out">
-      학습 통계
-    </a>
   </div>
 </div>
+
 </body>
 </html>

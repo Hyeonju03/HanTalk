@@ -2,27 +2,39 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원 탈퇴</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 h-screen flex items-center justify-center">
-<div class="bg-white p-8 rounded-xl shadow-md w-96 text-center">
-  <h1 class="text-2xl font-bold mb-4 text-red-600">회원 탈퇴</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-  <p class="mb-6 text-gray-700 leading-relaxed">
-    정말 탈퇴하시겠습니까? <br>
-    탈퇴 시 계정은 비활성화되며 복구할 수 없습니다.
-  </p>
+<!-- 헤더 fragments 포함 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-  <form action="/user/delete" method="post" class="mb-4">
-    <button type="submit"
-            onclick="return confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')"
-            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-150 ease-in-out">
-      탈퇴하기
-    </button>
-  </form>
+<div class="flex-grow flex">
+  <!-- 사이드바 fragments 포함 -->
+  <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-  <a href="/user/view" class="text-blue-500 hover:underline text-sm">← 돌아가기</a>
+  <!-- 메인 콘텐츠 영역 -->
+  <div class="flex-grow flex items-center justify-center p-8">
+    <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md text-center">
+      <h1 class="text-2xl font-bold mb-4 text-red-600">회원 탈퇴</h1>
+
+      <p class="mb-6 text-gray-700 leading-relaxed">
+        정말 탈퇴하시겠습니까? <br>
+        탈퇴 시 계정은 비활성화되며 복구할 수 없습니다.
+      </p>
+
+      <form action="/user/delete" method="post" class="mb-4">
+        <button type="submit"
+                onclick="return confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')"
+                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-150 ease-in-out">
+          탈퇴하기
+        </button>
+      </form>
+    </div>
+  </div>
 </div>
+
 </body>
 </html>
