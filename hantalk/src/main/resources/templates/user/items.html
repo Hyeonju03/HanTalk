@@ -41,7 +41,7 @@
       <h3 class="text-xl font-semibold mt-6 mb-2">프로필 이미지 선택</h3>
       <div class="grid grid-cols-4 gap-2">
         <img th:each="img : ${profileImages}"
-             th:src="@{'/images/' + ${img}}"
+             th:src="@{'/uploads/images/' + ${img}}"
              th:attr="data-img=${img}"
              class="item-profile-img cursor-pointer border rounded-full hover:ring-2 ring-offset-2 ring-blue-500 w-20 h-20 object-cover"
              onclick="selectProfileImage(this)">
@@ -51,7 +51,7 @@
       <h3 class="text-xl font-semibold mt-6 mb-2">프레임 이미지 선택</h3>
       <div class="grid grid-cols-4 gap-2">
         <img th:each="frame : ${frameImages}"
-             th:src="@{'/frames/' + ${frame}}"
+             th:src="@{'/uploads/frames/' + ${frame}}"
              th:attr="data-frame=${frame}"
              class="item-frame-img cursor-pointer border hover:ring-2 ring-offset-2 ring-blue-500 w-20 h-20 object-cover"
              onclick="selectFrameImage(this)">
@@ -142,13 +142,13 @@
   // 프로필 이미지 선택
   function selectProfileImage(el) {
     selectedProfileImage = selectItem('.item-profile-img', el, 'data-img', el.getAttribute("data-img"));
-    document.getElementById("preview-profile").src = "/images/" + selectedProfileImage;
+    document.getElementById("preview-profile").src = "/uploads/images/" + selectedProfileImage;
   }
 
   // 프레임 이미지 선택
   function selectFrameImage(el) {
     selectedFrameImage = selectItem('.item-frame-img', el, 'data-frame', el.getAttribute("data-frame"));
-    document.getElementById("preview-frame").src = "/frames/" + selectedFrameImage;
+    document.getElementById("preview-frame").src = "/uploads/frames/" + selectedFrameImage;
   }
 
   // 설정 버튼 클릭 이벤트 핸들러

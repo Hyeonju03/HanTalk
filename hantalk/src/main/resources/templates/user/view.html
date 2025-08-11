@@ -40,11 +40,11 @@
         <!-- 프로필 이미지 + 프레임 -->
         <div class="profile-container mb-4 md:mb-0 md:mr-8 flex-shrink-0">
           <img th:if="${user.profileImage != null}"
-               th:src="@{'/images/' + ${user.profileImage}}"
+               th:src="@{'/uploads/images/' + ${user.profileImage}}"
                alt="프로필 이미지"
                class="profile-image rounded-full object-cover z-0"/>
           <img th:if="${user.profileFrame != null}"
-               th:src="@{'/frames/' + ${user.profileFrame}}"
+               th:src="@{'/uploads/frames/' + ${user.profileFrame}}"
                alt="프레임 이미지"
                class="profile-frame pointer-events-none z-10"/>
           <div th:if="${user.profileImage == null and user.profileFrame == null}"
