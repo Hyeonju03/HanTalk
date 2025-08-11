@@ -16,7 +16,20 @@
     <input type="text" name="description" id="description" class="form-control">
   </div>
   <button>생성</button>
-  <a href="/study/voca/admin">취소</a>
+  <a href="/study/vocaList/admin">취소</a>
 </form>
+
+<th:block th:if="${error != null}">
+  <script th:inline="javascript">
+    alert([[${error}]]);
+  </script>
+</th:block>
+
+<th:block th:if="${success != null}">
+  <script th:inline="javascript">
+    alert([[${success}]]);
+  </script>
+</th:block>
+
 </body>
 </html>

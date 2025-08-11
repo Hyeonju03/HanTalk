@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <title>단어 목록 관리</title>
 </head>
 <body>
 <h1>단어 목록 관리</h1>
-<a th:href="@{'/study/vocaInsert'}">문장 추가</a>
+
+<!-- ✅ 단어 추가 (문구 수정) -->
+<a th:href="@{/study/vocaInsert}">단어 추가</a>
+
+<!-- ✅ 검색 폼 -->
+<form th:action="@{/study/vocaList/admin}" method="get" style="margin:12px 0;">
+  <input type="text" name="kw" th:value="${kw}" placeholder="단어 또는 의미 검색">
+  <button type="submit">검색</button>
+</form>
+
 <table>
   <thead>
   <tr>
@@ -18,37 +27,51 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:if="${dtoList == null || dtoList.size <= 0}">
-    <td colspan="4" rowspan="2">
-      문장 데이터가 존재하지 않습니다.
-    </td>
+  <!-- ✅ dtoList → paging.content 기준 -->
+  <tr th:if="${paging == null || paging.content.isEmpty()}">
+    <td colspan="5">단어 데이터가 존재하지 않습니다.</td>
   </tr>
-  <tr th:each="voca, loop : ${dtoList}">
-    <td th:text="${loop.count}"></td>
+
+  <tr th:each="voca, loop : ${paging.content}">
+    <td th:text="${paging.number * paging.size + loop.count}"></td>
     <td th:text="${voca.vocabulary}"></td>
     <td th:text="${voca.description}"></td>
     <td th:text="${#temporals.format(voca.createDate, 'yyyy-MM-dd')}"></td>
     <td>
-      <a th:href="@{'/study/vocaUpdate/' + ${voca.vocaId}}">수정</a>
-      <button type="button" class="btn-delete" th:onclick="'event.stopPropagation(); confirmDelete(' + ${voca.vocaId} + ');'">삭제</button>
+      <a th:href="@{|/study/vocaUpdate/${voca.vocaId}|}">수정</a>
+
+      <!-- ✅ 삭제: GET 유지 시 -->
+      <button type="button"
+              th:onclick="'if(confirm(\'삭제하시겠습니까?\')) location.href=\'/study/vocaDelete/' + ${voca.vocaId} + '\';'">
+        삭제
+      </button>
+
+      <!-- ✅ 권장: POST로 바꾸려면 아래 폼 사용(컨트롤러도 @PostMapping 필요)
+      <form th:action="@{|/study/vocaDelete/${voca.vocaId}|}" method="post" style="display:inline"
+            onsubmit="return confirm('삭제하시겠습니까?')">
+        <button type="submit">삭제</button>
+      </form>
+      -->
     </td>
   </tr>
   </tbody>
 </table>
 
-<script>
-  function confirmDelete(vocaId) {
-    if (confirm('정말 이 자료를 삭제하시겠습니까?')) {
-      window.location.href = '/study/vocaDelete/' + vocaId;
-    }
-  }
+<!-- ✅ 페이징 -->
+<div th:if="${paging != null && !paging.isEmpty()}" class="pagination" style="margin-top:12px;">
+  <ul>
+    <li th:classappend="${!paging.hasPrevious} ? 'disabled'">
+      <a th:href="@{|?page=${paging.number - 1}&kw=${kw}|}">이전</a>
+    </li>
+    <li th:each="p : ${#numbers.sequence(0, paging.totalPages - 1)}"
+        th:classappend="${p == paging.number} ? 'active'">
+      <a th:href="@{|?page=${p}&kw=${kw}|}" th:text="${p + 1}"></a>
+    </li>
+    <li th:classappend="${!paging.hasNext} ? 'disabled'">
+      <a th:href="@{|?page=${paging.number + 1}&kw=${kw}|}">다음</a>
+    </li>
+  </ul>
+</div>
 
-  function goToDetail(row) {
-    const url = row.getAttribute('data-url');
-    if (url) {
-      window.location.href = url;
-    }
-  }
-</script>
 </body>
 </html>
