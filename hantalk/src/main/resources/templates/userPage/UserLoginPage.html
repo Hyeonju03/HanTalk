@@ -208,16 +208,27 @@
 
     function checkId() {
         const userId = document.getElementById("userId").value.trim();
-        if (userId === "") {
-            alert("아이디를 입력하세요.");
-            return;
-        }
-        fetch(`/user/isIdAvail?userId=${encodeURIComponent(userId)}`)
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById("idMsg").textContent = data ? "사용 가능한 아이디입니다." : "이미 사용중인 아이디입니다.";
-            });
-    }
+        const msg = document.getElementById("idMsg");
+        if (!userId) { alert("아이디를 입력하세요."); return; }
+
+        msg.style.color = "inherit";
+        msg.textContent = "확인 중...";
+
+        fetch(`/user/isIdAvail?userId=${encodeURIComponent(userId)}`, { cache: 'no-store' })
+          .then(res => res.text())
+          .then(text => {
+            const available = text.trim().toLowerCase() === "true";
+            msg.style.color = available ? "green" : "red";
+            msg.textContent = available
+              ? "사용 가능한 아이디입니다."
+              : "이미 사용중인 아이디입니다.";
+          })
+          .catch(err => {
+            msg.style.color = "red";
+            msg.textContent = "중복 확인 중 오류가 발생했습니다.";
+            console.error(err);
+          });
+      }
 
     function toggleCustomDomain(select) {
         const customDomain = document.getElementById("customDomain");
@@ -232,18 +243,33 @@
         return (prefix !== "" && domain !== "") ? prefix + "@" + domain : "";
     }
 
-    function checkEmail() {
+     function checkEmail() {
         const email = getFullEmail();
+        const msg = document.getElementById("emailMsg");
         if (!email || !email.includes("@")) {
-            document.getElementById("emailMsg").textContent = "올바른 이메일을 입력하세요.";
-            return;
+          msg.style.color = "red";
+          msg.textContent = "올바른 이메일을 입력하세요.";
+          return;
         }
-        fetch(`/user/isEmailAvail?email=${encodeURIComponent(email)}`)
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById("emailMsg").textContent = data ? "사용 가능한 이메일입니다." : "이미 등록된 이메일입니다.";
-            });
-    }
+
+        msg.style.color = "inherit";
+        msg.textContent = "확인 중...";
+
+        fetch(`/user/isEmailAvail?email=${encodeURIComponent(email)}`, { cache: 'no-store' })
+          .then(res => res.text())
+          .then(text => {
+            const available = text.trim().toLowerCase() === "true";
+            msg.style.color = available ? "green" : "red";
+            msg.textContent = available
+              ? "사용 가능한 이메일입니다."
+              : "이미 등록된 이메일입니다.";
+          })
+          .catch(err => {
+            msg.style.color = "red";
+            msg.textContent = "중복 확인 중 오류가 발생했습니다.";
+            console.error(err);
+          });
+      }
     document.querySelector("form[action='/user/signup']").addEventListener("submit", function() {
         const birthInput = document.getElementById("birth").value;  // YYYY-MM-DD
         if (birthInput) {

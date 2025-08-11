@@ -21,9 +21,10 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/css/**", "/js/**", "/images/**","/user/test","/user/findIDPW", "/");
+                .excludePathPatterns("/css/**", "/js/**", "/images/**", "/user/test", "/user/findIDPW", "/",
+                        "/user/isIdAvail", "/user/isEmailAvail");
         registry.addInterceptor(adminInterceptor)
-                .addPathPatterns("/admin/**","/**/admin/**", "/**/admin")
+                .addPathPatterns("/admin/**", "/**/admin/**", "/**/admin")
                 .excludePathPatterns("/css/**", "/js/**", "/images/**");
     }
 
@@ -36,7 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
         String uploadPath = System.getProperty("user.dir") + "/uploads/videos/";
         registry.addResourceHandler("/videos/**")
                 .addResourceLocations("file:" + uploadPath);
-      
+
         // 프레임 이미지 경로
         registry.addResourceHandler("/frames/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/frames/");
