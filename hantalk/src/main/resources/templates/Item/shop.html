@@ -50,11 +50,45 @@
                     보유 포인트: <span th:text="${point}" class="text-green-600 font-extrabold"></span> pt
                 </div>
 
+
                 <!-- 관리자만 볼 수 있는 페이지로 이동하는 버튼 -->
                 <a th:if="${isAdmin}" href="/item/admin"
                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
                     관리자 페이지로 이동
                 </a>
+
+<!-- 아이템 목록 테이블 -->
+<table border="1">
+    <thead>
+    <tr>
+        <th>이미지</th>
+        <th>이름</th>
+        <th>가격</th>
+        <th>설명</th>
+        <th>구매</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${items}">
+        <td>
+            <img th:if="${item.itemType == 'frame'}"
+                 th:src="@{'/uploads/frames/' + ${item.itemImage}}"
+                 alt="아이템 이미지" width="80" height="80" />
+            <img th:unless="${item.itemType == 'frame'}"
+                 th:src="@{'/uploads/images/' + ${item.itemImage}}"
+                 alt="아이템 이미지" width="80" height="80" />
+        </td>
+        <td th:text="${item.itemName}">이름</td>
+        <td th:text="${item.price}">0</td>
+        <td th:text="${item.itemDescription}">설명</td>
+        <td>
+            <!-- 관리자일 경우 구매 버튼 숨김 -->
+            <div th:unless="${isAdmin}">
+                <form th:action="@{/item/purchase}" method="post">
+                    <input type="hidden" name="itemId" th:value="${item.itemId}" />
+                    <button type="submit">구매</button>
+                </form>
+
             </div>
 
             <!-- 메시지 및 오류 알림 -->

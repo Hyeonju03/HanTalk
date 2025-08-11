@@ -138,7 +138,7 @@ public class PostController {
         if (categoryId == 1 && !"ADMIN".equalsIgnoreCase(role)) {
             redire.addFlashAttribute("msg", "공지사항은 관리자만 작성할 수 있습니다.");
             String encodedCategoryName = URLEncoder.encode(categoryName, StandardCharsets.UTF_8);
-            return "redirect:/post/" + encodedCategoryName;
+            return "redirect:/post" + encodedCategoryName;
         }
 
         PostDTO postDTO = new PostDTO();
@@ -180,8 +180,8 @@ public class PostController {
 
         //파일 업로드 기능 추가
         if (uploadFile != null && !uploadFile.isEmpty()) {
-            // 저장 경로
-            String uploadDir = "C:/lsy/HanTalk/hantalk/fileUpload";
+            // 저장 경로를 WebConfig 경로와 맞춤
+            String uploadDir = System.getProperty("user.dir") + "/uploads/fileUpload";
 
             String originalFilename = uploadFile.getOriginalFilename();
             String newFilename = UUID.randomUUID().toString() + "_" + originalFilename;
@@ -333,8 +333,8 @@ public class PostController {
     //파일 다운
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String fileName) throws IOException {
-        // 업로드된 경로 설정
-        Path filePath = Paths.get("C:/lsy/HanTalk/hantalk/fileUpload/", fileName);
+        String uploadDir = System.getProperty("user.dir") + "/uploads/fileUpload";
+        Path filePath = Paths.get(uploadDir, fileName);
         Resource resource = new UrlResource(filePath.toUri());
 
         // 파일 존재 여부 확인

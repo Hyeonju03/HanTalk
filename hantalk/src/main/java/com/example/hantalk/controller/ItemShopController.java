@@ -1,5 +1,6 @@
 package com.example.hantalk.controller;
 
+import com.example.hantalk.SessionUtil;
 import com.example.hantalk.entity.Item;
 import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.UsersRepository;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+
 @Controller
 @RequestMapping("/item")
 @RequiredArgsConstructor
@@ -24,31 +26,29 @@ public class ItemShopController {
     private final ItemShopService itemShopService;
     private final UsersRepository userRepository;
 
+
     // 아이템 상점 페이지 조회
     @GetMapping("/shop")
     public String showShop(HttpSession session, Model model) {
-        // 사용자 or 관리자 체크
-        Integer userNo = (Integer) session.getAttribute("userNo");
-        String adminId = (String) session.getAttribute("adminId");
+        Integer userNo = SessionUtil.getLoginUserNo(session);
+        String role = SessionUtil.getRole(session);
 
-        if (userNo == null && adminId == null) {
-            return "redirect:/user/login"; // 로그인 안 되어있으면 리디렉션
+        if (userNo == null || role == null) {
+            return "redirect:/user/login";
         }
 
-        // 관리자일 경우 (adminId가 존재하면)
-        if (adminId != null) {
-            model.addAttribute("point", 0); // 관리자에게 포인트는 의미 없음
-            model.addAttribute("items", itemShopService.getAllItems()); // 모든 아이템 목록만 보여줌
-            model.addAttribute("isAdmin", true); // 뷰에서 분기용
+        if ("ADMIN".equals(role)) {
+            model.addAttribute("point", 0);
+            model.addAttribute("items", itemShopService.getAllItems());
+            model.addAttribute("isAdmin", true);
             return "item/shop";
         }
 
-        // 사용자일 경우
+        // USER 권한인 경우
         Users user = userRepository.findById(userNo).orElseThrow();
         model.addAttribute("point", user.getPoint());
         model.addAttribute("items", itemShopService.getAllItemsWithUserInfo(user));
-        model.addAttribute("isAdmin", false); // 뷰에서 분기용
-
+        model.addAttribute("isAdmin", false);
         return "item/shop";
     }
 
@@ -74,6 +74,7 @@ public class ItemShopController {
         return "redirect:/item/shop";
     }
 
+
     @GetMapping("/test-give-point")
     public String testGivePoint(HttpSession session, RedirectAttributes redirectAttributes) {
         Integer userNo = (Integer) session.getAttribute("userNo");
@@ -94,24 +95,6 @@ public class ItemShopController {
         return "item/admin";
     }
 
-    // 공통 로직 메서드로 추출해도 좋음
-    private String saveImageFile(MultipartFile imageFile, String itemType) throws IOException {
-        String originalFileName = imageFile.getOriginalFilename();
-        String baseDir = System.getProperty("user.dir");
-        String uploadDir = "images/";
-        if ("frame".equalsIgnoreCase(itemType)) {
-            uploadDir = "frames/";
-        }
-        File uploadPath = new File(baseDir + "/" + uploadDir);
-        if (!uploadPath.exists()) uploadPath.mkdirs();
-
-        File saveFile = new File(uploadPath, originalFileName);
-
-        if (!saveFile.exists()) {
-            imageFile.transferTo(saveFile);
-        }
-        return originalFileName;
-    }
 
     // 아이템 추가 폼
     @GetMapping("/chuga")
@@ -127,8 +110,25 @@ public class ItemShopController {
                             RedirectAttributes redirectAttributes) throws IOException {
 
         if (!imageFile.isEmpty()) {
-            String savedFileName = saveImageFile(imageFile, item.getItemType());
-            item.setItemImage(savedFileName);
+            String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+
+            // 아이템 종류에 따라 폴더 분리
+            String baseDir = System.getProperty("user.dir");
+            String uploadDir;
+
+            if ("frame".equalsIgnoreCase(item.getItemType())) {
+                uploadDir = baseDir + "/uploads/frames/";
+            } else {
+                uploadDir = baseDir + "/uploads/images/";
+            }
+
+            File uploadPath = new File(uploadDir);
+            if (!uploadPath.exists()) uploadPath.mkdirs();
+
+            File saveFile = new File(uploadDir + fileName);
+            imageFile.transferTo(saveFile);
+
+            item.setItemImage(fileName);
         }
 
         itemShopService.addItem(item);
@@ -152,9 +152,20 @@ public class ItemShopController {
                              RedirectAttributes redirectAttributes) throws IOException {
 
         if (imageFile != null && !imageFile.isEmpty()) {
-            String savedFileName = saveImageFile(imageFile, item.getItemType());
-            item.setItemImage(savedFileName);
+            // 새 이미지가 업로드되었을 경우 → 새 파일로 교체
+            String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+            String baseDir = System.getProperty("user.dir");
+            String uploadDir = baseDir + "/uploads/images/"; // 기본 디렉토리 (프레임과 구분 안 함)
+
+            File uploadPath = new File(uploadDir);
+            if (!uploadPath.exists()) uploadPath.mkdirs();
+
+            File saveFile = new File(uploadDir + fileName);
+            imageFile.transferTo(saveFile);
+
+            item.setItemImage(fileName); // 새 이미지 설정
         } else {
+            // 새 이미지가 업로드되지 않은 경우 → 기존 이미지 유지
             Item existingItem = itemShopService.getItemById(item.getItemId());
             item.setItemImage(existingItem.getItemImage());
         }
