@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>영상 수정</title>
+  <title>관리자 영상 수정</title>
 </head>
 <body>
 <h1>영상 수정</h1>
 
 <!-- enctype 꼭 있어야 함 -->
-<form th:action="@{'/' + ${role} + '/video/update'}" method="post" enctype="multipart/form-data">
+<form th:action="@{/video/admin/sujungProc}" method="post" enctype="multipart/form-data">
+
   <!-- 영상 ID -->
   <input type="hidden" name="videoId" th:value="${video.videoId}" />
   <input type="hidden" name="page" th:value="${param.page}" /> <!-- ✅ 현재 페이지 유지 -->
@@ -39,7 +40,7 @@
 </form>
 
 <!-- ✅ 목록 링크 -->
-<a th:href="@{'/' + ${role} + '/video/list'}">&larr; 목록으로</a>
+<a th:href="@{/video/admin/list(page=${param.page})}">&larr; 목록으로</a>
 
 </body>
 </html>

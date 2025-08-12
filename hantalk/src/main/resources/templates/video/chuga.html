@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>관리자 강의 업로드</title>
+  <meta charset="UTF-8" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>영상 업로드</h1>
+
+<form id="uploadForm" th:action="@{/video/admin/chugaProc}" method="post" enctype="multipart/form-data">
+
+  <label>제목: <input type="text" name="title" required /></label><br/>
+  <label>설명: <textarea name="content" required></textarea></label><br/>
+
+  <label>영상 파일:
+    <input type="file" name="file" id="fileInput" accept="video/mp4" required />
+  </label>
+  <span id="fileCheckResult" style="color:red; margin-left: 10px;"></span><br/>
+
+  <button type="submit" id="submitBtn">업로드</button>
+</form>
+
+<a th:href="@{/video/admin/list}">&larr; 목록으로</a>
+
+<script>
+  $(document).ready(function () {
+   let isDuplicate = false;
+
+   $('#fileInput').on('change', function () {
+  const file = this.files[0];
+  if (!file) return;
+
+  const filename = file.name;
+
+  $.ajax({
+    url: '/video/admin/check-filename',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({ filename: filename }),
+    success: function(response) {
+      if(response === true) {
+        $('#fileCheckResult').text('이미 동일한 영상이 업로드되어 있습니다.');
+        $('#submitBtn').prop('disabled', true);
+        isDuplicate = true;
+      } else {
+        $('#fileCheckResult').text('');
+        $('#submitBtn').prop('disabled', false);
+        isDuplicate = false;
+      }
+    },
+    error: function() {
+      $('#fileCheckResult').text('서버 오류로 중복 체크 실패');
+      $('#submitBtn').prop('disabled', true);
+      isDuplicate = true;
+    }
+  });
+});
+
+   $('#uploadForm').on('submit', function (e) {
+     if (isDuplicate) {
+       e.preventDefault();
+       alert('중복된 파일명으로 업로드할 수 없습니다.');
+     }
+   });
+ });
+
+</script>
+
+</body>
+</html>

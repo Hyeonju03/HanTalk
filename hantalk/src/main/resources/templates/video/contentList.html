@@ -3,7 +3,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>영상 목록</title>
+  <title>강의 목록</title>
   <style>
     body {
         font-family: Arial, sans-serif;
@@ -11,18 +11,6 @@
         background-color: #f4f4f4;
     }
     h1 { color: #333; }
-
-    /* 관리자 테이블 스타일 */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #fff;
-    }
-    th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: left;
-    }
 
     /* 사용자 카드 스타일 */
     .video-card {
@@ -95,8 +83,15 @@
   <strong th:text="${msg}"></strong>
 </div>
 
+<!--
+ 관리자일 때만 보이는 버튼
+<div th:if="${isAdmin}">
+  <a th:href="@{/video/admin/list}">관리자 페이지로 이동</a>
+</div>
+-->
+
 <!-- 검색 -->
-<form method="get" th:action="@{/user/video/list}">
+<form method="get" th:action="@{/video/user/contentList}">
   <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력" />
   <select name="searchType">
     <option value="title" th:selected="${searchType == 'title'}">제목</option>
@@ -143,30 +138,60 @@
 </table>-->
 
 <!-- ✅ 2. 사용자 화면 (카드형 목록) -->
-<div th:if="${!isAdmin}">
+<!--<div th:if="${!isAdmin}">-->
   <div th:each="video, stat : ${videoPage.content}" class="video-card">
     <div>
-      <strong th:text="${videoPage.number * videoPage.size + stat.index + 1} + '. '">1.</strong>
-      <a th:href="@{/user/video/view/{id}(id=${video.videoId})}" th:text="${video.title}">제목</a>
+      <strong th:text="(${videoPage.number} * ${videoPage.size} + ${stat.index} + 1) + '. '">1.</strong>
+
+      <a th:href="@{/video/user/contentView/{id}(id=${video.videoId})}" th:text="${video.title}">영상 제목</a>
     </div>
 
-    <a th:href="@{/user/video/view/{id}(id=${video.videoId})}" class="thumbnail-link">
-      <video class="video-thumbnail" th:src="@{'/videos/' + ${video.videoName}}" muted playsinline preload="metadata"></video>
+    <a th:href="@{/video/user/contentView/{id}(id=${video.videoId})}" class="thumbnail-link">
+      <video class="video-thumbnail" muted playsinline preload="metadata">
+        <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
+        영상 태그를 지원하지 않는 브라우저입니다.
+      </video>
       <div class="play-icon-overlay">▶</div>
     </a>
 
     <p th:text="${video.content}">설명</p>
   </div>
-</div>
-
-<!-- ✅ 3. 페이징 -->
+<!--</div>-->
+<!--
+  3. 페이징
 <div class="pagination" th:if="${videoPage.totalPages > 1}">
   <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
-  <a th:href="@{'/' + ${role} + '/video/list'(page=${i}, keyword=${keyword}, searchType=${searchType})}"
-     th:class="${i == videoPage.number} ? 'active-page' : ''"
-     th:text="${i + 1}">1</a>
+ <a th:href="@{/video/user/contentList(page=${i}, keyword=${keyword}, searchType=${searchType})}"
+    th:class="${i == videoPage.number} ? 'active-page' : ''"
+    th:text="${i + 1}">1</a>
 </span>
+</div>-->
+
+<div class="pagination" th:if="${videoPage.totalPages > 1}">
+  <!-- 이전 버튼 -->
+  <a th:if="${!videoPage.first}"
+     th:href="@{/video/user/contentList(page=${videoPage.number - 1}, keyword=${keyword}, searchType=${searchType})}">
+    &laquo; 이전
+  </a>
+  <span th:if="${videoPage.first}" style="color: #ccc;">&laquo; 이전</span>
+
+  <!-- 페이지 번호 버튼 -->
+  <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
+    <a th:href="@{/video/user/contentList(page=${i}, keyword=${keyword}, searchType=${searchType})}"
+       th:classappend="${i == videoPage.number} ? ' active-page' : ''"
+       th:text="${i + 1}">1</a>
+  </span>
+
+  <!-- 다음 버튼 -->
+  <a th:if="${!videoPage.last}"
+     th:href="@{/video/user/contentList(page=${videoPage.number + 1}, keyword=${keyword}, searchType=${searchType})}">
+    다음 &raquo;
+  </a>
+  <span th:if="${videoPage.last}" style="color: #ccc;">다음 &raquo;</span>
 </div>
+
+
+
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {

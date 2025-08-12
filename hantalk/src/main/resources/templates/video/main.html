@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>관리자 비디오 메인</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+    nav {
+      width: 220px;
+      background: #f2f6ff;
+      padding: 20px 15px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    nav li {
+      margin-bottom: 1rem;
+    }
+    nav a {
+      text-decoration: none;
+      color: #4e6cb2;
+      font-weight: 600;
+      display: block;
+      padding: 8px 10px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    nav a:hover {
+      background-color: #d8e3ff;
+    }
+    main {
+      margin-left: 220px; /* 사이드바 너비 만큼 */
+      padding: 40px;
+      flex: 1;
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    .admin-actions {
+      margin-top: 20px;
+    }
+    .admin-actions a {
+      display: block;
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      width: 200px;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+    .admin-actions a:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <ul>
+    <li th:if="${role == 'ADMIN'}"><a th:href="@{/video/admin/main}">관리자 비디오 메인</a></li>
+    <li th:if="${role == 'ADMIN'}"><a th:href="@{/video/admin/list}">영상 목록 관리</a></li>
+    <li th:if="${role == 'ADMIN'}"><a th:href="@{/video/admin/chuga}">새 영상 등록</a></li>
+
+    <li th:if="${role == 'USER' or role == 'ADMIN'}">
+      <a th:href="@{/video/user/contentList}">사용자 영상 목록</a>
+    </li>
+
+    <li th:if="${role == 'USER'}"><a th:href="@{/video/user/profile}">내 정보</a></li>
+
+    <li th:if="${role == null}"><a th:href="@{/login}">로그인</a></li>
+  </ul>
+</nav>
+
+<main>
+  <h1>🎥 비디오 메인</h1>
+
+  <div class="admin-actions" th:if="${role == 'ADMIN'}">
+    <a th:href="@{/video/admin/list}">📄 admin 영상 목록 관리</a>
+    <a th:href="@{/video/admin/chuga}">➕ 새 영상 등록</a>
+
+    <a th:if="${role == 'USER' or role == 'ADMIN'}"
+       th:href="@{/video/user/contentList}">🏠 사용자 페이지로 이동</a>
+  </div>
+
+  <div th:if="${role == 'USER'}">
+    <p>사용자용 메인 콘텐츠 영역</p>
+  </div>
+
+  <div th:if="${role == null}">
+    <p>로그인이 필요한 서비스입니다.</p>
+    <a th:href="@{/login}">로그인하러 가기</a>
+  </div>
+</main>
+
+
+</body>
+</html>
