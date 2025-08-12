@@ -36,9 +36,36 @@ public class VocaController {
     public String vocaList(Model model,
                            @RequestParam(value = "page", defaultValue = "0") int page,
                            @RequestParam(value = "kw", defaultValue = "") String kw) {
+
         Page<VocaDTO> paging = vocaService.getSelectAll(page, kw);
+
+        // 페이지 구조
+        int totalPages  = paging.getTotalPages();
+        int currentPage = page;
+        int window = 10;
+
+        // 블록 계산
+        int currentBlock = currentPage / window;
+        int start = currentBlock * window;
+        int end   = Math.min(start + window - 1, totalPages - 1);
+
+        // 이전/다음 블록 여부와 이동 시작 페이지
+        boolean hasPrevBlock = start > 0;
+        boolean hasNextBlock = end < totalPages - 1;
+        int prevBlockPage = Math.max(0, start - window);
+        int nextBlockPage = end + 1;
+
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("start", start);
+        model.addAttribute("end", end);
+        model.addAttribute("hasPrevBlock", hasPrevBlock);
+        model.addAttribute("hasNextBlock", hasNextBlock);
+        model.addAttribute("prevBlockPage", prevBlockPage);
+        model.addAttribute("nextBlockPage", nextBlockPage);
+
         return folderName + "/vocaList";
     }
 
@@ -47,8 +74,31 @@ public class VocaController {
                                 @RequestParam(value = "page", defaultValue = "0") int page,
                                 @RequestParam(value = "kw", defaultValue = "") String kw) {
         Page<VocaDTO> paging = vocaService.getSelectAll(page, kw);
+
+        int totalPages  = paging.getTotalPages();
+        int currentPage = page;
+        int window = 10;
+
+        int currentBlock = currentPage / window;
+        int start = currentBlock * window;
+        int end   = Math.min(start + window - 1, totalPages - 1);
+
+        boolean hasPrevBlock = start > 0;
+        boolean hasNextBlock = end < totalPages - 1;
+        int prevBlockPage = Math.max(0, start - window);
+        int nextBlockPage = end + 1;
+
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("start", start);
+        model.addAttribute("end", end);
+        model.addAttribute("hasPrevBlock", hasPrevBlock);
+        model.addAttribute("hasNextBlock", hasNextBlock);
+        model.addAttribute("prevBlockPage", prevBlockPage);
+        model.addAttribute("nextBlockPage", nextBlockPage);
+
         return folderName + "/vocaAdmin";
     }
 
