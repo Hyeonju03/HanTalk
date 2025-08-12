@@ -6,17 +6,17 @@
 </head>
 <body>
 <h1 th:text="${returnDTO.title}">게시글 제목</h1>
-
+<span th:text="${returnDTO.username != null ? returnDTO.username : '작성자 없음'}"></span>
 <p>작성일: <span th:text="${#temporals.format(returnDTO.createDate, 'yyyy-MM-dd HH:mm')}"></span></p>
-<p>
-    <strong>작성자:</strong> <span th:text="${post.userNo}">작성자명</span>
-</p>
 <p th:text="${returnDTO.content}">내용</p>
 <div>
     <a th:href="@{/post/download(fileName=${returnDTO.archive})}" th:text="${returnDTO.archive}">다운로드</a>
 </div>
 <button th:onclick="|location.href='@{/post/sujung/{postId}(postId=${returnDTO.postId})}'|">게시글 수정</button>
-<button th:onclick="|location.href='@{/post/sakje/{postId}(postId=${returnDTO.postId})}'|">게시글 삭제</button>
+<form th:action="@{/post/sakjeProc}" method="post" onsubmit="return confirm('삭제하시겠습니까?');">
+    <input type="hidden" name="postId" th:value="${returnDTO.postId}" />
+    <button type="submit">삭제</button>
+</form>
 
 <div th:if="${returnDTO.categoryId != 1}">
 
@@ -42,6 +42,12 @@
                 <span th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}">작성일</span>
             </p>
             <p th:text="${comment.content}">댓글 내용</p>
+
+            <a th:href="@{/comments/sujung(id=${comment.commentId})}">수정</a>
+
+
+            <a th:href="@{/comments/sakje(id=${comment.commentId}, postId=${returnDTO.postId})}"
+               onclick="return confirm('댓글을 삭제하시겠습니까?');">삭제</a>
             <hr/>
         </div>
     </div>

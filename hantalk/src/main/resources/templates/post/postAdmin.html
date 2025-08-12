@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>모든 게시글</title>
+  <meta charset="UTF-8">
+  <title>모든 게시글</title>
 </head>
 <body>
 <h1>모든 게시글 목록</h1>
-
 
 <div>
   <a th:href="@{/post/postAdmin}" th:classappend="${selectedCategoryName == null} ? 'active' : ''">전체보기</a> |
@@ -15,10 +14,11 @@
   <a th:href="@{/post/{categoryName}(categoryName='문의사항')}" th:classappend="${selectedCategoryName == '문의사항'} ? 'active' : ''">문의사항</a>
 </div>
 
-<form action="/post" method="post">
+<form th:action="@{/post/sakjeProc}" method="post">
   <table>
     <thead>
     <tr>
+      <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" /></th>
       <th>번호</th>
       <th>카테고리</th>
       <th>제목</th>
@@ -28,6 +28,7 @@
     </thead>
     <tbody>
     <tr th:each="post : ${list}">
+      <td><input type="checkbox" name="postIds" th:value="${post.postId}" /></td>
       <td th:text="${post.postId}"></td>
       <td th:text="${post.category.categoryName}"></td>
       <td><a th:href="@{/post/view/{id}(id=${post.postId})}" th:text="${post.title}"></a></td>
@@ -36,15 +37,17 @@
     </tr>
     </tbody>
   </table>
-
+  <button type="submit">선택 삭제하기</button>
 </form>
 
-<div>
-    <a th:href="@{/post/{categoryName}/chuga(categoryName=${selectedCategoryName})}">
-      <button type="button">작성하기</button>
-    </a>
-  
-</div>
+<script>
+  document.getElementById('selectAll').addEventListener('change', function() {
+    const checked = this.checked;
+    document.querySelectorAll('input[name="postIds"]').forEach(cb => cb.checked = checked);
+  });
+</script>
+
 
 </body>
 </html>
+

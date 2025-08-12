@@ -6,14 +6,15 @@ import com.example.hantalk.entity.Category;
 import com.example.hantalk.entity.Post;
 import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.CategoryRepository;
+import com.example.hantalk.repository.CommentRepository;
 import com.example.hantalk.repository.PostRepository;
 import com.example.hantalk.repository.UsersRepository;
-import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.*;
@@ -26,16 +27,17 @@ public class PostService {
     private final ModelMapper modelMapper;
     private final UsersRepository usersRepository;
     private final CategoryRepository categoryRepository;
+    private final CommentRepository commentRepository;
 
 
 
-
-    public PostService(PostRepository postRepository, ModelMapper modelMapper, UsersRepository usersRepository, CategoryRepository categoryRepository) {
+    public PostService(PostRepository postRepository, ModelMapper modelMapper, UsersRepository usersRepository, CategoryRepository categoryRepository,
+                       CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.usersRepository = usersRepository;
         this.modelMapper = modelMapper;
         this.categoryRepository = categoryRepository;
-
+        this.commentRepository = commentRepository;
     }
 
 
@@ -50,7 +52,6 @@ public class PostService {
 
         }
         return dtoList;
-
     }
 
     public PostDTO getSelectOne(PostDTO dto) {
@@ -59,7 +60,19 @@ public class PostService {
             return null;
         }
         Post post = on.get();
-        return modelMapper.map(post, PostDTO.class);
+
+        PostDTO postDTO = modelMapper.map(post, PostDTO.class);
+
+        if (post.getUsers() != null) {
+            postDTO.setUsername(post.getUsers().getUsername());
+            postDTO.setUserNo(post.getUsers().getUserNo());  // userNo도 확실히 넣어주기
+        }
+
+        if (post.getCategory() != null) {
+            postDTO.setCategoryId(post.getCategory().getCategoryId());
+        }
+
+        return postDTO;
     }
 
     public void setInsert(PostDTO dto) {
@@ -70,9 +83,14 @@ public class PostService {
         Users user = usersRepository.findById(dto.getUserNo())
                 .orElseThrow(() -> new RuntimeException("해당 유저가 없습니다."));
 
-        Post post = modelMapper.map(dto, Post.class);
+        Post post = new Post();
 
-
+        // DTO 필드 하나씩 직접 세팅 (명확하고 문제 없도록)
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+        post.setViewCount(dto.getViewCount());
+        post.setArchive(dto.getArchive());
+        // 작성자 세팅
         post.setUsers(user);
 
         if (dto.getCategoryId() != null) {
@@ -81,12 +99,9 @@ public class PostService {
             post.setCategory(category);
         }
 
-        if (dto.getArchive() != null) {
-                post.setArchive(dto.getArchive());
-            }
-
         postRepository.save(post);
     }
+
 
     public void setUpdate(PostDTO dto) {
         Optional<Post> on = postRepository.findById(dto.getPostId());
@@ -109,9 +124,16 @@ public class PostService {
         postRepository.save(post);
     }
 
+    @Transactional
     public void setDelete(PostDTO dto) {
         Optional<Post> postOpt = postRepository.findById(dto.getPostId());
-        postOpt.ifPresent(post -> postRepository.delete(post));
+        postOpt.ifPresent(post -> {
+            // 댓글 먼저 삭제
+            //commentRepository.deleteByPost(post);
+
+            // 게시글 삭제
+            postRepository.delete(post);
+        });
     }
 
     public Page<PostDTO> getPagePosts(int page, int size) {
@@ -174,7 +196,11 @@ public class PostService {
     }
 
 
+    @Transactional
     public void deletePostsByIds(List<Long> postIds) {
+        for (Long postId : postIds) {
+            postRepository.findById(Math.toIntExact(postId)).ifPresent(post -> postRepository.delete(post));
+        }
     }
 
     public PostDTO getSelectOneById(int postId) {
@@ -182,8 +208,20 @@ public class PostService {
         if (optionalPost.isEmpty()) {
             throw new RuntimeException("해당 게시글을 찾을 수 없습니다.");
         }
+        Post post = optionalPost.get();
+        PostDTO postDTO = modelMapper.map(post, PostDTO.class);
 
-        return modelMapper.map(optionalPost.get(), PostDTO.class);
+        if (post.getUsers() != null) {
+            postDTO.setUserNo(post.getUsers().getUserNo());
+            postDTO.setUsername(post.getUsers().getUsername());
+        }
+
+        if (post.getCategory() != null) {
+            postDTO.setCategoryId(post.getCategory().getCategoryId());
+        }
+
+        return postDTO;
     }
+
 }
 

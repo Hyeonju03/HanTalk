@@ -5,10 +5,30 @@
   <title>게시글 삭제</title>
 </head>
 <body>
-<form th:action="@{/post/sakjeProc}" method="post">
-  <input type="hidden" name="postId" th:value="${returnDTO.postId}" />
-  <button type="submit">삭제</button>
-  <a th:href="@{/post/view/{postId}(postId=${returnDTO.postId})}">취소</a>
+<form action="/post/sakjeProc" method="post">
+
+  <table>
+    <thead>
+    <tr>
+      <th>선택</th>
+      <th>게시글 제목</th>
+      <th>작성자</th>
+      <th>작성일</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="post : ${list}">
+      <td>
+        <input type="checkbox" name="postIds" th:value="${post.postId}" />
+      </td>
+      <td th:text="${post.title}">게시글 제목</td>
+      <td th:text="${post.userName}">작성자</td>
+      <td th:text="${post.createDate}">작성일</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <button type="submit">선택한 게시글 삭제</button>
 </form>
 
 </body>

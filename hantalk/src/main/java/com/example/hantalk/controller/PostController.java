@@ -3,14 +3,13 @@ package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.CommentDTO;
 import com.example.hantalk.dto.PostDTO;
-import com.example.hantalk.entity.Admin;
+
 import com.example.hantalk.entity.Category;
-import com.example.hantalk.entity.Post;
-import com.example.hantalk.entity.Users;
 import com.example.hantalk.service.CategoryService;
 import com.example.hantalk.service.CommentService;
 import com.example.hantalk.service.PostService;
 import com.example.hantalk.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -94,16 +93,16 @@ public class PostController {
     @GetMapping("/view/{postId}")
     public String view(@PathVariable("postId") int postId, Model model) {
 
-        //조회수
         postService.increaseViewCount(postId);
 
         PostDTO dto = new PostDTO();
         dto.setPostId(postId);
         PostDTO postDTO = postService.getSelectOne(dto);
 
-        List<CommentDTO> commentList = commentService.getCommentsByPostId(postId);
-
         model.addAttribute("returnDTO", postDTO);
+
+        //댓글목록
+        List<CommentDTO> commentList = commentService.getCommentsByPostId(postId);
         model.addAttribute("commentList", commentList);
 
         return "post/view";
@@ -119,12 +118,11 @@ public class PostController {
 
         Object roleObj = session.getAttribute("role");
         String role = (roleObj != null) ? roleObj.toString() : "";
+        Integer userNo = (Integer) session.getAttribute("userNo");
 
-        if (!"ADMIN".equalsIgnoreCase(role)) {
-            Integer userNo = (Integer) session.getAttribute("userNo");
-            if (userNo == null || userNo == 0) {
-                return "redirect:/user/login";
-            }
+        // 1. 로그인 안 한 사람은 무조건 차단
+        if (userNo == null && !"ADMIN".equalsIgnoreCase(role)) {
+            return "redirect:/user/login";
         }
 
         // DB에서 조회?
@@ -255,16 +253,30 @@ public class PostController {
     public String sakje(@PathVariable("postId") int postId, Model model, HttpSession session) {
         PostDTO dto = new PostDTO();
         dto.setPostId(postId);
+
         PostDTO returnDTO = postService.getSelectOne(dto);
+        if (returnDTO == null) {
+            return "redirect:/post/list";  // 게시글 없으면 목록으로
+        }
+
         model.addAttribute("returnDTO", returnDTO);
 
-        //작성자와 삭제하려는 이가 일치하는지 확인
-        int loginUsers = (int) session.getAttribute("userNo");
+        Object roleObj = session.getAttribute("role");
+        String role = (roleObj != null) ? roleObj.toString() : "";
 
-        if (loginUsers <= 0) {
+        Object userNoObj = session.getAttribute("userNo");
+        if (userNoObj == null) {
             return "redirect:/user/login";
         }
-        if (!returnDTO.getUserNo().equals(loginUsers)) {
+
+        int loginUsers;
+        try {
+            loginUsers =(userNoObj instanceof Integer) ? (Integer) userNoObj : Integer.parseInt(userNoObj.toString());
+        } catch (NumberFormatException e) {
+            return "redirect:/user/login";
+        }
+
+        if (!Objects.equals(returnDTO.getUserNo(), loginUsers) && !"ADMIN".equalsIgnoreCase(role)) {
             return "redirect:/post/list";
         }
 
@@ -273,44 +285,43 @@ public class PostController {
 
     // 게시글 삭제 처리
     @PostMapping("/sakjeProc")
-    public String sakjeProc(@RequestParam(value = "postIds", required = false) List<Long> postIds,
-                            @ModelAttribute PostDTO dto,
+    public String sakjeProc(@RequestParam(value = "postIds", required = false) List<Integer> postIds,
                             HttpSession session,
                             RedirectAttributes redire) {
 
-        Object roleObj = session.getAttribute("role");
-        Users loginUser = (Users) session.getAttribute("loginUser");
-
-        String role = (roleObj != null) ? roleObj.toString() : "";
-        boolean isAdmin = "ADMIN".equalsIgnoreCase(role);
-
-        if (isAdmin) {
-            // ✅ 관리자 다중 삭제 처리
-            if (postIds != null && !postIds.isEmpty()) {
-                postService.deletePostsByIds(postIds);
-                redire.addFlashAttribute("msg", "선택한 게시글이 삭제되었습니다.");
-            } else {
-                redire.addFlashAttribute("msg", "삭제할 게시글을 선택해주세요.");
-            }
-            return "redirect:/admin/postAdmin";
-
-        } else {
-            // ✅ 일반 사용자 단일 삭제 (작성자 검증 포함)
-            if (loginUser == null) {
-                redire.addFlashAttribute("msg", "로그인이 필요합니다.");
-                return "redirect:/user/login";
-            }
-
-            PostDTO targetPost = postService.getSelectOne(dto);
-            if (targetPost.getUserNo() != null && targetPost.getUserNo().equals(loginUser.getUserNo())) {
-                postService.setDelete(dto);
-                redire.addFlashAttribute("msg", "게시글이 삭제되었습니다.");
-            } else {
-                redire.addFlashAttribute("msg", "삭제 권한이 없습니다.");
-            }
+        if (postIds == null || postIds.isEmpty()) {
+            redire.addFlashAttribute("msg", "삭제할 게시글을 선택하세요.");
             return "redirect:/post/list";
         }
+
+        // 로그인 및 권한 체크 (예시)
+        Integer loginUserNo = (Integer) session.getAttribute("userNo");
+        String role = (String) session.getAttribute("role");
+
+        if (loginUserNo == null && !"ADMIN".equalsIgnoreCase(role)) {
+            redire.addFlashAttribute("msg", "로그인이 필요합니다.");
+            return "redirect:/user/login";
+        }
+
+        // 권한 체크 + 삭제 처리
+        for (Integer postId : postIds) {
+            PostDTO postDTO = postService.getSelectOneById(postId);
+
+            // 본인 글이거나 ADMIN 권한 있을 때만 삭제
+            if (postDTO.getUserNo().equals(loginUserNo) || "ADMIN".equalsIgnoreCase(role)) {
+                PostDTO dto = new PostDTO();
+                dto.setPostId(postId);
+                postService.setDelete(dto);
+            } else {
+                redire.addFlashAttribute("msg", "삭제 권한이 없는 게시글이 포함되어 있습니다.");
+                return "redirect:/post/list";
+            }
+        }
+
+        redire.addFlashAttribute("msg", "선택한 게시글을 삭제했습니다.");
+        return "redirect:/post/list";
     }
+
     //검색
     @GetMapping("/search")
     public String search(@RequestParam("keyword") String keyword,
@@ -350,6 +361,8 @@ public class PostController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                 .body(resource);
+
+
     }
 
     //관리자가 글 모아보기

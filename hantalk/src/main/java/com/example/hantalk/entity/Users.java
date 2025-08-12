@@ -73,4 +73,8 @@ public class Users {
 
     @OneToMany(mappedBy = "users", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
     private List<User_Items> userItemsList;
+
+    public String getUsername() {
+        return null;
+    }
 }
