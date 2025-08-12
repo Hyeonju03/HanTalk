@@ -36,19 +36,23 @@
 
 <div th:if="${paging != null && !paging.isEmpty()}" class="pagination" style="margin-top:12px;">
   <ul>
-    <li th:classappend="${!paging.hasPrevious} ? 'disabled'">
-      <a th:href="@{|?page=${paging.number - 1}&kw=${kw}|}">이전</a>
+    <!-- 1) ‘이전 10’은 번호 앞에 (있을 때만) -->
+    <li th:if="${hasPrevBlock}">
+      <a th:href="@{|?page=${prevBlockPage}&kw=${kw}|}">이전</a>
     </li>
 
-    <li th:each="p : ${#numbers.sequence(0, paging.totalPages - 1)}"
-        th:classappend="${p == paging.number} ? 'active'">
+    <!-- 2) 현재 블록의 번호들 -->
+    <li th:each="p : ${#numbers.sequence(start, end)}"
+        th:classappend="${p == currentPage} ? 'active'">
       <a th:href="@{|?page=${p}&kw=${kw}|}" th:text="${p + 1}"></a>
     </li>
 
-    <li th:classappend="${!paging.hasNext} ? 'disabled'">
-      <a th:href="@{|?page=${paging.number + 1}&kw=${kw}|}">다음</a>
+    <!-- 3) ‘다음 10’은 마지막 번호 **뒤에** (있을 때만) -->
+    <li th:if="${hasNextBlock}">
+      <a th:href="@{|?page=${nextBlockPage}&kw=${kw}|}">다음</a>
     </li>
   </ul>
 </div>
+
 </body>
 </html>
