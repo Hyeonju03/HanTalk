@@ -55,8 +55,12 @@ public class VideoController {
         if (filename == null || filename.trim().isEmpty()) {
             return false;
         }
-        return videoService.existsByVideoName(filename);
+
+        // ✅ 실제 업로드 폴더에서 존재 여부 검사 (DB가 아니라 파일 시스템 검사)
+        File file = new File(UPLOAD_PATH + filename);
+        return file.exists();
     }
+
     /* =========================
        관리자 메인 페이지
        - 로그인 여부 체크
@@ -95,9 +99,10 @@ public class VideoController {
       /*  boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");*/
 
         String role = SessionUtil.getRole(session);
-        if (!"USER".equals(role) && !"ADMIN".equals(role)) {
+        if (role == null || !(role.equalsIgnoreCase("USER") || role.equalsIgnoreCase("ADMIN"))) {
             return "redirect:/login";
         }
+
 
         // 영상 검색 + 페이징
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createDate"));
@@ -234,33 +239,34 @@ public class VideoController {
 
         if (file.isEmpty()) {
             model.addAttribute("error", "파일이 비어있습니다.");
-            model.addAttribute("role", SessionUtil.getRole(session));  // 업로드 오류 시 꼭 추가
+            model.addAttribute("role", SessionUtil.getRole(session));
             return "video/chuga";
         }
 
         String uploadDir = UPLOAD_PATH;
         String originalFilename = file.getOriginalFilename();
 
-        // 중복 파일 체크
-        File checkFile = new File(uploadDir + originalFilename);
-        if (checkFile.exists()) {
-            model.addAttribute("error", "이미 동일한 영상이 업로드되어 있습니다.");
+        // 중복 검사 - 같은 이름이 이미 존재하면 업로드 중단
+        File existingFile = new File(uploadDir + originalFilename);
+        if (existingFile.exists()) {
+            model.addAttribute("error", "이미 동일한 영상 파일명이 존재합니다. 다른 이름으로 변경하세요.");
+            model.addAttribute("role", SessionUtil.getRole(session));
             return "video/chuga";
         }
 
-        // 파일명 중복 방지 처리
-        String newFilename = getUniqueFileName(uploadDir, originalFilename);
-        file.transferTo(new File(uploadDir, newFilename));
+        // 중복 없으면 기존 파일명 그대로 저장
+        file.transferTo(new File(uploadDir, originalFilename));
 
         // DTO 생성 및 저장
         VideoDTO dto = new VideoDTO();
         dto.setTitle(title);
         dto.setContent(content);
-        dto.setVideoName(newFilename);
+        dto.setVideoName(originalFilename);
 
         int createdId = videoService.createVideo(dto);
         return "redirect:/video/admin/view/" + createdId;
     }
+
 
     /* =========================
        관리자 영상 수정 폼
@@ -311,7 +317,7 @@ public class VideoController {
             File oldFile = new File(uploadDir + savedFilename);
             if (oldFile.exists()) oldFile.delete();
 
-            savedFilename = file.getOriginalFilename();
+/*            savedFilename = file.getOriginalFilename();
 
             // 파일명 중복 방지
             File targetFile = new File(uploadDir + savedFilename);
@@ -319,8 +325,13 @@ public class VideoController {
                 savedFilename = getUniqueFileName(uploadDir, savedFilename);
             }
 
-            file.transferTo(new File(uploadDir + savedFilename));
+            file.transferTo(new File(uploadDir + savedFilename));*/
+
+            String originalFilename = file.getOriginalFilename();
+            savedFilename = getUniqueFileName(uploadDir, originalFilename);
+            file.transferTo(new File(uploadDir, savedFilename));
         }
+
 
         // DTO 업데이트
         VideoDTO dto = new VideoDTO();

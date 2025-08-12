@@ -31,8 +31,15 @@
 
 <h1>영상 상세 보기</h1>
 
-<h2 th:text="${video.title}">제목</h2>
 
+<p>
+  <span>등록일: <span th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}"></span></span>
+  <span style="margin-left: 20px;" th:if="${video.updateDate != null}">
+    수정일: <span th:text="${#temporals.format(video.updateDate, 'yyyy-MM-dd')}"></span>
+  </span>
+</p>
+
+<h2 th:text="${video.title}">제목</h2>
 
 <!-- ✅ 영상 플레이어 -->
 <video width="640" height="360" controls>

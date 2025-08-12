@@ -157,15 +157,41 @@
     <p th:text="${video.content}">설명</p>
   </div>
 <!--</div>-->
-
-<!-- ✅ 3. 페이징 -->
+<!--
+  3. 페이징
 <div class="pagination" th:if="${videoPage.totalPages > 1}">
   <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
  <a th:href="@{/video/user/contentList(page=${i}, keyword=${keyword}, searchType=${searchType})}"
     th:class="${i == videoPage.number} ? 'active-page' : ''"
     th:text="${i + 1}">1</a>
 </span>
+</div>-->
+
+<div class="pagination" th:if="${videoPage.totalPages > 1}">
+  <!-- 이전 버튼 -->
+  <a th:if="${!videoPage.first}"
+     th:href="@{/video/user/contentList(page=${videoPage.number - 1}, keyword=${keyword}, searchType=${searchType})}">
+    &laquo; 이전
+  </a>
+  <span th:if="${videoPage.first}" style="color: #ccc;">&laquo; 이전</span>
+
+  <!-- 페이지 번호 버튼 -->
+  <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
+    <a th:href="@{/video/user/contentList(page=${i}, keyword=${keyword}, searchType=${searchType})}"
+       th:classappend="${i == videoPage.number} ? ' active-page' : ''"
+       th:text="${i + 1}">1</a>
+  </span>
+
+  <!-- 다음 버튼 -->
+  <a th:if="${!videoPage.last}"
+     th:href="@{/video/user/contentList(page=${videoPage.number + 1}, keyword=${keyword}, searchType=${searchType})}">
+    다음 &raquo;
+  </a>
+  <span th:if="${videoPage.last}" style="color: #ccc;">다음 &raquo;</span>
 </div>
+
+
+
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
