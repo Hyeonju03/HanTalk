@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"/>
   <title>댓글 수정</title>
 </head>
 <body>
-
+<h1>댓글 수정</h1>
+<form th:action="@{/comments/sujungProc}" method="post">
+  <input type="hidden" name="commentId" th:value="${commentDTO.commentId}" />
+  <input type="hidden" name="postId" th:value="${commentDTO.postId}" />
+  <textarea name="content" required th:text="${commentDTO.content}"></textarea>
+  <br/>
+  <button type="submit">수정 완료</button>
+</form>
+<button th:onclick="|location.href='@{/post/view/{postId}(postId=${commentDTO.postId})}'|">취소</button>
 </body>
 </html>

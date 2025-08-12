@@ -23,8 +23,9 @@ public class PostDTO {
     private Integer userNo;
     private Integer categoryId;
     private Category category;
+    private String username;
 
-    private List<Comment> commentList;
+    private List<CommentDTO> commentList;
 
 
     

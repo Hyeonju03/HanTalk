@@ -55,7 +55,6 @@ public class Post {
     ///////////////////////////////////////////
 
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    @Column(name="comment_list")
     private List<Comment> commentList;
 
 
