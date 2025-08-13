@@ -2,172 +2,96 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
-  <title>사용자 파일 미리보기</title>
-  <style>
-    body {
-      background: #f0f4f8;
-      color: #444d6e;
-      font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      align-items: center;
-    }
-    nav {
-      width: 200px;
-      background: #dbe9ff;
-      padding: 2rem 1rem;
-      height: 100vh;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-      position: fixed;
-      top: 0; left: 0;
-      color: #506ab4;
-    }
-    nav h2 {
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
-      color: #3f5499;
-    }
-    nav ul {
-      list-style: none;
-      padding: 0;
-    }
-    nav li {
-      margin-bottom: 0.8rem;
-    }
-    nav a {
-      text-decoration: none;
-      color: #506ab4;
-      font-weight: 600;
-    }
-    nav a:hover {
-      color: #3a4f8a;
-    }
-    main {
-      margin-left: 200px;
-      padding: 2rem;
-      flex: 1;
-      background: #fefcff;
-      min-height: 100vh;
-      box-sizing: border-box;
-      max-width: 900px;
-      width: 100%;
-    }
-    h1 {
-      text-align: center;
-      color: #506ab4;
-      margin-bottom: 1rem;
-      font-weight: 700;
-      word-break: break-word;
-    }
-    iframe, img, pre {
-      width: 100%;
-      height: 600px;
-      border: none;
-      margin-top: 1.5rem;
-      border-radius: 8px;
-      background: #f9fafc;
-      box-shadow: inset 0 0 10px #dbe9ff;
-    }
-    pre {
-      white-space: pre-wrap;
-      background: #f5f7ff;
-      padding: 1.2rem;
-      border-radius: 8px;
-      overflow: auto;
-      max-height: 600px;
-      color: #333a66;
-      font-family: 'Nanum Gothic', monospace, monospace;
-      box-shadow: inset 0 0 6px #c3cde9;
-    }
-    p {
-      text-align: center;
-      font-size: 1rem;
-      color: #6a739c;
-      margin-top: 2rem;
-      font-weight: 600;
-    }
-    p a {
-      color: #506ab4;
-      font-weight: 700;
-      text-decoration: none;
-    }
-    p a:hover {
-      text-decoration: underline;
-      color: #3a4f8a;
-    }
-    .button-container {
-      text-align: center;
-      margin-top: 2rem;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-    .back-button {
-      padding: 10px 25px;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      background: #7ecdc4;
-    }
-    .back-button:hover {
-      background: #5ebcb1;
-    }
-  </style>
+  <title>자료 미리보기</title>
+
+  <!-- Google Fonts & Tailwind CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<nav>
-  <h2>자료실 메뉴</h2>
-  <ul>
-    <li><a href="/resource/main">사용자 메인</a></li>
-  </ul>
-</nav>
 
-<main>
-  <h1 th:text="${fileName}">파일명</h1>
+<body class="bg-[#fefcff] text-[#444] font-[Nanum_Gothic,_맑은_고딕,_sans-serif] min-h-screen flex flex-col">
 
-  <!-- 이미지 미리보기 -->
-  <img th:if="${isImage}" th:src="@{|/resource/image/${fileName}|}" alt="이미지 미리보기" />
+<!-- 헤더 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-  <!-- 오피스 파일 미리보기 (구글 문서 뷰어) -->
-  <iframe th:if="${isOfficeFile}"
-          th:src="@{${googleViewerUrl}}"
-          frameborder="0"></iframe>
+<div class="flex flex-1 w-full max-w-5xl mx-auto px-4 py-8 gap-8">
 
-  <!-- PDF 등 직접 미리보기 -->
-  <iframe th:if="${isDocument and !isOfficeFile and !isText}"
-          th:src="@{|/resource/view/file/${fileName}|}"
-          frameborder="0"></iframe>
+  <!-- 사이드바 -->
+  <nav class="w-48 bg-[#f2f6ff] p-6 rounded shadow-md flex-shrink-0">
+    <h2 class="text-xl font-bold mb-6 text-[#5e7bb4]">📁 메뉴</h2>
+    <ul class="space-y-3">
+      <li><a th:href="@{/resource/admin/main}" class="text-[#4e6cb2] hover:underline" th:if="${isAdmin}">관리자 목록</a></li>
+      <li><a th:href="@{/resource/main}" class="text-[#4e6cb2] hover:underline" th:unless="${isAdmin}">사용자 목록</a></li>
+    </ul>
+  </nav>
 
-  <!-- 텍스트 파일 -->
-  <pre th:if="${isText}" th:text="${textContent}">텍스트 내용</pre>
+  <!-- 본문 -->
+  <main class="flex-1 bg-white p-8 rounded shadow-md">
+    <h1 class="text-3xl font-bold mb-8 text-[#5e7bb4] border-b pb-3">자료 미리보기</h1>
 
-  <!-- 미지원 파일 안내 -->
-  <p th:if="${!isImage and !isDocument and !isText}">
-    미리보기를 지원하지 않는 파일입니다. 다운로드해 주세요.
-  </p>
+    <!-- 제목 -->
+    <div class="mb-4 flex">
+      <span class="font-semibold text-gray-700 w-28 flex-shrink-0">제목</span>
+      <span class="text-gray-900" th:text="${resource?.title} ?: ${fileName}">제목이 표시됩니다</span>
+    </div>
 
-  <!-- 다운로드 링크 -->
-  <p><a th:href="@{|/resource/download/file/${fileName}|}">파일 다운로드</a></p>
+    <!-- 내용 -->
+    <div class="mb-4 flex" th:if="${resource != null}">
+      <span class="font-semibold text-gray-700 w-28 flex-shrink-0">내용</span>
+      <span class="text-gray-900 whitespace-pre-wrap" th:text="${resource?.content}">내용이 표시됩니다</span>
+    </div>
 
-  <!-- 뒤로가기 버튼 -->
-  <div class="button-container">
-    <button type="button"
-            class="back-button"
-            th:text="${isAdmin} ? '관리자 목록으로' : '사용자 목록으로'"
-            th:onclick="${isAdmin} ? 'location.href=\'/resource/admin/main\'' : 'location.href=\'/resource/main\''">
-      목록으로
-    </button>
-  </div>
-</main>
-<!-- 푸터 프래그먼트 삽입 -->
+    <!-- 파일 미리보기 -->
+    <section class="mb-6">
+      <!-- 이미지 -->
+      <img th:if="${isImage}" th:src="@{|/resource/image/${fileName}|}" alt="이미지 미리보기" class="max-w-full rounded shadow mb-4" />
+
+      <!-- 오피스 파일 -->
+      <iframe th:if="${isOfficeFile}" th:src="@{${googleViewerUrl}}" class="w-full h-96 rounded shadow border-0 mb-4"></iframe>
+
+      <!-- PDF / 문서 -->
+      <iframe th:if="${isDocument and !isOfficeFile and !isText}" th:src="@{|/resource/view/file/${fileName}|}" class="w-full h-96 rounded shadow border-0 mb-4"></iframe>
+
+      <!-- 텍스트 -->
+      <pre th:if="${isText}" th:text="${textContent}" class="bg-[#e9f1f7] text-[#1e3a8a] p-4 rounded max-h-96 overflow-auto mb-4 font-mono whitespace-pre-wrap"></pre>
+
+      <!-- 미지원 파일 안내 -->
+      <p th:if="${!isImage and !isDocument and !isText}" class="text-red-500 font-semibold">미리보기를 지원하지 않는 파일입니다. 다운로드해 주세요.</p>
+    </section>
+
+    <!-- 파일 다운로드 -->
+    <div class="mb-6 flex">
+      <span class="font-semibold text-gray-700 w-28 flex-shrink-0">파일 다운로드</span>
+      <span>
+          <a th:if="${resource != null and resource.archive != null and !#strings.isEmpty(resource.archive)}"
+             th:href="@{|/resource/download/file/${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}|}"
+             download
+             class="text-[#4e6cb2] hover:underline font-semibold"
+             th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
+          <span th:unless="${resource != null and resource.archive != null and !#strings.isEmpty(resource.archive)}" class="text-gray-500">파일이 없습니다.</span>
+        </span>
+    </div>
+
+    <!-- 등록일 -->
+    <div class="mb-6 flex" th:if="${resource != null}">
+      <span class="font-semibold text-gray-700 w-28 flex-shrink-0">등록일</span>
+      <span class="text-gray-900" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
+    </div>
+
+    <!-- 뒤로가기 버튼 -->
+    <div class="text-center mt-6">
+      <button type="button"
+              th:text="${isAdmin} ? '관리자 목록으로' : '사용자 목록으로'"
+              th:onclick="${isAdmin} ? 'location.href=\'/resource/admin/main\'' : 'location.href=\'/resource/main\''"
+              class="bg-[#4e6cb2] hover:bg-[#3b5490] text-white px-4 py-2 rounded font-semibold">
+        목록으로
+      </button>
+    </div>
+  </main>
+</div>
+
+<!-- 푸터 -->
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
