@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시물 수정</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+<div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">게시물 수정</h2>
+    <form th:action="@{/post/updateProc/{postId}(postId=${post.postId})}" th:object="${post}" method="post">
+
+        <input type="hidden" th:field="*{postId}">
+
+        <div class="mb-4">
+            <label for="title" class="block text-gray-700 text-sm font-semibold mb-2">제목:</label>
+            <input type="text" id="title" th:field="*{title}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+        </div>
+
+        <div class="mb-6">
+            <label for="content" class="block text-gray-700 text-sm font-semibold mb-2">내용:</label>
+            <textarea id="content" th:field="*{content}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-48 resize-none" rows="10" required></textarea>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                수정
+            </button>
+            <a th:href="@{/post/view/{postId}(postId=${post.postId})}" class="inline-block align-baseline font-bold text-sm text-blue-600 hover:text-blue-800">
+                취소
+            </a>
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>

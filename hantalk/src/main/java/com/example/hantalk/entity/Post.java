@@ -11,7 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@EntityListeners(value = {AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Getter
 @Setter
@@ -29,7 +29,7 @@ public class Post {
     @Column(name="create_date", updatable = false, nullable = false)
     private LocalDateTime createDate; //작성일
 
-    @CreatedDate
+    @LastModifiedDate
     @Column(name="update_date", nullable = false)
     private LocalDateTime updateDate; //수정일
 
@@ -42,21 +42,15 @@ public class Post {
     @Column(name="view_count")
     private int viewCount = 0; // 조회수
 
-    //fk
-
     @ManyToOne
-    @JoinColumn(name = "user_no", nullable = false)
+    @JoinColumn(name = "user_no")
     private Users users; // 작성자
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category; //게시판 구분용
 
-    ///////////////////////////////////////////
-
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
     private List<Comment> commentList;
-
-
 
 }
