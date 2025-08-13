@@ -3,138 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <title>사용자 자료 상세 보기</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <style>
     body {
-      background: #fefcff;
-      color: #444;
       font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-    }
-    nav {
-      width: 200px;
-      background: #f2f6ff;
-      padding: 2rem 1rem;
-      height: 100vh;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-      position: fixed;
-      top: 0; left: 0;
-    }
-    nav h2 {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-      color: #5e7bb4;
-    }
-    nav ul {
-      list-style: none;
-      padding: 0;
-    }
-    nav li {
-      margin-bottom: 0.8rem;
-    }
-    nav a {
-      text-decoration: none;
-      color: #4e6cb2;
-    }
-    main {
-      margin-left: 200px;
-      padding: 2rem;
-      width: 100%;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(180, 200, 255, 0.2);
-      min-height: 100vh;
-    }
-    h1 {
-      color: #5e7bb4;
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-    .detail-item {
-      margin-bottom: 1.2rem;
-      line-height: 1.5;
-      font-size: 1.1rem;
-    }
-    .label {
-      font-weight: bold;
-      color: #4e6cb2;
-      display: inline-block;
-      width: 100px;
-    }
-    .content {
-      display: inline-block;
-      max-width: 70%;
-      word-wrap: break-word;
-      vertical-align: top;
-    }
-    .btn-group {
-      text-align: center;
-      margin-top: 2rem;
-    }
-    .btn {
-      background: #4e6cb2;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      margin: 0 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      text-decoration: none;
-      font-size: 1rem;
-    }
-    .btn:hover {
-      background: #3b5490;
     }
   </style>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800 flex min-h-screen">
 
-<nav>
-  <h2>📁 메뉴</h2>
-  <ul>
-    <li><a href="/resource/admin/main">자료 목록</a></li>
-    <li><a href="#">자주 묻는 질문</a></li>
-    <li><a href="#">문의하기</a></li>
-  </ul>
+<!-- Sidebar (Navigation) -->
+<nav class="w-64 bg-white shadow-lg p-6 flex flex-col justify-between">
+  <div>
+    <h2 class="text-xl font-bold text-indigo-700 mb-6">📁 메뉴</h2>
+    <ul class="space-y-4">
+      <li>
+        <a href="/resource/main" class="flex items-center text-gray-600 hover:text-indigo-700 transition duration-300">
+          <i class="fas fa-list-alt mr-3"></i>
+          <span>자료 목록</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center text-gray-600 hover:text-indigo-700 transition duration-300">
+          <i class="fas fa-question-circle mr-3"></i>
+          <span>자주 묻는 질문</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center text-gray-600 hover:text-indigo-700 transition duration-300">
+          <i class="fas fa-comment-dots mr-3"></i>
+          <span>문의하기</span>
+        </a>
+      </li>
+    </ul>
+  </div>
 </nav>
 
-<main>
-  <h1>자료 상세 보기</h1>
+<!-- Main Content -->
+<main class="flex-1 p-10 ml-64 bg-gray-100">
+  <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
+    <h1 class="text-3xl font-extrabold text-center text-indigo-700 mb-8">자료 상세 보기</h1>
 
-  <div class="detail-item">
-    <span class="label">제목:</span>
-    <span class="content" th:text="${resource.title}">제목이 표시됩니다</span>
-  </div>
+    <div class="space-y-6 text-lg">
+      <div class="detail-item flex items-start">
+        <span class="font-bold text-indigo-600 w-24 flex-shrink-0">제목:</span>
+        <span class="flex-1 break-words" th:text="${resource.title}">제목이 표시됩니다</span>
+      </div>
 
-  <div class="detail-item">
-    <span class="label">내용:</span>
-    <span class="content" th:text="${resource.content}">내용이 표시됩니다</span>
-  </div>
+      <div class="detail-item flex items-start">
+        <span class="font-bold text-indigo-600 w-24 flex-shrink-0">내용:</span>
+        <span class="flex-1 break-words whitespace-pre-wrap" th:text="${resource.content}">내용이 표시됩니다</span>
+      </div>
 
-  <div class="detail-item">
-    <span class="label">파일 링크:</span>
-    <span class="content">
-      <a th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
-         th:href="@{${resource.archive}}"
-         download
-         th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
-      <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}">파일이 없습니다.</span>
-    </span>
-  </div>
+      <div class="detail-item flex items-start">
+        <span class="font-bold text-indigo-600 w-24 flex-shrink-0">파일 링크:</span>
+        <span class="flex-1">
+          <a th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
+             th:href="@{${resource.archive}}"
+             download
+             class="text-blue-500 hover:underline transition duration-300"
+             th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
+          <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}" class="text-gray-500">파일이 없습니다.</span>
+        </span>
+      </div>
 
-  <div class="detail-item">
-    <span class="label">등록일:</span>
-    <span class="content" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
-  </div>
+      <div class="detail-item flex items-start">
+        <span class="font-bold text-indigo-600 w-24 flex-shrink-0">등록일:</span>
+        <span class="flex-1" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
+      </div>
+    </div>
 
-  <!--유저 로그인시 목록-->
-  <div class="btn-group">
-    <a href="/resource/main" class="btn">목록으로</a>
-    <a th:if="${session.loginUser != null and session.loginUser.role == 'ROLE_ADMIN'}"
-       th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
-       class="btn">수정</a>
+    <!-- 버튼 그룹 -->
+    <div class="flex justify-center mt-10 space-x-4">
+      <a href="/resource/main" class="bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md">
+        <i class="fas fa-list mr-2"></i>목록으로
+      </a>
+      <a th:if="${session.loginUser != null and session.loginUser.role == 'ROLE_ADMIN'}"
+         th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
+         class="bg-green-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+        <i class="fas fa-edit mr-2"></i>수정
+      </a>
+    </div>
   </div>
 </main>
 </body>

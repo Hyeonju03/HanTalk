@@ -1,5 +1,7 @@
 package com.example.hantalk.controller;
 
+import com.example.hantalk.SessionUtil;
+import com.example.hantalk.dto.ItemDTO;
 import com.example.hantalk.dto.ProfileUpdateRequestDTO;
 import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.entity.User_Items;
@@ -29,16 +31,23 @@ public class MyPageController {
     // 마이페이지 조회
     @GetMapping("/view")
     public String myPage(Model model, HttpSession session) {
-        Integer userNo = (Integer) session.getAttribute("userNo");
+        // ✅ 로그인 사용자 번호 가져오기
+        Integer userNo = SessionUtil.getLoginUserNo(session);
+        if (userNo == null) {
+            return "redirect:/login"; // 로그인 안 되어있으면 로그인 페이지로
+        }
+
+        // ✅ 사용자 기본 정보
         UsersDTO dto = myPageService.getMyPageInfo(userNo);
         model.addAttribute("user", dto);
 
-        // 구매한 아이템 목록 추가
-        List<User_Items> userItems = myPageService.getUserOwnedItems(userNo);
+        // ✅ 구매한 아이템 목록 (항상 최신 이미지 보이게)
+        List<ItemDTO> userItems = myPageService.getUserOwnedItems(userNo);
         model.addAttribute("userItems", userItems);
 
         return "user/view";
     }
+
 
     // 통계 페이지 조회
     @GetMapping("/statistics")

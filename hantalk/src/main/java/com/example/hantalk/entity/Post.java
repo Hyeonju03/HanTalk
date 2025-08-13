@@ -57,6 +57,4 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
     private List<Comment> commentList;
 
-
-
 }

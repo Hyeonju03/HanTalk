@@ -7,15 +7,15 @@
 <body>
 <h1>게시글 추가</h1>
 
-
-<p><strong>유저 번호:</strong> <span th:text="${user != null} ? user.userNo : '로그인 필요'">로그인 필요</span></p>
+<p><strong>유저 번호:</strong>
+    <span th:if="${usersDTO != null}" th:text="${usersDTO.userNo}">유저 번호 표시</span>
+    <span th:unless="${usersDTO != null}">로그인 필요</span>
+</p>
 
 <form th:action="@{/post/chugaProc}" th:object="${postDTO}" method="post" enctype="multipart/form-data">
     <input type="hidden" th:field="*{userNo}" />
     <p>제목: <input type="text" th:field="*{title}" /></p>
     <p>내용: <textarea th:field="*{content}"></textarea></p>
-
-
 
     <p>카테고리:
         <select th:field="*{categoryId}">
@@ -28,9 +28,9 @@
 
     <p>파일 업로드: <input type="file" name="uploadFile" /></p>
 
-
     <button type="submit">등록</button>
 </form>
+
 
 </body>
 </html>

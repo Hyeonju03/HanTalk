@@ -20,13 +20,10 @@ public class PostDTO {
     private String content;
     private String archive;
     private int viewCount;
-    private Integer userNo;
-    private Integer categoryId;
+    private int userNo;
+    private int categoryId;
     private Category category;
-    private String username;
 
     private List<CommentDTO> commentList;
 
-
-    
 }

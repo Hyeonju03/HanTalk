@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>모든 게시글</title>
+  <style>
+    /* 예: 활성화된 링크 스타일 */
+    .active {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
 <h1>모든 게시글 목록</h1>
 
 <div>
-  <a th:href="@{/post/postAdmin}" th:classappend="${selectedCategoryName == null} ? 'active' : ''">전체보기</a> |
-  <a th:href="@{/post/{categoryName}(categoryName='공지사항')}" th:classappend="${selectedCategoryName == '공지사항'} ? 'active' : ''">공지사항</a> |
-  <a th:href="@{/post/{categoryName}(categoryName='커뮤니티')}" th:classappend="${selectedCategoryName == '커뮤니티'} ? 'active' : ''">커뮤니티</a> |
-  <a th:href="@{/post/{categoryName}(categoryName='문의사항')}" th:classappend="${selectedCategoryName == '문의사항'} ? 'active' : ''">문의사항</a>
+  <a th:href="@{/post/postAdmin}" th:classappend="${selectedCategoryName == null} ? ' active' : ''">전체보기</a> |
+  <a th:href="@{/post/{categoryName}(categoryName='공지사항')}" th:classappend="${selectedCategoryName == '공지사항'} ? ' active' : ''">공지사항</a> |
+  <a th:href="@{/post/{categoryName}(categoryName='커뮤니티')}" th:classappend="${selectedCategoryName == '커뮤니티'} ? ' active' : ''">커뮤니티</a> |
+  <a th:href="@{/post/{categoryName}(categoryName='문의사항')}" th:classappend="${selectedCategoryName == '문의사항'} ? ' active' : ''">문의사항</a>
 </div>
 
 <form th:action="@{/post/sakjeProc}" method="post">
-  <table>
+  <table border="1" cellspacing="0" cellpadding="5">
     <thead>
     <tr>
-      <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" /></th>
+      <th><input type="checkbox" id="selectAll" /></th>
       <th>번호</th>
       <th>카테고리</th>
       <th>제목</th>
@@ -30,8 +37,8 @@
     <tr th:each="post : ${list}">
       <td><input type="checkbox" name="postIds" th:value="${post.postId}" /></td>
       <td th:text="${post.postId}"></td>
-      <td th:text="${post.category.categoryName}"></td>
-      <td><a th:href="@{/post/view/{id}(id=${post.postId})}" th:text="${post.title}"></a></td>
+      <td th:text="${post.category != null} ? ${post.category.categoryName} : '없음'"></td>
+      <td><a th:href="@{/post/view/{postId}(postId=${post.postId})}" th:text="${post.title}"></a></td>
       <td th:text="${post.userNo}"></td>
       <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd')}"></td>
     </tr>
@@ -47,7 +54,5 @@
   });
 </script>
 
-
 </body>
 </html>
-

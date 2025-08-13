@@ -26,7 +26,7 @@
   <!-- 기존 이미지 미리보기 -->
   <div>
     <p>현재 이미지:</p>
-    <img th:src="@{'/' + (${item.itemType} == 'frame' ? 'frames/' : 'images/') + ${item.itemImage}}"
+    <img th:src="@{'/uploads/' + (${item.itemType} == 'frame' ? 'frames/' : 'images/') + ${item.itemImage}}"
          alt="기존 이미지"
          style="width:100px; height:100px; object-fit:cover; border:1px solid #ccc;">
   </div><br>

@@ -39,4 +39,3 @@ public class Comment {
     @JoinColumn(name = "user_no", nullable = false)
     private Users users; // 작성자
 }
-
