@@ -1,10 +1,12 @@
 package com.example.hantalk.service;
 
+import com.example.hantalk.dto.ItemDTO;
 import com.example.hantalk.dto.UsersDTO;
 import com.example.hantalk.entity.Item;
 import com.example.hantalk.entity.User_Items;
 import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.ItemRepository;
+import com.example.hantalk.repository.UserItemRepository;
 import com.example.hantalk.repository.UsersRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class MyPageService {
 
     private final UsersRepository usersRepository;
     private final ItemRepository itemRepository;
+    private final UserItemRepository userItemRepository;
 
     public UsersDTO getMyPageInfo(Integer userNo) {
         Users user = usersRepository.findById(userNo)
@@ -102,12 +105,26 @@ public class MyPageService {
         }
     }
 
-    public List<User_Items> getUserOwnedItems(Integer userNo) {
-        Users user = usersRepository.findById(userNo)
-                .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
-        return user.getUserItemsList();
+    /**  구매한 아이템 목록 (항상 최신 Item 이미지 반영) */
+    public List<ItemDTO> getUserOwnedItems(Integer userNo) {
+        List<User_Items> userItems = userItemRepository.findByUsers_UserNo(userNo);
+
+        return userItems.stream()
+                .map(userItem -> {
+                    Item item = userItem.getItem(); // 항상 최신 Item 엔티티 참조
+                    ItemDTO dto = new ItemDTO();
+                    dto.setItemId(item.getItemId());
+                    dto.setItemName(item.getItemName());
+                    dto.setItemDescription(item.getItemDescription());
+                    dto.setPrice(item.getPrice());
+                    dto.setItemImage(item.getItemImage()); // 최신 이미지 반영
+                    dto.setItemType(item.getItemType());
+                    return dto;
+                })
+                .toList();
     }
+
 
     public List<User_Items> getUserItems(Integer userNo) {
         Users user = usersRepository.findById(userNo)
@@ -122,6 +139,5 @@ public class MyPageService {
     public void applyProfileFrameByImageName(int userNo, String frameName) {
         usersRepository.updateProfileFrame(userNo, frameName);
     }
-
 
 }

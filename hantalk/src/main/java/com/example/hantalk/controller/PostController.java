@@ -4,6 +4,7 @@ import com.example.hantalk.SessionUtil;
 import com.example.hantalk.dto.PostDTO;
 import com.example.hantalk.entity.Category;
 import com.example.hantalk.entity.Users;
+
 import com.example.hantalk.service.PostService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -99,7 +100,6 @@ public class PostController {
     @PostMapping("/insertProc/{categoryId}")
     public String insertProc(@PathVariable int categoryId, @ModelAttribute PostDTO postDTO, HttpSession session) {
         System.out.println("PostDTO: " + postDTO.toString());
-
         try {
             if (!SessionUtil.isLoggedIn(session)) {
                 return "redirect:/login";

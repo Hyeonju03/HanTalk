@@ -30,25 +30,32 @@ public class ItemShopController {
     // 아이템 상점 페이지 조회
     @GetMapping("/shop")
     public String showShop(HttpSession session, Model model) {
-        Integer userNo = SessionUtil.getLoginUserNo(session);
-        String role = SessionUtil.getRole(session);
-
-        if (userNo == null || role == null) {
+        // 로그인 여부 확인
+        if (!SessionUtil.isLoggedIn(session)) {
             return "redirect:/user/login";
         }
 
-        if ("ADMIN".equals(role)) {
+        String role = SessionUtil.getRole(session);
+        // role이 null이거나 USER / ADMIN 둘 다 아니면 접근 차단
+        if (role == null || !(role.equalsIgnoreCase("USER") || role.equalsIgnoreCase("ADMIN"))) {
+            return "redirect:/user/login";
+        }
+
+        // ADMIN인 경우
+        if ("ADMIN".equalsIgnoreCase(role)) {
             model.addAttribute("point", 0);
             model.addAttribute("items", itemShopService.getAllItems());
             model.addAttribute("isAdmin", true);
             return "item/shop";
         }
 
-        // USER 권한인 경우
+        // USER인 경우
+        Integer userNo = SessionUtil.getLoginUserNo(session);
         Users user = userRepository.findById(userNo).orElseThrow();
         model.addAttribute("point", user.getPoint());
         model.addAttribute("items", itemShopService.getAllItemsWithUserInfo(user));
         model.addAttribute("isAdmin", false);
+
         return "item/shop";
     }
 
@@ -147,15 +154,18 @@ public class ItemShopController {
 
     // 아이템 수정 처리
     @PostMapping("/sujungProc")
-    public String sujungItem(@ModelAttribute Item item,
+    public String sujungItem(@ModelAttribute Item formItem,
                              @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                              RedirectAttributes redirectAttributes) throws IOException {
 
+        // 1. 기존 아이템 가져오기 (DB에 있는 걸 수정해야 참조 유지됨)
+        Item existingItem = itemShopService.getItemById(formItem.getItemId());
+
+        // 2. 이미지 처리
         if (imageFile != null && !imageFile.isEmpty()) {
-            // 새 이미지가 업로드되었을 경우 → 새 파일로 교체
             String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
             String baseDir = System.getProperty("user.dir");
-            String uploadDir = baseDir + "/uploads/images/"; // 기본 디렉토리 (프레임과 구분 안 함)
+            String uploadDir = baseDir + "/uploads/images/";
 
             File uploadPath = new File(uploadDir);
             if (!uploadPath.exists()) uploadPath.mkdirs();
@@ -163,17 +173,23 @@ public class ItemShopController {
             File saveFile = new File(uploadDir + fileName);
             imageFile.transferTo(saveFile);
 
-            item.setItemImage(fileName); // 새 이미지 설정
-        } else {
-            // 새 이미지가 업로드되지 않은 경우 → 기존 이미지 유지
-            Item existingItem = itemShopService.getItemById(item.getItemId());
-            item.setItemImage(existingItem.getItemImage());
+            existingItem.setItemImage(fileName); // 새 이미지로 변경
         }
+        // 새 이미지를 안 올렸으면 existingItem의 이미지 그대로 유지
 
-        itemShopService.updateItem(item);
+        // 3. 나머지 필드 업데이트
+        existingItem.setItemName(formItem.getItemName());
+        existingItem.setPrice(formItem.getPrice());
+
+        // 필요한 다른 필드도 여기에 추가
+
+        // 4. 저장 (UPDATE)
+        itemShopService.updateItem(existingItem);
+
         redirectAttributes.addFlashAttribute("message", "아이템이 수정되었습니다.");
         return "redirect:/item/admin";
     }
+
 
 
     // 아이템 삭제 확인 페이지

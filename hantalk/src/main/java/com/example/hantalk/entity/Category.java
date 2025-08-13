@@ -22,5 +22,4 @@ public class Category {
     @OneToMany(mappedBy = "category", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
     private List<Post> postList;
 
-
 }
