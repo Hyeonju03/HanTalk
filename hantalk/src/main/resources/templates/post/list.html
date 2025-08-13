@@ -1,74 +1,121 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>게시판 목록</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시물 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 1000px;
+            margin-top: 50px;
+        }
+        .board-header {
+            margin-bottom: 20px;
+        }
+        .board-header h1 {
+            font-weight: bold;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .search-box {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .board-title a {
+            color: #212529;
+            text-decoration: none;
+        }
+        .board-title a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-<h1> 게시판</h1>
 
-<div th:if="${msg}">
-    <p th:text="${msg}" style="color:red;"></p>
-</div>
+<div class="container">
+    <div class="board-header">
+        <h1 th:if="${categoryId == 1}">공지사항</h1>
+        <h1 th:if="${categoryId == 2}">커뮤니티</h1>
+        <h1 th:if="${categoryId == 3}">문의사항</h1>
+    </div>
 
-<div th:if="${param.msg}">
-    <p th:text="${param.msg}" style="color:red;"></p>
-</div>
+    <div class="search-box">
+        <form th:action="@{|/post/list/${categoryId}|}" method="get" class="d-flex">
+            <select name="searchType" class="form-select me-2">
+                <option value="title" th:selected="${searchType == 'title'}">제목</option>
+                <option value="content" th:selected="${searchType == 'content'}">내용</option>
+                <option value="author" th:selected="${searchType == 'author'}">작성자</option>
+            </select>
+            <input type="text" name="keyword" class="form-control me-2" th:value="${keyword}" placeholder="검색어를 입력하세요">
+            <button class="btn btn-outline-secondary" type="submit">검색</button>
+        </form>
+    </div>
 
-<form action="/post/search" method="get">
-    <input type="text" name="keyword" placeholder="검색어 입력" required />
-    <button type="submit">검색하기</button>
-</form>
-
-<!-- 카테고리 링크 -->
-<a th:href="@{/post/공지사항}">공지사항</a>
-<a th:href="@{/post/커뮤니티}">커뮤니티</a>
-<a th:href="@{/post/문의사항}">문의사항</a>
-
-<!-- 삭제 폼 -->
-<form th:action="@{/post/sakjeProc}" method="post">
-    <table>
+    <table class="table table-hover table-striped">
         <thead>
         <tr>
-            <th><input type="checkbox" onclick="toggleSelectAll(this)"> 전체선택</th>
-            <th>제목</th>
-            <th>작성자</th>
-            <th>조회수</th>
-            <th>작성일</th>
-            <th>첨부파일</th>
+            <th style="width: 60%;">제목</th>
+            <th style="width: 15%;">작성자</th>
+            <th style="width: 15%;">작성일</th>
+            <th style="width: 10%;">조회수</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="post : ${list}">
-            <td><input type="checkbox" name="postIds" th:value="${post.postId}" /></td>
-            <td><a th:href="@{/post/view/{id}(id=${post.postId})}" th:text="${post.title}"></a></td>
-            <td th:text="${post.userNo}"></td>
-            <td th:text="${post.viewCount}"></td>
-            <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></td>
-            <td>
-                <span th:if="${post.archive != null}">
-                    <a th:href="@{/file/download(fileName=${post.archive})}" th:text="${post.archive}"></a>
-                </span>
-                <span th:if="${post.archive == null}">-</span>
+        <tr th:if="${postPage.isEmpty()}">
+            <td colspan="5" class="text-center">게시물이 없습니다.</td>
+        </tr>
+        <tr th:each="post : ${postPage.content}">
+            <td class="board-title">
+                <a th:href="@{|/post/view/${post.postId}|}" th:text="${post.title}">제목입니다.</a>
             </td>
+            <td th:text="${post.users != null ? post.users.nickname : '관리자'}">관리자</td>
+            <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
+            <td th:text="${post.viewCount}">0</td>
         </tr>
         </tbody>
     </table>
 
-    <button type="submit">선택 삭제하기</button>
-</form>
+    <div class="d-flex justify-content-between align-items-center">
+        <a th:href="@{|/post/insert/${categoryId}|}" class="btn btn-primary mt-3">새 글 작성</a>
 
-<script>
-    function toggleSelectAll(source) {
-        const checkboxes = document.getElementsByName('postIds');
-        for (let i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].checked = source.checked;
-        }
-    }
-</script>
+        <div th:if="${!postPage.isEmpty()}" class="pagination-container">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${postPage.first} ? 'disabled'">
+                        <a class="page-link" th:href="@{|/post/list/${categoryId}|(page=0, keyword=${keyword}, searchType=${searchType})}">처음</a>
+                    </li>
+                    <li class="page-item" th:classappend="${postPage.first} ? 'disabled'">
+                        <a class="page-link" th:href="@{|/post/list/${categoryId}|(page=${postPage.number-1}, keyword=${keyword}, searchType=${searchType})}">이전</a>
+                    </li>
+                    <li th:each="pageNumber : ${#numbers.sequence(0, postPage.totalPages - 1)}"
+                        th:classappend="${pageNumber == postPage.number} ? 'active'" class="page-item">
+                        <a th:href="@{|/post/list/${categoryId}|(page=${pageNumber}, keyword=${keyword}, searchType=${searchType})}"
+                           th:text="${pageNumber + 1}" class="page-link"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${postPage.last} ? 'disabled'">
+                        <a class="page-link" th:href="@{|/post/list/${categoryId}|(page=${postPage.number+1}, keyword=${keyword}, searchType=${searchType})}">다음</a>
+                    </li>
+                    <li class="page-item" th:classappend="${postPage.last} ? 'disabled'">
+                        <a class="page-link" th:href="@{|/post/list/${categoryId}|(page=${postPage.totalPages - 1}, keyword=${keyword}, searchType=${searchType})}">마지막</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
 
-
-
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

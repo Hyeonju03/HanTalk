@@ -1,60 +1,89 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <title>게시글 상세</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${post.title}">게시물 제목</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        .post-header {
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .post-title {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .post-meta {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .post-content {
+            white-space: pre-wrap; /* 줄바꿈, 공백 유지 */
+            min-height: 200px;
+        }
+        .btn-group {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-<h1 th:text="${returnDTO.title}">게시글 제목</h1>
-<span th:text="${returnDTO.username != null ? returnDTO.username : '작성자 없음'}"></span>
-<p>작성일: <span th:text="${#temporals.format(returnDTO.createDate, 'yyyy-MM-dd HH:mm')}"></span></p>
-<p th:text="${returnDTO.content}">내용</p>
-<div>
-    <a th:href="@{/post/download(fileName=${returnDTO.archive})}" th:text="${returnDTO.archive}">다운로드</a>
-</div>
-<button th:onclick="|location.href='@{/post/sujung/{postId}(postId=${returnDTO.postId})}'|">게시글 수정</button>
-<form th:action="@{/post/sakjeProc}" method="post" onsubmit="return confirm('삭제하시겠습니까?');">
-    <input type="hidden" name="postId" th:value="${returnDTO.postId}" />
-    <button type="submit">삭제</button>
-</form>
 
-<div th:if="${returnDTO.categoryId != 1}">
-
-    <!-- 댓글 작성 -->
-    <div>
-        <h3>댓글 작성</h3>
-        <form th:action="@{/comments/chuga}" method="post">
-            <input type="hidden" name="postId" th:value="${returnDTO.postId}" />
-            <textarea name="content" placeholder="댓글을 입력하세요" required></textarea>
-            <button type="submit">등록</button>
-        </form>
+<div class="container">
+    <div class="post-header">
+        <h1 class="post-title" th:text="${post.title}">게시물 제목</h1>
+        <div class="post-meta">
+            <span th:text="${post.users.nickname}">작성자</span> |
+            <span th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}">2025-08-01 12:00</span> |
+            <span>조회수: <span th:text="${post.viewCount}">0</span></span>
+        </div>
     </div>
 
+    <div class="post-content p-3 border rounded">
+        <p th:text="${post.content}">게시물 내용입니다.</p>
+    </div>
 
-    <div>
-        <h3>댓글 목록</h3>
-        <div th:if="${#lists.isEmpty(commentList)}">
-            댓글이 없습니다.
-        </div>
-        <div th:each="comment : ${commentList}">
-            <p>
-                <strong th:text="${comment.users != null ? comment.users.username : '익명'}">작성자</strong> |
-                <span th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}">작성일</span>
-            </p>
-            <p th:text="${comment.content}">댓글 내용</p>
+    <div class="btn-group">
+        <a th:if="${isAdmin} or ${loginUserNo == post.users.userNo}"
+           th:href="@{|/post/update/${post.postId}|}" class="btn btn-warning">수정</a>
 
-            <a th:href="@{/comments/sujung(id=${comment.commentId})}">수정</a>
+        <button th:if="${isAdmin} or (${loginUserNo == post.users.userNo} and ${post.category.categoryId == 2})"
+                th:data-post-id="${post.postId}" class="btn btn-danger" id="delete-btn">삭제</button>
 
-
-            <a th:href="@{/comments/sakje(id=${comment.commentId}, postId=${returnDTO.postId})}"
-               onclick="return confirm('댓글을 삭제하시겠습니까?');">삭제</a>
-            <hr/>
-        </div>
+        <a th:href="@{|/post/list/${post.category.categoryId}|}" class="btn btn-secondary">목록</a>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script th:inline="javascript">
+    /* 삭제 버튼 클릭 시 AJAX 요청 */
+    $(document).ready(function() {
+        $('#delete-btn').on('click', function() {
+            var postId = $(this).data('post-id');
 
-
-<button th:onclick="|location.href='@{/post/list(categoryId=${returnDTO.categoryId})}'|">목록으로</button>
+            if (confirm('정말로 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/post/deleteProc/' + postId,
+                    type: 'DELETE',
+                    success: function(result) {
+                        alert('게시물이 삭제되었습니다.');
+                        // 삭제 성공 후 목록 페이지로 이동
+                        window.location.href = '/post/list/' + [[${post.category.categoryId}]];
+                    },
+                    error: function(xhr, status, error) {
+                        alert('삭제 권한이 없거나 오류가 발생했습니다.');
+                        console.error('Error:', error);
+                    }
+                });
+            }
+        });
+    });
+</script>
 </body>
 </html>
