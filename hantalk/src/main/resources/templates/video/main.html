@@ -79,10 +79,10 @@
     <li th:if="${role == 'ADMIN'}"><a th:href="@{/video/admin/chuga}">새 영상 등록</a></li>
 
     <li th:if="${role == 'USER' or role == 'ADMIN'}">
-      <a th:href="@{/video/user/contentList}">사용자 영상 목록</a>
+      <a th:href="@{/video/contentList}">사용자 영상 목록</a>
     </li>
 
-    <li th:if="${role == 'USER'}"><a th:href="@{/video/user/profile}">내 정보</a></li>
+    <li th:if="${role == 'USER'}"><a th:href="@{/video/profile}">내 정보</a></li>
 
     <li th:if="${role == null}"><a th:href="@{/login}">로그인</a></li>
   </ul>
@@ -96,7 +96,7 @@
     <a th:href="@{/video/admin/chuga}">➕ 새 영상 등록</a>
 
     <a th:if="${role == 'USER' or role == 'ADMIN'}"
-       th:href="@{/video/user/contentList}">🏠 사용자 페이지로 이동</a>
+       th:href="@{/video/contentList}">🏠 사용자 페이지로 이동</a>
   </div>
 
   <div th:if="${role == 'USER'}">
@@ -109,6 +109,9 @@
   </div>
 </main>
 
+<!-- 푸터 프래그먼트 삽입 -->
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

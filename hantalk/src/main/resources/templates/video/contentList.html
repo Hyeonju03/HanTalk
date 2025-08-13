@@ -1,228 +1,91 @@
-
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>강의 목록</title>
-  <style>
-    body {
-        font-family: Arial, sans-serif;
-        padding: 30px;
-        background-color: #f4f4f4;
-    }
-    h1 { color: #333; }
-
-    /* 사용자 카드 스타일 */
-    .video-card {
-        background: white;
-        padding: 15px;
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-    }
-    .video-actions {
-        margin-top: 10px;
-    }
-    .video-actions a, .video-actions button {
-        margin-right: 8px;
-        text-decoration: none;
-        color: #007BFF;
-        border: none;
-        background: none;
-        cursor: pointer;
-    }
-
-    /* 페이징 스타일 */
-    .pagination {
-        margin-top: 20px;
-    }
-    .pagination a {
-        margin: 0 5px;
-        text-decoration: none;
-    }
-    .active-page {
-        font-weight: bold;
-        color: red;
-    }
-
-    /* ✅ 영상 썸네일 형태 */
-.thumbnail-link {
-    position: relative;
-    display: block;
-    width: 200px;
-    height: 112px;
-    overflow: hidden;
-    border-radius: 5px;
-    margin-top: 10px;
-}
-
-.video-thumbnail {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none; /* 영상 클릭 방지 (a태그만 작동) */
-}
-
-/* ✅ 중앙 ▶ 아이콘 오버레이 */
-.play-icon-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 36px;
-    color: white;
-    text-shadow: 0 0 10px black;
-    pointer-events: none;
-}
-  </style>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h1>🎬 영상 목록</h1>
-<!-- ⚠️ 로그인 필요 메시지 표시 -->
-<div th:if="${msg}" style="color:red; margin-top:10px;">
-  <strong th:text="${msg}"></strong>
-</div>
+<body class="bg-gray-100 font-sans text-gray-800 flex flex-col min-h-screen">
 
-<!--
- 관리자일 때만 보이는 버튼
-<div th:if="${isAdmin}">
-  <a th:href="@{/video/admin/list}">관리자 페이지로 이동</a>
-</div>
--->
+<!-- 헤더 프래그먼트 삽입 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<!-- 검색 -->
-<form method="get" th:action="@{/video/user/contentList}">
-  <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력" />
-  <select name="searchType">
-    <option value="title" th:selected="${searchType == 'title'}">제목</option>
-    <option value="content" th:selected="${searchType == 'content'}">내용</option>
-    <option value="all" th:selected="${searchType == 'all'}">제목 + 내용</option>
-  </select>
-  <button type="submit">검색</button>
-</form>
-<!--
-&lt;!&ndash; 🎯 영상 등록 버튼 (관리자만) &ndash;&gt;
-<a th:if="${isAdmin}" th:href="@{/admin/video/upload}">➕ 새 영상 등록</a>
+<main class="flex-1 container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-extrabold text-center mb-8 text-pink-600">🎬 영상 목록</h1>
 
-&lt;!&ndash; ✅ 1. 관리자 화면 (테이블 형식) &ndash;&gt;
-<table th:if="${isAdmin}">
-  <thead>
-  <tr>
-    <th>번호</th>
-    <th>제목</th>
-    <th>설명</th>
-    <th>등록일</th>
-    <th>수정일</th>
-    <th>관리</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="video, stat : ${videoPage.content}" th:id="'row-' + ${video.videoId}">
-    <td th:text="${videoPage.number * videoPage.size + stat.index + 1}">1</td>
-    <td>
-      &lt;!&ndash; 디버깅: ID 확인 &ndash;&gt;
-      <span th:text="'[ID: ' + ${video.videoId} + ']'">[ID]</span>
+  <!-- 검색 폼 -->
+  <form method="get" th:action="@{/video/user/contentList}" class="max-w-xl mx-auto mb-8 flex justify-center gap-2">
+    <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력" class="flex-grow min-w-0 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500" />
+    <select name="searchType" class="flex-shrink p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
+      <option value="title" th:selected="${searchType == 'title'}">제목</option>
+      <option value="content" th:selected="${searchType == 'content'}">내용</option>
+      <option value="all" th:selected="${searchType == 'all'}">제목 + 내용</option>
+    </select>
+    <button type="submit" class="px-6 py-2 bg-pink-500 text-white font-semibold rounded-lg shadow-md hover:bg-pink-600 transition duration-300">
+      검색
+    </button>
+  </form>
 
-      &lt;!&ndash; 제목 링크 &ndash;&gt;
-      <a th:href="@{/admin/video/view/{id}(id=${video.videoId})}" th:text="${video.title}">제목</a>
-    </td>
-    <td th:text="${video.content}">내용</td>
-    <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</td>
-    <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}"></td>
-    <td>
-      <a th:href="@{/admin/video/edit/{id}(id=${video.videoId})}">수정</a> |
-      <button type="button" th:attr="data-id=${video.videoId}" onclick="deleteVideo(this)">삭제</button>
-    </td>
-  </tr>
-  </tbody>
-</table>-->
-
-<!-- ✅ 2. 사용자 화면 (카드형 목록) -->
-<!--<div th:if="${!isAdmin}">-->
-  <div th:each="video, stat : ${videoPage.content}" class="video-card">
-    <div>
-      <strong th:text="(${videoPage.number} * ${videoPage.size} + ${stat.index} + 1) + '. '">1.</strong>
-
-      <a th:href="@{/video/user/contentView/{id}(id=${video.videoId})}" th:text="${video.title}">영상 제목</a>
+  <!-- 비디오 카드 리스트 -->
+  <div class="video-list-container flex flex-wrap justify-center gap-6 max-w-5xl mx-auto px-3" th:if="${videoPage.totalElements > 0}">
+    <div th:each="video, stat : ${videoPage.content}" class="video-card flex-1 min-w-[280px] max-w-sm bg-white rounded-xl shadow-md p-4 flex flex-col transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer" th:if="${stat.index < 9}">
+      <a th:href="@{/video/user/contentView/{id}(id=${video.videoId})}" class="thumbnail-link relative block w-full h-48 overflow-hidden rounded-lg mb-3">
+        <video class="video-thumbnail w-full h-full object-cover pointer-events-none" muted playsinline preload="metadata">
+          <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
+          영상 태그를 지원하지 않는 브라우저입니다.
+        </video>
+        <div class="play-icon-overlay absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl text-white text-shadow-lg pointer-events-none">▶</div>
+      </a>
+      <strong class="text-lg font-bold text-gray-900 leading-tight mb-2">
+        <a th:href="@{/video/contentView/{id}(id=${video.videoId})}" th:text="${video.title}" class="no-underline hover:text-pink-600 transition duration-300">영상 제목</a>
+      </strong>
+      <p class="text-sm text-gray-500 line-clamp-2" th:text="${video.content}">설명</p>
     </div>
-
-    <a th:href="@{/video/user/contentView/{id}(id=${video.videoId})}" class="thumbnail-link">
-      <video class="video-thumbnail" muted playsinline preload="metadata">
-        <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
-        영상 태그를 지원하지 않는 브라우저입니다.
-      </video>
-      <div class="play-icon-overlay">▶</div>
-    </a>
-
-    <p th:text="${video.content}">설명</p>
   </div>
-<!--</div>-->
-<!--
-  3. 페이징
-<div class="pagination" th:if="${videoPage.totalPages > 1}">
-  <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
- <a th:href="@{/video/user/contentList(page=${i}, keyword=${keyword}, searchType=${searchType})}"
-    th:class="${i == videoPage.number} ? 'active-page' : ''"
-    th:text="${i + 1}">1</a>
-</span>
-</div>-->
 
-<div class="pagination" th:if="${videoPage.totalPages > 1}">
-  <!-- 이전 버튼 -->
-  <a th:if="${!videoPage.first}"
-     th:href="@{/video/user/contentList(page=${videoPage.number - 1}, keyword=${keyword}, searchType=${searchType})}">
-    &laquo; 이전
-  </a>
-  <span th:if="${videoPage.first}" style="color: #ccc;">&laquo; 이전</span>
-
-  <!-- 페이지 번호 버튼 -->
-  <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
-    <a th:href="@{/video/user/contentList(page=${i}, keyword=${keyword}, searchType=${searchType})}"
-       th:classappend="${i == videoPage.number} ? ' active-page' : ''"
-       th:text="${i + 1}">1</a>
-  </span>
-
-  <!-- 다음 버튼 -->
-  <a th:if="${!videoPage.last}"
-     th:href="@{/video/user/contentList(page=${videoPage.number + 1}, keyword=${keyword}, searchType=${searchType})}">
-    다음 &raquo;
-  </a>
-  <span th:if="${videoPage.last}" style="color: #ccc;">다음 &raquo;</span>
-</div>
+  <!-- 검색 결과가 없을 경우 메시지 -->
+  <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-gray-50 rounded-lg shadow-inner">
+    <p class="text-xl font-medium text-gray-600">검색 결과가 없습니다.</p>
+  </div>
 
 
+  <!-- 페이징 -->
+  <div class="pagination text-center mt-8" th:if="${videoPage.totalPages > 1}">
+    <span th:if="${!videoPage.first}">
+      <a th:href="@{/video/user/contentList(page=${videoPage.number - 1}, keyword=${keyword}, searchType=${searchType})}" class="inline-block px-3 py-1.5 mx-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">&laquo; 이전</a>
+    </span>
+    <span th:if="${videoPage.first}" class="inline-block px-3 py-1.5 mx-1 bg-gray-100 text-gray-400 rounded-md cursor-not-allowed">&laquo; 이전</span>
 
+    <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
+      <a th:href="@{/video/user/contentList(page=${i}, keyword=${keyword}, searchType=${searchType})}"
+         th:classappend="${i == videoPage.number} ? 'bg-pink-500 text-white font-bold' : 'bg-gray-200 text-gray-600'"
+         class="inline-block px-3 py-1.5 mx-1 rounded-md hover:bg-gray-300"
+         th:text="${i + 1}">1</a>
+    </span>
+
+    <span th:if="${!videoPage.last}">
+      <a th:href="@{/video/user/contentList(page=${videoPage.number + 1}, keyword=${keyword}, searchType=${searchType})}" class="inline-block px-3 py-1.5 mx-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">다음 &raquo;</a>
+    </span>
+    <span th:if="${videoPage.last}" class="inline-block px-3 py-1.5 mx-1 bg-gray-100 text-gray-400 rounded-md cursor-not-allowed">다음 &raquo;</span>
+  </div>
+</main>
+
+<!-- 푸터 프래그먼트 삽입 -->
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".video-thumbnail").forEach(video => {
       video.addEventListener("loadeddata", function () {
         try {
-          video.currentTime = 0.1; // 썸네일용 0.1초
+          video.currentTime = 1; // 썸네일용 0.1초
           video.pause();
         } catch (e) {}
       });
     });
   });
 </script>
-<!-- ✅ 4. Ajax 삭제 -->
-<!--<script>
-  function deleteVideo(button) {
-      const videoId = $(button).data("id");
-      if (confirm("정말 삭제하시겠습니까?")) {
-          $.ajax({
-              url: "/admin/video/" + videoId,
-              type: "DELETE",
-              success: function () {
-                  alert("삭제되었습니다.");
-                  location.reload(); // 새로고침으로 동기화
-              },
-              error: function () {
-                  alert("삭제 중 오류 발생");
-              }
-          });
-      }
-  }
-</script>-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
