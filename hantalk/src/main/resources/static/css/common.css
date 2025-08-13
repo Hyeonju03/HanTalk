@@ -1,0 +1,153 @@
+/* video 파트 */
+body {
+  font-family: Arial, sans-serif;
+  padding: 30px;
+  background-color: white;
+  color: #4a4a4a;
+  margin: 0;
+}
+h1 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* 검색 폼 */
+form {
+  max-width: 480px;
+  margin: 0 auto 30px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+/* 검색어 입력창 - 더 크게 */
+input[type="text"] {
+  flex: 3; /* 기본 flex: 1 대신 3배로 키움 */
+  min-width: 0; /* overflow 방지 */
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* 검색 타입 선택(select) - 더 작게 */
+select {
+  flex: 1; /* 기존보다 작게 */
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-width: 0;
+}
+button {
+  padding: 8px 16px;
+  border: none;
+  background-color: #f7c6c5;
+  color: #5a2a2a;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button:hover {
+  background-color: #e6b3b2; /* 조금 더 진한 핑크 */
+}
+
+/* 카드 리스트 컨테이너 */
+.video-list-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+/* 카드 */
+.video-card {
+  flex: 1 1 280px;
+  max-width: 300px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(163, 210, 190, 0.25);
+  padding: 18px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: #3a3a3a;
+  cursor: pointer;
+}
+.video-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(163, 210, 190, 0.25); /* 연한 핑크 그림자 */
+}
+
+/* 썸네일 */
+.thumbnail-link {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 168px; /* 16:9 비율 (300px 기준) */
+  overflow: hidden;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+.video-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* 플레이 아이콘 오버레이 */
+.play-icon-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  color: white;
+  text-shadow: 0 0 10px black;
+  pointer-events: none;
+}
+
+/* 제목 */
+.video-card strong a {
+  font-size: 1.1rem;
+  color: #333333;
+ text-decoration: none !important;
+}
+.video-card strong a:hover {
+text-decoration: none !important;
+}
+
+/* 설명 */
+.video-content {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  color: #777;
+  flex-grow: 1;
+}
+
+/* 페이징 */
+.pagination {
+  margin-top: 30px;
+  text-align: center;
+}
+.pagination a {
+  margin: 0 6px;
+  color: #4a4a4a;
+  text-decoration: none;
+  font-weight: 500;
+}
+.pagination a:hover {
+  text-decoration: underline;
+}
+.active-page {
+  font-weight: bold;
+  color: #A3D9B1;
+  pointer-events: none;
+}

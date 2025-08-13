@@ -17,5 +17,9 @@
   <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
   <a href="/study/vocaList/admin">취소</a>
 </form>
+<!-- 푸터 프래그먼트 삽입 -->
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

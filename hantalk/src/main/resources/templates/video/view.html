@@ -50,5 +50,9 @@
   <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}">✏️ 수정</a>
 </div>
 
+<!-- 푸터 프래그먼트 삽입 -->
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

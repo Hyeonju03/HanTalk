@@ -4,189 +4,157 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인 / 회원가입 페이지</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
+        /* 커스텀 Tailwind CSS 설정 */
+        @layer base {
+            :root {
+                --color-background: #FDFBFF; /* 아주 연한 보라빛 흰색 */
+                --color-main: #B8E0D2; /* 민트색 파스텔 톤 */
+                --color-sub: #FFDEE9; /* 연분홍색 파스텔 톤 */
+                --color-accent: #CDE7F0; /* 하늘색 파스텔 톤 */
+            }
         }
-        h1 { text-align: center; margin-top: 20px; }
 
-        .box {
-            width: 800px;
-            margin: 40px auto;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        .container-box {
             display: flex;
-            overflow: hidden;
-            align-items: center;
+            transition: transform 0.5s ease-in-out;
         }
 
-        .container {
-            width: 50%;
-            padding: 20px;
-            box-sizing: border-box;
-            transition: opacity 0.3s ease;
+        .container-signup {
+            transform: translateX(-50%);
         }
-
-        .hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        input {
-            width: 70%;
-            padding: 0 8px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            height: 40px;              /* ✅ 고정 높이 */
-            line-height: 40px;         /* ✅ 텍스트 수직 정렬 */
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 80%;
-            padding: 10px;
-            margin-top: 0px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover { background: #45a049; }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            width: 90%;
-            margin: 5px auto;
-        }
-
-        .input-group input {
-            flex: 1;
-            border: 1px solid #ccc;
-            border-radius: 4px 0 0 4px;
-            height: 40px;              /* ✅ input과 버튼 동일 높이 */
-            line-height: 40px;
-        }
-
-        .input-group .check-btn {
-            width: 90px;
-            height: 40px;              /* ✅ 동일 높이 */
-            font-size: 13px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-        }
-        .input-group .check-btn:hover { background: #0056b3; }
-
-        .msg {
-            font-size: 0.85em;
-            margin-left: 5%;
-            color: red;
-        }
-
-
     </style>
-
 </head>
-<body>
+<body class="bg-[#FDFBFF] flex flex-col items-center justify-center min-h-screen p-4 text-gray-800">
 
-<h1>로그인 / 회원가입 페이지</h1>
-<a href="/user/logout">로그아웃</a>
+<div class="w-full text-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-700">로그인 / 회원가입 페이지</h1>
+    <a href="/user/logout" class="text-sm text-blue-500 hover:underline">로그아웃</a>
+</div>
 
-<div class="box">
-    <!-- ✅ 로그인 영역 -->
-    <div class="container" id="loginContainer">
-        <h2>로그인</h2>
-        <form action="/user/login" method="post">
-            <input type="text" name="userId" placeholder="아이디" required>
-            <input type="password" name="password" placeholder="비밀번호" required>
-            <button type="submit">로그인</button>
-        </form>
-        <p>계정을 잊으셨나요? <a href="/user/findIDPW">아이디 / 패스워드 찾기</a></p><br>
-        <p>계정이 없으신가요? <a href="#" onclick="showSignup()">회원가입</a></p>
-    </div>
-
-    <!-- ✅ 회원가입 영역 -->
-    <div class="container hidden" id="signupContainer">
-        <h2>회원가입</h2>
-        <form action="/user/signup" method="post" enctype="multipart/form-data" onsubmit="return checkPasswordMatch();">
-            <div class="input-group">
-                <input type="text" id="userId" name="userId" placeholder="아이디" required>
-                <button type="button" class="check-btn" onclick="checkId()">중복확인</button>
+<div class="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden min-h-[500px]">
+    <div id="formContainer" class="container-box w-[200%]">
+        <div id="loginContainer" class="flex-shrink-0 w-1/2 p-10 flex flex-col justify-center items-center text-center">
+            <h2 class="text-2xl font-bold mb-6">로그인</h2>
+            <form action="/user/login" method="post" class="space-y-4 w-full max-w-sm">
+                <input type="text" name="userId" placeholder="아이디" required
+                       class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                <input type="password" name="password" placeholder="비밀번호" required
+                       class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                <button type="submit"
+                        class="w-full h-12 bg-[#B8E0D2] text-white font-bold rounded-md hover:bg-[#a3ccbf] transition-colors duration-300">
+                    로그인
+                </button>
+            </form>
+            <div class="mt-6 text-sm space-y-2">
+                <p class="text-gray-600">
+                    계정을 잊으셨나요?
+                    <a href="/user/findIDPW" class="text-[#FFDEE9] font-semibold hover:underline">아이디 / 패스워드 찾기</a>
+                </p>
+                <p class="text-gray-600">
+                    계정이 없으신가요?
+                    <a href="#" onclick="showSignup()" class="text-[#FFDEE9] font-semibold hover:underline">회원가입</a>
+                </p>
             </div>
-            <div id="idMsg" class="msg"></div>
+        </div>
 
-            <input type="text" name="name" placeholder="이름" required>
+        <div id="signupContainer" class="flex-shrink-0 w-1/2 p-10 flex flex-col justify-center items-center text-center bg-[#FDFBFF]">
+            <h2 class="text-2xl font-bold mb-6">회원가입</h2>
+            <form action="/user/signup" method="post" enctype="multipart/form-data" onsubmit="return checkPasswordMatch();" class="space-y-4 w-full max-w-sm">
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="userId" name="userId" placeholder="아이디" required
+                           class="flex-1 h-10 px-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                    <button type="button" onclick="checkId()"
+                            class="h-10 w-24 bg-[#CDE7F0] text-gray-700 text-sm font-medium rounded-r-md hover:bg-[#b5d5e2] transition-colors duration-300">
+                        중복확인
+                    </button>
+                </div>
+                <div id="idMsg" class="text-sm text-left px-2"></div>
 
-            <div class="input-group">
-                <input type="text" id="emailPrefix" placeholder="이메일 아이디" style="flex:1;" required>
-                <span>@</span>
-                <select id="emailDomain" style="width:35%;" onchange="toggleCustomDomain(this)">
-                    <option value="gmail.com">gmail.com</option>
-                    <option value="naver.com">naver.com</option>
-                    <option value="daum.net">daum.net</option>
-                    <option value="custom">직접 입력</option>
-                </select>
-            </div>
-            <!-- 직접 입력시 나타나는 필드 -->
-            <input type="text" id="customDomain" placeholder="직접 입력" style="display:none; width:90%; margin:5px auto;">
-            <div class="input-group">
-                <button type="button" class="check-btn" onclick="checkEmail()">중복확인</button>
-            </div>
-            <input type="hidden" name="email" id="emailHidden">
-            <div id="emailMsg" class="msg"></div>
+                <input type="text" name="name" placeholder="이름" required
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
 
-            <input type="password" id="password" name="password" placeholder="비밀번호" required>
-            <input type="password" id="passwordRE" name="passwordRE" placeholder="비밀번호 확인" required
-                   oninput="validatePassword()">
-            <div id="pwMsg" class="msg"></div>
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="emailPrefix" placeholder="이메일 아이디" required
+                           class="flex-1 h-10 px-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                    <span class="text-gray-500">@</span>
+                    <select id="emailDomain" onchange="toggleCustomDomain(this)"
+                            class="w-32 h-10 px-3 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                        <option value="gmail.com">gmail.com</option>
+                        <option value="naver.com">naver.com</option>
+                        <option value="daum.net">daum.net</option>
+                        <option value="custom">직접 입력</option>
+                    </select>
+                </div>
+                <input type="text" id="customDomain" placeholder="직접 입력" style="display:none;"
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
 
-            <input type="text" name="nickname" placeholder="닉네임" required>
+                <div class="flex justify-end">
+                    <button type="button" onclick="checkEmail()"
+                            class="h-10 w-24 bg-[#CDE7F0] text-gray-700 text-sm font-medium rounded-md hover:bg-[#b5d5e2] transition-colors duration-300">
+                        중복확인
+                    </button>
+                </div>
+                <input type="hidden" name="email" id="emailHidden">
+                <div id="emailMsg" class="text-sm text-left px-2"></div>
 
-            <input type="date" id="birth" required>
-            <input type="hidden" name="birth" id="birthHidden">
+                <input type="password" id="password" name="password" placeholder="비밀번호" required
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                <input type="password" id="passwordRE" name="passwordRE" placeholder="비밀번호 확인" required
+                       oninput="validatePassword()"
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                <div id="pwMsg" class="text-sm text-left px-2"></div>
 
-            <button type="submit">회원가입</button>
-        </form>
-        <p>이미 계정이 있으신가요? <a href="#" onclick="showLogin()">로그인</a></p>
+                <input type="text" name="nickname" placeholder="닉네임" required
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+
+                <input type="date" id="birth" required
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                <input type="hidden" name="birth" id="birthHidden">
+
+                <button type="submit"
+                        class="w-full h-12 bg-[#B8E0D2] text-white font-bold rounded-md hover:bg-[#a3ccbf] transition-colors duration-300">
+                    회원가입
+                </button>
+            </form>
+            <p class="mt-6 text-sm text-gray-600">
+                이미 계정이 있으신가요?
+                <a href="#" onclick="showLogin()" class="text-[#FFDEE9] font-semibold hover:underline">로그인</a>
+            </p>
+        </div>
     </div>
 </div>
 
 <script>
-    function showSignup() {
-        document.getElementById("loginContainer").classList.add("hidden");
-        document.getElementById("signupContainer").classList.remove("hidden");
+    const formContainer = document.getElementById("formContainer");
 
-        let loginForm = document.querySelector("#loginContainer form");
-        if (loginForm) loginForm.reset();
+    function showSignup() {
+        formContainer.classList.add("container-signup");
+        document.querySelector("#loginContainer form").reset();
+        resetValidationMessages();
     }
     function showLogin() {
-        document.getElementById("signupContainer").classList.add("hidden");
-        document.getElementById("loginContainer").classList.remove("hidden");
-
-        let signupForm = document.querySelector("#signupContainer form");
-        if (signupForm) signupForm.reset();
+        formContainer.classList.remove("container-signup");
+        document.querySelector("#signupContainer form").reset();
+        resetValidationMessages();
+    }
+    function resetValidationMessages() {
+        document.getElementById("idMsg").textContent = "";
+        document.getElementById("emailMsg").textContent = "";
+        document.getElementById("pwMsg").textContent = "";
+        document.getElementById("customDomain").style.display = "none";
     }
     function validatePassword() {
         let pw = document.getElementById("password").value;
         let pwRe = document.getElementById("passwordRE").value;
         let msg = document.getElementById("pwMsg");
         msg.textContent = (pw !== pwRe) ? "비밀번호가 일치하지 않습니다." : "";
+        msg.style.color = (pw !== pwRe) ? "red" : "green";
     }
-
-    // ✅ form 전송 시 체크
     function checkPasswordMatch() {
         const pw = document.getElementById("password").value;
         const pwRe = document.getElementById("passwordRE").value;
-
         if (pw === "" || pwRe === "") {
             alert("비밀번호를 입력하세요.");
             return false;
@@ -195,46 +163,36 @@
             alert("비밀번호가 일치하지 않습니다.");
             return false;
         }
-
-        // ✅ 이메일 Null 체크
         const email = getFullEmail();
         if (!email || !email.includes("@") || email.split("@")[1] === "") {
             alert("올바른 이메일을 입력하세요.");
             return false;
         }
-
-        return true; // ✅ 통과 시 전송
+        return true;
     }
-
     function checkId() {
         const userId = document.getElementById("userId").value.trim();
         const msg = document.getElementById("idMsg");
-        if (!userId) { alert("아이디를 입력하세요."); return; }
-
+        if (!userId) { msg.textContent = "아이디를 입력하세요."; msg.style.color = "red"; return; }
         msg.style.color = "inherit";
         msg.textContent = "확인 중...";
-
         fetch(`/user/isIdAvail?userId=${encodeURIComponent(userId)}`, { cache: 'no-store' })
-          .then(res => res.text())
-          .then(text => {
-            const available = text.trim().toLowerCase() === "true";
-            msg.style.color = available ? "green" : "red";
-            msg.textContent = available
-              ? "사용 가능한 아이디입니다."
-              : "이미 사용중인 아이디입니다.";
-          })
-          .catch(err => {
-            msg.style.color = "red";
-            msg.textContent = "중복 확인 중 오류가 발생했습니다.";
-            console.error(err);
-          });
-      }
-
+            .then(res => res.text())
+            .then(text => {
+                const available = text.trim().toLowerCase() === "true";
+                msg.style.color = available ? "green" : "red";
+                msg.textContent = available ? "사용 가능한 아이디입니다." : "이미 사용중인 아이디입니다.";
+            })
+            .catch(err => {
+                msg.style.color = "red";
+                msg.textContent = "중복 확인 중 오류가 발생했습니다.";
+                console.error(err);
+            });
+    }
     function toggleCustomDomain(select) {
         const customDomain = document.getElementById("customDomain");
         customDomain.style.display = (select.value === "custom") ? "block" : "none";
     }
-
     function getFullEmail() {
         const prefix = document.getElementById("emailPrefix").value.trim();
         const domainSelect = document.getElementById("emailDomain").value;
@@ -242,45 +200,38 @@
         const domain = (domainSelect === "custom") ? customDomain : domainSelect;
         return (prefix !== "" && domain !== "") ? prefix + "@" + domain : "";
     }
-
-     function checkEmail() {
+    function checkEmail() {
         const email = getFullEmail();
         const msg = document.getElementById("emailMsg");
         if (!email || !email.includes("@")) {
-          msg.style.color = "red";
-          msg.textContent = "올바른 이메일을 입력하세요.";
-          return;
+            msg.style.color = "red";
+            msg.textContent = "올바른 이메일을 입력하세요.";
+            return;
         }
-
         msg.style.color = "inherit";
         msg.textContent = "확인 중...";
-
         fetch(`/user/isEmailAvail?email=${encodeURIComponent(email)}`, { cache: 'no-store' })
-          .then(res => res.text())
-          .then(text => {
-            const available = text.trim().toLowerCase() === "true";
-            msg.style.color = available ? "green" : "red";
-            msg.textContent = available
-              ? "사용 가능한 이메일입니다."
-              : "이미 등록된 이메일입니다.";
-          })
-          .catch(err => {
-            msg.style.color = "red";
-            msg.textContent = "중복 확인 중 오류가 발생했습니다.";
-            console.error(err);
-          });
-      }
+            .then(res => res.text())
+            .then(text => {
+                const available = text.trim().toLowerCase() === "true";
+                msg.style.color = available ? "green" : "red";
+                msg.textContent = available ? "사용 가능한 이메일입니다." : "이미 등록된 이메일입니다.";
+            })
+            .catch(err => {
+                msg.style.color = "red";
+                msg.textContent = "중복 확인 중 오류가 발생했습니다.";
+                console.error(err);
+            });
+    }
     document.querySelector("form[action='/user/signup']").addEventListener("submit", function() {
-        const birthInput = document.getElementById("birth").value;  // YYYY-MM-DD
+        const birthInput = document.getElementById("birth").value;
         if (birthInput) {
-            const formatted = birthInput.replace(/-/g, "");  // 1994-02-03 → 19940203
+            const formatted = birthInput.replace(/-/g, "");
             document.getElementById("birthHidden").value = formatted;
         }
-
         const email = getFullEmail();
         document.getElementById("emailHidden").value = email;
     });
 </script>
-
 </body>
 </html>
