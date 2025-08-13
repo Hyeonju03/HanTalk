@@ -22,10 +22,10 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/css/**", "/js/**", "/images/**", "/user/test", "/user/findIDPW", "/",
-                        "/user/isIdAvail", "/user/isEmailAvail");
+                        "/user/isIdAvail", "/user/isEmailAvail", "/api/**");
         registry.addInterceptor(adminInterceptor)
                 .addPathPatterns("/admin/**", "/**/admin/**", "/**/admin")
-                .excludePathPatterns("/css/**", "/js/**", "/images/**");
+                .excludePathPatterns("/css/**", "/js/**", "/images/**", "/api/**");
     }
 
     @Override
