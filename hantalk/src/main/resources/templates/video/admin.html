@@ -123,18 +123,19 @@
      }
   }
 
-  // tr 클릭 시 상세 페이지로 이동 (수정, 삭제 클릭 제외)
-  $(document).ready(function() {
-   $(".clickable-row").click(function(e) {
-     // 클릭한 태그가 수정/삭제/아이콘이면 이동 막기
-     if ($(e.target).closest("a, button").length === 0) {
-       const videoId = $(this).data("id");
-       if (videoId) {
-         window.location.href = "/video/admin/view/" + videoId;
-       }
-     }
-   });
+// video/admin.html
+// tr 클릭 시 상세 페이지로 이동
+$(document).ready(function() {
+  $(".clickable-row").click(function(e) {
+    if ($(e.target).closest("a, button").length === 0) {
+      const videoId = $(this).data("id");
+      if (videoId) {
+        // URL을 "/video/view/"로 통일
+        window.location.href = "/video/view/" + videoId;
+      }
+    }
   });
+});
 
 
 </script>

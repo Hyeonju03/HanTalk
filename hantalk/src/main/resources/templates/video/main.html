@@ -72,7 +72,7 @@
 </head>
 <body>
 
-<nav>
+<!--<nav>
   <ul>
     <li th:if="${role == 'ADMIN'}"><a th:href="@{/video/admin/main}">관리자 비디오 메인</a></li>
     <li th:if="${role == 'ADMIN'}"><a th:href="@{/video/list}">영상 목록 관리</a></li>
@@ -85,7 +85,7 @@
     <li th:if="${role == 'USER'}"><a th:href="@{/video/profile}">내 정보</a></li>
     <li th:if="${role == null}"><a th:href="@{/login}">로그인</a></li>
   </ul>
-</nav>
+</nav>-->
 
 <main>
   <h1>🎥 비디오 메인</h1>
@@ -98,14 +98,6 @@
        th:href="@{/video/list}">🏠 사용자 페이지로 이동</a>
   </div>
 
-  <div th:if="${role == 'USER'}">
-    <p>사용자용 메인 콘텐츠 영역</p>
-  </div>
-
-  <div th:if="${role == null}">
-    <p>로그인이 필요한 서비스입니다.</p>
-    <a th:href="@{/login}">로그인하러 가기</a>
-  </div>
 </main>
 
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
