@@ -5,6 +5,7 @@ import com.example.hantalk.entity.Comment;
 import com.example.hantalk.entity.Users;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
+@ToString
 public class PostDTO {
     private int postId;
     private String title;
@@ -20,13 +22,10 @@ public class PostDTO {
     private String content;
     private String archive;
     private int viewCount;
-    private Integer userNo;
-    private Integer categoryId;
+
+    private Users users;
     private Category category;
-    private String username;
 
     private List<CommentDTO> commentList;
-
-
     
 }

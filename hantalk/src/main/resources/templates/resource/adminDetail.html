@@ -3,138 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <title>관리자 자료 상세 보기</title>
+
+  <!-- Bootstrap과 Tailwind CSS CDN -->
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     body {
-      background: #fefcff;
-      color: #444;
       font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-    }
-    nav {
-      width: 200px;
-      background: #f2f6ff;
-      padding: 2rem 1rem;
-      height: 100vh;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-      position: fixed;
-      top: 0; left: 0;
-    }
-    nav h2 {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-      color: #5e7bb4;
-    }
-    nav ul {
-      list-style: none;
-      padding: 0;
-    }
-    nav li {
-      margin-bottom: 0.8rem;
-    }
-    nav a {
-      text-decoration: none;
-      color: #4e6cb2;
-    }
-    main {
-      margin-left: 200px;
-      padding: 2rem;
-      width: 100%;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(180, 200, 255, 0.2);
-      min-height: 100vh;
-    }
-    h1 {
-      color: #5e7bb4;
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-    .detail-item {
-      margin-bottom: 1.2rem;
-      line-height: 1.5;
-      font-size: 1.1rem;
-    }
-    .label {
-      font-weight: bold;
-      color: #4e6cb2;
-      display: inline-block;
-      width: 100px;
-    }
-    .content {
-      display: inline-block;
-      max-width: 70%;
-      word-wrap: break-word;
-      vertical-align: top;
-    }
-    .btn-group {
-      text-align: center;
-      margin-top: 2rem;
-    }
-    .btn {
-      background: #4e6cb2;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      margin: 0 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      text-decoration: none;
-      font-size: 1rem;
-    }
-    .btn:hover {
-      background: #3b5490;
     }
   </style>
 </head>
-<body>
+<body class="bg-[#fefcff] text-[#444] m-0 p-0 flex flex-col min-h-screen">
 
-<nav>
-  <h2>📁 메뉴</h2>
-  <ul>
-    <li><a href="/resource/admin/main">관리자 목록</a></li>
-    <li><a href="/resource/main">사용자 메인</a></li>
-  </ul>
-</nav>
+<!-- 헤더 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<main>
-  <h1>자료 상세 보기</h1>
+<!-- 메인 컨테이너: 좌측 메뉴 + 본문 -->
+<div class="flex flex-1 w-full">
 
-  <div class="detail-item">
-    <span class="label">제목:</span>
-    <span class="content" th:text="${resource.title}">제목이 표시됩니다</span>
-  </div>
+  <!-- 사이드바 -->
+  <nav class="w-[200px] bg-[#f2f6ff] p-8 shadow-md flex-shrink-0">
+    <h2 class="text-lg mb-4 text-[#5e7bb4] font-bold">📁 메뉴</h2>
+    <ul class="list-none p-0">
+      <li class="mb-3">
+        <a href="/resource/admin/main" class="no-underline text-[#4e6cb2] hover:underline">관리자 목록</a>
+      </li>
+      <li class="mb-3">
+        <a href="/resource/main" class="no-underline text-[#4e6cb2] hover:underline">사용자 메인</a>
+      </li>
+    </ul>
+  </nav>
 
-  <div class="detail-item">
-    <span class="label">내용:</span>
-    <span class="content" th:text="${resource.content}">내용이 표시됩니다</span>
-  </div>
+  <!-- 본문 -->
+  <main class="flex-1 p-8 box-border bg-[#fefcff]">
+    <h1 class="text-2xl font-bold text-[#5e7bb4] mb-6 border-b pb-3">자료 상세 보기</h1>
 
-  <div class="detail-item">
-    <span class="label">파일 링크:</span>
-    <span class="content">
-      <a th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
-         th:href="@{/resource/download/file/{fileName}(fileName=${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)})}"
-         download
-         th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
-      <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}">파일이 없습니다.</span>
-    </span>
-  </div>
+    <!-- 제목 -->
+    <div class="mb-4 flex">
+      <span class="font-semibold text-gray-700 w-24">제목</span>
+      <span class="text-gray-900" th:text="${resource.title}">제목이 표시됩니다</span>
+    </div>
 
-  <div class="detail-item">
-    <span class="label">등록일:</span>
-    <span class="content" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
-  </div>
+    <!-- 내용 -->
+    <div class="mb-4 flex">
+      <span class="font-semibold text-gray-700 w-24">내용</span>
+      <span class="text-gray-900" th:text="${resource.content}">내용이 표시됩니다</span>
+    </div>
 
-  <div class="btn-group">
-    <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}" class="btn">수정</a>
-    <a href="/resource/admin/main" class="btn">관리자 목록으로</a>
-  </div>
-</main>
-<!-- 푸터 프래그먼트 삽입 -->
+    <!-- 파일 링크 -->
+    <div class="mb-4 flex">
+      <span class="font-semibold text-gray-700 w-24">파일 링크</span>
+      <span>
+        <a th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
+           th:href="@{/resource/download/file/{fileName}(fileName=${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)})}"
+           download
+           class="text-[#4e6cb2] hover:underline font-semibold"
+           th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
+        <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
+              class="text-gray-500">파일이 없습니다.</span>
+      </span>
+    </div>
+
+    <!-- 등록일 -->
+    <div class="mb-6 flex">
+      <span class="font-semibold text-gray-700 w-24">등록일</span>
+      <span class="text-gray-900" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
+    </div>
+
+    <!-- 버튼 -->
+    <div class="flex gap-4">
+      <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
+         class="px-4 py-2 bg-[#4e6cb2] text-white rounded hover:bg-[#3b5490]">수정</a>
+      <a href="/resource/admin/main"
+         class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">관리자 목록으로</a>
+    </div>
+  </main>
+</div>
+
+<!-- 푸터 -->
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

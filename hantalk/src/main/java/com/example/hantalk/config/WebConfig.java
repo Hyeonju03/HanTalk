@@ -26,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/user/findID", "/user/findPW");
         registry.addInterceptor(adminInterceptor)
                 .addPathPatterns("/admin/**", "/**/admin/**", "/**/admin")
-                .excludePathPatterns("/css/**", "/js/**", "/images/**");
+                .excludePathPatterns("/css/**", "/js/**", "/images/**", "/api/**");
     }
 
     @Override
@@ -53,10 +53,6 @@ public class WebConfig implements WebMvcConfigurer {
         String uploadPath = System.getProperty("user.dir") + "/uploads/videos/";
         registry.addResourceHandler("/videos/**")
                 .addResourceLocations("file:" + uploadPath);
-
-        // 프레임 이미지 경로
-        registry.addResourceHandler("/frames/**")
-                .addResourceLocations("file:" + System.getProperty("user.dir") + "/frames/");
 
         registry.addResourceHandler("/image/**")
                 .addResourceLocations("classpath:/static/images/");

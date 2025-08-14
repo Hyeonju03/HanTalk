@@ -1,6 +1,5 @@
 package com.example.hantalk.dto;
 
-import com.example.hantalk.entity.Post;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,5 +11,5 @@ public class CategoryDTO {
     private int categoryId;
     private String categoryName;
 
-    private List<Post> postList;
+    private List<PostDTO> postList;
 }

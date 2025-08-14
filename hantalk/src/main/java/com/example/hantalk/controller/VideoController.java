@@ -69,7 +69,7 @@ public class VideoController {
        - 로그인 필수
        - 관리자면 /admin/list로 리다이렉트
     ========================== */
-    @GetMapping("/contentList")
+    @GetMapping("/list")
     public String userList(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "searchType", defaultValue = "title") String searchType,
@@ -104,7 +104,7 @@ public class VideoController {
 /*        if (isAdmin) { // 관리자면 관리자 목록 페이지로
             return "redirect:/video/admin/list";
         }*/
-        return "video/contentList"; // 사용자 목록 페이지
+        return "video/list"; // 사용자 목록 페이지
     }
 
     /* =========================

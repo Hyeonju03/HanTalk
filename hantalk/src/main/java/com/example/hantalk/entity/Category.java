@@ -19,10 +19,7 @@ public class Category {
     @Column(name = "category_name", length = 200)
     private String categoryName; //카테고리명
 
-    /// /////////////////////////////////
     @OneToMany(mappedBy = "category", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
-    @Column(name = "post_list")
     private List<Post> postList;
-
 
 }

@@ -1,145 +1,84 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>자료 수정</title>
-  <style>
-    /* 기존 스타일 유지 */
-    body {
-      background: #fefcff;
-      color: #444;
-      font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-    }
 
-    nav {
-      width: 200px;
-      background: #f2f6ff;
-      padding: 2rem 1rem;
-      height: 100vh;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-      position: fixed;
-      top: 0; left: 0;
-    }
+  <!-- Bootstrap과 Tailwind CSS CDN -->
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    nav h2 {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-      color: #5e7bb4;
-    }
-
-    nav ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    nav li {
-      margin-bottom: 0.8rem;
-    }
-
-    nav a {
-      text-decoration: none;
-      color: #4e6cb2;
-    }
-
-    main {
-      margin-left: 200px;
-      padding: 2rem;
-      width: 100%;
-    }
-
-    h1 {
-      text-align: center;
-      color: #5e7bb4;
-      margin-bottom: 2rem;
-    }
-
-    form {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(180, 200, 255, 0.2);
-    }
-
-    label {
-      display: block;
-      margin-bottom: 1rem;
-      font-weight: bold;
-    }
-
-    input[type="text"], textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-top: 5px;
-      font-size: 1rem;
-    }
-
-    textarea {
-      height: 150px;
-      resize: vertical;
-    }
-
-    button {
-      background: #4e6cb2;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      cursor: pointer;
-      margin-top: 1rem;
-      margin-right: 10px;
-    }
-
-    button:hover {
-      background: #3b5490;
-    }
-  </style>
 </head>
-<body>
 
-<nav>
-  <h2>📁 메뉴</h2>
-  <ul>
-    <li><a href="/resource/admin">자료 목록</a></li>
-    <li><a href="#">자주 묻는 질문</a></li>
-    <li><a href="#">문의하기</a></li>
-  </ul>
-</nav>
+<body class="bg-[#fefcff] text-[#444] font-[Nanum_Gothic] min-h-screen flex flex-col">
 
-<main>
-  <h1>자료 수정</h1>
-  <form th:action="@{'/resource/edit/' + ${resourceDTO.resourceId}}" method="post" enctype="multipart/form-data" th:object="${resourceDTO}">
-    <label>제목
-      <input type="text" th:field="*{title}" required />
-    </label>
+<!-- 헤더 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-    <label>내용
-      <textarea th:field="*{content}" required></textarea>
-    </label>
+<!-- 메인 컨테이너: flex로 가로 배치 -->
+<div class="flex flex-1 max-w-7xl mx-auto w-full">
 
-    <!-- 기존 archive 필드 노출 -->
-    <label>기존 파일명
-      <input type="text" th:field="*{archive}" readonly />
-    </label>
+  <!-- 사이드바 -->
+  <nav class="w-56 bg-[#f2f6ff] p-6 shadow-md flex-shrink-0">
+    <h2 class="text-xl font-semibold text-[#5e7bb4] mb-4">📁 메뉴</h2>
+    <ul class="space-y-3 text-[#4e6cb2] font-semibold">
+      <li><a href="/resource/admin" class="hover:underline block">자료 목록</a></li>
+      <li><a href="#" class="hover:underline block">자주 묻는 질문</a></li>
+      <li><a href="#" class="hover:underline block">문의하기</a></li>
+    </ul>
+  </nav>
 
-    <!-- 새 파일 업로드 -->
-    <label>파일 업로드 (새 파일 선택 시 기존 파일 대체)
-      <input type="file" name="file" />
-    </label>
+  <!-- 본문 -->
+  <main class="flex-1 bg-white p-8 rounded-lg shadow-md ml-6">
+    <h1 class="text-3xl font-bold text-[#5e7bb4] mb-8 border-b pb-4">자료 수정</h1>
 
-    <button type="submit">수정</button>
-    <button type="button" onclick="window.location.href='/resource/admin/main'">취소</button>
-  </form>
-</main>
-<!-- 푸터 프래그먼트 삽입 -->
+    <form th:action="@{'/resource/edit/' + ${resourceDTO.resourceId}}" method="post" enctype="multipart/form-data" th:object="${resourceDTO}" class="space-y-6">
+
+      <label class="block">
+        <span class="text-gray-700 font-semibold mb-1 block">제목</span>
+        <input type="text" th:field="*{title}" required
+               class="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4e6cb2]" />
+      </label>
+
+      <label class="block">
+        <span class="text-gray-700 font-semibold mb-1 block">내용</span>
+        <textarea th:field="*{content}" rows="6" required
+                  class="w-full rounded border border-gray-300 px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-[#4e6cb2]"></textarea>
+      </label>
+
+      <label class="block">
+        <span class="text-gray-700 font-semibold mb-1 block">기존 파일명</span>
+        <input type="text" th:field="*{archive}" readonly
+               class="w-full bg-gray-100 rounded border border-gray-300 px-3 py-2 cursor-not-allowed" />
+      </label>
+
+      <label class="block">
+        <span class="text-gray-700 font-semibold mb-1 block">파일 업로드 (새 파일 선택 시 기존 파일 대체)</span>
+        <input type="file" name="file"
+               class="w-full text-gray-600" />
+      </label>
+
+      <div class="flex gap-4 justify-center mt-8">
+        <button type="submit"
+                class="bg-[#4e6cb2] text-white font-semibold px-6 py-2 rounded hover:bg-[#3b5490] transition-colors">
+          수정
+        </button>
+        <button type="button"
+                onclick="window.location.href='/resource/admin/main'"
+                class="bg-gray-300 text-gray-700 font-semibold px-6 py-2 rounded hover:bg-gray-400 transition-colors">
+          취소
+        </button>
+      </div>
+
+    </form>
+  </main>
+</div>
+
+<!-- 푸터 -->
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
