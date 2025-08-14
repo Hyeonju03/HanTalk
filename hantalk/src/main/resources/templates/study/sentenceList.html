@@ -1,62 +1,69 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>문장 목록</title>
+    <title>오답노트</title>
+
+    <!-- Bootstrap & Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+
 </head>
-<body>
-<h1>문장 목록</h1>
+<body class="min-h-screen flex flex-col">
 
-<div class="search-container">
-    <form th:action="@{/study/sentenceList}" method="get">
-        <input type="text" name="kw" th:value="${kw}" placeholder="문장 또는 의미 검색">
-        <button type="submit">검색</button>
-    </form>
-</div>
+<!-- 헤더 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<table>
-    <thead>
-    <tr>
-        <th>순번</th>
-        <th>문장</th>
-        <th>의미</th>
-        <th>등록일</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:if="${paging == null || paging.content.isEmpty()}">
-        <td colspan="4">
-            문장 데이터가 존재하지 않습니다.
-        </td>
-    </tr>
-    <tr th:each="sentence, loop : ${paging.content}">
-        <td th:text="${paging.number * paging.size + loop.count}"></td>
-        <td th:text="${sentence.munjang.replace('^',' ')}"></td>
-        <td th:text="${sentence.description}"></td>
-        <td th:text="${#temporals.format(sentence.createDate, 'yyyy-MM-dd')}"></td>
-    </tr>
-    </tbody>
-</table>
+<!-- 본문 -->
+<main class="flex-1 p-4">
 
-<div th:if="${!paging.isEmpty()}" class="pagination">
-    <ul>
-        <li th:if="${paging.hasPrevious}">
-            <a th:href="@{|?page=${paging.number - 1}&kw=${kw}|}">이전</a>
-        </li>
+    <h2 class="text-2xl font-semibold mb-4">오답노트</h2>
+    <div class="flex gap-5">
+        <!-- ✅ 단어 오답 -->
+        <div class="flex-1">
+            <h3 class="text-xl mb-2">📘 단어 오답</h3>
+            <table class="w-full border border-gray-300" th:if="${!#lists.isEmpty(wordNotes)}">
+                <thead class="bg-gray-100">
+                <tr>
+                    <th class="border px-2 py-1 text-left">단어</th>
+                    <th class="border px-2 py-1 text-left">뜻</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="note : ${wordNotes}">
+                    <td class="border px-2 py-1" th:text="${note.voca.vocabulary}"></td>
+                    <td class="border px-2 py-1" th:text="${note.voca.description}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <li th:each="page: ${#numbers.sequence(0, paging.totalPages - 1)}"
-            th:classappend="${page == paging.number} ? 'active'">
-            <a th:href="@{|?page=${page}&kw=${kw}|}" th:text="${page + 1}"></a>
-        </li>
+        <!-- ✅ 문장 오답 -->
+        <div class="flex-1">
+            <h3 class="text-xl mb-2">📙 문장 오답</h3>
+            <table class="w-full border border-gray-300" th:if="${!#lists.isEmpty(sentenceNotes)}">
+                <thead class="bg-gray-100">
+                <tr>
+                    <th class="border px-2 py-1 text-left">문장</th>
+                    <th class="border px-2 py-1 text-left">해석</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="note : ${sentenceNotes}">
+                    <td class="border px-2 py-1" th:text="${note.sentence.munjang.replace('^', ' ')}"></td>
+                    <td class="border px-2 py-1" th:text="${note.sentence.description.replace('^', ' ')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        <li th:if="${paging.hasNext}">
-            <a th:href="@{|?page=${paging.number + 1}&kw=${kw}|}">다음</a>
-        </li>
-    </ul>
-</div>
-<!-- 푸터 프래그먼트 삽입 -->
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+    <!-- 전체 오답노트가 비어 있을 경우 -->
+    <p th:if="${#lists.isEmpty(notes)}" class="mt-4">오답노트가 비어 있습니다.</p>
+</main>
 
+<!-- 푸터 -->
+<div th:replace="~{fragments/footer :: footerFragment}" class="bg-gray-100 text-center py-4"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
