@@ -1,71 +1,70 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title th:text="${video.title}">강의 상세 보기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${video.title} + ' | 강의 상세 보기'"></title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-        font-family: Arial, sans-serif;
-        padding: 30px;
-        background-color: #f9f9f9;
+    /* Tailwind CSS 커스텀 색상 변수 적용 */
+    @layer base {
+      :root {
+        --color-background: #FDFBFF;
+        --color-main: #B8E0D2;
+        --color-sub: #FFDEE9;
+        --color-accent: #CDE7F0;
+      }
     }
-    h1 {
-        color: #333;
-    }
-    video {
-        margin-top: 20px;
-        border: 1px solid #ccc;
-    }
-    .actions {
-        margin-top: 20px;
-    }
-    .actions a {
-        margin-right: 10px;
-        text-decoration: none;
-        color: #007BFF;
-    }
+    .bg-main { background-color: var(--color-main); }
+    .bg-sub { background-color: var(--color-sub); }
   </style>
 </head>
-<body>
+<body class="bg-[#FDFBFF] font-sans text-gray-800 flex flex-col min-h-screen">
 
-<h1>영상 상세 보기</h1>
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
+<main class="flex-1 container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8">
 
-<p>
-  <span>등록일: <span th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}"></span></span>
-  <span style="margin-left: 20px;" th:if="${video.updateDate != null}">
-    수정일: <span th:text="${#temporals.format(video.updateDate, 'yyyy-MM-dd')}"></span>
-  </span>
-</p>
+    <h1 class="text-3xl font-extrabold text-gray-800 mb-2" th:text="${video.title}">제목</h1>
 
-<h2 th:text="${video.title}">제목</h2>
+    <div class="text-gray-500 text-sm mb-6 flex items-center">
+      <span>등록일: <span th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}"></span></span>
+      <span class="ml-4" th:if="${video.updateDate != null}">
+        수정일: <span th:text="${#temporals.format(video.updateDate, 'yyyy-MM-dd')}"></span>
+      </span>
+    </div>
 
-<!--@@@@@@@@@@@@@@ 나중에 수정 필요함 @@@@@@@@@@@@@@@@@@@-->
-<div class="video-like-section">
-  <button id="btnLike" type="button">👍 좋아요</button>
-  <span id="likeCount">0</span>
-</div>
+    <div class="flex items-center space-x-2 mb-6">
+      <button id="btnLike" type="button" class="bg-sub hover:bg-[#e6c5d1] text-white px-4 py-2 rounded-full font-bold transition-colors duration-300">
+        👍 좋아요
+      </button>
+      <span id="likeCount" class="text-lg font-medium text-gray-700">0</span>
+    </div>
 
-<!-- ✅ 영상 플레이어 -->
-<video width="640" height="360" controls>
-  <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4">
-  이 브라우저는 video 태그를 지원하지 않습니다.
-</video>
+    <div class="video-container aspect-video w-full mb-6 rounded-lg overflow-hidden shadow-lg">
+      <video width="100%" height="100%" controls class="w-full h-full object-cover">
+        <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4">
+        이 브라우저는 video 태그를 지원하지 않습니다.
+      </video>
+    </div>
 
+    <p class="text-gray-700 leading-relaxed mb-8" th:text="${video.content}">설명</p>
 
-<p th:text="${video.content}">설명</p>
+    <div class="flex items-center space-x-4">
+      <a th:href="@{/video/contentList}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-300">
+        <span class="mr-2">←</span> 목록으로
+      </a>
 
-<!-- ✅ 이동 및 관리자 기능 -->
-<div class="actions">
-  <a th:href="@{/video/user/contentList}">← 목록으로</a>
+      <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}" class="inline-flex items-center px-4 py-2 bg-main text-white rounded-md font-semibold hover:bg-[#a3ccbf] transition-colors duration-300">
+        <span class="mr-2">✏️</span> 수정
+      </a>
+    </div>
 
-  <!-- 관리자만 수정 버튼 노출 -->
-  <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}">✏️ 수정</a>
+  </div>
+</main>
 
-</div>
-<!-- 푸터 프래그먼트 삽입 -->
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
