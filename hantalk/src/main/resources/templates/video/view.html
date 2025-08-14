@@ -1,54 +1,77 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title th:text="${video.title}">관리자 영상 상세 보기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${video.title} + ' | 강의 상세 보기'"></title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-        font-family: Arial, sans-serif;
-        padding: 30px;
-        background-color: #f9f9f9;
-    }
-    h1 {
-        color: #333;
-    }
-    video {
-        margin-top: 20px;
-        border: 1px solid #ccc;
-    }
-    .actions {
-        margin-top: 20px;
-    }
-    .actions a {
-        margin-right: 10px;
-        text-decoration: none;
-        color: #007BFF;
-    }
+    /* 커스텀 색상 및 호버 효과 정의 */
+    .bg-main-dark { background-color: #2F4160; }
+    .text-main-dark { color: #2F4160; }
+    .bg-accent-pink { background-color: #F29DA0; }
+    .text-accent-pink { color: #F29DA0; }
+    .bg-soft-blue { background-color: #B5D0E3; }
+    .text-soft-blue { color: #B5D0E3; }
+
+    /* 호버 효과 (Tailwind의 hover: 대신 커스텀 CSS로 명확하게 정의) */
+    .hover-bg-main-dark:hover { background-color: #43587A; } /* 메인 다크 호버 색상 */
+    .hover-bg-accent-pink:hover { background-color: #EF8689; }
+    .hover-bg-soft-blue:hover { background-color: #92B8D0; }
   </style>
 </head>
-<body>
+<body class="bg-gray-100 font-sans text-gray-800 flex flex-col min-h-screen">
 
-<h1>영상 상세 보기</h1>
-<h2 th:text="${video.title}">제목</h2>
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
+<main class="flex-1 container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8">
 
-<video width="640" height="360" controls>
-  <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4">
-  이 브라우저는 video 태그를 지원하지 않습니다.
-</video>
+    <h1 class="text-3xl font-extrabold text-gray-800 mb-2" th:text="${video.title}">제목</h1>
 
-<p th:text="${video.content}">설명</p>
+    <div class="text-gray-500 text-sm mb-6 flex items-center">
+      <span>등록일: <span th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}"></span></span>
+      <span class="ml-4" th:if="${video.updateDate != null}">
+        수정일: <span th:text="${#temporals.format(video.updateDate, 'yyyy-MM-dd')}"></span>
+      </span>
+    </div>
 
+    <div class="flex items-center space-x-2 mb-6">
+      <!-- 좋아요 버튼 -->
+      <button id="btnLike" type="button" class="bg-sub hover:bg-[#e6c5d1] text-gray-800 px-4 py-2 rounded-full font-bold transition-colors duration-300">
+        👍 좋아요
+      </button>
+      <span id="likeCount" class="text-lg font-medium text-gray-700">0</span>
+    </div>
 
-<div class="actions">
-  <a th:if="${isAdmin}" th:href="@{/video/admin/list}">&larr; 목록으로</a>
-  <a th:unless="${isAdmin}" th:href="@{/video/list}">&larr; 목록으로</a>
+    <div class="video-container aspect-video w-full mb-6 rounded-lg overflow-hidden shadow-lg">
+      <video width="100%" height="100%" controls class="w-full h-full object-cover">
+        <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4">
+        이 브라우저는 video 태그를 지원하지 않습니다.
+      </video>
+    </div>
 
-  <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}">✏️ 수정</a>
-</div>
+    <p class="text-gray-700 leading-relaxed mb-8" th:text="${video.content}">설명</p>
+
+    <div class="flex items-center space-x-4">
+      <!-- 관리자 여부에 따라 목록 링크 변경 -->
+      <a th:if="${isAdmin}" th:href="@{/video/admin/list}" class="inline-flex items-center px-4 py-2 bg-soft-blue text-white font-semibold rounded-lg shadow-md hover-bg-soft-blue transition duration-300">
+        <span class="mr-2">←</span> 목록으로
+      </a>
+      <a th:unless="${isAdmin}" th:href="@{/video/list}" class="inline-flex items-center px-4 py-2 bg-soft-blue text-white font-semibold rounded-lg shadow-md hover-bg-soft-blue transition duration-300">
+        <span class="mr-2">←</span> 목록으로
+      </a>
+
+      <!-- 관리자일 경우에만 수정 버튼 표시 -->
+      <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}" class="inline-flex items-center px-4 py-2 bg-main-dark text-white rounded-md font-semibold shadow-md hover-bg-main-dark transition duration-300">
+        <span class="mr-2">✏️</span> 수정
+      </a>
+    </div>
+
+  </div>
+</main>
 
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
