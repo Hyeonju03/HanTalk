@@ -8,14 +8,12 @@
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex flex-col min-h-screen">
 
-<!-- 헤더 프래그먼트 삽입 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
 <main class="flex-1 container mx-auto px-4 py-8">
   <h1 class="text-3xl font-extrabold text-center mb-8 text-pink-600">🎬 영상 목록</h1>
 
-  <!-- 검색 폼 -->
-  <form method="get" th:action="@{/video/user/contentList}" class="max-w-xl mx-auto mb-8 flex justify-center gap-2">
+  <form method="get" th:action="@{/video/list}" class="max-w-xl mx-auto mb-8 flex justify-center gap-2">
     <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력" class="flex-grow min-w-0 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500" />
     <select name="searchType" class="flex-shrink p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
       <option value="title" th:selected="${searchType == 'title'}">제목</option>
@@ -27,10 +25,9 @@
     </button>
   </form>
 
-  <!-- 비디오 카드 리스트 -->
   <div class="video-list-container flex flex-wrap justify-center gap-6 max-w-5xl mx-auto px-3" th:if="${videoPage.totalElements > 0}">
     <div th:each="video, stat : ${videoPage.content}" class="video-card flex-1 min-w-[280px] max-w-sm bg-white rounded-xl shadow-md p-4 flex flex-col transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer" th:if="${stat.index < 9}">
-      <a th:href="@{/video/user/contentView/{id}(id=${video.videoId})}" class="thumbnail-link relative block w-full h-48 overflow-hidden rounded-lg mb-3">
+      <a th:href="@{/video/view/{id}(id=${video.videoId})}" class="thumbnail-link relative block w-full h-48 overflow-hidden rounded-lg mb-3">
         <video class="video-thumbnail w-full h-full object-cover pointer-events-none" muted playsinline preload="metadata">
           <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
           영상 태그를 지원하지 않는 브라우저입니다.
@@ -38,40 +35,37 @@
         <div class="play-icon-overlay absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl text-white text-shadow-lg pointer-events-none">▶</div>
       </a>
       <strong class="text-lg font-bold text-gray-900 leading-tight mb-2">
-        <a th:href="@{/video/user/contentView/{id}(id=${video.videoId})}" th:text="${video.title}" class="no-underline hover:text-pink-600 transition duration-300">영상 제목</a>
+        <a th:href="@{/video/view/{id}(id=${video.videoId})}" th:text="${video.title}" class="no-underline hover:text-pink-600 transition duration-300">영상 제목</a>
       </strong>
       <p class="text-sm text-gray-500 line-clamp-2" th:text="${video.content}">설명</p>
     </div>
   </div>
 
-  <!-- 검색 결과가 없을 경우 메시지 -->
   <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-gray-50 rounded-lg shadow-inner">
     <p class="text-xl font-medium text-gray-600">검색 결과가 없습니다.</p>
   </div>
 
 
-  <!-- 페이징 -->
   <div class="pagination text-center mt-8" th:if="${videoPage.totalPages > 1}">
     <span th:if="${!videoPage.first}">
-      <a th:href="@{/video/user/contentList(page=${videoPage.number - 1}, keyword=${keyword}, searchType=${searchType})}" class="inline-block px-3 py-1.5 mx-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">&laquo; 이전</a>
+      <a th:href="@{/video/list(page=${videoPage.number - 1}, keyword=${keyword}, searchType=${searchType})}" class="inline-block px-3 py-1.5 mx-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">&laquo; 이전</a>
     </span>
     <span th:if="${videoPage.first}" class="inline-block px-3 py-1.5 mx-1 bg-gray-100 text-gray-400 rounded-md cursor-not-allowed">&laquo; 이전</span>
 
     <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
-      <a th:href="@{/video/user/contentList(page=${i}, keyword=${keyword}, searchType=${searchType})}"
+      <a th:href="@{/video/list(page=${i}, keyword=${keyword}, searchType=${searchType})}"
          th:classappend="${i == videoPage.number} ? 'bg-pink-500 text-white font-bold' : 'bg-gray-200 text-gray-600'"
          class="inline-block px-3 py-1.5 mx-1 rounded-md hover:bg-gray-300"
          th:text="${i + 1}">1</a>
     </span>
 
     <span th:if="${!videoPage.last}">
-      <a th:href="@{/video/user/contentList(page=${videoPage.number + 1}, keyword=${keyword}, searchType=${searchType})}" class="inline-block px-3 py-1.5 mx-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">다음 &raquo;</a>
+      <a th:href="@{/video/list(page=${videoPage.number + 1}, keyword=${keyword}, searchType=${searchType})}" class="inline-block px-3 py-1.5 mx-1 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300">다음 &raquo;</a>
     </span>
     <span th:if="${videoPage.last}" class="inline-block px-3 py-1.5 mx-1 bg-gray-100 text-gray-400 rounded-md cursor-not-allowed">다음 &raquo;</span>
   </div>
 </main>
 
-<!-- 푸터 프래그먼트 삽입 -->
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script>

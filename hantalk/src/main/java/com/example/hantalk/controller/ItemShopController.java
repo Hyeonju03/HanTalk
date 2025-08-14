@@ -158,14 +158,19 @@ public class ItemShopController {
                              @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                              RedirectAttributes redirectAttributes) throws IOException {
 
-        // 1. 기존 아이템 가져오기 (DB에 있는 걸 수정해야 참조 유지됨)
         Item existingItem = itemShopService.getItemById(formItem.getItemId());
 
-        // 2. 이미지 처리
+        // 이미지 처리
         if (imageFile != null && !imageFile.isEmpty()) {
             String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
             String baseDir = System.getProperty("user.dir");
-            String uploadDir = baseDir + "/uploads/images/";
+
+            // 타입에 따라 저장 폴더 결정
+            String subDir = "images/";
+            if ("frame".equals(existingItem.getItemType())) {
+                subDir = "frames/";
+            }
+            String uploadDir = baseDir + "/uploads/" + subDir;
 
             File uploadPath = new File(uploadDir);
             if (!uploadPath.exists()) uploadPath.mkdirs();
@@ -173,23 +178,18 @@ public class ItemShopController {
             File saveFile = new File(uploadDir + fileName);
             imageFile.transferTo(saveFile);
 
-            existingItem.setItemImage(fileName); // 새 이미지로 변경
+            existingItem.setItemImage(fileName); // 파일명만 저장
         }
-        // 새 이미지를 안 올렸으면 existingItem의 이미지 그대로 유지
 
-        // 3. 나머지 필드 업데이트
         existingItem.setItemName(formItem.getItemName());
+        existingItem.setItemDescription(formItem.getItemDescription());
         existingItem.setPrice(formItem.getPrice());
 
-        // 필요한 다른 필드도 여기에 추가
-
-        // 4. 저장 (UPDATE)
         itemShopService.updateItem(existingItem);
 
         redirectAttributes.addFlashAttribute("message", "아이템이 수정되었습니다.");
         return "redirect:/item/admin";
     }
-
 
 
     // 아이템 삭제 확인 페이지
