@@ -91,7 +91,39 @@ public class VideoController {
         return "video/list"; // 'list.html' 단일 뷰 반환
     }
 
-    // 관리자 전용 영상 목록 페이지
+
+    /* =========================
+       사용자 영상 상세
+       - 관리자면 관리자 뷰로 리다이렉트
+    ========================== */
+    @GetMapping("/contentView/{id}")
+    public String userView(@PathVariable int id, HttpSession session, Model model) {
+        if (!SessionUtil.isLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+/*        boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");*/
+
+        String role = SessionUtil.getRole(session);
+        if (!"USER".equals(role) && !"ADMIN".equals(role)) {
+            return "redirect:/login";
+        }
+
+        VideoDTO video = videoService.getVideo(id);
+        model.addAttribute("video", video);
+        model.addAttribute("role", SessionUtil.getRole(session));
+        model.addAttribute("isAdmin", SessionUtil.hasRole(session, "ADMIN"));  // 이 부분 추가
+   /*     model.addAttribute("isAdmin", isAdmin);*/
+
+/*        if (isAdmin) { // 관리자면 관리자 상세 페이지로
+            return "redirect:/video/admin/view/" + id;
+        }*/
+        return "video/contentView";
+    }
+
+    /* =========================
+       관리자 영상 목록
+    ========================== */
     @GetMapping("/admin/list")
     public String adminList(
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -103,6 +135,10 @@ public class VideoController {
         // ✅ 관리자만 접근 가능하도록 역할 확인
         if (!SessionUtil.isLoggedIn(session) || !SessionUtil.hasRole(session, "ADMIN")) {
             return "redirect:/login";
+        }
+
+        if (!SessionUtil.hasRole(session, "ADMIN")) {
+            return "redirect:/video/contentList";
         }
 
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createDate"));
@@ -123,7 +159,6 @@ public class VideoController {
         if (!SessionUtil.isLoggedIn(session)) {
             return "redirect:/login";
         }
-
         String role = SessionUtil.getRole(session);
         if (role == null || !("USER".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role))) {
             return "redirect:/login";
@@ -144,6 +179,9 @@ public class VideoController {
     public String adminUploadForm(HttpSession session, Model model) {
         if (!SessionUtil.isLoggedIn(session) || !SessionUtil.hasRole(session, "ADMIN")) {
             return "redirect:/login";
+        }
+        if (!SessionUtil.hasRole(session, "ADMIN")) {
+            return "redirect:/video/contentList";
         }
 
         model.addAttribute("video", new VideoDTO());
@@ -201,6 +239,10 @@ public class VideoController {
             return "redirect:/login";
         }
 
+        if (!SessionUtil.hasRole(session, "ADMIN")) {
+            return "redirect:/video/contentList";
+        }
+
         VideoDTO video = videoService.getVideo(id);
         model.addAttribute("video", video);
         model.addAttribute("role", SessionUtil.getRole(session));
@@ -219,6 +261,9 @@ public class VideoController {
 
         if (!SessionUtil.isLoggedIn(session) || !SessionUtil.hasRole(session, "ADMIN")) {
             return "redirect:/login";
+        }
+        if (!SessionUtil.hasRole(session, "ADMIN")) {
+            return "redirect:/video/contentList";
         }
 
         String uploadDir = UPLOAD_PATH;

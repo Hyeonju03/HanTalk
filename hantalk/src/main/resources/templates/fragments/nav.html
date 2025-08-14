@@ -41,7 +41,7 @@
             <!-- 로그인 상태에 따라 링크를 조건부로 렌더링 -->
             <div class="flex-shrink-0 flex items-center space-x-4">
                 <!-- 로그인하지 않은 경우 -->
-                <div th:unless="${session.user}">
+                <div th:unless="${session.userId}">
                     <a href="/user/login" class="text-sm font-medium text-gray-500 hover:text-gray-900">
                         로그인
                     </a>
@@ -51,7 +51,8 @@
                 </div>
 
                 <!-- 로그인한 경우 -->
-                <div th:if="${session.user}">
+                <div th:if="${session.userId}">
+                    <span class="text-sm font-medium text-gray-900 mr-2" th:text="${session.userId} + '님'"></span>
                     <a href="/user/logout" class="text-sm font-medium text-gray-500 hover:text-gray-900">
                         로그아웃
                     </a>
