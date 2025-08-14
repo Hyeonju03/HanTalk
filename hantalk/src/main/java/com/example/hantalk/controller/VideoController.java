@@ -29,21 +29,6 @@ public class VideoController {
     private final VideoService videoService;
     private static final String UPLOAD_PATH = System.getProperty("user.dir") + "/uploads/videos/";
 
-/*
-    @PostMapping("/admin/check-filename")
-    @ResponseBody
-    public boolean checkFilename(@RequestBody Map<String, String> request, HttpSession session) {
-        if (!SessionUtil.isLoggedIn(session) || !SessionUtil.hasRole(session, "ADMIN")) {
-            return false; // 비로그인 또는 권한 없으면 false 처리
-        }
-        String filename = request.get("filename");
-        if (filename == null || filename.trim().isEmpty()) {
-            return false;
-        }
-        File file = new File(UPLOAD_PATH + filename);
-        return file.exists();
-    }
-*/
 
     @PostMapping("/admin/check-filename")
     @ResponseBody
@@ -73,7 +58,7 @@ public class VideoController {
         }
         String role = SessionUtil.getRole(session);
         if (!"ADMIN".equals(role)) { // 관리자 아님 → 사용자 페이지
-            return "redirect:/video/user/contentList";
+            return "redirect:/video/contentList";
         }
         model.addAttribute("role", role);
         return "video/main"; // 관리자 메인 페이지
@@ -84,7 +69,7 @@ public class VideoController {
        - 로그인 필수
        - 관리자면 /admin/list로 리다이렉트
     ========================== */
-    @GetMapping("/user/contentList")
+    @GetMapping("/contentList")
     public String userList(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "searchType", defaultValue = "title") String searchType,
@@ -126,7 +111,7 @@ public class VideoController {
        사용자 영상 상세
        - 관리자면 관리자 뷰로 리다이렉트
     ========================== */
-    @GetMapping("user/contentView/{id}")
+    @GetMapping("/contentView/{id}")
     public String userView(@PathVariable int id, HttpSession session, Model model) {
         if (!SessionUtil.isLoggedIn(session)) {
             return "redirect:/login";
@@ -166,7 +151,7 @@ public class VideoController {
             return "redirect:/login";
         }
         if (!SessionUtil.hasRole(session, "ADMIN")) {
-            return "redirect:/video/user/contentList";
+            return "redirect:/video/contentList";
         }
 
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createDate"));
@@ -191,7 +176,7 @@ public class VideoController {
             return "redirect:/login";
         }
         if (!SessionUtil.hasRole(session, "ADMIN")) {
-            return "redirect:/video/user/contentList";
+            return "redirect:/video/contentList";
         }
 
         VideoDTO video = videoService.getVideo(id);
@@ -211,7 +196,7 @@ public class VideoController {
             return "redirect:/login";
         }
         if (!SessionUtil.hasRole(session, "ADMIN")) {
-            return "redirect:/video/user/contentList";
+            return "redirect:/video/contentList";
         }
 
         model.addAttribute("video", new VideoDTO());
@@ -234,7 +219,7 @@ public class VideoController {
             return "redirect:/login";
         }
         if (!SessionUtil.hasRole(session, "ADMIN")) {
-            return "redirect:/video/user/contentList";
+            return "redirect:/video/contentList";
         }
 
         if (file.isEmpty()) {
@@ -277,7 +262,7 @@ public class VideoController {
             return "redirect:/login";
         }
         if (!SessionUtil.hasRole(session, "ADMIN")) {
-            return "redirect:/video/user/contentList";
+            return "redirect:/video/contentList";
         }
 
         VideoDTO video = videoService.getVideo(id);
@@ -302,7 +287,7 @@ public class VideoController {
             return "redirect:/login";
         }
         if (!SessionUtil.hasRole(session, "ADMIN")) {
-            return "redirect:/video/user/contentList";
+            return "redirect:/video/contentList";
         }
 
         String uploadDir = UPLOAD_PATH;
