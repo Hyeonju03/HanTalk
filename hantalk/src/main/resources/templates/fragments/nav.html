@@ -8,32 +8,33 @@
 <nav th:fragment="navFragment" class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- flex-grow를 사용해 중앙 링크들이 공간을 유연하게 차지하도록 수정 -->
-        <div class="flex justify-between h-16 items-center">
+        <div class="flex justify-between h-24 items-center">
             <!-- HanTalk 로고 (왼쪽 끝) -->
             <div class="flex-shrink-0 flex items-center">
-                <a href="/" class="text-2xl font-bold text-blue-600">
-                    HanTalk
+                <!-- 이미지 로고로 변경 -->
+                <a href="/hantalk/home">
+                    <img th:src="@{/images/logo.png}" alt="HanTalk 로고" class="w-40 h-auto">
                 </a>
             </div>
 
             <!-- 주요 내비게이션 링크 (가운데) -->
             <div class="flex-grow flex justify-center space-x-4 lg:space-x-8">
-                <a href="/user/view" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                <a href="/user/view" class="text-xl font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
                     마이페이지
                 </a>
-                <a href="/study/main" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                <a href="/study/main" class="text-xl font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
                     학습
                 </a>
-                <a href="/video/list" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                <a href="/video/list" class="text-xl font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
                     비디오학습
                 </a>
-                <a href="/resource/main" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                <a href="/resource/main" class="text-xl font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
                     자료실
                 </a>
-                <a href="/post/list/1" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                <a href="/post/list/1" class="text-xl font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
                     게시판
                 </a>
-                <a href="/item/shop" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                <a href="/item/shop" class="text-xl font-medium text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
                     포인트상점
                 </a>
             </div>
@@ -42,18 +43,18 @@
             <div class="flex-shrink-0 flex items-center space-x-4">
                 <!-- 로그인하지 않은 경우 -->
                 <div th:unless="${session.userId}">
-                    <a href="/user/login" class="text-sm font-medium text-gray-500 hover:text-gray-900">
+                    <a href="/user/login" class="text-lg font-medium text-gray-500 hover:text-gray-900">
                         로그인
                     </a>
-                    <a href="/user/register" class="text-sm font-medium text-blue-600 hover:text-blue-500">
+                    <a href="/user/register" class="text-lg font-medium text-blue-600 hover:text-blue-500">
                         회원가입
                     </a>
                 </div>
 
                 <!-- 로그인한 경우 -->
                 <div th:if="${session.userId}">
-                    <span class="text-sm font-medium text-gray-900 mr-2" th:text="${session.userId} + '님'"></span>
-                    <a href="/user/logout" class="text-sm font-medium text-gray-500 hover:text-gray-900">
+                    <span class="text-lg font-medium text-gray-900 mr-2" th:text="${session.userId} + '님'"></span>
+                    <a href="/user/logout" class="text-lg font-medium text-gray-500 hover:text-gray-900">
                         로그아웃
                     </a>
                 </div>

@@ -21,4 +21,15 @@ public class MainController {
         return "main";
     }
 
+    @GetMapping("/hantalk/home")
+    public String hantalkHome(HttpSession session, Model model) {
+        Integer userNo = (Integer) session.getAttribute("userNo");
+        if (userNo != null) {
+            model.addAttribute("isLoggedIn", true);
+        } else {
+            model.addAttribute("isLoggedIn", false);
+        }
+        return "hantalk/home";
+    }
+
 }
