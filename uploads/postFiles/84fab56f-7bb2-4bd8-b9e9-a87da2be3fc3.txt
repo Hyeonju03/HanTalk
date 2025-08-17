@@ -1,0 +1,2 @@
+
+C:\YUS\_tools\apache-maven-3.9.9\bin\mvn install:install-file -Dfile=C:\YUS\_tools\ojdbc_driver\ojdbc6.jar -DgroupId=com.oracle.jdbc -DartifactId=ojdbc6 -Dversion=11.1.0.6.0 -Dpackaging=jar

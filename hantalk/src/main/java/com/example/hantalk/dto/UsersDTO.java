@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class UsersDTO {
-    private int userNo;
+    private Integer userNo;
     private String userId;
     private String name;
     private String email;

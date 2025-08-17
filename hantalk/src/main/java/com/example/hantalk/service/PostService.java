@@ -3,15 +3,19 @@ package com.example.hantalk.service;
 import com.example.hantalk.dto.PostDTO;
 import com.example.hantalk.entity.Category;
 import com.example.hantalk.entity.Post;
-import com.example.hantalk.entity.Users;
 import com.example.hantalk.repository.CategoryRepository;
 import com.example.hantalk.repository.PostRepository;
-import com.example.hantalk.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -19,11 +23,24 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
-    private final UsersRepository usersRepository;
+    private final String uploadDir = System.getProperty("user.dir") + "/uploads/postFiles";
 
     // 게시물 등록
     @Transactional
     public PostDTO createPost(PostDTO dto) {
+        Post post = toEntity(dto);
+        Post savedPost = postRepository.save(post);
+        return toDto(savedPost);
+    }
+
+    // 첨부파일을 포함한 게시물 등록
+    @Transactional
+    public PostDTO createPostWithFile(PostDTO dto, MultipartFile file) {
+
+        String savedFileName = saveFile(file);
+        if (savedFileName != null) {
+            dto.setArchive(savedFileName);
+        }
         Post post = toEntity(dto);
         Post savedPost = postRepository.save(post);
         return toDto(savedPost);
@@ -41,11 +58,56 @@ public class PostService {
         return toDto(post);
     }
 
-    // 단일 게시물 조회
-    @Transactional(readOnly = true)
+    // 첨부파일을 포함한 게시물 수정 (파일 삭제 옵션 추가)
+    @Transactional
+    public PostDTO updatePostWithFile(int postId, PostDTO dto, MultipartFile file, Boolean deleteFile) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
+
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+
+        // case 1: 새로운 파일이 업로드된 경우
+        if (file != null && !file.isEmpty()) {
+            // 기존 파일이 있다면 삭제
+            if (post.getArchive() != null) {
+                deleteFile(post.getArchive());
+            }
+            // 새 파일을 저장하고 archive 필드 업데이트
+            String savedFileName = saveFile(file);
+            post.setArchive(savedFileName);
+        }
+        // case 2: 파일 삭제 체크박스가 선택된 경우
+        else if (Boolean.TRUE.equals(deleteFile)) {
+            // 기존 파일이 있다면 삭제
+            if (post.getArchive() != null) {
+                deleteFile(post.getArchive());
+            }
+            // archive 필드를 null로 설정
+            post.setArchive(null);
+        }
+        // case 3: 아무런 파일 변경이 없는 경우
+        // 기존 archive 값은 변경하지 않습니다.
+        else {
+            post.setArchive(dto.getArchive());
+        }
+
+        // JPA의 변경 감지(Dirty Checking) 기능으로 인해 postRepository.save(post)는 생략 가능
+        return toDto(post);
+    }
+
+
+    // 단일 게시물 조회 및 조회수 증가
+    @Transactional // readOnly = true 제거 또는 false로 변경
     public PostDTO getPost(int postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
+
+        // 조회수 증가 로직
+        post.setViewCount(post.getViewCount() + 1);
+
+        // 변경 감지(Dirty Checking) 기능으로 인해 postRepository.save(post)는 생략 가능
+
         return toDto(post);
     }
 
@@ -80,7 +142,7 @@ public class PostService {
                     posts = postRepository.findByCategory_CategoryIdAndUsers_UsernameContaining(categoryId, keyword, pageable);
                     break;
                 default: // 제목 또는 내용으로 검색
-                    posts = postRepository.findByCategory_CategoryIdAndTitleContainingOrCategory_CategoryIdAndContentContaining(categoryId, keyword, categoryId, keyword, pageable);
+                    posts = postRepository.findByCategory_CategoryIdAndContentContaining(categoryId, keyword, pageable);
                     break;
             }
         }
@@ -118,6 +180,7 @@ public class PostService {
 
         // Category 엔티티 조회 및 설정
         if (dto.getCategory().getCategoryId() > 0) {
+
             Category category = categoryRepository.findById(dto.getCategory().getCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
             post.setCategory(category);
@@ -127,4 +190,49 @@ public class PostService {
 
         return post;
     }
+
+    // 파일 저장 로직 (ResourceService의 saveFile을 참고)
+    private String saveFile(MultipartFile file) {
+        try {
+
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+
+
+            String savedFileName = UUID.randomUUID().toString() + fileExtension;
+            Path filePath = uploadPath.resolve(savedFileName);
+            file.transferTo(filePath.toFile());
+
+
+            return savedFileName;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // 파일 삭제 로직 추가
+    private void deleteFile(String fileName) {
+        if (fileName != null && !fileName.isEmpty()) {
+            Path filePath = Paths.get(uploadDir, fileName);
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                // 로그를 남기거나 예외 처리를 추가할 수 있습니다.
+                System.err.println("파일 삭제 실패: " + filePath);
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

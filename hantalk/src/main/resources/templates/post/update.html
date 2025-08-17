@@ -4,14 +4,36 @@
     <meta charset="UTF-8">
     <title>게시물 수정</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
 <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
     <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">게시물 수정</h2>
-    <form th:action="@{/post/updateProc/{postId}(postId=${post.postId})}" th:object="${post}" method="post">
+
+    <!-- 수정 중인 게시물의 작성자 정보 표시 -->
+    <div th:if="${post.users != null}" class="mb-4 text-sm text-gray-600 border-b pb-2">
+        <span>작성자: <span th:text="${post.users.nickname}" class="font-semibold"></span></span>
+        <span class="ml-4">작성일: <span th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></span></span>
+    </div>
+
+    <!-- 파일 업로드를 위해 enctype="multipart/form-data" 속성을 추가했습니다. -->
+    <form th:action="@{/post/updateProc/{postId}(postId=${post.postId})}"
+          th:object="${post}"
+          method="post"
+          enctype="multipart/form-data">
 
         <input type="hidden" th:field="*{postId}">
+        <!-- 기존 첨부파일 이름을 유지하기 위한 hidden 필드를 추가했습니다. -->
+        <input type="hidden" th:field="*{archive}">
+        <!-- 기존 파일 삭제 여부를 전달하기 위한 hidden 필드 -->
+        <input type="hidden" id="deleteFileHidden" name="deleteFile" value="false">
+
 
         <div class="mb-4">
             <label for="title" class="block text-gray-700 text-sm font-semibold mb-2">제목:</label>
@@ -23,17 +45,37 @@
             <textarea id="content" th:field="*{content}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent h-48 resize-none" rows="10" required></textarea>
         </div>
 
-        <div class="flex items-center justify-between">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        <!-- 파일 업로드를 위한 필드를 추가했습니다. -->
+        <div class="mb-6">
+            <label for="file" class="block text-gray-700 text-sm font-semibold mb-2">첨부파일:</label>
+            <div th:if="*{archive != null}" class="text-sm text-gray-500 mb-2 flex items-center justify-between">
+                <!-- UUID를 제거하고 원본 파일명만 표시하도록 수정 -->
+                <span>현재 파일: <span th:text="${#strings.substringAfter(post.archive, '_')}" class="font-medium text-gray-700"></span></span>
+                <!-- 기존 파일 삭제를 위한 체크박스를 추가했습니다. -->
+                <label class="inline-flex items-center ml-4">
+                    <input type="checkbox" id="deleteFile" class="form-checkbox text-red-600 rounded">
+                    <span class="ml-2 text-red-700">기존 파일 삭제</span>
+                </label>
+            </div>
+            <input type="file" id="file" name="newFile" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+        </div>
+
+        <div class="flex items-center justify-between mt-8">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200">
                 수정
             </button>
-            <a th:href="@{/post/view/{postId}(postId=${post.postId})}" class="inline-block align-baseline font-bold text-sm text-blue-600 hover:text-blue-800">
+            <a th:href="@{/post/view/{postId}(postId=${post.postId})}" class="inline-block align-baseline font-bold text-sm text-gray-600 hover:text-gray-800 transition duration-200">
                 취소
             </a>
         </div>
-
     </form>
 </div>
 
+<script>
+    // 기존 파일 삭제 체크박스 상태를 hidden 필드에 동기화
+    document.getElementById('deleteFile').addEventListener('change', function() {
+        document.getElementById('deleteFileHidden').value = this.checked;
+    });
+</script>
 </body>
 </html>
