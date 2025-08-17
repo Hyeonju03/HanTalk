@@ -2,10 +2,15 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관리자 자료실</title>
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome CDN 추가 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <style>
+    /* Nanum Gothic 폰트 설정 */
     body {
       font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
     }
@@ -15,126 +20,145 @@
     }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 flex min-h-screen">
+<body class="bg-[#f3f4f6] text-[#2F4160] min-h-screen flex flex-col">
 
-<!-- Sidebar (Navigation) -->
-<nav class="w-64 bg-white shadow-lg p-6 flex flex-col justify-between fixed h-full">
-  <div>
-    <h2 class="text-xl font-bold text-indigo-700 mb-6">📁 메뉴</h2>
-    <ul class="space-y-4">
+<!-- 헤더 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+
+<div class="flex-grow flex">
+  <!-- 사이드바 (사용자 자료실 테마 적용) -->
+  <nav class="w-72 bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm flex-shrink-0 fixed h-full">
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-[#2F4160]">📁 메뉴</h2>
+    </div>
+    <ul class="space-y-2">
+      <!-- '관리자 메인' 링크 -->
       <li>
-        <a href="/resource/main" class="flex items-center text-gray-600 hover:text-indigo-700 transition duration-300">
-          <i class="fas fa-user-circle mr-3"></i>
-          <span>사용자 메인</span>
-        </a>
-      </li>
-      <li>
-        <a href="/resource/admin/main" class="flex items-center text-gray-600 hover:text-indigo-700 transition duration-300">
-          <i class="fas fa-cogs mr-3"></i>
+        <a th:href="@{/resource/admin/main}"
+           class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
+          <i class="fas fa-list-alt mr-3"></i> <!-- 사용자 자료실 아이콘으로 변경 -->
           <span>관리자 메인</span>
         </a>
       </li>
+      <li>
+        <a th:href="@{/resource/main}" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F299A0]/80 rounded-lg transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+          </svg>
+          <span>사용자 목록</span>
+        </a>
+      </li>
     </ul>
+  </nav>
+
+  <!-- 본문 영역 (사이드바 너비에 맞춰 여백 조정) -->
+  <div class="flex-1 ml-72 flex flex-col p-0">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl mx-auto flex-grow">
+      <div class="p-8">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold text-[#2F4160]">관리자 자료실</h1>
+          <!-- '자료 등록하기' 버튼은 이제 항상 표시됩니다. 서버에서 권한을 처리해야 합니다. -->
+          <a th:href="@{/resource/chuga}" class="bg-[#F29DA0] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center">
+            <i class="fas fa-plus mr-2"></i>
+            자료 등록하기
+          </a>
+        </div>
+
+        <form class="search-form text-center mb-6 flex justify-center items-center space-x-2" th:action="@{/resource/admin/main}" method="get">
+          <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword} ?: ''"
+                 class="p-2 border border-gray-300 rounded-lg w-72 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]" />
+          <button type="submit"
+                  class="bg-[#F29DA0] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 ml-2">
+            <i class="fas fa-search mr-1"></i>검색
+          </button>
+        </form>
+
+        <div class="overflow-x-auto bg-white rounded-xl shadow-lg">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+            <tr class="bg-[#FDFBFF]">
+              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">번호</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">제목</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">내용</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">파일</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">작성자</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">작성일</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">관리</th>
+            </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+            <tr th:each="resource, iterStat : ${resourcePage.content}"
+                th:attr="data-url=@{'/resource/admin/detail/' + ${resource.resourceId}}"
+                onclick="goToDetail(this)"
+                class="hover:bg-gray-50 transition duration-150 table-row-clickable">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${resourcePage.number * resourcePage.size + iterStat.index + 1}">1</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${resource.title}">제목</td>
+              <td class="px-6 py-4 text-sm text-gray-800" th:text="${#strings.length(resource.content) > 30 ? #strings.substring(resource.content, 0, 30) + '...' : resource.content}">내용</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}" class="flex justify-center items-center gap-1.5 text-sm">
+                    <a th:href="@{'/resource/admin/preview/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
+                       th:title="${resource.originalFileName}"
+                       onclick="event.stopPropagation();"
+                       class="text-[#2F4160] hover:text-[#F29DA0] hover:underline transition duration-300">
+                      <i class="fas fa-eye mr-1"></i>보기
+                    </a>
+                    <span class="text-gray-400 select-none">|</span>
+                    <a th:href="@{'/resource/download/file/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
+                       th:title="${resource.originalFileName}"
+                       onclick="event.stopPropagation();"
+                       class="text-[#2F4160] hover:text-[#F29DA0] hover:underline transition duration-300">
+                      <i class="fas fa-download mr-1"></i>다운로드
+                    </a>
+                  </span>
+                <span th:if="${resource.archive == null or #strings.isEmpty(resource.archive)}" class="text-gray-400">파일 없음</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">관리자</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <!-- '수정' 및 '삭제' 버튼에 걸려있던 th:if 조건을 제거하여 항상 표시되도록 변경 -->
+                <div class="flex justify-center items-center space-x-2">
+                  <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
+                     class="bg-[#2F4160] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#F29DA0] transition duration-300"
+                     onclick="event.stopPropagation();"><i class="fas fa-edit"></i> 수정</a>
+                  <button type="button"
+                          class="bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 ml-2"
+                          th:onclick="'event.stopPropagation(); confirmDelete(' + ${resource.resourceId} + ');'">
+                    <i class="fas fa-trash"></i> 삭제
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr th:if="${resourcePage.content.size() == 0}">
+              <td colspan="7" class="text-center p-4 text-gray-600">검색 결과가 없습니다.</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-center mt-8 space-x-2">
+          <span th:if="${resourcePage.hasPrevious()}" class="inline-flex">
+            <a th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}" class="bg-white text-[#2F4160] font-semibold py-2 px-4 rounded-lg hover:bg-[#f3f4f6] transition duration-300">이전</a>
+          </span>
+
+          <span th:each="pageNum : ${#numbers.sequence(0, resourcePage.totalPages - 1)}" class="inline-flex">
+            <a th:href="@{|/resource/admin/main?page=${pageNum}&keyword=${keyword}|}"
+               th:text="${pageNum + 1}"
+               th:classappend="${pageNum == resourcePage.number} ? 'bg-[#B5D0E3] text-[#2F4160] font-bold py-2 px-4 rounded-lg shadow-md' : 'bg-white text-[#2F4160] font-semibold py-2 px-4 rounded-lg hover:bg-[#f3f4f6] transition duration-300'">1</a>
+          </span>
+
+          <span th:if="${resourcePage.hasNext()}" class="inline-flex">
+            <a th:href="@{|/resource/admin/main?page=${resourcePage.number + 1}&keyword=${keyword}|}" class="bg-white text-[#2F4160] font-semibold py-2 px-4 rounded-lg hover:bg-[#f3f4f6] transition duration-300">다음</a>
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
-</nav>
+</div>
 
-<!-- Main Content -->
-<main class="flex-1 p-10 ml-64">
-  <div class="max-w-7xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-extrabold text-indigo-700">관리자 자료실</h1>
-      <a th:href="@{/resource/chuga}" class="bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md flex items-center">
-        <i class="fas fa-plus mr-2"></i>
-        자료 등록하기
-      </a>
-    </div>
-
-    <form class="search-form text-center mb-6" th:action="@{/resource/admin/main}" method="get">
-      <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요" class="p-2 border border-gray-300 rounded-lg w-72 focus:outline-none focus:border-indigo-500" />
-      <button type="submit" class="bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-indigo-700 transition duration-300 ml-2">
-        <i class="fas fa-search mr-1"></i>검색
-      </button>
-    </form>
-
-    <div class="overflow-x-auto bg-white rounded-xl shadow-lg">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-indigo-50">
-        <tr>
-          <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-indigo-600 uppercase tracking-wider">번호</th>
-          <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-indigo-600 uppercase tracking-wider">제목</th>
-          <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-indigo-600 uppercase tracking-wider">내용</th>
-          <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-indigo-600 uppercase tracking-wider">파일</th>
-          <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-indigo-600 uppercase tracking-wider">작성자</th>
-          <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-indigo-600 uppercase tracking-wider">작성일</th>
-          <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-indigo-600 uppercase tracking-wider">관리</th>
-        </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-        <tr th:each="resource, iterStat : ${resourcePage.content}"
-            th:attr="data-url=@{'/resource/admin/detail/' + ${resource.resourceId}}"
-            onclick="goToDetail(this)"
-            class="hover:bg-indigo-50 transition duration-150 table-row-clickable">
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${resourcePage.number * resourcePage.size + iterStat.index + 1}">1</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${resource.title}">제목</td>
-          <td class="px-6 py-4 text-sm text-gray-500" th:text="${#strings.length(resource.content) > 30} ? ${#strings.substring(resource.content, 0, 30)} + '...' : ${resource.content}">내용</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}">
-                <a th:href="@{'/resource/admin/preview/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
-                   th:title="${resource.originalFileName}"
-                   onclick="event.stopPropagation();"
-                   class="text-blue-500 hover:text-blue-700 hover:underline transition duration-300">
-                  <i class="fas fa-eye mr-1"></i>보기
-                </a>
-                |
-                <a th:href="@{'/resource/download/file/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
-                   th:title="${resource.originalFileName}"
-                   onclick="event.stopPropagation();"
-                   class="text-blue-500 hover:text-blue-700 hover:underline transition duration-300">
-                  <i class="fas fa-download mr-1"></i>다운로드
-                </a>
-              </span>
-            <span th:if="${resource.archive == null or #strings.isEmpty(resource.archive)}" class="text-gray-400">파일 없음</span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">관리자</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-            <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
-               class="bg-green-600 text-white font-semibold py-1 px-3 rounded-lg hover:bg-green-700 transition duration-300"
-               onclick="event.stopPropagation();"><i class="fas fa-edit"></i> 수정</a>
-            <button type="button"
-                    class="bg-red-600 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-700 transition duration-300 ml-2"
-                    th:onclick="'event.stopPropagation(); confirmDelete(' + ${resource.resourceId} + ');'">
-              <i class="fas fa-trash"></i> 삭제
-            </button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination -->
-    <div class="flex justify-center mt-8 space-x-2">
-      <span th:if="${resourcePage.hasPrevious()}" class="inline-flex">
-        <a th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}" class="bg-gray-200 text-gray-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300">이전</a>
-      </span>
-
-      <span th:each="pageNum : ${#numbers.sequence(0, resourcePage.totalPages - 1)}" class="inline-flex">
-        <a th:href="@{|/resource/admin/main?page=${pageNum}&keyword=${keyword}|}"
-           th:text="${pageNum + 1}"
-           th:classappend="${pageNum == resourcePage.number} ? 'bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md' : 'bg-gray-200 text-gray-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300'">1</a>
-      </span>
-
-      <span th:if="${resourcePage.hasNext()}" class="inline-flex">
-        <a th:href="@{|/resource/admin/main?page=${resourcePage.number + 1}&keyword=${keyword}|}" class="bg-gray-200 text-gray-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300">다음</a>
-      </span>
-    </div>
-  </div>
-</main>
 <script>
   function confirmDelete(resourceId) {
     if (confirm('정말 이 자료를 삭제하시겠습니까?')) {
-      // 실제로는 AJAX DELETE 요청을 보내는 것이 더 좋습니다.
-      // 여기서는 예시로 GET 요청을 사용하지만, DELETE 요청으로 변경하는 것을 권장합니다.
       window.location.href = '/resource/delete/' + resourceId;
     }
   }
@@ -145,6 +169,21 @@
       window.location.href = url;
     }
   }
+
+  function handlePreviewClick(event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const target = event.currentTarget;
+    const filename = target.getAttribute('data-filename');
+    if (filename) {
+      window.location.href = '/resource/admin/preview/' + filename;
+    }
+  }
 </script>
+
+<!-- 푸터 삽입 -->
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
+
 </body>
 </html>

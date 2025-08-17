@@ -1,30 +1,62 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>아이템 관리</title></head>
-<body>
-<h2>관리자 아이템 목록</h2>
-<a href="/item/chuga">➕ 아이템 추가</a>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아이템 관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f3f4f6] min-h-screen flex flex-col text-[#2F4160]">
 
-<div th:if="${message}" style="color:green;">[[${message}]]</div>
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<table border="1">
-    <thead>
-    <tr><th>ID</th><th>이름</th><th>가격</th><th>설명</th><th>수정</th><th>삭제</th></tr>
-    </thead>
-    <tbody>
-    <tr th:each="item : ${items}">
-        <td th:text="${item.itemId}"></td>
-        <td th:text="${item.itemName}"></td>
-        <td th:text="${item.price}"></td>
-        <td th:text="${item.itemDescription}"></td>
-        <td><a th:href="@{'/item/sujung/' + ${item.itemId}}">수정</a></td>
-        <td><a th:href="@{'/item/sakje/' + ${item.itemId}}">삭제</a></td>
-    </tr>
-    </tbody>
-</table>
-<!-- 푸터 프래그먼트 삽입 -->
+<div class="flex-grow flex justify-center p-8">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl">
+
+        <div class="p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
+            <h2 class="text-3xl font-bold mb-4 text-center">관리자 아이템 목록</h2>
+            <a href="/item/chuga" class="block w-fit mx-auto bg-[#F29DA0] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
+                ➕ 아이템 추가
+            </a>
+        </div>
+
+        <!-- Success Message Background Color Changed to #B5D0E3 -->
+        <div th:if="${message}" class="p-4 text-center text-green-700 bg-[#B5D0E3] rounded-b-xl">
+            [[${message}]]
+        </div>
+
+        <div class="p-8 overflow-x-auto">
+            <table class="min-w-full bg-white border-collapse">
+                <thead>
+                <tr class="bg-[#FDFBFF] border-b border-[#E0E0E0]">
+                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">ID</th>
+                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">이름</th>
+                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">가격</th>
+                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">설명</th>
+                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">수정</th>
+                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">삭제</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${items}" class="border-b border-gray-200 hover:bg-gray-50">
+                    <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.itemId}"></td>
+                    <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.itemName}"></td>
+                    <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.price}"></td>
+                    <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.itemDescription}"></td>
+                    <td class="py-4 px-6 text-sm">
+                        <a th:href="@{'/item/sujung/' + ${item.itemId}}" class="text-[#2F4160] hover:underline">수정</a> <!-- '수정' 글씨 색상 변경 -->
+                    </td>
+                    <td class="py-4 px-6 text-sm">
+                        <a th:href="@{'/item/sakje/' + ${item.itemId}}" class="text-red-500 hover:underline">삭제</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

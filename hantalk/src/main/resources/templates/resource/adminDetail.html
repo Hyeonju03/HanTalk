@@ -2,90 +2,94 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관리자 자료 상세 보기</title>
-
-  <!-- Bootstrap과 Tailwind CSS CDN -->
-  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <style>
     body {
       font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
     }
   </style>
 </head>
-<body class="bg-[#fefcff] text-[#444] m-0 p-0 flex flex-col min-h-screen">
+<body class="bg-[#f3f4f6] text-[#2F4160] min-h-screen flex flex-col">
 
 <!-- 헤더 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<!-- 메인 컨테이너: 좌측 메뉴 + 본문 -->
-<div class="flex flex-1 w-full">
+<div class="flex flex-1 w-full max-w-5xl mx-auto px-4 py-8 gap-8">
 
   <!-- 사이드바 -->
-  <nav class="w-[200px] bg-[#f2f6ff] p-8 shadow-md flex-shrink-0">
-    <h2 class="text-lg mb-4 text-[#5e7bb4] font-bold">📁 메뉴</h2>
-    <ul class="list-none p-0">
-      <li class="mb-3">
-        <a href="/resource/admin/main" class="no-underline text-[#4e6cb2] hover:underline">관리자 목록</a>
+  <nav class="w-72 bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm flex-shrink-0">
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-[#2F4160]">📁 메뉴</h2>
+    </div>
+    <ul class="space-y-2">
+      <li>
+        <a href="/resource/admin/main" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
+          <i class="fas fa-list-alt mr-3"></i>
+          <span>관리자 메인</span>
+        </a>
       </li>
-      <li class="mb-3">
-        <a href="/resource/main" class="no-underline text-[#4e6cb2] hover:underline">사용자 메인</a>
+      <li>
+        <a href="/resource/chuga" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
+          <i class="fas fa-plus-circle mr-3"></i>
+          <span>자료 등록</span>
+        </a>
       </li>
     </ul>
   </nav>
 
   <!-- 본문 -->
-  <main class="flex-1 p-8 box-border bg-[#fefcff]">
-    <h1 class="text-2xl font-bold text-[#5e7bb4] mb-6 border-b pb-3">자료 상세 보기</h1>
+  <main class="flex-1 bg-white p-8 rounded-xl shadow-xl">
+    <h1 class="text-3xl font-bold text-[#2F4160] mb-8 border-b border-[#E0E0E0] pb-3 text-center">자료 상세 보기</h1>
 
-    <!-- 제목 -->
-    <div class="mb-4 flex">
-      <span class="font-semibold text-gray-700 w-24">제목</span>
-      <span class="text-gray-900" th:text="${resource.title}">제목이 표시됩니다</span>
-    </div>
+    <div class="space-y-6 text-lg">
+      <div class="detail-item flex items-start">
+        <span class="font-bold text-[#2F4160] w-24 flex-shrink-0">제목:</span>
+        <span class="flex-1 break-words text-gray-800" th:text="${resource.title}">제목이 표시됩니다</span>
+      </div>
 
-    <!-- 내용 -->
-    <div class="mb-4 flex">
-      <span class="font-semibold text-gray-700 w-24">내용</span>
-      <span class="text-gray-900" th:text="${resource.content}">내용이 표시됩니다</span>
-    </div>
+      <div class="detail-item flex items-start">
+        <span class="font-bold text-[#2F4160] w-24 flex-shrink-0">내용:</span>
+        <span class="flex-1 break-words whitespace-pre-wrap text-gray-800" th:text="${resource.content}">내용이 표시됩니다</span>
+      </div>
 
-    <!-- 파일 링크 -->
-    <div class="mb-4 flex">
-      <span class="font-semibold text-gray-700 w-24">파일 링크</span>
-      <span>
-        <a th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
-           th:href="@{/resource/download/file/{fileName}(fileName=${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)})}"
-           download
-           class="text-[#4e6cb2] hover:underline font-semibold"
-           th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
-        <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
-              class="text-gray-500">파일이 없습니다.</span>
-      </span>
-    </div>
+      <div class="detail-item flex items-start">
+        <span class="font-bold text-[#2F4160] w-24 flex-shrink-0">파일 링크:</span>
+        <span class="flex-1">
+          <a th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
+             th:href="@{/resource/download/file/{fileName}(fileName=${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)})}"
+             download
+             class="text-[#2F4160] hover:underline font-semibold"
+             th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
+          <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
+                class="text-gray-500">파일이 없습니다.</span>
+        </span>
+      </div>
 
-    <!-- 등록일 -->
-    <div class="mb-6 flex">
-      <span class="font-semibold text-gray-700 w-24">등록일</span>
-      <span class="text-gray-900" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
+      <div class="detail-item flex items-start">
+        <span class="font-bold text-[#2F4160] w-24 flex-shrink-0">등록일:</span>
+        <span class="flex-1 text-gray-800" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
+      </div>
     </div>
 
     <!-- 버튼 -->
-    <div class="flex gap-4">
+    <div class="flex gap-4 justify-center mt-8">
       <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
-         class="px-4 py-2 bg-[#4e6cb2] text-white rounded hover:bg-[#3b5490]">수정</a>
+         class="bg-[#F29DA0] text-white font-semibold px-6 py-2 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md">
+        <i class="fas fa-edit mr-2"></i>수정
+      </a>
       <a href="/resource/admin/main"
-         class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">관리자 목록으로</a>
+         class="bg-white text-[#2F4160] border border-[#E0E0E0] font-semibold px-6 py-2 rounded-lg hover:bg-gray-50 transition duration-300 shadow-md">
+        <i class="fas fa-list mr-2"></i>관리자 목록으로
+      </a>
     </div>
   </main>
 </div>
 
 <!-- 푸터 -->
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
