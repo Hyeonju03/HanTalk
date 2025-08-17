@@ -30,7 +30,7 @@
         <h1 th:if="${post.category.categoryId == 3}">문의사항 작성</h1>
     </div>
 
-    <form th:action="@{|/post/insertProc/${post.category.categoryId}|}" th:object="${post}" method="post">
+    <form th:action="@{|/post/insertProc/${post.category.categoryId}|}" th:object="${post}" method="post" enctype="multipart/form-data">
         <input type="hidden" name="categoryId" th:value="${post.category.categoryId}">
 
         <div class="mb-3">
@@ -41,6 +41,12 @@
         <div class="mb-3">
             <label for="content" class="form-label">내용</label>
             <textarea id="content" th:field="*{content}" class="form-control" rows="10" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="file" class="form-label">첨부파일</label>
+            <!-- `name` 속성을 `file`로 설정하여 컨트롤러의 `MultipartFile file`과 매칭 -->
+            <input type="file" id="file" name="file" class="form-control">
         </div>
 
         <div class="btn-group">

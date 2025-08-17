@@ -1,20 +1,17 @@
 package com.example.hantalk.repository;
 
 import com.example.hantalk.entity.Comment;
-import com.example.hantalk.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
+
+    // 게시물 ID(postId)로 댓글 목록을 조회하는 메서드
     List<Comment> findByPost_PostId(int postId);
 
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM Comment c WHERE c.post = :post")
-    void deleteByPost(@Param("post") Post post);
 }
+
+

@@ -2,6 +2,7 @@ package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.LogDataDTO;
 import com.example.hantalk.service.LogService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -19,15 +20,15 @@ public class LogController {
     private final LogService logService;
 
     @GetMapping("/admin/getLogdata")
-    public String getAllLog(Model model) {
-        List<LogDataDTO> logList = logService.getLog();
+    public String getAllLog(Model model, HttpSession session) {
+        List<LogDataDTO> logList = logService.getLog(session);
         model.addAttribute("list", logList);
         return "logPage/logList";
     }
 
     @GetMapping("/user/{userNo}")
-    public String getLogsByUser(@PathVariable int userNo, Model model) {
-        List<LogDataDTO> logList = logService.getLogToUser(userNo);
+    public String getLogsByUser(@PathVariable int userNo, Model model, HttpSession session) {
+        List<LogDataDTO> logList = logService.getLogToUser(userNo,session);
         model.addAttribute("list", logList);
         model.addAttribute("filter",  userNo);
         return "logPage/logList";
@@ -35,8 +36,8 @@ public class LogController {
     @GetMapping("/date")
     public String getLogsByDate(@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                 @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                                Model model) {
-        List<LogDataDTO> logList = logService.getLogToDate(startDate, endDate);
+                                Model model, HttpSession session) {
+        List<LogDataDTO> logList = logService.getLogToDate(startDate, endDate,session);
         model.addAttribute("list", logList);
         model.addAttribute("filter", "기간: " + startDate + " ~ " + endDate);
         return "logPage/logList";
@@ -45,8 +46,8 @@ public class LogController {
     public String getLogsByUserAndDate(@RequestParam("userNo") int userNo,
                                        @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                        @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                                       Model model) {
-        List<LogDataDTO> logList = logService.getLogToUserAndDate(userNo, startDate, endDate);
+                                       Model model, HttpSession session) {
+        List<LogDataDTO> logList = logService.getLogToUserAndDate(userNo, startDate, endDate,session);
         model.addAttribute("list", logList);
         model.addAttribute("filter", "사용자: " + userNo + ", 기간: " + startDate + " ~ " + endDate);
         return "logPage/logList";

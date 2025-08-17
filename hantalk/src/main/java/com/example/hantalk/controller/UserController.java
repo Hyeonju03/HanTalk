@@ -42,6 +42,18 @@ public class UserController {
             System.out.println("✅ id : admin  / pw : 11111");
         }
         if (service.getUserList().isEmpty()) {
+            UsersDTO dto1 = new UsersDTO();
+            dto1.setUserId("adminUser");
+            dto1.setPassword("11111");
+            dto1.setName("관리자");
+            dto1.setEmail("adminator@example.com");
+            dto1.setNickname("관리자");
+            dto1.setBirth(19901231);
+            dto1.setStatus("Block");
+            dto1.setPoint(999);
+            dto1.setProfileImage(null);
+            service.signUp(dto1);
+
             UsersDTO dto = new UsersDTO();
             dto.setUserId("user0");
             dto.setPassword("user1234");
@@ -121,6 +133,7 @@ public class UserController {
 
         newSession.setAttribute("userId", userId);
         if ("ADMIN".equals(role)) {
+            newSession.setAttribute("userNo", 1);
             newSession.setAttribute("role", "ADMIN");
         } else {
             UsersDTO user = service.getUserOne(userId);
@@ -163,7 +176,7 @@ public class UserController {
         String role = SessionUtil.getRole(session);
         if (service.isRoleOk(userid, sessionUserId, role)) {
             UsersDTO user = service.getUserOne(userId);
-            List<LogDataDTO> logList = logService.getLogToUser(user.getUserNo());
+            List<LogDataDTO> logList = logService.getLogToUser(user.getUserNo(),session);
             model.addAttribute("user", user);
             model.addAttribute("logList", logList);
             return "userPage/UserDetailPage";

@@ -53,9 +53,6 @@ public class Inc_NoteController {
     @GetMapping("/note")
     public String getNotes(Model model, HttpSession session) {
         Integer userNo = (Integer) session.getAttribute("userNo");
-        if (userNo == null) {
-            throw new IllegalArgumentException("로그인이 필요합니다.");
-        }
 
         List<Inc_Note> notes = incNoteService.findNotes(userNo);
 

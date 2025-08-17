@@ -45,8 +45,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/ResourceFile/");
 
         // 게시판 첨부자료 경로
-        registry.addResourceHandler("/uploads/fileUpload/**")
-                .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/fileUpload/");
+        registry.addResourceHandler("/uploads/postFiles/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/postFiles/");
 
         // 학습 영상 경로
         String uploadPath = System.getProperty("user.dir") + "/uploads/videos/";
