@@ -34,20 +34,12 @@
             <p th:text="${post.content}">게시물 내용입니다.</p>
         </div>
 
-        <!-- 첨부파일 다운로드 및 미리보기 섹션 -->
+        <!-- 첨부파일 다운로드 섹션 -->
         <div th:if="${post.archive != null}" class="mb-4 mt-6">
             <h4 class="font-bold text-lg text-gray-800">첨부파일</h4>
             <div class="flex items-center space-x-4 mt-2">
-                <!-- 파일명을 표시하는 부분 -->
-                <span th:text="${#strings.substringAfter(post.archive, '_')}"
-                      class="text-gray-700 font-medium"></span>
+                <span th:text="${post.originalFileName}" class="text-gray-700 font-medium"></span>
 
-                <!-- 미리보기 링크 -->
-                <a th:href="@{|/post/preview/${post.archive}|}"
-                   class="text-blue-600 hover:text-blue-800 underline"
-                   target="_blank">미리보기</a>
-
-                <!-- 다운로드 링크 -->
                 <a th:href="@{|/post/download/file/${post.archive}|}"
                    class="text-green-600 hover:text-green-800 underline">다운로드</a>
             </div>

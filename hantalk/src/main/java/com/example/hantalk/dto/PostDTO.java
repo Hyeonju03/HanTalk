@@ -21,6 +21,7 @@ public class PostDTO {
     private LocalDateTime updateDate;
     private String content;
     private String archive;
+    private String originalFileName;
     private int viewCount;
 
     private Users users;

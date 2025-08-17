@@ -268,7 +268,9 @@ public class PostController {
     // 파일 다운로드
     @GetMapping("/download/file/{fileName}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) throws IOException {
-        if (fileName.contains("..")) return ResponseEntity.badRequest().build();
+        if (fileName.contains("..")) {
+            return ResponseEntity.badRequest().build();
+        }
 
         Path path = Paths.get(uploadDir).resolve(fileName).normalize();
         UrlResource resource = new UrlResource(path.toUri());
@@ -277,8 +279,12 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
 
-        String originalFileName = "postService.getOriginalFileName(fileName)";
-        if (originalFileName == null) originalFileName = fileName;
+        // PostService를 통해 원본 파일명을 가져오도록 수정
+        String originalFileName = postService.getOriginalFileName(fileName);
+        if (originalFileName == null) {
+            // 원본 파일명이 없을 경우를 대비하여 저장된 파일명을 사용
+            originalFileName = fileName;
+        }
 
         String encodedFileName = UriUtils.encode(originalFileName, StandardCharsets.UTF_8);
         String contentDisposition = "attachment; filename=\"" + originalFileName + "\"; filename*=UTF-8''" + encodedFileName;
@@ -286,78 +292,6 @@ public class PostController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
-    }
-
-    // 파일 미리보기 (인라인)
-    @GetMapping("/view/file/{fileName}")
-    public ResponseEntity<Resource> viewFileInline(@PathVariable String fileName) throws IOException {
-        if (fileName.contains("..")) return ResponseEntity.badRequest().build();
-
-        Path path = Paths.get(uploadDir).resolve(fileName).normalize();
-        UrlResource resource = new UrlResource(path.toUri());
-
-        if (!resource.exists() || !resource.isReadable()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        String contentType = Files.probeContentType(path);
-        if (contentType == null) contentType = "application/octet-stream";
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(resource);
-    }
-
-    // 파일 미리보기 페이지로 이동
-    @GetMapping("/preview/{fileName}")
-    public String previewFile(@PathVariable String fileName, Model model, Principal principal, HttpSession session) {
-        try {
-            if (fileName.contains("..")) return "redirect:/post/list/" + INQUIRY_CATEGORY_ID;
-
-            Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
-            if (!Files.exists(filePath)) return "redirect:/post/list/" + INQUIRY_CATEGORY_ID;
-
-            String ext = getExtension(fileName);
-            model.addAttribute("fileName", fileName);
-            model.addAttribute("isImage", isImage(fileName));
-            model.addAttribute("isDocument", ext.matches("pdf|xls|xlsx|hwp|doc|docx|ppt|pptx"));
-            model.addAttribute("isText", isTextFile(fileName));
-            model.addAttribute("isOfficeFile", ext.matches("ppt|pptx|doc|docx|xls|xlsx"));
-            model.addAttribute("isAdmin", SessionUtil.hasRole(session, "ADMIN"));
-
-            if (isTextFile(fileName)) {
-                try {
-                    String text = Files.readString(filePath, StandardCharsets.UTF_8);
-                    model.addAttribute("textContent", text);
-                } catch (IOException e) {
-                    model.addAttribute("textContent", "텍스트 파일을 읽는 중 오류가 발생했습니다.");
-                }
-            }
-
-            return "post/preview";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "redirect:/post/list/" + INQUIRY_CATEGORY_ID;
-        }
-    }
-
-    // 이미지 출력 (직접 접근)
-    @GetMapping("/image/{fileName}")
-    @ResponseBody
-    public ResponseEntity<Resource> serveImage(@PathVariable String fileName) throws IOException {
-        Path path = Paths.get(uploadDir).resolve(fileName).normalize();
-        UrlResource resource = new UrlResource(path.toUri());
-
-        if (!resource.exists() || !resource.isReadable()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        String contentType = Files.probeContentType(path);
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType != null ? contentType : "image/png"))
                 .body(resource);
     }
 }

@@ -16,7 +16,9 @@
     <li><strong>설명:</strong> <span th:text="${item.itemDescription}">설명</span></li>
     <li>
       <strong>이미지:</strong><br>
-      <img th:src="@{'/images/' + ${item.itemImage}}" alt="아이템 이미지" width="80" height="80">
+      <img th:src="@{'/uploads/' + (${item.itemType} == 'frame' ? 'frames/' : 'images/') + ${item.itemImage}}"
+           alt="기존 이미지"
+           style="width:100px; height:100px; object-fit:cover; border:1px solid #ccc;">
     </li>
   </ul>
 </div>
