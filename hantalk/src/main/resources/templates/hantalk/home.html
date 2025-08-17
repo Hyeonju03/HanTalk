@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HanTalk - 홈</title>
+    <!-- Tailwind CSS CDN을 불러옵니다. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f2f5;
+        }
+        /* Swiper의 사용자 정의 스타일입니다. */
+        .swiper {
+            width: 100%;
+            height: 100%;
+        }
+        /* Swiper-slide의 그라데이션을 설정합니다. */
+        .swiper-slide {
+            background: linear-gradient(135deg, #F29DA0 0%, #B5D0E3 100%);
+        }
+        .text-hantalk-navy {
+            color: #2F4160;
+        }
+    </style>
+    <!-- Swiper CSS를 불러옵니다. -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+</head>
+<body>
+
+<!-- 헤더 영역을 삽입합니다. -->
+<div th:replace="~{fragments/header :: headerFragment(isLoggedIn=${isLoggedIn})}"></div>
+
+<!-- 메인 콘텐츠 영역입니다. -->
+<main class="w-full flex-grow">
+    <!-- 상단 섹션: Swiper 슬라이드 -->
+    <section class="h-[75vh] w-full flex items-center justify-center">
+        <!-- Swiper 컨테이너에 relative 클래스를 추가하여 내부 요소의 absolute 위치를 기준으로 설정합니다. -->
+        <div class="swiper mySwiper w-full h-full relative">
+            <div class="swiper-wrapper">
+                <!-- 슬라이드 1 -->
+                <div class="swiper-slide">
+                    <div class="space-y-4 text-center flex flex-col items-center justify-center h-full">
+                        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-hantalk-navy">
+                            우리 모두를 위한 디지털 학습 공간
+                        </h1>
+                        <p class="text-lg sm:text-xl md:text-2xl text-gray-700">
+                            재미있고 편한 학습의 시작, 지금 함께해요!
+                        </p>
+                        <a th:href="@{/hantalk/home}" class="inline-block px-8 py-4 bg-white text-[#F29DA0] font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+                            강의 시작하기
+                        </a>
+                    </div>
+                </div>
+                <!-- 슬라이드 2 -->
+                <div class="swiper-slide">
+                    <div class="space-y-4 text-center flex flex-col items-center justify-center h-full">
+                        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-hantalk-navy">
+                            재미있는 한글 학습의 첫걸음
+                        </h1>
+                        <p class="text-lg sm:text-xl md:text-2xl text-gray-700">
+                            다양한 게임과 콘텐츠로 한글을 마스터하세요!
+                        </p>
+                        <a th:href="@{/study/main}" class="inline-block px-8 py-4 bg-white text-[#2F4160] font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+                            학습 페이지로 이동
+                        </a>
+                    </div>
+                </div>
+                <!-- 슬라이드 3 -->
+                <div class="swiper-slide">
+                    <div class="space-y-4 text-center flex flex-col items-center justify-center h-full">
+                        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-hantalk-navy">
+                            커뮤니티에서 함께 성장해요
+                        </h1>
+                        <p class="text-lg sm:text-xl md:text-2xl text-gray-700">
+                            서로의 노하우를 공유하고 질문을 주고받을 수 있어요.
+                        </p>
+                        <a th:href="@{/post/list/1}" class="inline-block px-8 py-4 bg-white text-[#2F4160] font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+                            커뮤니티로 이동
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Swiper 탐색 버튼: absolute와 z-10 클래스를 추가하여 항상 위에 보이도록 합니다. -->
+            <div class="swiper-button-next text-hantalk-navy absolute z-10"></div>
+            <div class="swiper-button-prev text-hantalk-navy absolute z-10"></div>
+            <!-- Swiper 페이지네이션: absolute와 z-10 클래스를 추가하여 항상 위에 보이도록 합니다. -->
+            <div class="swiper-pagination absolute z-10"></div>
+        </div>
+    </section>
+
+    <!-- 하단 섹션: 카드 목록 -->
+    <section class="container mx-auto px-4 py-12 mt-12 flex flex-col md:flex-row justify-center items-center gap-16">
+        <!-- 카드 1: 강의 -->
+        <!-- div 대신 a 태그로 변경하여 링크를 연결하고, 기존 스타일을 유지합니다. -->
+        <a th:href="@{/video/list}" class="w-full md:w-1/3 max-w-xs bg-blue-50 p-6 rounded-2xl shadow-lg flex flex-col items-center text-center aspect-square justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+            <h2 class="text-2xl font-bold text-hantalk-navy mb-2">강의</h2>
+            <p class="text-gray-600 mb-4">
+                트렌디한 강의를 빠르게 만나보세요. 매주 업데이트!
+            </p>
+        </a>
+
+        <!-- 카드 2: 학습 -->
+        <!-- div 대신 a 태그로 변경하여 링크를 연결하고, 기존 스타일을 유지합니다. -->
+        <a th:href="@{/study/main}" class="w-full md:w-1/3 max-w-xs bg-blue-50 p-6 rounded-2xl shadow-lg flex flex-col items-center text-center aspect-square justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+            <h2 class="text-2xl font-bold text-hantalk-navy mb-2">학습</h2>
+            <p class="text-gray-600 mb-4">
+                새롭고 즐거운 방법으로 한글과 다양한 지식을 배워보세요.
+            </p>
+        </a>
+
+        <!-- 카드 3: 자료실 -->
+        <!-- div 대신 a 태그로 변경하여 링크를 연결하고, 기존 스타일을 유지합니다. -->
+        <a th:href="@{/resource/main}" class="w-full md:w-1/3 max-w-xs bg-blue-50 p-6 rounded-2xl shadow-lg flex flex-col items-center text-center aspect-square justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+            <h2 class="text-2xl font-bold text-hantalk-navy mb-2">자료실</h2>
+            <p class="text-gray-600 mb-4">
+                학습에 도움이 되는 자료를 자유롭게 내려받을 수 있어요.
+            </p>
+        </a>
+    </section>
+
+    <!-- 새로운 섹션: 공지사항과 커뮤니티 -->
+    <section class="container mx-auto px-4 py-8 mt-12 flex flex-col md:flex-row justify-center items-start space-y-8 md:space-y-0 md:space-x-8">
+        <!-- 첫 번째 섹션: 공지사항 -->
+        <div class="w-full md:w-1/2 flex flex-col">
+            <h2 class="text-2xl font-bold text-hantalk-navy mb-4">공지사항</h2>
+            <div class="bg-white p-6 rounded-2xl shadow-xl space-y-2">
+                <!-- 리스트 아이템 -->
+                <div class="flex justify-between items-center">
+                    <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors">
+                        [공지] 2024 상반기 서비스 만족도 조사 이벤트 당첨자 발표
+                    </a>
+                    <span class="text-gray-500 text-sm">2024.07.30</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors">
+                        [공지] 2924 온라인 코딩페스티벌 시즌1 행사 안내
+                    </a>
+                    <span class="text-gray-500 text-sm">2024.06.16</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors">
+                        [공지] 2024 코딩 크리에이터 공모전 일정 및 결과 발표
+                    </a>
+                    <span class="text-gray-500 text-sm">2024.06.12</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 두 번째 섹션: 커뮤니티 -->
+        <div class="w-full md:w-1/2 flex flex-col">
+            <h2 class="text-2xl font-bold text-hantalk-navy mb-4">커뮤니티</h2>
+            <div class="bg-white p-6 rounded-2xl shadow-xl space-y-2">
+                <!-- 리스트 아이템 -->
+                <div class="flex justify-between items-center">
+                    <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors">
+                        학습에 어려움이 있을 때 묻는 곳
+                    </a>
+                    <span class="text-gray-500 text-sm">2024.07.25</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors">
+                        오늘의 학습일지
+                    </a>
+                    <span class="text-gray-500 text-sm">2024.06.20</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors">
+                        다들 열심히 하시네요!
+                    </a>
+                    <span class="text-gray-500 text-sm">2024.06.15</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- 푸터 영역을 삽입합니다. -->
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
+
+<!-- Swiper JS를 불러옵니다. -->
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const swiper = new Swiper('.mySwiper', {
+            loop: true,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+    });
+</script>
+</body>
+</html>
