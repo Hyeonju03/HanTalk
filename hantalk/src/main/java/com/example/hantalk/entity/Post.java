@@ -36,6 +36,9 @@ public class Post {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content; //본문
 
+    @Column
+    private String originalFileName;
+
     @Column(length = 200)
     private String archive; //첨부파일명과 타입
 

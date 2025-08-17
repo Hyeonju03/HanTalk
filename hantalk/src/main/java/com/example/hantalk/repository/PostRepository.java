@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
     // 특정 카테고리의 모든 게시물
@@ -27,4 +29,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> searchByTitleOrContent(@Param("categoryId") int categoryId,
                                       @Param("keyword") String keyword,
                                       Pageable pageable);
+
+    // UUID로 저장된 파일명을 기준으로 게시물을 찾는 메서드 추가
+    Optional<Post> findByArchive(String archive);
 }

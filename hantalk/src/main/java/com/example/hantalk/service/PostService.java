@@ -36,14 +36,22 @@ public class PostService {
     // 첨부파일을 포함한 게시물 등록
     @Transactional
     public PostDTO createPostWithFile(PostDTO dto, MultipartFile file) {
-
         String savedFileName = saveFile(file);
         if (savedFileName != null) {
             dto.setArchive(savedFileName);
+            // 원본 파일명을 DTO에 저장
+            dto.setOriginalFileName(file.getOriginalFilename());
         }
-        Post post = toEntity(dto);
+        Post post = toEntity(dto); // DTO를 Entity로 변환하는 메서드
         Post savedPost = postRepository.save(post);
-        return toDto(savedPost);
+        return toDto(savedPost); // Entity를 DTO로 변환
+    }
+
+    // UUID 파일명으로 원본 파일명을 찾아주는 메서드
+    public String getOriginalFileName(String savedFileName) {
+        return postRepository.findByArchive(savedFileName)
+                .map(Post::getOriginalFileName)
+                .orElse(null);
     }
 
     // 게시물 수정
