@@ -1,80 +1,94 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>단어 목록 관리</title>
+    <meta charset="UTF-8">
+    <title>단어 목록 관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h1>단어 목록 관리</h1>
+<body class="bg-gray-100 p-8 font-sans antialiased">
 
-<!-- ✅ 단어 추가 (문구 수정) -->
-<a th:href="@{/study/vocaInsert}">단어 추가</a>
+<div class="max-w-7xl mx-auto bg-white p-8 rounded-xl shadow-lg">
 
-<!-- ✅ 검색 폼 -->
-<form th:action="@{/study/vocaList/admin}" method="get" style="margin:12px 0;">
-  <input type="text" name="kw" th:value="${kw}" placeholder="단어 또는 의미 검색">
-  <button type="submit">검색</button>
-</form>
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">단어 목록 관리</h1>
+        <a th:href="@{/study/vocaInsert}"
+           class="bg-blue-500 text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
+            + 단어 추가
+        </a>
+    </div>
 
-<table>
-  <thead>
-  <tr>
-    <th>순번</th>
-    <th>단어</th>
-    <th>의미</th>
-    <th>등록일</th>
-    <th>관리</th>
-  </tr>
-  </thead>
-  <tbody>
-  <!-- ✅ dtoList → paging.content 기준 -->
-  <tr th:if="${paging == null || paging.content.isEmpty()}">
-    <td colspan="5">단어 데이터가 존재하지 않습니다.</td>
-  </tr>
+    <div class="mb-8">
+        <form th:action="@{/study/vocaList/admin}" method="get" class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <input type="text" name="kw" th:value="${kw}" placeholder="단어 또는 의미 검색"
+                   class="flex-grow w-full sm:w-auto border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit"
+                    class="w-full sm:w-auto bg-gray-200 text-gray-700 py-2 px-6 rounded-lg shadow-md hover:bg-gray-300 transition-colors duration-300">
+                검색
+            </button>
+        </form>
+    </div>
 
-  <tr th:each="voca, loop : ${paging.content}">
-    <td th:text="${paging.number * paging.size + loop.count}"></td>
-    <td th:text="${voca.vocabulary}"></td>
-    <td th:text="${voca.description}"></td>
-    <td th:text="${#temporals.format(voca.createDate, 'yyyy-MM-dd')}"></td>
-    <td>
-      <a th:href="@{|/study/vocaUpdate/${voca.vocaId}|}">수정</a>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg border-collapse">
+            <thead>
+            <tr class="bg-gray-200 text-gray-700 text-left text-sm font-semibold uppercase tracking-wider">
+                <th class="py-3 px-4 rounded-tl-lg">순번</th>
+                <th class="py-3 px-4">단어</th>
+                <th class="py-3 px-4">의미</th>
+                <th class="py-3 px-4">등록일</th>
+                <th class="py-3 px-4 rounded-tr-lg text-right">관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${paging == null || paging.content.isEmpty()}">
+                <td colspan="5" class="py-12 text-center text-gray-500">
+                    단어 데이터가 존재하지 않습니다.
+                </td>
+            </tr>
 
-      <!-- ✅ 삭제: GET 유지 시 -->
-      <button type="button"
-              th:onclick="'if(confirm(\'삭제하시겠습니까?\')) location.href=\'/study/vocaDelete/' + ${voca.vocaId} + '\';'">
-        삭제
-      </button>
+            <tr th:each="voca, loop : ${paging.content}" class="border-t border-gray-200 hover:bg-blue-50 transition-colors duration-300">
+                <td th:text="${paging.number * paging.size + loop.count}" class="py-4 px-4"></td>
+                <td th:text="${voca.vocabulary}" class="py-4 px-4"></td>
+                <td th:text="${voca.description}" class="py-4 px-4"></td>
+                <td th:text="${#temporals.format(voca.createDate, 'yyyy-MM-dd')}" class="py-4 px-4 text-sm text-gray-500"></td>
+                <td class="py-4 px-4 text-right space-x-2">
+                    <a th:href="@{|/study/vocaUpdate/${voca.vocaId}|}" class="text-blue-500 hover:underline font-medium text-sm">수정</a>
+                    <span class="text-gray-400">|</span>
+                    <button type="button" class="text-red-500 hover:underline font-medium text-sm"
+                            th:onclick="'if(confirm(\'정말 이 자료를 삭제하시겠습니까?\')) location.href=\'/study/vocaDelete/' + ${voca.vocaId} + '\';'">
+                        삭제
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-      <!-- ✅ 권장: POST로 바꾸려면 아래 폼 사용(컨트롤러도 @PostMapping 필요)
-      <form th:action="@{|/study/vocaDelete/${voca.vocaId}|}" method="post" style="display:inline"
-            onsubmit="return confirm('삭제하시겠습니까?')">
-        <button type="submit">삭제</button>
-      </form>
-      -->
-    </td>
-  </tr>
-  </tbody>
-</table>
+    <div th:if="${paging != null && !paging.isEmpty()}" class="mt-8">
+        <ul class="flex justify-center items-center space-x-2">
+            <li th:if="${hasPrevBlock}">
+                <a th:href="@{|?page=${prevBlockPage}&kw=${kw}|}"
+                   class="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-200 transition-colors duration-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </a>
+            </li>
 
-<div th:if="${paging != null && !paging.isEmpty()}" class="pagination" style="margin-top:12px;">
-  <ul>
-    <li th:if="${hasPrevBlock}">
-      <a th:href="@{|?page=${prevBlockPage}&kw=${kw}|}">이전</a>
-    </li>
+            <li th:each="p : ${#numbers.sequence(start, end)}"
+                th:classappend="${p == currentPage} ? 'bg-blue-500 text-white rounded-lg font-bold' : 'bg-white text-gray-700 rounded-lg hover:bg-gray-200'">
+                <a th:href="@{|?page=${p}&kw=${kw}|}" th:text="${p + 1}"
+                   class="flex items-center justify-center w-10 h-10 transition-colors duration-300"
+                   th:classappend="${p == currentPage} ? 'pointer-events-none' : ''"></a>
+            </li>
 
-    <li th:each="p : ${#numbers.sequence(start, end)}"
-        th:classappend="${p == currentPage} ? 'active'">
-      <a th:href="@{|?page=${p}&kw=${kw}|}" th:text="${p + 1}"></a>
-    </li>
-
-    <li th:if="${hasNextBlock}">
-      <a th:href="@{|?page=${nextBlockPage}&kw=${kw}|}">다음</a>
-    </li>
-  </ul>
+            <li th:if="${hasNextBlock}">
+                <a th:href="@{|?page=${nextBlockPage}&kw=${kw}|}"
+                   class="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-200 transition-colors duration-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </a>
+            </li>
+        </ul>
+    </div>
 </div>
-<!-- 푸터 프래그먼트 삽입 -->
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

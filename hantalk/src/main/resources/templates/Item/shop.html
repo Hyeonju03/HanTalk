@@ -26,35 +26,30 @@
 </head>
 <body class="bg-[#f3f4f6] min-h-screen flex flex-col text-[#2F4160]">
 
-<!-- 헤더 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex-grow flex">
-    <!-- 사이드바 -->
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div class="flex-grow flex justify-center p-8 space-x-8">
 
-    <!-- 메인 콘텐츠 -->
-    <div class="flex-grow p-8">
-        <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-xl p-8"> <!-- 메인 콘텐츠 영역에도 카드 스타일 적용 -->
+    <div th:replace="~{fragments/mypageSidebar :: mypageSidebar}"></div>
+
+    <div class="container-custom w-full">
+        <div class="bg-white rounded-xl shadow-xl p-8">
             <h1 class="text-3xl font-bold text-center text-[#2F4160] mb-6">아이템 상점</h1>
 
-            <!-- 상태 메시지 -->
             <div class="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                 <div th:if="${isAdmin}" class="bg-[#B5D0E3] text-[#2F4160] px-4 py-2 rounded-lg font-semibold w-full sm:w-auto text-center">
                     관리자입니다. 구매는 불가능합니다.
                 </div>
                 <div th:unless="${isAdmin}" class="bg-[#B5D0E3] text-[#2F4160] px-4 py-2 rounded-lg font-semibold w-full sm:w-auto text-center">
-                    보유 포인트: <span th:text="${point}" class="text-[#2F4160] font-extrabold"></span> pt <!-- 텍스트 색상 #2F4160으로 변경 -->
+                    보유 포인트: <span th:text="${point}" class="text-[#2F4160] font-extrabold"></span> pt
                 </div>
 
-                <!-- 관리자 페이지 이동 버튼 -->
                 <a th:if="${isAdmin}" href="/item/admin"
                    class="bg-[#4B4B4B] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg shadow transition duration-300 w-full sm:w-auto text-center">
                     관리자 페이지로 이동
                 </a>
             </div>
 
-            <!-- 성공/오류 메시지 -->
             <div th:if="${message}" class="bg-[#B5D0E3] border border-[#B5D0E3] text-[#2F4160] px-4 py-3 rounded-lg relative mb-4 text-center" role="alert">
                 <span th:text="${message}"></span>
             </div>
@@ -62,28 +57,24 @@
                 <span th:text="${error}"></span>
             </div>
 
-            <!-- 아이템 목록 그리드 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <div th:each="item : ${items}" class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-200">
                     <div class="p-4">
-                        <!-- 아이템 이미지 -->
                         <div class="item-image-container mb-4">
                             <img th:if="${item.itemType == 'frame'}"
                                  th:src="@{'/uploads/frames/' + ${item.itemImage}}"
                                  th:alt="${item.itemName}"
-                                 class="item-image item-type-frame border-2 border-[#E0E0E0] rounded-md" /> <!-- 테두리 색상 및 약간의 둥근 모서리 추가 -->
+                                 class="item-image item-type-frame border-2 border-[#E0E0E0] rounded-md" />
                             <img th:unless="${item.itemType == 'frame'}"
                                  th:src="@{'/uploads/images/' + ${item.itemImage}}"
                                  th:alt="${item.itemName}"
-                                 class="item-image item-type-profile border-2 border-[#E0E0E0] rounded-full" /> <!-- 테두리 색상 및 둥근 모서리 유지 -->
+                                 class="item-image item-type-profile border-2 border-[#E0E0E0] rounded-full" />
                         </div>
 
-                        <!-- 아이템 정보 -->
                         <h3 class="text-xl font-bold text-[#2F4160] mb-1" th:text="${item.itemName}">이름</h3>
-                        <p class="text-2xl font-extrabold text-[#2F4160] mb-2" th:text="${item.price} + ' pt'">0 pt</p> <!-- 가격 색상 #2F4160으로 변경 -->
+                        <p class="text-2xl font-extrabold text-[#2F4160] mb-2" th:text="${item.price} + ' pt'">0 pt</p>
                         <p class="text-sm text-gray-600 mb-4 h-12 overflow-hidden" th:text="${item.itemDescription}">설명</p>
 
-                        <!-- 구매 버튼 -->
                         <div th:unless="${isAdmin}">
                             <form th:action="@{/item/purchase}" method="post">
                                 <input type="hidden" name="itemId" th:value="${item.itemId}" />
@@ -99,11 +90,10 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
-<!-- 푸터 프래그먼트 삽입 -->
+
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 </body>

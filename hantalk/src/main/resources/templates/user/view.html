@@ -1,87 +1,88 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>마이페이지</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* 프로필 이미지와 프레임이 겹쳐 보이도록 z-index 설정 */
-    .profile-container {
-      position: relative;
-      width: 112px; /* 28 * 4px */
-      height: 112px; /* 28 * 4px */
-      margin: 0 auto;
-    }
-    .profile-image, .profile-frame {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 프로필 이미지와 프레임이 겹쳐 보이도록 z-index 설정 */
+        .profile-container {
+            position: relative;
+            width: 112px; /* 28 * 4px */
+            height: 112px; /* 28 * 4px */
+            margin: 0 auto;
+        }
+        .profile-image, .profile-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 <body class="bg-[#f3f4f6] min-h-screen flex flex-col text-[#2F4160]">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex-grow flex">
-  <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div class="flex-grow flex justify-center p-8 space-x-8">
 
-  <div class="flex-grow p-8">
-    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-xl">
+    <div th:replace="~{fragments/mypageSidebar :: mypageSidebar}"></div>
 
-      <div class="flex flex-col md:flex-row items-center p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
-        <div class="profile-container mb-4 md:mb-0 md:mr-8 flex-shrink-0">
-          <img th:if="${user.profileImage != null}"
-               th:src="@{'/uploads/images/' + ${user.profileImage}}"
-               alt="프로필 이미지"
-               class="profile-image rounded-full object-cover z-0"/>
-          <img th:if="${user.profileFrame != null}"
-               th:src="@{'/uploads/frames/' + ${user.profileFrame}}"
-               alt="프레임 이미지"
-               class="profile-frame pointer-events-none z-10"/>
-          <div th:if="${user.profileImage == null and user.profileFrame == null}"
-               class="profile-image flex items-center justify-center text-[#2F4160] text-sm text-center z-20 bg-white bg-opacity-80 rounded-full">
-            프로필 이미지 및<br/>프레임이 설정되지 않았습니다.
-          </div>
+    <div class="container-custom w-full">
+        <div class="bg-white rounded-xl shadow-xl">
+            <div class="flex flex-col md:flex-row items-center p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
+                <div class="profile-container mb-4 md:mb-0 md:mr-8 flex-shrink-0">
+                    <img th:if="${user.profileImage != null}"
+                         th:src="@{'/uploads/images/' + ${user.profileImage}}"
+                         alt="프로필 이미지"
+                         class="profile-image rounded-full object-cover z-0"/>
+                    <img th:if="${user.profileFrame != null}"
+                         th:src="@{'/uploads/frames/' + ${user.profileFrame}}"
+                         alt="프레임 이미지"
+                         class="profile-frame pointer-events-none z-10"/>
+                    <div th:if="${user.profileImage == null and user.profileFrame == null}"
+                         class="profile-image flex items-center justify-center text-[#2F4160] text-sm text-center z-20 bg-white bg-opacity-80 rounded-full">
+                        프로필 이미지 및<br/>프레임이 설정되지 않았습니다.
+                    </div>
+                </div>
+
+                <div class="text-center md:text-left flex-grow">
+                    <h1 class="text-3xl font-bold mb-1" th:text="${user.nickname}">닉네임</h1>
+                    <p class="text-sm" th:text="${user.userId}">아이디</p>
+                </div>
+            </div>
+
+            <div class="p-8">
+                <h2 class="text-xl font-bold mb-4 border-l-4 border-[#F29DA0] pl-3">상세 정보</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                    <div>
+                        <strong class="block text-sm">이름</strong>
+                        <span class="text-lg font-semibold" th:text="${user.name}">이름</span>
+                    </div>
+
+                    <div>
+                        <strong class="block text-sm">이메일</strong>
+                        <span class="text-lg font-semibold" th:text="${user.email}">이메일</span>
+                    </div>
+
+                    <div>
+                        <strong class="block text-sm">포인트</strong>
+                        <span class="text-lg font-bold text-[#F29DA0]" th:text="${user.point}">0</span> pt
+                    </div>
+
+                    <div>
+                        <strong class="block text-sm">가입일</strong>
+                        <span class="text-lg font-semibold" th:text="${#temporals.format(user.JoinDate, 'yyyy-MM-dd')}">2025-08-01</span>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="text-center md:text-left flex-grow">
-          <h1 class="text-3xl font-bold mb-1" th:text="${user.nickname}">닉네임</h1>
-          <p class="text-sm" th:text="${user.userId}">아이디</p>
-        </div>
-      </div>
-
-      <div class="p-8">
-        <h2 class="text-xl font-bold mb-4 border-l-4 border-[#F29DA0] pl-3">상세 정보</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-          <div>
-            <strong class="block text-sm">이름</strong>
-            <span class="text-lg font-semibold" th:text="${user.name}">이름</span>
-          </div>
-
-          <div>
-            <strong class="block text-sm">이메일</strong>
-            <span class="text-lg font-semibold" th:text="${user.email}">이메일</span>
-          </div>
-
-          <div>
-            <strong class="block text-sm">포인트</strong>
-            <span class="text-lg font-bold text-[#F29DA0]" th:text="${user.point}">0</span> pt
-          </div>
-
-          <div>
-            <strong class="block text-sm">가입일</strong>
-            <span class="text-lg font-semibold" th:text="${#temporals.format(user.JoinDate, 'yyyy-MM-dd')}">2025-08-01</span>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
+
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

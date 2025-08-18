@@ -1,249 +1,252 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>출석 캘린더</title>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* 이 부분은 Tailwind CSS로 직접 구현하기 어려운 z-index, position 속성 등을 위해 유지합니다. */
-    .profile-container {
-      position: relative;
-      width: 112px;
-      height: 112px;
-      margin: 0 auto;
-    }
-    .profile-image, .profile-frame {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출석 캘린더</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 이 부분은 Tailwind CSS로 직접 구현하기 어려운 z-index, position 속성 등을 위해 유지합니다. */
+        .profile-container {
+          position: relative;
+          width: 112px;
+          height: 112px;
+          margin: 0 auto;
+        }
+        .profile-image, .profile-frame {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
 
-    .calendar-grid-cell {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100px;
-      padding: 5px;
-    }
-  </style>
+        .calendar-grid-cell {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          min-height: 100px;
+          padding: 5px;
+        }
+    </style>
 </head>
 <body class="bg-[#f3f4f6] flex flex-col min-h-screen font-sans text-[#2F4160] overflow-y-scroll">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex-grow flex">
-  <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div class="flex-grow flex justify-center p-8 space-x-8">
 
-  <div class="flex-grow p-8">
-    <h1 class="text-3xl font-bold text-[#2F4160] mb-6">출석 캘린더</h1>
+    <div th:replace="~{fragments/mypageSidebar :: mypageSidebar}"></div>
 
-    <div class="bg-white rounded-xl shadow-xl">
-      <div class="flex items-center justify-between border-b border-[#E0E0E0] p-3 select-none">
-        <button id="prevMonth" class="text-2xl hover:text-[#F29DA0] text-[#2F4160]">◀</button>
-        <div id="currentMonth" class="text-xl font-semibold text-[#2F4160]"></div>
-        <button id="nextMonth" class="text-2xl hover:text-[#F29DA0] text-[#2F4160]">▶</button>
-      </div>
+    <div class="container-custom w-full">
+        <div class="bg-white rounded-xl shadow-xl p-8">
+            <h1 class="text-3xl font-bold text-[#2F4160] mb-6 text-center">출석 캘린더</h1>
 
-      <div class="grid grid-cols-7 text-sm text-center uppercase border-b border-[#E0E0E0]">
-        <div class="py-2 text-red-600">SUN</div>
-        <div class="py-2 text-[#2F4160]">MON</div>
-        <div class="py-2 text-[#2F4160]">TUE</div>
-        <div class="py-2 text-[#2F4160]">WED</div>
-        <div class="py-2 text-[#2F4160]">THU</div>
-        <div class="py-2 text-[#2F4160]">FRI</div>
-        <div class="py-2 text-blue-600">SAT</div>
-      </div>
+            <div class="bg-white rounded-xl">
+                <div class="flex items-center justify-between border-b border-[#E0E0E0] p-3 select-none">
+                    <button id="prevMonth" class="text-2xl hover:text-[#F29DA0] text-[#2F4160]">◀</button>
+                    <div id="currentMonth" class="text-xl font-semibold text-[#2F4160]"></div>
+                    <button id="nextMonth" class="text-2xl hover:text-[#F29DA0] text-[#2F4160]">▶</button>
+                </div>
 
-      <div id="calendar" class="grid grid-cols-7 gap-1 p-2 text-center text-base text-[#2F4160]">
-      </div>
+                <div class="grid grid-cols-7 text-sm text-center uppercase border-b border-[#E0E0E0]">
+                    <div class="py-2 text-red-600">SUN</div>
+                    <div class="py-2 text-[#2F4160]">MON</div>
+                    <div class="py-2 text-[#2F4160]">TUE</div>
+                    <div class="py-2 text-[#2F4160]">WED</div>
+                    <div class="py-2 text-[#2F4160]">THU</div>
+                    <div class="py-2 text-[#2F4160]">FRI</div>
+                    <div class="py-2 text-blue-600">SAT</div>
+                </div>
+
+                <div id="calendar" class="grid grid-cols-7 gap-1 p-2 text-center text-base text-[#2F4160]">
+                </div>
+            </div>
+
+            <div class="text-center mt-6">
+                <button id="checkInButton" class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-3 px-6 rounded-lg shadow-md text-lg transition-colors duration-200">
+                    오늘 출석하기
+                </button>
+                <a href="/user/view" class="text-[#2F4160] hover:text-[#F29DA0] hover:underline text-lg block mt-4 transition-colors duration-200">마이 페이지로</a>
+            </div>
+        </div>
     </div>
-
-    <div class="text-center mt-6">
-      <button id="checkInButton" class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-3 px-6 rounded-lg shadow-md text-lg transition-colors duration-200">
-        오늘 출석하기
-      </button>
-      <a href="/user/view" class="text-[#2F4160] hover:text-[#F29DA0] hover:underline text-lg block mt-4 transition-colors duration-200">마이 페이지로</a>
-    </div>
-  </div>
 </div>
 
 <div id="alertModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-40 hidden">
-  <div class="bg-white p-5 md:p-6 border border-[#E0E0E0] max-w-sm w-11/12 rounded-lg text-center text-[#2F4160] shadow-md">
-    <span class="text-[#2F4160] float-right text-2xl font-bold cursor-pointer hover:text-[#F29DA0]" id="alertCloseBtn">&times;</span>
-    <p id="alertMessage" class="mt-4 mb-4"></p>
-    <button class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200" id="confirmAlertCloseBtn">확인</button>
-  </div>
+    <div class="bg-white p-5 md:p-6 border border-[#E0E0E0] max-w-sm w-11/12 rounded-lg text-center text-[#2F4160] shadow-md">
+        <span class="text-[#2F4160] float-right text-2xl font-bold cursor-pointer hover:text-[#F29DA0]" id="alertCloseBtn">&times;</span>
+        <p id="alertMessage" class="mt-4 mb-4"></p>
+        <button class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200" id="confirmAlertCloseBtn">확인</button>
+    </div>
 </div>
 
 <script>
-  const calendarEl = document.getElementById('calendar');
-  const monthLabel = document.getElementById('currentMonth');
-  const checkInButton = document.getElementById('checkInButton');
+    const calendarEl = document.getElementById('calendar');
+    const monthLabel = document.getElementById('currentMonth');
+    const checkInButton = document.getElementById('checkInButton');
 
-  const alertModal = document.getElementById('alertModal');
-  const alertCloseBtn = document.getElementById('alertCloseBtn');
-  const confirmAlertCloseBtn = document.getElementById('confirmAlertCloseBtn');
-  const alertMessage = document.getElementById('alertMessage');
+    const alertModal = document.getElementById('alertModal');
+    const alertCloseBtn = document.getElementById('alertCloseBtn');
+    const confirmAlertCloseBtn = document.getElementById('confirmAlertCloseBtn');
+    const alertMessage = document.getElementById('alertMessage');
 
-  function showAlert(message) {
-      alertMessage.textContent = message;
-      alertModal.classList.remove('hidden');
-      alertModal.style.display = 'flex';
-  }
-
-  alertCloseBtn.onclick = function() {
-      alertModal.classList.add('hidden');
-      alertModal.style.display = 'none';
-  }
-  confirmAlertCloseBtn.onclick = function() {
-      alertModal.classList.add('hidden');
-      alertModal.style.display = 'none';
-  }
-
-  window.onclick = function(event) {
-      if (event.target == alertModal) {
-          alertModal.classList.add('hidden');
-          alertModal.style.display = 'none';
-      }
-  }
-
-  const today = new Date();
-  let currentYear = today.getFullYear();
-  let currentMonth = today.getMonth();
-
-  function renderCalendar(attendanceDates) {
-    calendarEl.innerHTML = '';
-
-    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-    const lastDateOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-    monthLabel.textContent = `${currentYear}.${currentMonth + 1}`;
-
-    const startDayOffset = firstDayOfMonth;
-
-    for (let i = 0; i < startDayOffset; i++) {
-      const emptyCell = document.createElement('div');
-      emptyCell.className = 'calendar-grid-cell';
-      calendarEl.appendChild(emptyCell);
+    function showAlert(message) {
+        alertMessage.textContent = message;
+        alertModal.classList.remove('hidden');
+        alertModal.style.display = 'flex';
     }
 
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    let hasCheckedInToday = false;
+    alertCloseBtn.onclick = function() {
+        alertModal.classList.add('hidden');
+        alertModal.style.display = 'none';
+    }
+    confirmAlertCloseBtn.onclick = function() {
+        alertModal.classList.add('hidden');
+        alertModal.style.display = 'none';
+    }
 
-    for (let day = 1; day <= lastDateOfMonth; day++) {
-      const cell = document.createElement('div');
-      cell.className = 'calendar-grid-cell relative rounded cursor-default border border-transparent hover:border-[#B5D0E3]/50';
-
-      const dayText = document.createElement('div');
-      dayText.textContent = day;
-      dayText.className = 'font-semibold mb-1';
-
-      const currentDayOfWeek = new Date(currentYear, currentMonth, day).getDay();
-
-      if (currentDayOfWeek === 0) {
-        dayText.classList.add('text-red-600');
-      } else if (currentDayOfWeek === 6) {
-        dayText.classList.add('text-blue-600');
-      }
-
-      cell.appendChild(dayText);
-
-      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      if (attendanceDates.includes(dateStr)) {
-        const imgIcon = document.createElement('img');
-        imgIcon.src = '/image/chulsuk4.png';
-        imgIcon.className = 'w-28 h-28 mx-auto';
-
-        cell.appendChild(imgIcon);
-
-        if (dateStr === todayStr) {
-          hasCheckedInToday = true;
+    window.onclick = function(event) {
+        if (event.target == alertModal) {
+            alertModal.classList.add('hidden');
+            alertModal.style.display = 'none';
         }
-      }
-
-      if (dateStr === todayStr && currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
-        cell.classList.add('border-2', 'border-[#F29DA0]', 'bg-[#B5D0E3]/20');
-      }
-
-      calendarEl.appendChild(cell);
     }
 
-    if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
-      if (!hasCheckedInToday) {
-        checkInButton.disabled = false;
-        checkInButton.textContent = '오늘 출석하기';
-        checkInButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
-        checkInButton.classList.add('bg-[#F29DA0]', 'hover:bg-[#2F4160]');
+    const today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
+
+    function renderCalendar(attendanceDates) {
+      calendarEl.innerHTML = '';
+
+      const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+      const lastDateOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      monthLabel.textContent = `${currentYear}.${currentMonth + 1}`;
+
+      const startDayOffset = firstDayOfMonth;
+
+      for (let i = 0; i < startDayOffset; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'calendar-grid-cell';
+        calendarEl.appendChild(emptyCell);
+      }
+
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      let hasCheckedInToday = false;
+
+      for (let day = 1; day <= lastDateOfMonth; day++) {
+        const cell = document.createElement('div');
+        cell.className = 'calendar-grid-cell relative rounded cursor-default border border-transparent hover:border-[#B5D0E3]/50';
+
+        const dayText = document.createElement('div');
+        dayText.textContent = day;
+        dayText.className = 'font-semibold mb-1';
+
+        const currentDayOfWeek = new Date(currentYear, currentMonth, day).getDay();
+
+        if (currentDayOfWeek === 0) {
+          dayText.classList.add('text-red-600');
+        } else if (currentDayOfWeek === 6) {
+          dayText.classList.add('text-blue-600');
+        }
+
+        cell.appendChild(dayText);
+
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        if (attendanceDates.includes(dateStr)) {
+          const imgIcon = document.createElement('img');
+          imgIcon.src = '/image/chulsuk4.png';
+          imgIcon.className = 'w-28 h-28 mx-auto';
+
+          cell.appendChild(imgIcon);
+
+          if (dateStr === todayStr) {
+            hasCheckedInToday = true;
+          }
+        }
+
+        if (dateStr === todayStr && currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
+          cell.classList.add('border-2', 'border-[#F29DA0]', 'bg-[#B5D0E3]/20');
+        }
+
+        calendarEl.appendChild(cell);
+      }
+
+      if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
+        if (!hasCheckedInToday) {
+          checkInButton.disabled = false;
+          checkInButton.textContent = '오늘 출석하기';
+          checkInButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+          checkInButton.classList.add('bg-[#F29DA0]', 'hover:bg-[#2F4160]');
+        } else {
+          checkInButton.disabled = true;
+          checkInButton.textContent = '출석 완료!';
+          checkInButton.classList.remove('bg-[#F29DA0]', 'hover:bg-[#2F4160]');
+          checkInButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+        }
       } else {
         checkInButton.disabled = true;
-        checkInButton.textContent = '출석 완료!';
+        checkInButton.textContent = '출석할 수 없습니다';
         checkInButton.classList.remove('bg-[#F29DA0]', 'hover:bg-[#2F4160]');
         checkInButton.classList.add('bg-gray-400', 'cursor-not-allowed');
       }
-    } else {
-      checkInButton.disabled = true;
-      checkInButton.textContent = '출석할 수 없습니다';
-      checkInButton.classList.remove('bg-[#F29DA0]', 'hover:bg-[#2F4160]');
-      checkInButton.classList.add('bg-gray-400', 'cursor-not-allowed');
     }
-  }
 
-  function fetchAndRender() {
-    axios.get('/user/calendar/data')
-      .then(response => {
-        renderCalendar(response.data);
-      })
-      .catch(error => {
-        console.error('출석 정보 불러오기 실패:', error);
-        showAlert('출석 정보를 불러오는데 실패했습니다.');
-        renderCalendar([]);
-      });
-  }
-
-  document.getElementById('prevMonth').addEventListener('click', () => {
-    currentMonth--;
-    if (currentMonth < 0) {
-      currentMonth = 11;
-      currentYear--;
+    function fetchAndRender() {
+      axios.get('/user/calendar/data')
+        .then(response => {
+          renderCalendar(response.data);
+        })
+        .catch(error => {
+          console.error('출석 정보 불러오기 실패:', error);
+          showAlert('출석 정보를 불러오는데 실패했습니다.');
+          renderCalendar([]);
+        });
     }
+
+    document.getElementById('prevMonth').addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      fetchAndRender();
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      fetchAndRender();
+    });
+
+    checkInButton.addEventListener('click', () => {
+      if (checkInButton.disabled) {
+          return;
+      }
+
+      axios.post('/user/checkTodayAttendance')
+        .then(response => {
+          if (response.data.success) {
+            showAlert(response.data.message || '출석 완료! 10 포인트가 적립되었습니다.');
+            fetchAndRender();
+          } else {
+            showAlert(response.data.message || '출석에 실패했습니다.');
+          }
+        })
+        .catch(error => {
+          console.error('출석 체크 중 오류 발생:', error);
+          showAlert('출석 체크 중 오류가 발생했습니다. 다시 시도해 주세요.');
+        });
+    });
+
     fetchAndRender();
-  });
-
-  document.getElementById('nextMonth').addEventListener('click', () => {
-    currentMonth++;
-    if (currentMonth > 11) {
-      currentMonth = 0;
-      currentYear++;
-    }
-    fetchAndRender();
-  });
-
-  checkInButton.addEventListener('click', () => {
-    if (checkInButton.disabled) {
-        return;
-    }
-
-    axios.post('/user/checkTodayAttendance')
-      .then(response => {
-        if (response.data.success) {
-          showAlert(response.data.message || '출석 완료! 10 포인트가 적립되었습니다.');
-          fetchAndRender();
-        } else {
-          showAlert(response.data.message || '출석에 실패했습니다.');
-        }
-      })
-      .catch(error => {
-        console.error('출석 체크 중 오류 발생:', error);
-        showAlert('출석 체크 중 오류가 발생했습니다. 다시 시도해 주세요.');
-      });
-  });
-
-  fetchAndRender();
 </script>
 <div th:replace="~{fragments/footer :: footerFragment}" class="w-full"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
