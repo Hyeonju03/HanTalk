@@ -1,22 +1,27 @@
-<!--전-->
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 / 회원가입 페이지</title>
+    <title>로그인 / 회원가입</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
-        /* 커스텀 Tailwind CSS 설정 */
-        @layer base {
-            :root {
-                --color-background: #FDFBFF; /* 아주 연한 보라빛 흰색 */
-                --color-main: #B8E0D2; /* 민트색 파스텔 톤 */
-                --color-sub: #FFDEE9; /* 연분홍색 파스텔 톤 */
-                --color-accent: #CDE7F0; /* 하늘색 파스텔 톤 */
-            }
+        /* Nanum Gothic 폰트 설정 */
+        body {
+            font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
         }
 
+        /* Custom Colors based on the provided theme */
+        .bg-custom-gray { background-color: #f3f4f6; }
+        .text-custom-navy { color: #2F4160; }
+        .bg-custom-blue { background-color: #B5D0E3; }
+        .bg-custom-pink { background-color: #F29DA0; }
+        .bg-custom-darkgray { background-color: #4B4B4B; }
+        .hover-bg-custom-navy:hover { background-color: #2F4160; }
+
+        /* Form container transition */
         .container-box {
             display: flex;
             transition: transform 0.5s ease-in-out;
@@ -27,60 +32,61 @@
         }
     </style>
 </head>
-<body class="bg-[#FDFBFF] flex flex-col items-center justify-center min-h-screen p-4 text-gray-800">
+<body class="bg-custom-gray flex flex-col items-center justify-center min-h-screen p-4 text-custom-navy">
 
 <div class="w-full text-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-700">로그인 / 회원가입 페이지</h1>
+    <h1 class="text-3xl font-bold">로그인 / 회원가입 페이지</h1>
+    <a href="/user/logout" class="text-sm text-gray-600 hover:underline transition-colors duration-300">로그아웃</a>
 </div>
 
-<div class="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden min-h-[500px]">
-    <div id="formContainer" class="container-box w-[200%]">
+<div class="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden min-h-[600px] md:min-h-[500px]">
+    <div id="formContainer" class="container-box w-[200%] h-full">
         <div id="loginContainer" class="flex-shrink-0 w-1/2 p-10 flex flex-col justify-center items-center text-center">
             <h2 class="text-2xl font-bold mb-6">로그인</h2>
             <form action="/user/login" method="post" class="space-y-4 w-full max-w-sm">
                 <input type="text" name="userId" placeholder="아이디" required
-                       class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                       class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
                 <input type="password" name="password" placeholder="비밀번호" required
-                       class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                       class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
                 <button type="submit"
-                        class="w-full h-12 bg-[#B8E0D2] text-white font-bold rounded-md hover:bg-[#a3ccbf] transition-colors duration-300">
-                    로그인
+                        class="w-full h-12 bg-custom-pink text-white font-bold rounded-md hover-bg-custom-navy transition-colors duration-300">
+                    <i class="fas fa-sign-in-alt mr-2"></i> 로그인
                 </button>
             </form>
             <div class="mt-6 text-sm space-y-2">
                 <p class="text-gray-600">
                     계정을 잊으셨나요?
-                    <a href="/user/findIDPW" class="text-[#FFDEE9] font-semibold hover:underline">아이디 / 패스워드 찾기</a>
+                    <a href="/user/findIDPW" class="text-custom-navy font-semibold hover:underline">아이디 / 패스워드 찾기</a>
                 </p>
                 <p class="text-gray-600">
                     계정이 없으신가요?
-                    <a href="#" onclick="showSignup()" class="text-[#FFDEE9] font-semibold hover:underline">회원가입</a>
+                    <a href="#" onclick="showSignup()" class="text-custom-navy font-semibold hover:underline">회원가입</a>
                 </p>
             </div>
         </div>
 
-        <div id="signupContainer" class="flex-shrink-0 w-1/2 p-10 flex flex-col justify-center items-center text-center bg-[#FDFBFF]">
+        <div id="signupContainer" class="flex-shrink-0 w-1/2 p-10 flex flex-col justify-center items-center text-center bg-white">
             <h2 class="text-2xl font-bold mb-6">회원가입</h2>
             <form action="/user/signup" method="post" enctype="multipart/form-data" onsubmit="return checkPasswordMatch();" class="space-y-4 w-full max-w-sm">
                 <div class="flex items-center space-x-2">
                     <input type="text" id="userId" name="userId" placeholder="아이디" required
-                           class="flex-1 h-10 px-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                           class="flex-1 h-10 px-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
                     <button type="button" onclick="checkId()"
-                            class="h-10 w-24 bg-[#CDE7F0] text-gray-700 text-sm font-medium rounded-r-md hover:bg-[#b5d5e2] transition-colors duration-300">
+                            class="h-10 w-24 bg-custom-blue text-custom-navy text-sm font-medium rounded-r-md hover-bg-custom-navy hover:text-white transition-colors duration-300">
                         중복확인
                     </button>
                 </div>
                 <div id="idMsg" class="text-sm text-left px-2"></div>
 
                 <input type="text" name="name" placeholder="이름" required
-                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
 
                 <div class="flex items-center space-x-2">
                     <input type="text" id="emailPrefix" placeholder="이메일 아이디" required
-                           class="flex-1 h-10 px-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                           class="flex-1 h-10 px-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
                     <span class="text-gray-500">@</span>
                     <select id="emailDomain" onchange="toggleCustomDomain(this)"
-                            class="w-32 h-10 px-3 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                            class="w-32 h-10 px-3 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
                         <option value="gmail.com">gmail.com</option>
                         <option value="naver.com">naver.com</option>
                         <option value="daum.net">daum.net</option>
@@ -88,11 +94,11 @@
                     </select>
                 </div>
                 <input type="text" id="customDomain" placeholder="직접 입력" style="display:none;"
-                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
 
                 <div class="flex justify-end">
                     <button type="button" onclick="checkEmail()"
-                            class="h-10 w-24 bg-[#CDE7F0] text-gray-700 text-sm font-medium rounded-md hover:bg-[#b5d5e2] transition-colors duration-300">
+                            class="h-10 w-24 bg-custom-blue text-custom-navy text-sm font-medium rounded-md hover-bg-custom-navy hover:text-white transition-colors duration-300">
                         중복확인
                     </button>
                 </div>
@@ -100,27 +106,27 @@
                 <div id="emailMsg" class="text-sm text-left px-2"></div>
 
                 <input type="password" id="password" name="password" placeholder="비밀번호" required
-                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
                 <input type="password" id="passwordRE" name="passwordRE" placeholder="비밀번호 확인" required
                        oninput="validatePassword()"
-                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
                 <div id="pwMsg" class="text-sm text-left px-2"></div>
 
                 <input type="text" name="nickname" placeholder="닉네임" required
-                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
 
                 <input type="date" id="birth" required
-                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#CDE7F0]">
+                       class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
                 <input type="hidden" name="birth" id="birthHidden">
 
                 <button type="submit"
-                        class="w-full h-12 bg-[#B8E0D2] text-white font-bold rounded-md hover:bg-[#a3ccbf] transition-colors duration-300">
-                    회원가입
+                        class="w-full h-12 bg-custom-pink text-white font-bold rounded-md hover-bg-custom-navy transition-colors duration-300">
+                    <i class="fas fa-user-plus mr-2"></i> 회원가입
                 </button>
             </form>
             <p class="mt-6 text-sm text-gray-600">
                 이미 계정이 있으신가요?
-                <a href="#" onclick="showLogin()" class="text-[#FFDEE9] font-semibold hover:underline">로그인</a>
+                <a href="#" onclick="showLogin()" class="text-custom-navy font-semibold hover:underline">로그인</a>
             </p>
         </div>
     </div>

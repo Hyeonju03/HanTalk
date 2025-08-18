@@ -1,48 +1,48 @@
-<!--전-->
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>아이디 / 비밀번호 찾기</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom Colors from previous prompt */
-        .bg-main { background-color: #B8E0D2; }
-        .bg-main:hover { background-color: #a3ccbf; }
-        .bg-sub { background-color: #FFDEE9; }
-        .bg-accent { background-color: #CDE7F0; }
-        .text-sub { color: #FFDEE9; }
 
-        /* Custom Styles for this page */
-        .find-box {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        /* Nanum Gothic 폰트 설정 */
+        body {
+            font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
         }
+
+        /* Custom Colors based on the provided theme */
+        .bg-custom-gray { background-color: #f3f4f6; }
+        .text-custom-navy { color: #2F4160; }
+        .bg-custom-blue { background-color: #B5D0E3; }
+        .bg-custom-pink { background-color: #F29DA0; }
+        .bg-custom-darkgray { background-color: #4B4B4B; }
+        .hover-bg-custom-navy:hover { background-color: #2F4160; }
     </style>
 </head>
-<body class="bg-[#FDFBFF] flex flex-col items-center min-h-screen p-4 text-gray-800">
+<body class="bg-custom-gray text-custom-navy min-h-screen flex flex-col items-center justify-center p-4">
 
 <header class="w-full max-w-4xl bg-white rounded-b-xl shadow-lg p-4 flex justify-between items-center mb-8">
-    <h1 class="text-2xl font-bold text-gray-700">HanTalk</h1>
+    <h1 class="text-2xl font-bold text-custom-navy">HanTalk</h1>
     <nav>
-        <a href="/login" class="text-gray-600 hover:text-gray-900 transition-colors duration-300 mx-2">로그인</a>
-        <a href="/signup" class="text-gray-600 hover:text-gray-900 transition-colors duration-300 mx-2">회원가입</a>
+        <a href="/login" class="text-gray-600 hover:text-custom-navy transition-colors duration-300 mx-2 font-semibold">로그인</a>
+        <a href="/signup" class="text-gray-600 hover:text-custom-navy transition-colors duration-300 mx-2 font-semibold">회원가입</a>
     </nav>
 </header>
 
-<div class="w-full max-w-lg p-8 space-y-8 find-box">
+<div class="w-full max-w-lg p-8 space-y-8 bg-white rounded-xl shadow-xl">
     <div>
         <h2 class="text-2xl font-bold text-center mb-6">아이디 찾기</h2>
         <div class="space-y-4">
             <input type="text" id="findName" placeholder="이름"
-                   class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400">
+                   class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
             <input type="text" id="findEmail" placeholder="이메일"
-                   class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400">
+                   class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
             <button onclick="findId()"
-                    class="w-full h-12 bg-main text-white font-bold rounded-md hover:bg-[#a3ccbf] transition-colors duration-300">
-                아이디 찾기
+                    class="w-full h-12 bg-custom-pink text-white font-bold rounded-md hover-bg-custom-navy transition-colors duration-300">
+                <i class="fas fa-search mr-2"></i> 아이디 찾기
             </button>
         </div>
         <p id="findIdResult" class="text-center mt-4 text-sm font-medium"></p>
@@ -54,14 +54,14 @@
         <h2 class="text-2xl font-bold text-center mb-6">비밀번호 찾기</h2>
         <div class="space-y-4">
             <input type="text" id="pwName" placeholder="이름"
-                   class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400">
+                   class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
             <input type="text" id="pwEmail" placeholder="이메일"
-                   class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400">
+                   class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
             <input type="text" id="pwUserId" placeholder="아이디"
-                   class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400">
+                   class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
             <button onclick="findPw()"
-                    class="w-full h-12 bg-accent text-gray-800 font-bold rounded-md hover:bg-[#b5d5e2] transition-colors duration-300">
-                비밀번호 찾기
+                    class="w-full h-12 bg-custom-darkgray text-white font-bold rounded-md hover-bg-custom-navy transition-colors duration-300">
+                <i class="fas fa-key mr-2"></i> 비밀번호 찾기
             </button>
         </div>
         <p id="findPwResult" class="text-center mt-4 text-sm font-medium"></p>
@@ -89,14 +89,17 @@
         .then(data => {
             if (data.status === "success") {
                 resultElement.textContent = "아이디: " + data.userId;
+                resultElement.classList.remove("text-red-500");
                 resultElement.classList.add("text-green-500");
             } else {
                 resultElement.textContent = "일치하는 정보가 없습니다.";
+                resultElement.classList.remove("text-green-500");
                 resultElement.classList.add("text-red-500");
             }
         })
         .catch(() => {
             resultElement.textContent = "오류가 발생했습니다.";
+            resultElement.classList.remove("text-green-500");
             resultElement.classList.add("text-red-500");
         });
     }
@@ -117,15 +120,18 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === "success") {
-                resultElement.textContent = "임시 비밀번호: " + data.tempPw;
+                resultElement.textContent = "임시 비밀번호가 이메일로 전송되었습니다.";
+                resultElement.classList.remove("text-red-500");
                 resultElement.classList.add("text-green-500");
             } else {
                 resultElement.textContent = "정보가 일치하지 않습니다.";
+                resultElement.classList.remove("text-green-500");
                 resultElement.classList.add("text-red-500");
             }
         })
         .catch(() => {
             resultElement.textContent = "오류가 발생했습니다.";
+            resultElement.classList.remove("text-green-500");
             resultElement.classList.add("text-red-500");
         });
     }

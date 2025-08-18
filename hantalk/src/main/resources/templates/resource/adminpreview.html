@@ -23,16 +23,16 @@
         <div class="mb-8">
             <h2 class="text-2xl font-bold text-[#2F4160]">📁 메뉴</h2>
         </div>
-        <ul class="space-y-2"> <!-- Adjusted space-y to 2 -->
+        <ul class="space-y-4"> <!-- 간격 조정: space-y-2에서 space-y-4로 변경 -->
             <li>
-                <a href="/resource/admin/main" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
-                    <i class="fas fa-list-alt mr-3"></i>
+                <a href="/resource/admin/main" class="flex items-center p-3 text-[#2F4160] hover:bg-[#404040]/80 rounded-lg transition-colors duration-200">
+                    <i class="fas fa-bars mr-3"></i> <!-- '관리자 메인' 아이콘은 유지 -->
                     <span>관리자 메인</span>
                 </a>
             </li>
             <li>
                 <a href="/resource/chuga" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
-                    <i class="fas fa-plus-circle mr-3"></i>
+                    <i class="fas fa-plus-circle mr-3"></i> <!-- '자료 등록' 아이콘을 fas fa-plus-circle로 복원 -->
                     <span>자료 등록</span>
                 </a>
             </li>
@@ -77,7 +77,7 @@
 
         <!-- 관리자 목록으로 돌아가기 버튼 -->
         <div class="flex justify-center mt-8">
-            <button type="button" class="bg-[#F29DA0] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300" onclick="location.href='/resource/admin/main'">
+            <button type="button" class="bg-[#4B4B4B] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300" onclick="location.href='/resource/admin/main'">
                 <i class="fas fa-arrow-left mr-2"></i>관리자 목록으로
             </button>
         </div>
