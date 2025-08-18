@@ -22,53 +22,53 @@
     .animate-float-slow {
       animation: float 4s ease-in-out infinite;
     }
+
+    /* New pulse animation for the button */
+    @keyframes pulse-slow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 2s ease-in-out infinite;
+    }
   </style>
 </head>
 <body>
 
 <div id="fullpage">
 
-  <!-- Main Section: Overlapping Image Design -->
-  <div class="section relative flex flex-col items-center justify-center p-8 overflow-hidden bg-[#B5D0E3]">
-    <!-- Background element (book icon) -->
+  <div class="section relative flex flex-col items-center justify-center p-8 overflow-hidden bg-[#FFFDF6]">
     <div class="absolute inset-0 z-0">
-      <!-- Book Icon (top right) -->
       <img src="https://placehold.co/200x200/F29DA0/FFFFFF?text=Book+Icon"
-           alt="Book Icon"
+           alt="한 톡!"
            class="absolute top-12 right-12 w-32 h-auto animate-float-slow"
            style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
     </div>
 
-    <!-- Central content area -->
     <div class="relative z-10 flex flex-col items-center justify-center text-center">
-      <!-- Image container: Used for overlapping images -->
       <div class="relative w-[56rem] h-[36rem] mb-8">
-
-        <!-- First image (bottom, no rotation) -->
-        <img src="/images/main_mint.PNG"
+        <img src="/images/main_2.PNG"
              alt="HanTalk Main Image 1"
-             class="absolute top-1/2 left-1/2 -translate-x-[100%] -translate-y-[45%] w-[85%] h-auto drop-shadow-lg z-10 transition-all duration-500 ease-in-out"
+             class="absolute top-1/2 left-1/2 -translate-x-[120%] -translate-y-[70%] w-[80%] h-auto drop-shadow-lg z-10 transition-all duration-500 ease-in-out"
              style="filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));">
 
-        <!-- Second image (top, no rotation) -->
-        <img src="/images/main_yellow.png"
+        <img src="/images/main_mint.png"
              alt="HanTalk Main Image 2"
-             class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[55%] w-[80%] h-auto drop-shadow-lg z-20 transition-all duration-500 ease-in-out"
+             class="absolute top-1/2 left-1/2 -translate-x-[35%] -translate-y-[20%] w-[75%] h-auto drop-shadow-lg z-20 transition-all duration-500 ease-in-out"
              style="filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));">
       </div>
+    </div>
 
-      <h1 class="text-7xl font-extrabold text-[#2F4160] mb-6 animate-fade-in-down drop-shadow-lg">HanTalk</h1>
+    <div class="absolute top-1/2 -translate-y-1/2 right-40 z-20">
+      <h1 class="text-7xl font-extrabold text-[#2F4160] mb-6 animate-fade-in-down drop-shadow-lg">'한톡'</h1>
       <p class="text-4xl text-[#2F4160] mb-12 animate-fade-in-up drop-shadow-lg">한글 학습의 새로운 시작</p>
-
-      <!-- 'Start' button design -->
       <a th:href="@{/hantalk/home}"
-         class="px-12 py-5 bg-[#F29DA0] text-white font-extrabold rounded-full shadow-2xl transition-all duration-500 ease-in-out transform hover:scale-110 hover:bg-[#F29DA0] hover:saturate-150">
+         class="px-20 py-6 bg-[#F29DA0] text-white font-extrabold rounded-full shadow-2xl transition-all duration-500 ease-in-out transform hover:scale-110 hover:bg-[#F29DA0] hover:saturate-150 animate-pulse-slow text-xl">
         <span class="relative z-10">시작하기</span>
       </a>
     </div>
   </div>
 
-  <!-- Section 2: Korean Learning -->
   <div class="section" data-anchor="learn">
     <div class="flex flex-col lg:flex-row items-center justify-center p-8 h-full bg-white">
       <div class="lg:w-1/2 p-4 text-center lg:text-left animate-slide-in-left">
@@ -82,7 +82,6 @@
     </div>
   </div>
 
-  <!-- Section 3: Vocabulary Book -->
   <div class="section" data-anchor="vocabulary">
     <div class="flex flex-col lg:flex-row items-center justify-center p-8 h-full bg-gray-100">
       <div class="lg:w-1/2 flex justify-center p-4">
@@ -96,7 +95,6 @@
     </div>
   </div>
 
-  <!-- Section 4: Video Learning -->
   <div class="section" data-anchor="video-learn">
     <div class="flex flex-col items-center justify-center p-8 h-full bg-white">
       <h2 class="text-4xl font-bold text-gray-800 mb-4 animate-fade-in-down">비디오 학습</h2>
@@ -105,16 +103,6 @@
     </div>
   </div>
 
-  <!-- Section 5: Materials -->
-  <div class="section" data-anchor="materials">
-    <div class="flex flex-col items-center justify-center p-8 h-full bg-gray-100">
-      <h2 class="text-4xl font-bold text-gray-800 mb-4 animate-fade-in-up">자료실</h2>
-      <p class="text-lg text-gray-600 mb-8 text-center animate-fade-in-down">학습 자료와 워크시트를 무료로 다운로드하여 활용해보세요.</p>
-      <img src="https://placehold.co/600x400/a5b4fc/FFFFFF?text=MATERIALS" alt="자료실 이미지" class="rounded-lg shadow-xl animate-fade-in-up">
-    </div>
-  </div>
-
-  <!-- Section 6: Community -->
   <div class="section" data-anchor="community">
     <div class="flex flex-col items-center justify-center p-8 h-full bg-center-cover bg-[url('https://placehold.co/1920x1080/fcd34d/FFFFFF?text=COMMUNITY')]">
       <h2 class="text-5xl font-extrabold text-white text-shadow-lg drop-shadow-md mb-4 animate-fade-in-down">함께 배우는 커뮤니티</h2>
@@ -122,16 +110,8 @@
       <button class="px-8 py-4 bg-white text-yellow-600 font-bold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">커뮤니티 가기</button>
     </div>
   </div>
-
-  <!-- Section 7: Point Shop -->
-  <div class="section" data-anchor="shop">
-    <div class="flex flex-col items-center justify-center p-8 h-full bg-white">
-      <h2 class="text-4xl font-bold text-gray-800 mb-4 animate-fade-in-down">포인트 상점</h2>
-      <p class="text-lg text-gray-600 mb-8 text-center animate-fade-in-up">다양한 활동으로 포인트를 모아 원하는 아이템으로 교환하세요.</p>
-      <img src="https://placehold.co/600x400/8d8a7c/FFFFFF?text=POINT+SHOP" alt="포인트 상점 이미지" class="rounded-lg shadow-xl animate-fade-in-down">
-    </div>
-  </div>
 </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.1.2/fullpage.min.js"></script>
 
@@ -143,8 +123,8 @@
       autoScrolling: true,
       navigation: true,
       anchors: ['home', 'learn', 'vocabulary', 'video-learn', 'materials', 'community', 'shop'],
-      sectionsColor: ['#B5D0E3', '#f8f9fa', '#e2e8f0', '#ffffff', '#e2e8f0', '#fcd34d', '#ffffff'],
-      fixedElements: '#fullpage-header, #fullpage-footer',
+      sectionsColor: ['#FFFDF6', '#f8f9fa', '#e2e8f0', '#ffffff', '#e2e8f0', '#fcd34d', '#ffffff'],
+      // fixedElements: '#fullpage-header, #fullpage-footer',  <-- 이 부분을 제거했습니다.
 
       onLeave: function(origin, destination, direction) {
         // Remove animation classes from previous section
