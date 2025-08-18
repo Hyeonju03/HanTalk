@@ -39,7 +39,7 @@
 
   <div class="section relative flex flex-col items-center justify-center p-8 overflow-hidden bg-[#FFFDF6]">
     <div class="absolute inset-0 z-0">
-      <img src="https://placehold.co/200x200/F29DA0/FFFFFF?text=Book+Icon"
+      <img src="https://placehold.co/200x200/F29DA0/FFFFFF?text=Han+Talk!"
            alt="한 톡!"
            class="absolute top-12 right-12 w-32 h-auto animate-float-slow"
            style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
@@ -47,7 +47,7 @@
 
     <div class="relative z-10 flex flex-col items-center justify-center text-center">
       <div class="relative w-[56rem] h-[36rem] mb-8">
-        <img src="/images/main_2.PNG"
+        <img src="/images/main.PNG"
              alt="HanTalk Main Image 1"
              class="absolute top-1/2 left-1/2 -translate-x-[120%] -translate-y-[70%] w-[80%] h-auto drop-shadow-lg z-10 transition-all duration-500 ease-in-out"
              style="filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));">
@@ -59,47 +59,83 @@
       </div>
     </div>
 
-    <div class="absolute top-1/2 -translate-y-1/2 right-40 z-20">
+    <div class="absolute top-[43%] -translate-y-1/2 right-[105px] z-20">
       <h1 class="text-7xl font-extrabold text-[#2F4160] mb-6 animate-fade-in-down drop-shadow-lg">'한톡'</h1>
       <p class="text-4xl text-[#2F4160] mb-12 animate-fade-in-up drop-shadow-lg">한글 학습의 새로운 시작</p>
       <a th:href="@{/hantalk/home}"
-         class="px-20 py-6 bg-[#F29DA0] text-white font-extrabold rounded-full shadow-2xl transition-all duration-500 ease-in-out transform hover:scale-110 hover:bg-[#F29DA0] hover:saturate-150 animate-pulse-slow text-xl">
+         class="px-20 py-6 bg-[#F29DA0] text-white font-extrabold rounded-full shadow-2xl transition-all duration-500 ease-in-out transform hover:scale-110 hover:bg-[#2F4160] hover:saturate-150 animate-pulse-slow text-xl">
         <span class="relative z-10">시작하기</span>
       </a>
     </div>
   </div>
 
   <div class="section" data-anchor="learn">
-    <div class="flex flex-col lg:flex-row items-center justify-center p-8 h-full bg-white">
-      <div class="lg:w-1/2 p-4 text-center lg:text-left animate-slide-in-left">
-        <h2 class="text-4xl font-bold text-gray-800 mb-4">한글 학습</h2>
-        <p class="text-lg text-gray-600 mb-4">재미있는 게임과 다양한 콘텐츠로 한글을 쉽고 재미있게 배워보세요.</p>
-        <button class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition duration-300">자세히 보기</button>
+    <div class="flex flex-col lg:flex-row items-center justify-center p-8 h-full">
+      <div class="lg:w-1/2 p-4 text-center lg:text-center animate-slide-in-left">
+        <h2 class="text-4xl font-bold text-gray-800 mb-4">" 한글 학습 "</h2>
+
+        <p class="text-lg text-gray-600 mb-6 font-semibold">
+          게임처럼 즐기며 배우는 우리말 학습!
+        </p>
+        <p class="text-lg text-gray-600 mb-4">
+          게임을 즐기면서 한국어를 자연스럽게 배워보세요! <br>
+          재미있는 학습 경험으로 한국어에 대한 흥미가 쑥쑥 올라가고, <br>
+          우리말을 더 자신 있게 사용할 수 있도록 도와드릴게요! ✨
+        </p>
       </div>
       <div class="lg:w-1/2 flex justify-center p-4">
-        <img src="https://placehold.co/600x400/2596be/FFFFFF?text=LEARN+KOREAN" alt="한글 학습 이미지" class="rounded-lg shadow-xl animate-fade-in-right">
+        <img src="/images/game_study.png"
+             alt="한글 학습 이미지"
+             class="rounded-lg shadow-xl animate-fade-in-right"
+             style="transform: translateX(-50px);">
       </div>
     </div>
   </div>
 
   <div class="section" data-anchor="vocabulary">
-    <div class="flex flex-col lg:flex-row items-center justify-center p-8 h-full bg-gray-100">
+    <div class="flex flex-col lg:flex-row items-center justify-center p-8 h-full">
       <div class="lg:w-1/2 flex justify-center p-4">
-        <img src="https://placehold.co/600x400/94a3b8/FFFFFF?text=VOCABULARY+BOOK" alt="단어장 이미지" class="rounded-lg shadow-xl animate-fade-in-left">
+        <img src="/images/vocabulary_book.png"
+             alt="오답노트 이미지"
+             class="rounded-lg shadow-xl animate-fade-in-left">
       </div>
-      <div class="lg:w-1/2 p-4 text-center lg:text-left animate-slide-in-right">
-        <h2 class="text-4xl font-bold text-gray-800 mb-4">나만의 단어장</h2>
-        <p class="text-lg text-gray-600 mb-4">새롭게 배운 단어를 저장하고 언제든지 복습할 수 있는 단어장을 만들어보세요.</p>
-        <button class="px-6 py-3 bg-gray-800 text-white font-semibold rounded-full shadow-md hover:bg-gray-900 transition duration-300">자세히 보기</button>
+
+      <div class="lg:w-1/2 p-4 text-center lg:text-center animate-slide-in-right">
+        <h2 class="text-4xl font-bold text-gray-800 mb-4">" 나만의 단어장 "</h2>
+
+        <p class="text-lg text-gray-600 mb-6 font-semibold">
+          오답노트로 나만의 단어장을 채워보세요!
+        </p>
+        <p class="text-lg text-gray-600 mb-2">
+          퀴즈와 게임으로 한국어를 신나게 배우다 보면, 틀린 문제는 오답노트에 쏙쏙 담아드려요.<br>
+          놓쳤던 단어와 문장들을 다시 한번 복습하면서 나만의 실력을 쑥쑥 키워보세요! ✨
+        </p>
       </div>
     </div>
   </div>
 
   <div class="section" data-anchor="video-learn">
-    <div class="flex flex-col items-center justify-center p-8 h-full bg-white">
-      <h2 class="text-4xl font-bold text-gray-800 mb-4 animate-fade-in-down">비디오 학습</h2>
-      <p class="text-lg text-gray-600 mb-8 text-center animate-fade-in-up">다양한 주제의 비디오 콘텐츠로 한글을 생생하게 배워보세요.</p>
-      <img src="https://placehold.co/600x400/81c2d5/FFFFFF?text=VIDEO+LEARN" alt="비디오 학습 이미지" class="rounded-lg shadow-xl animate-fade-in-down">
+    <div class="flex flex-col items-center justify-center p-8 h-full">
+
+      <div class="p-4 text-center animate-fade-in-up">
+        <h2 class="text-4xl font-bold text-gray-800 mb-4">
+          " 영상 강의 학습 "
+        </h2>
+        <p class="text-lg text-gray-600 mb-6 font-semibold">
+          영상으로 배우는 한국어 기본 상식!
+        </p>
+        <p class="text-lg text-gray-600 mb-8">
+          영상을 통해 한국어의 기초 상식과 맞춤법을 익혀보세요.<br>
+          체계적인 강의로 우리말을 더 정확하고 자신 있게 쓸 수 있도록 도와드릴게요! 😊
+        </p>
+      </div>
+
+      <div class="flex justify-center p-4 animate-fade-in-down">
+        <img src="/images/video_study.png"
+             alt="비디오 학습 이미지"
+             class="rounded-lg shadow-xl"
+             style="transform: scale(1.0); transition: transform 0.3s ease; max-width: 80%;">
+      </div>
     </div>
   </div>
 
@@ -122,9 +158,8 @@
       licenseKey: 'open-source-gplv3-license',
       autoScrolling: true,
       navigation: true,
-      anchors: ['home', 'learn', 'vocabulary', 'video-learn', 'materials', 'community', 'shop'],
-      sectionsColor: ['#FFFDF6', '#f8f9fa', '#e2e8f0', '#ffffff', '#e2e8f0', '#fcd34d', '#ffffff'],
-      // fixedElements: '#fullpage-header, #fullpage-footer',  <-- 이 부분을 제거했습니다.
+      anchors: ['home', 'learn', 'vocabulary', 'video-learn', 'community'],
+      sectionsColor: ['#E2F2E4', '#FEEA84', '#87CEEB', '#BA68C8', '#fcd34d'],
 
       onLeave: function(origin, destination, direction) {
         // Remove animation classes from previous section
