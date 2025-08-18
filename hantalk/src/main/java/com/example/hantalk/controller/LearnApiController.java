@@ -22,7 +22,7 @@ public class LearnApiController {
     private final VocaService vocaService;
     private final SentenceService sentenceService;
 
-    // 단어 or 문장만 선택 가능
+/*    // 단어 or 문장만 선택 가능
     @GetMapping(path="/one", produces="application/json")
     public Map<String, Object> getOne(
             @RequestParam(name="kind", required=false, defaultValue="word") String kind) {
@@ -33,18 +33,6 @@ public class LearnApiController {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "항목이 없습니다.");
         }
-    }
-
-    private VocaDTO pickWord() {
-        List<VocaDTO> list = vocaService.getFillBlank(Collections.emptyList(), 1);
-        if (list.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "단어가 없습니다.");
-        return list.get(0);
-    }
-
-    private SentenceDTO pickSentence() {
-        SentenceDTO s = sentenceService.getSelectRandom();
-        if (s == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문장이 없습니다.");
-        return s;
     }
 
     private Map<String, Object> fromVoca(VocaDTO vocaDTO) {
@@ -61,19 +49,54 @@ public class LearnApiController {
         map.put("text", sentenceDTO.getMunjang());
         map.put("mean", sentenceDTO.getDescription());
         return map;
-    }
+    }*/
 
+    // ✅ 최소 수정: 기존 /both 유지 + stage 파라미터로 분기 (기본=3: 단어+문장)
     @GetMapping(path="/both", produces="application/json")
-    public Map<String, Object> getBoth() {
+    public Map<String, Object> getBoth(@RequestParam(name="stage", defaultValue="3") int stage) {
+        Map<String, Object> map = new LinkedHashMap<>();
+
+        if (stage == 1) { // 단어만
+            VocaDTO v = pickWord();
+            map.put("vocabulary", v.getVocabulary());
+            map.put("descriptionWord", v.getDescription());
+            map.put("vocaId", v.getVocaId());
+            return map;
+        }
+
+        if (stage == 2) { // 문장만
+            SentenceDTO s = pickSentence();
+            map.put("munjang", s.getMunjang());
+            map.put("descriptionMunjang", s.getDescription());
+            map.put("sentenceId", s.getSentenceId());
+            map.put("munjangDisplay", s.getMunjang() == null ? "" : s.getMunjang().replace('^',' ').trim());
+            return map;
+        }
+
+        // stage == 3 (기본): 단어 + 문장
         VocaDTO v = pickWord();
         SentenceDTO s = pickSentence();
-
-        Map<String, Object> map = new LinkedHashMap<>();
         map.put("vocabulary", v.getVocabulary());
         map.put("descriptionWord", v.getDescription());
         map.put("munjang", s.getMunjang());
         map.put("descriptionMunjang", s.getDescription());
+        map.put("vocaId", v.getVocaId());
+        map.put("sentenceId", s.getSentenceId());
+        map.put("munjangDisplay", s.getMunjang() == null ? "" : s.getMunjang().replace('^',' ').trim());
         return map;
+    }
+
+
+    private VocaDTO pickWord() {
+        List<VocaDTO> list = vocaService.getFillBlank(Collections.emptyList(), 1);
+        if (list.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "단어가 없습니다.");
+        return list.get(0);
+    }
+
+    private SentenceDTO pickSentence() {
+        SentenceDTO s = sentenceService.getSelectRandom();
+        if (s == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문장이 없습니다.");
+        return s;
     }
 
 }
