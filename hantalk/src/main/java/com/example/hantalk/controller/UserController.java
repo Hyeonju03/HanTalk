@@ -135,16 +135,18 @@ public class UserController {
         if ("ADMIN".equals(role)) {
             newSession.setAttribute("userNo", 1);
             newSession.setAttribute("role", "ADMIN");
+            newSession.setAttribute("isAdmin", true);
         } else {
             UsersDTO user = service.getUserOne(userId);
             newSession.setAttribute("userNo", user.getUserNo());
             newSession.setAttribute("role", "USER");
+            newSession.setAttribute("isAdmin", false);
 
             // 러닝로그 세팅하는 부분
             Learning_LogService.setLearningLog(userId);
         }
         newSession.setMaxInactiveInterval(1800); //세션 시간제한 설정
-        return "redirect:/";
+        return "redirect:/hantalk/home";
 
     }
 
@@ -152,6 +154,17 @@ public class UserController {
     @GetMapping("/user/logout")
     public String logout(HttpSession session) {
         session.invalidate();
+        return "redirect:/";
+    }
+
+    // 관리자 메인페이지
+    @GetMapping("/admin")
+    public String adminPage(HttpSession session) {
+        // 세션에 isAdmin 속성이 true일 때만 접근 허용
+        if (session.getAttribute("isAdmin") != null && (boolean) session.getAttribute("isAdmin")) {
+            return "userPage/adminMain";
+        }
+        // 관리자가 아니면 로그인 페이지로 리다이렉트
         return "redirect:/user/login";
     }
 
