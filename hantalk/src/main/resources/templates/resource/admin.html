@@ -20,28 +20,26 @@
     }
   </style>
 </head>
-<body class="bg-[#f3f4f6] text-[#2F4160] min-h-screen flex flex-col">
+<body class="bg-gray-100 text-[#2F4160] min-h-screen flex flex-col">
 
 <!-- 헤더 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
 <div class="flex-grow flex">
-  <!-- 사이드바 (사용자 자료실 테마 적용) -->
+  <!-- 사이드바 -->
   <nav class="w-72 bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm flex-shrink-0 fixed h-full">
     <div class="mb-8">
       <h2 class="text-2xl font-bold text-[#2F4160]">📁 메뉴</h2>
     </div>
     <ul class="space-y-2">
-      <!-- '관리자 메인' 링크 -->
       <li>
         <a th:href="@{/resource/admin/main}"
-           class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
-          <i class="fas fa-list-alt mr-3"></i> <!-- 사용자 자료실 아이콘으로 변경 -->
-          <span>관리자 메인</span>
+           class="flex items-center p-3 text-[#2F4160] hover:bg-gray-200 rounded-lg transition-colors duration-200">
+          <i class="fas fa-list-alt mr-3"></i> <span>관리자 메인</span>
         </a>
       </li>
       <li>
-        <a th:href="@{/resource/main}" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F299A0]/80 rounded-lg transition-colors duration-200">
+        <a th:href="@{/resource/main}" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
           </svg>
@@ -51,14 +49,12 @@
     </ul>
   </nav>
 
-  <!-- 본문 영역 (사이드바 너비에 맞춰 여백 조정) -->
   <div class="flex-1 ml-72 flex flex-col p-0">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl mx-auto flex-grow">
       <div class="p-8">
         <div class="flex justify-between items-center mb-6">
           <h1 class="text-3xl font-bold text-[#2F4160]">관리자 자료실</h1>
-          <!-- '자료 등록하기' 버튼은 이제 항상 표시됩니다. 서버에서 권한을 처리해야 합니다. -->
-          <a th:href="@{/resource/chuga}" class="bg-[#F29DA0] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center">
+          <a th:href="@{/resource/chuga}" class="bg-[#4B4B4B] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center">
             <i class="fas fa-plus mr-2"></i>
             자료 등록하기
           </a>
@@ -68,7 +64,7 @@
           <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword} ?: ''"
                  class="p-2 border border-gray-300 rounded-lg w-72 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]" />
           <button type="submit"
-                  class="bg-[#F29DA0] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 ml-2">
+                  class="bg-[#4B4B4B] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 ml-2">
             <i class="fas fa-search mr-1"></i>검색
           </button>
         </form>
@@ -93,7 +89,7 @@
                 class="hover:bg-gray-50 transition duration-150 table-row-clickable">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${resourcePage.number * resourcePage.size + iterStat.index + 1}">1</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${resource.title}">제목</td>
-              <td class="px-6 py-4 text-sm text-gray-800" th:text="${#strings.length(resource.content) > 30 ? #strings.substring(resource.content, 0, 30) + '...' : resource.content}">내용</td>
+              <td class="px-6 py-4 text-sm text-gray-800 break-words" th:text="${#strings.length(resource.content) > 30 ? #strings.substring(resource.content, 0, 30) + '...' : resource.content}">내용</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                   <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}" class="flex justify-center items-center gap-1.5 text-sm">
                     <a th:href="@{'/resource/admin/preview/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
@@ -115,10 +111,9 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">관리자</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <!-- '수정' 및 '삭제' 버튼에 걸려있던 th:if 조건을 제거하여 항상 표시되도록 변경 -->
                 <div class="flex justify-center items-center space-x-2">
                   <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
-                     class="bg-[#2F4160] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#F29DA0] transition duration-300"
+                     class="bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300"
                      onclick="event.stopPropagation();"><i class="fas fa-edit"></i> 수정</a>
                   <button type="button"
                           class="bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 ml-2"
@@ -135,7 +130,6 @@
           </table>
         </div>
 
-        <!-- Pagination -->
         <div class="flex justify-center mt-8 space-x-2">
           <span th:if="${resourcePage.hasPrevious()}" class="inline-flex">
             <a th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}" class="bg-white text-[#2F4160] font-semibold py-2 px-4 rounded-lg hover:bg-[#f3f4f6] transition duration-300">이전</a>
@@ -182,7 +176,6 @@
   }
 </script>
 
-<!-- 푸터 삽입 -->
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 </body>

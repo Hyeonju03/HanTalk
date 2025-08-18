@@ -15,7 +15,7 @@
 
         <div class="p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
             <h2 class="text-3xl font-bold mb-4 text-center">관리자 아이템 목록</h2>
-            <a href="/item/chuga" class="block w-fit mx-auto bg-[#F29DA0] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
+            <a href="/item/chuga" class="block w-fit mx-auto bg-[#4B4B4B] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
                 ➕ 아이템 추가
             </a>
         </div>
@@ -44,7 +44,7 @@
                     <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.price}"></td>
                     <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.itemDescription}"></td>
                     <td class="py-4 px-6 text-sm">
-                        <a th:href="@{'/item/sujung/' + ${item.itemId}}" class="text-[#2F4160] hover:underline">수정</a> <!-- '수정' 글씨 색상 변경 -->
+                        <a th:href="@{'/item/sujung/' + ${item.itemId}}" class="text-[#2F4160] hover:underline">수정</a>
                     </td>
                     <td class="py-4 px-6 text-sm">
                         <a th:href="@{'/item/sakje/' + ${item.itemId}}" class="text-red-500 hover:underline">삭제</a>

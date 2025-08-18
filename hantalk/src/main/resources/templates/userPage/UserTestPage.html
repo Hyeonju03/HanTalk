@@ -1,42 +1,53 @@
 <!DOCTYPE html>
-<html lang="kr">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>유저 기능 테스트용</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>유저 기능 테스트</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
     <style>
+        /* Nanum Gothic 폰트 설정 */
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            text-align: center;
-            padding: 50px;
-        }
-        h1 {
-            color: #333;
-        }
-        a {
-            display: block;
-            margin: 15px auto;
-            padding: 10px 20px;
-            width: 250px;
-            text-decoration: none;
-            background: #4CAF50;
-            color: white;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        a:hover {
-            background: #45a049;
+            font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
         }
     </style>
 </head>
-<body>
-<h1>유저 기능 테스트 폐이지</h1>
-<h2>관리자 로그인을 해야 기능 사용이 가능합니다.</h2>
-<h2>ID : admin<br>PW: 11111</h2>
-<a href="/user/login">로그인 / 회원가입 테스트</a>
-<a href="/user/logout">로그아웃</a>
-<a href="/user/admin/list">회원 기능 테스트 (회원목록)</a>
-<a href="/admin/getLogdata">전체 로그 확인 (관리자용)</a>
-<a href="/user/view">마이 페이지로</a>
+<body class="bg-gray-100 text-[#2F4160] min-h-screen flex flex-col items-center justify-center p-8">
+
+<div class="bg-white rounded-xl shadow-xl p-10 max-w-lg w-full text-center">
+    <h1 class="text-3xl font-bold mb-2">유저 기능 테스트 페이지</h1>
+    <h2 class="text-lg text-gray-600 mb-6">관리자 로그인을 해야 기능 사용이 가능합니다.</h2>
+    <h2 class="text-lg text-gray-600 mb-8">
+        <span class="font-semibold text-blue-800">ID : admin</span><br>
+        <span class="font-semibold text-blue-800">PW: 11111</span>
+    </h2>
+
+    <div class="space-y-4">
+        <a href="/user/login"
+           class="bg-[#4B4B4B] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center justify-center">
+            <i class="fas fa-sign-in-alt mr-2"></i> 로그인 / 회원가입 테스트
+        </a>
+        <a href="/user/logout"
+           class="bg-[#4B4B4B] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center justify-center">
+            <i class="fas fa-sign-out-alt mr-2"></i> 로그아웃
+        </a>
+        <a href="/user/admin/list"
+           class="bg-[#4B4B4B] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center justify-center">
+            <i class="fas fa-users-cog mr-2"></i> 회원 기능 테스트 (회원목록)
+        </a>
+        <a href="/admin/getLogdata"
+           class="bg-[#4B4B4B] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center justify-center">
+            <i class="fas fa-chart-line mr-2"></i> 전체 로그 확인 (관리자용)
+        </a>
+        <a href="/user/view"
+           class="bg-[#4B4B4B] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center justify-center">
+            <i class="fas fa-user-circle mr-2"></i> 마이 페이지로
+        </a>
+    </div>
+</div>
+
 </body>
 </html>

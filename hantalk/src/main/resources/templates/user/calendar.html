@@ -10,9 +10,8 @@
     /* 이 부분은 Tailwind CSS로 직접 구현하기 어려운 z-index, position 속성 등을 위해 유지합니다. */
     .profile-container {
       position: relative;
-
-      width: 112px; /* 28 * 4px */
-      height: 112px; /* 28 * 4px */
+      width: 112px;
+      height: 112px;
       margin: 0 auto;
     }
     .profile-image, .profile-frame {
@@ -33,40 +32,31 @@
     }
   </style>
 </head>
-<!-- 배경색과 기본 텍스트 색상 통일 -->
-<!-- overflow-y: scroll; 추가하여 세로 스크롤바 항상 표시 -->
 <body class="bg-[#f3f4f6] flex flex-col min-h-screen font-sans text-[#2F4160] overflow-y-scroll">
 
-<!-- 헤더 fragments 포함 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
 <div class="flex-grow flex">
-  <!-- 사이드바 fragments 포함 -->
   <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-  <!-- 메인 콘텐츠 영역 -->
   <div class="flex-grow p-8">
-    <!-- 제목 색상 통일 -->
     <h1 class="text-3xl font-bold text-[#2F4160] mb-6">출석 캘린더</h1>
 
-    <!-- 메인 페이지와 동일한 카드 스타일 적용 -->
     <div class="bg-white rounded-xl shadow-xl">
-      <!-- 캘린더 헤더 (월 이동 버튼 및 현재 월) -->
       <div class="flex items-center justify-between border-b border-[#E0E0E0] p-3 select-none">
         <button id="prevMonth" class="text-2xl hover:text-[#F29DA0] text-[#2F4160]">◀</button>
         <div id="currentMonth" class="text-xl font-semibold text-[#2F4160]"></div>
         <button id="nextMonth" class="text-2xl hover:text-[#F29DA0] text-[#2F4160]">▶</button>
       </div>
 
-      <!-- 요일 표시 -->
       <div class="grid grid-cols-7 text-sm text-center uppercase border-b border-[#E0E0E0]">
-        <div class="py-2 text-red-600">SUN</div> <!-- 일요일은 빨간색 유지 (일반적인 캘린더 관례) -->
+        <div class="py-2 text-red-600">SUN</div>
         <div class="py-2 text-[#2F4160]">MON</div>
         <div class="py-2 text-[#2F4160]">TUE</div>
         <div class="py-2 text-[#2F4160]">WED</div>
         <div class="py-2 text-[#2F4160]">THU</div>
         <div class="py-2 text-[#2F4160]">FRI</div>
-        <div class="py-2 text-blue-600">SAT</div> <!-- 토요일은 파란색 유지 (일반적인 캘린더 관례) -->
+        <div class="py-2 text-blue-600">SAT</div>
       </div>
 
       <div id="calendar" class="grid grid-cols-7 gap-1 p-2 text-center text-base text-[#2F4160]">
@@ -74,18 +64,14 @@
     </div>
 
     <div class="text-center mt-6">
-      <!-- 출석 버튼 스타일 통일 -->
       <button id="checkInButton" class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-3 px-6 rounded-lg shadow-md text-lg transition-colors duration-200">
         오늘 출석하기
       </button>
-      <!-- "마이 페이지로" 링크 스타일 통일 -->
       <a href="/user/view" class="text-[#2F4160] hover:text-[#F29DA0] hover:underline text-lg block mt-4 transition-colors duration-200">마이 페이지로</a>
     </div>
   </div>
 </div>
 
-<!-- 커스텀 알림 모달 -->
-<!-- modal 스타일을 직접 Tailwind 클래스로 변환 -->
 <div id="alertModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-40 hidden">
   <div class="bg-white p-5 md:p-6 border border-[#E0E0E0] max-w-sm w-11/12 rounded-lg text-center text-[#2F4160] shadow-md">
     <span class="text-[#2F4160] float-right text-2xl font-bold cursor-pointer hover:text-[#F29DA0]" id="alertCloseBtn">&times;</span>
@@ -99,46 +85,41 @@
   const monthLabel = document.getElementById('currentMonth');
   const checkInButton = document.getElementById('checkInButton');
 
-  // 커스텀 모달 관련 요소
   const alertModal = document.getElementById('alertModal');
   const alertCloseBtn = document.getElementById('alertCloseBtn');
-  const confirmAlertCloseBtn = document.getElementById('confirmAlertCloseBtn'); // 확인 버튼 추가
+  const confirmAlertCloseBtn = document.getElementById('confirmAlertCloseBtn');
   const alertMessage = document.getElementById('alertMessage');
 
-  // 커스텀 알림 모달 표시 함수 (alert() 대신 사용)
   function showAlert(message) {
       alertMessage.textContent = message;
-      alertModal.classList.remove('hidden'); // hidden 클래스 제거
-      alertModal.style.display = 'flex'; // flex로 표시
+      alertModal.classList.remove('hidden');
+      alertModal.style.display = 'flex';
   }
 
-  // 모달 닫기 버튼 이벤트
   alertCloseBtn.onclick = function() {
-      alertModal.classList.add('hidden'); // hidden 클래스 추가
+      alertModal.classList.add('hidden');
       alertModal.style.display = 'none';
   }
-  confirmAlertCloseBtn.onclick = function() { // 확인 버튼 클릭 시 닫기
+  confirmAlertCloseBtn.onclick = function() {
       alertModal.classList.add('hidden');
       alertModal.style.display = 'none';
   }
 
-
   window.onclick = function(event) {
       if (event.target == alertModal) {
-          alertModal.classList.add('hidden'); // hidden 클래스 추가
+          alertModal.classList.add('hidden');
           alertModal.style.display = 'none';
       }
   }
 
   const today = new Date();
   let currentYear = today.getFullYear();
-  let currentMonth = today.getMonth(); // 0~11
+  let currentMonth = today.getMonth();
 
-  // 캘린더 렌더링 (attendanceDates를 인자로 받음)
   function renderCalendar(attendanceDates) {
     calendarEl.innerHTML = '';
 
-    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0:일요일 ~ 6:토요일
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
     const lastDateOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
     monthLabel.textContent = `${currentYear}.${currentMonth + 1}`;
@@ -156,7 +137,6 @@
 
     for (let day = 1; day <= lastDateOfMonth; day++) {
       const cell = document.createElement('div');
-      // 캘린더 셀 기본 스타일
       cell.className = 'calendar-grid-cell relative rounded cursor-default border border-transparent hover:border-[#B5D0E3]/50';
 
       const dayText = document.createElement('div');
@@ -176,9 +156,8 @@
       const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       if (attendanceDates.includes(dateStr)) {
         const imgIcon = document.createElement('img');
-        // 이미지 경로를 '/image/chulsuk4.png'로 유지 (실제 경로가 맞다면)
         imgIcon.src = '/image/chulsuk4.png';
-        imgIcon.className = 'w-28 h-28 mx-auto'; /* w-30 -> w-28 로 변경 */
+        imgIcon.className = 'w-28 h-28 mx-auto';
 
         cell.appendChild(imgIcon);
 
@@ -187,9 +166,8 @@
         }
       }
 
-      // 오늘 날짜 셀 스타일 변경
       if (dateStr === todayStr && currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
-        cell.classList.add('border-2', 'border-[#F29DA0]', 'bg-[#B5D0E3]/20'); /* 테마 색상 적용 */
+        cell.classList.add('border-2', 'border-[#F29DA0]', 'bg-[#B5D0E3]/20');
       }
 
       calendarEl.appendChild(cell);
@@ -200,17 +178,17 @@
         checkInButton.disabled = false;
         checkInButton.textContent = '오늘 출석하기';
         checkInButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
-        checkInButton.classList.add('bg-[#F29DA0]', 'hover:bg-[#2F4160]'); /* 테마 색상 적용 */
+        checkInButton.classList.add('bg-[#F29DA0]', 'hover:bg-[#2F4160]');
       } else {
         checkInButton.disabled = true;
         checkInButton.textContent = '출석 완료!';
-        checkInButton.classList.remove('bg-[#F29DA0]', 'hover:bg-[#2F4160]'); /* 테마 색상 적용 */
+        checkInButton.classList.remove('bg-[#F29DA0]', 'hover:bg-[#2F4160]');
         checkInButton.classList.add('bg-gray-400', 'cursor-not-allowed');
       }
     } else {
       checkInButton.disabled = true;
       checkInButton.textContent = '출석할 수 없습니다';
-      checkInButton.classList.remove('bg-[#F29DA0]', 'hover:bg-[#2F4160]'); /* 테마 색상 적용 */
+      checkInButton.classList.remove('bg-[#F29DA0]', 'hover:bg-[#2F4160]');
       checkInButton.classList.add('bg-gray-400', 'cursor-not-allowed');
     }
   }
@@ -267,8 +245,7 @@
 
   fetchAndRender();
 </script>
-<!-- 푸터 프래그먼트 삽입 -->
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<div th:replace="~{fragments/footer :: footerFragment}" class="w-full"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
