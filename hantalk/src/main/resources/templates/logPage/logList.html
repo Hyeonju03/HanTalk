@@ -1,210 +1,149 @@
 <!DOCTYPE html>
-<html lang="kr" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>로그 데이터</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HanTalk - 로그 데이터</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
-        padding: 20px;
-        text-align: center;
-    }
-    h1 { color: #333; }
-    .filter-info {
-        background: #4CAF50;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        display: inline-block;
-        margin-bottom: 15px;
-    }
-    .filter-buttons {
-        margin: 10px auto 20px;
-    }
-    .filter-buttons button {
-        padding: 8px 16px;
-        background: #2196F3;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 4px;
-        margin: 0 5px;
-    }
-    .filter-buttons button:hover { background: #1976D2; }
-    .filter-section {
-        background: #fff;
-        width: 65%;
-        margin: 10px auto;
-        padding: 15px;
-        border-radius: 6px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        display: none; /* ✅ 처음엔 숨김 */
-    }
-    .filter-section h3 { margin-bottom: 10px; color: #4CAF50; }
-    .filter-section input {
-        padding: 8px;
-        margin: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-    .filter-section button {
-        padding: 8px 16px;
-        background: #4CAF50;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 4px;
-    }
-    .filter-section button:hover { background: #45a049; }
-    button.toggle {
-        padding: 8px 16px;
-        margin: 10px 0;
-        background: #4CAF50;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 4px;
-    }
-    table {
-        width: 95%;
-        margin: 0 auto;
-        border-collapse: collapse;
-        background: white;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        table-layout: fixed;
-    }
-    th {
-        background: #4CAF50;
-        color: white;
-        padding: 10px;
-    }
-    td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        word-wrap: break-word;
-    }
-    tr:nth-child(even) { background: #f9f9f9; }
+    /* 커스텀 스타일이나 컴포넌트 스타일이 필요하다면 여기에 추가 */
   </style>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-8">
 
-<h1>로그 데이터</h1>
-<a href="/user/test">테스트 페이지로</a><br>
-<a href="/user/logout">로그아웃</a>
+<div th:replace="~{fragments/header :: headerFragment(isLoggedIn=${isLoggedIn})}"></div>
 
-<!-- ✅ 필터 정보 표시 -->
-<div th:if="${filter}" class="filter-info">
-  [[${filter}]]
-</div>
+<main class="w-full max-w-7xl mx-auto flex-grow">
+  <div class="container mx-auto px-4 py-8">
 
-<!-- ✅ 필터 선택 버튼 -->
-<div class="filter-buttons">
-  <button onclick="showFilter('userFilter')">사용자별</button>
-  <button onclick="showFilter('dateFilter')">기간별</button>
-  <button onclick="showFilter('userDateFilter')">사용자+기간</button>
-</div>
+    <div class="flex flex-col items-center justify-center mb-10">
+      <h1 class="text-4xl font-bold text-gray-800 mb-4">로그 데이터</h1>
+      <a href="/admin" class="text-lg text-blue-600 hover:text-blue-800 transition duration-300">
+        &larr; 관리자 페이지로
+      </a>
+    </div>
 
-<!-- ✅ 사용자별 보기 -->
-<div id="userFilter" class="filter-section">
-  <h3>사용자별 로그 보기</h3>
-  <form method="get" onsubmit="this.action='/user/' + document.getElementById('userNoInput').value; return true;">
-    <label>사용자 번호:</label>
-    <input type="number" id="userNoInput" placeholder="예: 1" required>
-    <button type="submit">검색</button>
-  </form>
-</div>
+    <div th:if="${filter}" class="bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md mb-6 mx-auto w-fit">
+      [[${filter}]]
+    </div>
 
-<!-- ✅ 기간별 보기 -->
-<div id="dateFilter" class="filter-section">
-  <h3>기간별 로그 보기</h3>
-  <form method="get" action="/date">
-    <label>시작일:</label>
-    <input type="date" name="start" required>
-    <label>종료일:</label>
-    <input type="date" name="end" required>
-    <button type="submit">검색</button>
-  </form>
-</div>
+    <div class="flex flex-wrap justify-center gap-4 mb-8">
+      <button onclick="showFilter('allLogs')" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
+        전체 로그 보기
+      </button>
+      <button onclick="showFilter('userFilter')" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
+        사용자별
+      </button>
+      <button onclick="showFilter('dateFilter')" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
+        기간별
+      </button>
+      <button onclick="showFilter('userDateFilter')" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
+        사용자+기간
+      </button>
 
-<!-- ✅ 사용자 + 기간별 보기 -->
-<div id="userDateFilter" class="filter-section">
-<h3>사용자 + 기간별 로그 보기</h3>
-<form method="get" action="/user-date">
-  <label>사용자 번호:</label>
-  <input type="number" name="userNo" placeholder="예: 1" required>
-  <label>시작일:</label>
-  <input type="date" name="start" required>
-  <label>종료일:</label>
-  <input type="date" name="end" required>
-  <button type="submit">검색</button>
-</form>
-</div>
+    </div>
 
-<!-- ✅ 전체 로그 보기 -->
-<div class="filter-section" style="display:block;">
-  <form method="get" action="/admin/getLogdata">
-    <button type="submit">전체 로그 보기</button>
-  </form>
-</div>
+    <div id="userFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
+      <h3 class="text-xl font-semibold mb-4 text-green-700">사용자별 로그 보기</h3>
+      <form method="get" onsubmit="this.action='/user/' + document.getElementById('userNoInput').value; return true;" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+        <input type="number" id="userNoInput" placeholder="사용자 번호: 예) 1" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <button type="submit" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors duration-300">
+          검색
+        </button>
+      </form>
+    </div>
 
-<!-- ✅ 로그 토글 버튼 -->
-<button id="toggleLog" class="toggle">로그 보기</button>
+    <div id="dateFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
+      <h3 class="text-xl font-semibold mb-4 text-green-700">기간별 로그 보기</h3>
+      <form method="get" action="/date" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+        <input type="date" name="start" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <input type="date" name="end" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <button type="submit" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors duration-300">
+          검색
+        </button>
+      </form>
+    </div>
 
-<!-- ✅ 로그 테이블 -->
-<div id="logContainer" style="display:none;">
-  <table>
-    <thead>
-    <tr>
-      <th>사용자ID</th>
-      <th>사용자</th>
-      <th>URI</th>
-      <th>메서드</th>
-      <th>디바이스</th>
-      <th>응답 코드</th>
-      <th>처리 시간(ms)</th>
-      <th>요청 시간</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="log : ${list}">
-      <td>[[${log.user.userId}]]</td>
-      <td>[[${log.user.name}]]</td>
-      <td>[[${log.uri}]]</td>
-      <td>[[${log.method}]]</td>
-      <td>[[${log.device}]]</td>
-      <td>[[${log.statusCode}]]</td>
-      <td>[[${log.responseTime}]]</td>
-      <td>[[${log.createDate}]]</td>
-    </tr>
-    </tbody>
-  </table>
-</div>
+    <div id="userDateFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
+      <h3 class="text-xl font-semibold mb-4 text-green-700">사용자 + 기간별 로그 보기</h3>
+      <form method="get" action="/user-date" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+        <input type="number" name="userNo" placeholder="사용자 번호: 예) 1" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <input type="date" name="start" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <input type="date" name="end" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <button type="submit" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors duration-300">
+          검색
+        </button>
+      </form>
+    </div>
+
+    <div id="allLogs" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
+      <h3 class="text-xl font-semibold mb-4 text-green-700">전체 로그 보기</h3>
+      <form method="get" action="/admin/getLogdata">
+        <button type="submit" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors duration-300">
+          전체 로그 보기
+        </button>
+      </form>
+    </div>
+
+    <div class="text-center mb-8">
+      <button id="toggleLog" class="px-8 py-4 bg-gray-700 text-white font-bold rounded-lg shadow-lg hover:bg-gray-800 transition-colors duration-300">
+        로그 보기
+      </button>
+    </div>
+
+    <div id="logContainer" class="hidden">
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full">
+          <thead class="bg-gray-200">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">사용자ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">사용자</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URI</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">메서드</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">디바이스</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">응답 코드</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">처리 시간(ms)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">요청 시간</th>
+          </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+          <tr th:each="log : ${list}">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.user.userId}]]</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.user.name}]]</td>
+            <td class="px-6 py-4 text-sm text-gray-500">[[${log.uri}]]</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.method}]]</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.device}]]</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.statusCode}]]</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.responseTime}]]</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.createDate}]]</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script>
-  /* ✅ 검색 폼 표시 제어 */
   function showFilter(id) {
       document.querySelectorAll(".filter-section").forEach(section => {
-          section.style.display = "none";
+          section.classList.add("hidden");
       });
-      document.getElementById(id).style.display = "block";
+      document.getElementById(id).classList.remove("hidden");
   }
 
-  /* ✅ 로그 테이블 토글 */
   document.addEventListener("DOMContentLoaded", function() {
       const toggleBtn = document.getElementById("toggleLog");
       const logContainer = document.getElementById("logContainer");
 
       toggleBtn.addEventListener("click", function() {
-          const isHidden = logContainer.style.display === "none";
-          logContainer.style.display = isHidden ? "block" : "none";
-          toggleBtn.textContent = isHidden ? "로그 접기" : "로그 보기";
+          logContainer.classList.toggle("hidden");
+          const isHidden = logContainer.classList.contains("hidden");
+          toggleBtn.textContent = isHidden ? "로그 보기" : "로그 접기";
       });
   });
 </script>
-<!-- 푸터 프래그먼트 삽입 -->
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
