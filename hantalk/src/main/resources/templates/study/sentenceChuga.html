@@ -2,68 +2,134 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>문장 추가</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <!-- Google Fonts for Nanum Gothic -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+        }
+
+        /* Custom animation for message box */
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 p-8 font-sans antialiased flex flex-col min-h-screen">
+<body class="bg-[#f3f4f6] p-8 font-sans antialiased flex flex-col min-h-screen">
 
-<div class="bg-white p-8 rounded-lg shadow-md w-full max-w-3xl mx-auto">
+<!-- Thymeleaf fragments/header :: headerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
+<!-- <div th:replace="~{fragments/header :: headerFragment}"></div> -->
 
-    <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">문장 추가</h1>
+<div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-3xl mx-auto">
+
+    <h1 class="text-3xl font-bold text-[#2F4160] mb-8 text-center">📝 문장 추가</h1>
 
     <form id="sentenceForm" th:action="@{/study/sentenceInsertProc}" method="post" class="space-y-6">
 
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">치환 방식 선택:</label>
-            <div class="space-y-2 p-4 border border-gray-300 rounded-lg bg-gray-50">
+            <label class="block text-lg font-semibold text-[#2F4160] mb-2">치환 방식 선택:</label>
+            <div class="space-y-2 p-4 border border-gray-300 rounded-lg bg-[#FDFBFF]">
                 <div class="flex items-center">
                     <input type="radio" name="insertionType" id="autoInsert" value="auto" checked
-                           class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
-                    <label for="autoInsert" class="ml-3 block text-sm text-gray-800">^표시 자동 삽입</label>
+                           class="h-4 w-4 text-[#4B4B4B] border-gray-300 focus:ring-[#B5D0E3] cursor-pointer">
+                    <label for="autoInsert" class="ml-3 block text-base text-[#2F4160]">^표시 자동 삽입</label>
                 </div>
                 <div class="flex items-center">
                     <input type="radio" name="insertionType" id="manualInsert" value="manual"
-                           class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
-                    <label for="manualInsert" class="ml-3 block text-sm text-gray-800">^표시 수동 삽입</label>
+                           class="h-4 w-4 text-[#4B4B4B] border-gray-300 focus:ring-[#B5D0E3] cursor-pointer">
+                    <label for="manualInsert" class="ml-3 block text-base text-[#2F4160]">^표시 수동 삽입</label>
                 </div>
             </div>
         </div>
 
         <div>
-            <label for="munjang" class="block text-sm font-medium text-gray-700 mb-1">문장</label>
+            <label for="munjang" class="block text-lg font-semibold text-[#2F4160] mb-1">문장</label>
             <input type="text" name="munjang" id="munjang" placeholder="추가할 문장을 입력하세요"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3] text-[#2F4160]">
         </div>
 
         <div>
-            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">의미</label>
+            <label for="description" class="block text-lg font-semibold text-[#2F4160] mb-1">의미</label>
             <input type="text" name="description" id="description" placeholder="문장의 의미를 입력하세요"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3] text-[#2F4160]">
         </div>
 
         <div id="preview-container" class="mt-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">미리보기</label>
-            <div id="preview-sentence" class="mt-1 p-3 min-h-[44px] bg-gray-50 rounded-lg text-gray-700 font-semibold break-words border border-gray-300"></div>
+            <label class="block text-lg font-semibold text-[#2F4160] mb-1">미리보기</label>
+            <div id="preview-sentence" class="mt-1 p-3 min-h-[44px] bg-[#FDFBFF] rounded-lg text-[#2F4160] font-semibold break-words border border-gray-300"></div>
         </div>
 
         <div class="flex justify-end space-x-4 pt-4">
             <a href="/study/sentenceList/admin"
-               class="bg-gray-300 text-gray-700 font-medium py-2 px-6 rounded-lg shadow-md hover:bg-gray-400 transition-colors duration-300">
-                취소
+               class="bg-[#A0A0A0] text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-[#2F4160] hover:text-white transition-colors duration-300 flex items-center">
+                <i class="fas fa-times mr-2"></i> 취소
             </a>
             <button type="submit"
-                    class="bg-blue-500 text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
-                생성
+                    class="bg-[#4B4B4B] text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300 flex items-center">
+                <i class="fas fa-plus mr-2"></i> 생성
             </button>
         </div>
     </form>
 </div>
 
-<div th:replace="~{fragments/footer :: footerFragment}" class="mt-auto"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Thymeleaf fragments/footer :: footerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
+<!-- <div th:replace="~{fragments/footer :: footerFragment}" class="mt-auto"></div> -->
 
 <script>
+    // Custom message box function (reused from other admin pages)
+    function showCustomMessage(message, type = 'info') {
+        const messageBox = document.createElement('div');
+        messageBox.textContent = message;
+        let bgColor = '#2F4160'; // Default: Dark Navy
+        let textColor = 'white';
+
+        if (type === 'error') {
+            bgColor = '#F29DA0'; // Coral Pink for errors
+        } else if (type === 'success') {
+            bgColor = '#B5D0E3'; // Soft Sky Blue for success
+            textColor = '#2F4160'; // Dark Navy for text on success
+        }
+
+        messageBox.style.cssText = `
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: ${bgColor};
+            color: ${textColor};
+            padding: 15px 30px;
+            border-radius: 8px;
+            z-index: 1000;
+            font-size: 1.1em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            animation: fadeOut 3s forwards;
+        `;
+        document.body.appendChild(messageBox);
+
+        // Ensure the fadeOut keyframes are available (add only once)
+        if (!document.querySelector('style#fadeOutKeyframes')) {
+            const styleSheet = document.createElement("style");
+            styleSheet.id = "fadeOutKeyframes"; // Add an ID to prevent duplicates
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @keyframes fadeOut {
+                    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        }
+
+        setTimeout(() => {
+            messageBox.remove();
+        }, 3000);
+    }
+
     const form = document.getElementById('sentenceForm');
     const sentenceInput = document.getElementById('munjang');
     const descriptionInput = document.getElementById('description');
@@ -90,13 +156,13 @@
         const isAutoMode = autoInsertRadio.checked;
 
         if (sentence === '' || description === '') {
-            alert('문장과 의미를 모두 입력해주세요.');
+            showCustomMessage('문장과 의미를 모두 입력해주세요.', 'error'); // alert 대신 showCustomMessage 사용
             event.preventDefault();
             return;
         }
 
         if (!isAutoMode && !sentence.includes('^')) {
-            alert("스페이스바 대신 '^' 표시가 사용되어야 합니다.");
+            showCustomMessage("스페이스바 대신 '^' 표시가 사용되어야 합니다.", 'error'); // alert 대신 showCustomMessage 사용
             event.preventDefault();
             return;
         }

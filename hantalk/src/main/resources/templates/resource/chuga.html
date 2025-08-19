@@ -15,28 +15,10 @@
 <!-- 헤더 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex flex-1 w-full max-w-5xl mx-auto px-4 py-8 gap-8">
+<!-- 메인 콘텐츠를 감싸는 div: gap-8 제거, justify-center 추가 -->
+<div class="flex flex-1 w-full max-w-5xl mx-auto px-4 py-8 justify-center">
 
-  <!-- 사이드바 -->
-  <nav class="w-72 bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm flex-shrink-0">
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-[#2F4160]">📁 메뉴</h2>
-    </div>
-    <ul class="space-y-4"> <!-- 간격 조정: space-y-4로 통일 -->
-      <li>
-        <a href="/resource/admin/main" class="flex items-center p-3 text-[#2F4160] hover:bg-[#404040]/80 rounded-lg transition-colors duration-200">
-          <i class="fas fa-bars mr-3"></i> <!-- '관리자 메인' 아이콘 -->
-          <span>관리자 메인</span>
-        </a>
-      </li>
-      <li>
-        <a href="/resource/chuga" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
-          <i class="fas fa-plus-circle mr-3"></i> <!-- '자료 등록' 아이콘 -->
-          <span>자료 등록</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
+  <!-- 사이드바 제거됨 -->
 
   <!-- 본문 -->
   <main class="flex-1 p-8 bg-white rounded-xl shadow-xl">

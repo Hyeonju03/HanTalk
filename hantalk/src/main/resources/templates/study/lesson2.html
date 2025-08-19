@@ -1,93 +1,162 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>문장 순서 맞추기</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for Nanum Gothic -->
   <style>
-    .container {
-        min-height: 50px;
-        border: 2px dashed #ccc;
-        margin-bottom: 20px;
-        padding: 10px;
-        display: flex;
-        gap: 10px;
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
+    body {
+      font-family: 'Nanum Gothic', sans-serif;
     }
     .sentence-piece {
-        padding: 10px;
-        background-color: #f0f0f0; /* 회색으로 칠해져있는 칸 */
-        border: 1px solid #ddd;
         cursor: grab;
         user-select: none;
     }
     .is-dragging {
         opacity: 0.5;
+        border-style: dashed !important; /* 드래그 중에는 테두리를 점선으로 */
     }
 
-    #feedback-icon {
-        position: fixed; /* 화면 중앙에 고정 */
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 100px;
-        font-weight: bold;
-        display: none; /* 초기에는 숨김 */
-        z-index: 100; /* 다른 요소들 위에 표시 */
+    /* Custom animations for feedback icon */
+    @keyframes pulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+        50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    }
+    .animate-pulse {
+        animation: pulse 1s infinite;
     }
 
-    .correct {
-        color: green;
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translate(-50%, -50%) translateY(0); opacity: 0.8; }
+        40% { transform: translate(-50%, -50%) translateY(-10px); }
+        60% { transform: translate(-50%, -50%) translateY(-5px); }
+    }
+    .animate-bounce {
+        animation: bounce 1s infinite;
     }
 
-    .incorrect {
-        color: red;
-    }
-
-    #next-problem-button {
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 16px;
-        display: none;
-    }
-
+    /* Shake animation for incorrect answer */
     @keyframes shake {
-        10%, 90% { transform: translateX(-5px); }
-        20%, 80% { transform: translateX(5px); }
-        30%, 70% { transform: translateX(-5px); }
-        40%, 60% { transform: translateX(5px); }
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
     }
-
     .shake {
         animation: shake 0.5s ease-in-out;
     }
   </style>
 </head>
-<body>
-<h1>문장 순서 맞추기</h1>
+<body class="bg-[#FBF9F2] min-h-screen flex flex-col items-center p-4">
 
-<div id="shuffled-container" class="container">
+<h1 class="text-4xl font-extrabold text-[#2F4160] mb-8 mt-12">🧩 문장 순서 맞추기</h1>
+
+<div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl flex flex-col items-center space-y-6">
+
+  <!-- 지시문 -->
+  <p class="text-lg text-[#2F4160] font-semibold text-center leading-relaxed">
+    아래 문장 조각들을 드래그하여 올바른 순서로 배열하세요.
+  </p>
+
+  <!-- 드래그 가능한 조각들이 있는 컨테이너 -->
+  <div id="shuffled-container"
+       class="container min-h-[80px] w-full border-2 border-[#B5D0E3] rounded-lg p-3 flex flex-wrap gap-2 justify-center bg-gray-50 shadow-inner">
+    <!-- 문장 조각들이 여기에 동적으로 로드됩니다 -->
+  </div>
+
+  <!-- 구분선 -->
+  <hr class="w-full border-t-2 border-gray-200 my-4">
+
+  <!-- 사용자가 정렬할 컨테이너 -->
+  <div id="sorted-container"
+       class="container min-h-[80px] w-full border-2 border-[#F29DA0] rounded-lg p-3 flex flex-wrap gap-2 justify-center bg-gray-50 shadow-inner">
+    <!-- 문장 조각들이 여기에 드롭됩니다 -->
+  </div>
+
+  <div class="flex gap-4">
+    <button id="check-button"
+            class="bg-[#F29DA0] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#2F4160] transition duration-300 transform hover:scale-105 shadow-md">
+      정답 확인
+    </button>
+    <button id="next-problem-button" style="display: none;"
+            class="bg-[#B5D0E3] text-[#2F4160] px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#2F4160] hover:text-white transition duration-300 transform hover:scale-105 shadow-md">
+      다음 문제
+    </button>
+  </div>
+
+  <p id="result-message" class="text-xl font-bold mt-4 text-[#2F4160] text-center"></p>
+
 </div>
 
-<hr>
+<!-- 피드백 아이콘 (O/X) -->
+<div id="feedback-icon" class="hidden text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 z-10"></div>
 
-<div id="sorted-container" class="container">
+<!-- 하단 고정 버튼 -->
+<div class="fixed bottom-6 right-6">
+  <button id="quitBtn" onclick="quitLesson()"
+          class="bg-gray-500 text-white px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-700 transition duration-300 transform hover:scale-105 shadow-lg">
+    그만하기
+  </button>
 </div>
-
-<button id="check-button">정답 확인</button>
-
-<div id="feedback-icon"></div>
-<button id="next-problem-button" style="display: none;">다음 문제</button>
-<button id="quitBtn" onclick="quitLesson()">그만하기</button>
-
-<div id="result-message"></div>
 
 <script>
-  let sentenceId = null; // 모든 함수 위에서 선언
+  // 'let' 대신 'var'를 사용하여 전역 변수 재선언 오류 방지
+  var sentenceId = null; // 모든 함수 위에서 선언
+
+  // Custom message box functions (from previous immersive)
+  function showCustomMessage(message, type = 'info') {
+      const messageBox = document.createElement('div');
+      messageBox.textContent = message;
+      let bgColor = '#2F4160'; // Default: Dark Navy
+      let textColor = 'white';
+
+      if (type === 'error') {
+          bgColor = '#F29DA0'; // Coral Pink for errors
+      }
+
+      messageBox.style.cssText = `
+          position: fixed;
+          top: 20%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: ${bgColor};
+          color: ${textColor};
+          padding: 15px 30px;
+          border-radius: 8px;
+          z-index: 1000;
+          font-size: 1.1em;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+          animation: fadeOut 3s forwards;
+      `;
+      document.body.appendChild(messageBox);
+
+      const styleSheet = document.createElement("style");
+      styleSheet.type = "text/css";
+      styleSheet.innerText = `
+          @keyframes fadeOut {
+              0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+              100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+          }
+      `;
+      document.head.appendChild(styleSheet);
+
+      setTimeout(() => {
+          messageBox.remove();
+          if (styleSheet.parentNode) {
+              styleSheet.parentNode.removeChild(styleSheet);
+          }
+      }, 3000);
+  }
 
   function quitLesson() {
       if (window.opener) {
           window.close();
       } else {
-          alert("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.");
+          showCustomMessage("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.", 'info');
       }
   }
 
@@ -102,27 +171,39 @@
           container.addEventListener('dragover', e => {
               e.preventDefault();
               const draggable = document.querySelector('.is-dragging');
-              const afterElement = getDragAfterElement(container, e.clientX);
-              if (afterElement == null) {
-                  container.appendChild(draggable);
-              } else {
-                  container.insertBefore(draggable, afterElement);
+              if (draggable) { // Ensure a draggable element exists
+                  const afterElement = getDragAfterElement(container, e.clientX);
+                  if (afterElement == null) {
+                      container.appendChild(draggable);
+                  } else {
+                      container.insertBefore(draggable, afterElement);
+                  }
               }
           });
       });
   });
 
   function loadNewProblem() {
-      document.getElementById('feedback-icon').style.display = 'none';
+      document.getElementById('feedback-icon').classList.add('hidden'); // Tailwind hidden class
       document.getElementById('next-problem-button').style.display = 'none';
       document.getElementById('result-message').textContent = '';
       document.getElementById('check-button').style.display = 'block';
 
-      fetch('/study/api/get-lesson2-sentence')
-          .then(response => response.json())
+      // Reset containers
+      document.getElementById('shuffled-container').innerHTML = '';
+      document.getElementById('sorted-container').innerHTML = '';
+
+      // 절대 경로로 fetch 요청 수정
+      fetch(`${window.location.origin}/study/api/get-lesson2-sentence`)
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok ' + response.statusText);
+              }
+              return response.json();
+          })
           .then(data => {
               if (data.error) {
-                  alert(data.error);
+                  showCustomMessage(data.error, 'error'); // Use custom message
                   return;
               }
               sentenceId = data.sentenceId; // 전역 변수에 저장
@@ -130,18 +211,18 @@
           })
           .catch(error => {
               console.error('Error loading problem:', error);
-              alert('문제 로딩에 실패했습니다.');
+              showCustomMessage('문제 로딩에 실패했습니다.', 'error'); // Use custom message
           });
   }
 
   function displayPieces(pieces) {
       const shuffledContainer = document.getElementById('shuffled-container');
       shuffledContainer.innerHTML = '';
-      document.getElementById('sorted-container').innerHTML = '';
 
       pieces.forEach(pieceText => {
           const pieceDiv = document.createElement('div');
-          pieceDiv.className = 'sentence-piece';
+          // Tailwind classes for styling sentence pieces
+          pieceDiv.className = 'sentence-piece bg-white text-[#2F4160] px-4 py-2 rounded-lg shadow-md border border-gray-200 transition-all duration-200 hover:scale-105';
           pieceDiv.textContent = pieceText;
           pieceDiv.setAttribute('draggable', true);
 
@@ -162,50 +243,61 @@
                               .map(el => el.textContent);
 
       if (userPieces.length === 0) {
-          alert('먼저 문장 조각을 배치해주세요.');
+          showCustomMessage('먼저 문장 조각을 배치해주세요.', 'error'); // Use custom message
           return;
       }
 
-      fetch('/study/api/check-lesson2-answer', {
+      // 절대 경로로 fetch 요청 수정
+      fetch(`${window.location.origin}/study/api/check-lesson2-answer`, {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ userPieces: userPieces })
+          body: JSON.stringify({ userPieces: userPieces, sentenceId: sentenceId }) // sentenceId 추가
       })
-      .then(response => response.json())
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok ' + response.statusText);
+          }
+          return response.json();
+      })
       .then(data => {
           const feedbackIcon = document.getElementById('feedback-icon');
           const nextButton = document.getElementById('next-problem-button');
           const sortedContainer = document.getElementById('sorted-container');
+          const checkButton = document.getElementById('check-button');
 
           if (data.isCorrect) {
-              feedbackIcon.textContent = 'O';
-              feedbackIcon.className = 'correct';
-              feedbackIcon.style.display = 'block';
+              feedbackIcon.textContent = '✔️';
+              feedbackIcon.className = 'text-[#2F4160] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-pulse';
+              feedbackIcon.classList.remove('hidden');
               nextButton.style.display = 'block';
-              document.getElementById('check-button').style.display = 'none'; // 정답 확인 버튼 숨기기
-              // 다음 문제 id 업데이트
+              checkButton.style.display = 'none';
+
+              setTimeout(() => { feedbackIcon.classList.add('hidden'); }, 1500); // 1.5초 후 아이콘 숨기기
+
               if (data.nextSentenceId) {
-                  sentenceId = data.nextSentenceId;
+                  sentenceId = data.nextSentenceId; // 다음 문제 id 업데이트
               }
           } else {
-              if (data.message.includes('3번 틀렸습니다.')) {
-                  feedbackIcon.textContent = 'X';
-                  feedbackIcon.className = 'incorrect';
-                  feedbackIcon.style.display = 'block';
+              // 3번 틀렸을 경우 (최종 오답)
+              if (data.attemptsLeft === 0) { // Assuming backend sends attemptsLeft
+                  feedbackIcon.textContent = '✖️';
+                  feedbackIcon.className = 'text-[#F29DA0] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-bounce';
+                  feedbackIcon.classList.remove('hidden');
                   nextButton.style.display = 'block';
-                  document.getElementById('check-button').style.display = 'none'; // 정답 확인 버튼 숨기기
-                  // 다음 문제 id 업데이트
+                  checkButton.style.display = 'none';
+
+                  setTimeout(() => { feedbackIcon.classList.add('hidden'); }, 1500); // 1.5초 후 아이콘 숨기기
+
                   if (data.nextSentenceId) {
-                      sentenceId = data.nextSentenceId;
+                      sentenceId = data.nextSentenceId; // 다음 문제 id 업데이트
                   }
               } else {
-                  // 2번까지 틀렸을 경우
+                  // 아직 기회가 남았을 경우 (흔들림 효과 및 재배치)
                   sortedContainer.classList.add('shake');
                   sortedContainer.addEventListener('animationend', () => {
                       sortedContainer.classList.remove('shake');
-
                       const shuffledContainer = document.getElementById('shuffled-container');
                       while(sortedContainer.firstChild) {
                           shuffledContainer.appendChild(sortedContainer.firstChild);
@@ -213,12 +305,11 @@
                   }, { once: true });
               }
           }
-
           document.getElementById('result-message').textContent = data.message;
       })
       .catch(error => {
           console.error('Error checking answer:', error);
-          alert('정답 확인 중 오류가 발생했습니다.');
+          showCustomMessage('정답 확인 중 오류가 발생했습니다.', 'error'); // Use custom message
       });
   }
 
