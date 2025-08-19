@@ -35,16 +35,22 @@
 </head>
 <body>
 
+<div class="fixed top-12 right-12 z-50">
+  <div class="w-24 h-24 bg-[#F29DA0] rounded-xl shadow-lg flex items-center justify-center text-center animate-float-slow">
+    <p class="text-white text-lg font-bold">Han Talk!</p>
+  </div>
+</div>
+
+<!-- <div class="fixed top-12 right-12 z-50">
+  <img src="https://placehold.co/200x200/F29DA0/FFFFFF?text=Han+Talk!"
+       alt="한 톡!"
+       class="w-32 h-auto animate-float-slow"
+       style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
+</div> -->
+
 <div id="fullpage">
 
   <div class="section relative flex flex-col items-center justify-center p-8 overflow-hidden bg-[#FFFDF6]">
-    <div class="absolute inset-0 z-0">
-      <img src="https://placehold.co/200x200/F29DA0/FFFFFF?text=Han+Talk!"
-           alt="한 톡!"
-           class="absolute top-12 right-12 w-32 h-auto animate-float-slow"
-           style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
-    </div>
-
     <div class="relative z-10 flex flex-col items-center justify-center text-center">
       <div class="relative w-[56rem] h-[36rem] mb-8">
         <img src="/images/main.PNG"
@@ -72,12 +78,12 @@
   <div class="section" data-anchor="learn">
     <div class="flex flex-col lg:flex-row items-center justify-center p-8 h-full">
       <div class="lg:w-1/2 p-4 text-center lg:text-center animate-slide-in-left">
-        <h2 class="text-4xl font-bold text-gray-800 mb-4">" 한글 학습 "</h2>
+        <h2 class="text-5xl font-bold text-gray-800 mb-4">" 한글 학습 "</h2>
 
-        <p class="text-lg text-gray-600 mb-6 font-semibold">
+        <p class="text-xl text-gray-600 mb-6 font-semibold">
           게임처럼 즐기며 배우는 우리말 학습!
         </p>
-        <p class="text-lg text-gray-600 mb-4">
+        <p class="text-xl text-gray-600 mb-4">
           게임을 즐기면서 한국어를 자연스럽게 배워보세요! <br>
           재미있는 학습 경험으로 한국어에 대한 흥미가 쑥쑥 올라가고, <br>
           우리말을 더 자신 있게 사용할 수 있도록 도와드릴게요! ✨
@@ -101,12 +107,12 @@
       </div>
 
       <div class="lg:w-1/2 p-4 text-center lg:text-center animate-slide-in-right">
-        <h2 class="text-4xl font-bold text-gray-800 mb-4">" 나만의 단어장 "</h2>
+        <h2 class="text-5xl font-bold text-gray-800 mb-4">" 나만의 단어장 "</h2>
 
-        <p class="text-lg text-gray-600 mb-6 font-semibold">
+        <p class="text-xl text-gray-600 mb-6 font-semibold">
           오답노트로 나만의 단어장을 채워보세요!
         </p>
-        <p class="text-lg text-gray-600 mb-2">
+        <p class="text-xl text-gray-600 mb-2">
           퀴즈와 게임으로 한국어를 신나게 배우다 보면, 틀린 문제는 오답노트에 쏙쏙 담아드려요.<br>
           놓쳤던 단어와 문장들을 다시 한번 복습하면서 나만의 실력을 쑥쑥 키워보세요! ✨
         </p>
@@ -117,35 +123,37 @@
   <div class="section" data-anchor="video-learn">
     <div class="flex flex-col items-center justify-center p-8 h-full">
 
-      <div class="p-4 text-center animate-fade-in-up">
-        <h2 class="text-4xl font-bold text-gray-800 mb-4">
+      <div class="p-4 pt-10 text-center animate-fade-in-up">
+        <h2 class="text-5xl font-bold text-gray-800 mb-4">
           " 영상 강의 학습 "
         </h2>
-        <p class="text-lg text-gray-600 mb-6 font-semibold">
+        <p class="text-xl text-gray-600 mb-6 font-semibold">
           영상으로 배우는 한국어 기본 상식!
         </p>
-        <p class="text-lg text-gray-600 mb-8">
+        <p class="text-xl text-gray-600 mb-8">
           영상을 통해 한국어의 기초 상식과 맞춤법을 익혀보세요.<br>
           체계적인 강의로 우리말을 더 정확하고 자신 있게 쓸 수 있도록 도와드릴게요! 😊
         </p>
       </div>
 
-      <div class="flex justify-center p-4 animate-fade-in-down">
+      <div class="flex justify-center p-4 -mt-9 animate-fade-in-down">
         <img src="/images/video_study.png"
              alt="비디오 학습 이미지"
              class="rounded-lg shadow-xl"
-             style="transform: scale(1.0); transition: transform 0.3s ease; max-width: 80%;">
+             style="transform: scale(0.8); transition: transform 0.3s ease; max-width: 70%;">
       </div>
+
     </div>
   </div>
 
   <div class="section" data-anchor="community">
-    <div class="flex flex-col items-center justify-center p-8 h-full bg-center-cover bg-[url('https://placehold.co/1920x1080/fcd34d/FFFFFF?text=COMMUNITY')]">
-      <h2 class="text-5xl font-extrabold text-white text-shadow-lg drop-shadow-md mb-4 animate-fade-in-down">함께 배우는 커뮤니티</h2>
-      <p class="text-xl text-white text-shadow-md mb-8 animate-fade-in-up">질문을 공유하고, 다른 학습자들과 소통하며 함께 성장하세요.</p>
-      <button class="px-8 py-4 bg-white text-yellow-600 font-bold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">커뮤니티 가기</button>
+    <div class="flex flex-col items-center justify-center p-8 h-full bg-center-cover bg-[url('https://placehold.co/1920x1080/5C6BC0/FFFFFF?text=COMMUNITY')]">
+      <h2 class="text-6xl font-extrabold text-white text-shadow-lg drop-shadow-md mb-4">함께 배우는 커뮤니티</h2>
+      <p class="text-xl text-white text-shadow-md mb-8">질문을 공유하고, 다른 학습자들과 소통하며 함께 성장하세요.</p>
+      <button class="px-8 py-4 bg-white text-yellow-600 font-bold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">한톡과 함께해요!</button>
     </div>
   </div>
+
 </div>
 
 
@@ -159,7 +167,7 @@
       autoScrolling: true,
       navigation: true,
       anchors: ['home', 'learn', 'vocabulary', 'video-learn', 'community'],
-      sectionsColor: ['#E2F2E4', '#FEEA84', '#87CEEB', '#BA68C8', '#fcd34d'],
+      sectionsColor: ['#E2F2E4', '#FEEA84', '#87CEEB', '#D9D2F1', '#5C6BC0'],
 
       onLeave: function(origin, destination, direction) {
         // Remove animation classes from previous section
