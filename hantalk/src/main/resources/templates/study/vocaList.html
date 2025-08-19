@@ -2,66 +2,120 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>단어 목록</title>
-
-  <!-- 헤더삽입 -->
-  <title>자료실</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>HanTalk - 단어 목록</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Nanum Gothic 폰트 설정 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+  <style>
 
+    .search-container {
+        max-width: 600px;
+        margin: 0 auto 2rem;
+    }
+    .pagination a, .pagination span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 9999px;
+        transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+        transition-duration: 150ms;
+    }
+    .pagination .active a {
+        background-color: #F29DA0; /* 코랄 핑크 */
+        color: #ffffff; /* 흰색 */
+        pointer-events: none;
+    }
+    /* 검색 버튼 호버 스타일 */
+    .search-button:hover {
+      background-color: #2F4160;
+      color: #ffffff;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-gray-100">
 
-<!-- 헤더 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<!-- 본문 -->
-<main class="flex-1 p-4">
-  <h1>단어 목록</h1>
+<main class="flex-grow p-8 container mx-auto">
+  <h1 class="text-4xl font-extrabold text-center mb-10" style="color: #2F4160; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">단어 목록</h1>
 
-  <form th:action="@{/study/vocaList}" method="get" style="margin-bottom:12px;">
-    <input type="text" name="kw" th:value="${kw}" placeholder="단어 또는 의미 검색">
-    <button type="submit">검색</button>
-  </form>
+  <div class="search-container">
+    <form th:action="@{/study/vocaList}" method="get" class="flex items-center gap-2">
+      <input type="text" name="kw" th:value="${kw}" placeholder="단어 또는 의미 검색"
+             class="flex-grow p-3 border rounded-lg focus:outline-none focus:ring-2"
+             style="border-color: #2F4160; background-color: #F8F9FA; color: #2F4160; focus:ring-color: #F29DA0;">
+      <button type="submit" class="px-6 py-3 font-semibold rounded-lg shadow-md transition-colors bg-[#F29DA0] text-[#2F4160] hover:bg-[#d18a8d] hover:text-white">
+        검색
+      </button>
+    </form>
+  </div>
 
-  <table>
-    <thead>
-    <tr>
-      <th>순번</th>
-      <th>단어</th>
-      <th>뜻</th>
-      <th>등록일</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:if="${paging == null || paging.content.isEmpty()}">
-      <td colspan="4">단어 데이터가 존재하지 않습니다.</td>
-    </tr>
-    <tr th:each="voca, loop : ${paging.content}">
-      <td th:text="${paging.number * paging.size + loop.count}"></td>
-      <td th:text="${voca.vocabulary}"></td>
-      <td th:text="${voca.description}"></td>
-      <td th:text="${#temporals.format(voca.createDate, 'yyyy-MM-dd')}"></td>
-    </tr>
-    </tbody>
-  </table>
+  <div class="rounded-lg shadow-md overflow-hidden" style="background-color: #F8F9FA;">
+    <table class="min-w-full divide-y" style="border-color: #B5D0E3;">
+      <thead class="text-white" style="background-color: #2F4160;">
+      <tr>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+          순번
+        </th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+          단어
+        </th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+          의미
+        </th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+          등록일
+        </th>
+      </tr>
+      </thead>
+      <tbody class="divide-y" style="border-color: #B5D0E3;">
+      <tr th:if="${paging == null || paging.content.isEmpty()}">
+        <td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium" style="color: #2F4160;">
+          단어 데이터가 존재하지 않습니다.
+        </td>
+      </tr>
+      <tr th:each="voca, loop : ${paging.content}" th:if="${voca != null}" class="odd:bg-gray-50" style="color: #2F4160;">
+        <td th:text="${paging.number * paging.size + loop.count}" class="px-6 py-4 whitespace-nowrap text-sm"></td>
+        <td th:text="${voca.vocabulary}" class="px-6 py-4 text-sm"></td>
+        <td th:text="${voca.description}" class="px-6 py-4 text-sm"></td>
+        <td th:text="${#temporals.format(voca.createDate, 'yyyy-MM-dd')}" class="px-6 py-4 whitespace-nowrap text-sm"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <div th:if="${paging != null && !paging.isEmpty()}" class="pagination" style="margin-top:12px;">
-    <ul>
-      <li th:if="${hasPrevBlock}">
-        <a th:href="@{|?page=${prevBlockPage}&kw=${kw}|}">이전</a>
+  <div th:if="${paging != null && !paging.isEmpty()}" class="flex justify-center mt-8">
+    <ul class="flex gap-2 pagination">
+      <li th:if="${paging.hasPrevious}">
+        <a th:href="@{|?page=${paging.number - 1}&kw=${kw}|}"
+           class="border text-white hover:bg-opacity-80"
+           style="background-color: #2F4160; border-color: #2F4160;">
+          이전
+        </a>
       </li>
-      <li th:each="p : ${#numbers.sequence(start, end)}" th:classappend="${p == currentPage} ? 'active'">
-        <a th:href="@{|?page=${p}&kw=${kw}|}" th:text="${p + 1}"></a>
+      <li th:each="page: ${#numbers.sequence(0, paging.totalPages - 1)}"
+          th:classappend="${page == paging.number} ? 'active'">
+        <a th:href="@{|?page=${page}&kw=${kw}|}"
+           th:text="${page + 1}"
+           class="border"
+           style="border-color: #2F4160; color: #2F4160; hover-bg-color: #B5D0E3;">
+        </a>
       </li>
-      <li th:if="${hasNextBlock}">
-        <a th:href="@{|?page=${nextBlockPage}&kw=${kw}|}">다음</a>
+      <li th:if="${paging.hasNext}">
+        <a th:href="@{|?page=${paging.number + 1}&kw=${kw}|}"
+           class="border text-white hover:bg-opacity-80"
+           style="background-color: #2F4160; border-color: #2F4160;">
+          다음
+        </a>
       </li>
     </ul>
   </div>
 </main>
 
-<!-- 푸터 -->
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
