@@ -6,6 +6,16 @@
     <title>아이템 상점</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        .bg-main-dark { background-color: #2F4160; }
+        .text-main-dark { color: #2F4160; }
+        .bg-accent-pink { background-color: #F29DA0; }
+        .text-accent-pink { color: #F29DA0; }
+        .bg-soft-blue { background-color: #B5D0E3; }
+        .text-soft-blue { color: #B5D0E3; }
+        .hover-bg-soft-blue:hover { background-color: #B5D0E3; }
+        .hover-text-accent-pink:hover { color: #F29DA0; }
+        .container-custom { max-width: 1000px; }
+
         /* 기존 이미지 컨테이너 및 타입별 스타일 유지 */
         .item-image-container {
             position: relative;
@@ -28,29 +38,33 @@
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex-grow flex justify-center p-8 space-x-8">
-
-    <div th:replace="~{fragments/mypageSidebar :: mypageSidebar}"></div>
+<main class="flex-grow flex justify-center p-8">
 
     <div class="container-custom w-full">
         <div class="bg-white rounded-xl shadow-xl p-8">
-            <h1 class="text-3xl font-bold text-center text-[#2F4160] mb-6">아이템 상점</h1>
+            <h1 class="text-3xl font-bold text-center text-main-dark mb-6">아이템 상점</h1>
 
             <div class="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-                <div th:if="${isAdmin}" class="bg-[#B5D0E3] text-[#2F4160] px-4 py-2 rounded-lg font-semibold w-full sm:w-auto text-center">
+                <div th:if="${isAdmin}" class="bg-soft-blue text-main-dark px-4 py-2 rounded-lg font-semibold w-full sm:w-auto text-center">
                     관리자입니다. 구매는 불가능합니다.
                 </div>
-                <div th:unless="${isAdmin}" class="bg-[#B5D0E3] text-[#2F4160] px-4 py-2 rounded-lg font-semibold w-full sm:w-auto text-center">
-                    보유 포인트: <span th:text="${point}" class="text-[#2F4160] font-extrabold"></span> pt
+
+                <div th:unless="${isAdmin}" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:flex-grow">
+                    <div class="bg-soft-blue text-main-dark px-4 py-2 rounded-lg font-semibold text-center inline-block">
+                        보유 포인트: <span th:text="${point}" class="text-main-dark font-extrabold"></span> pt
+                    </div>
+                    <a href="http://localhost:9001/user/items" class="bg-accent-pink hover:bg-main-dark text-white font-bold py-2 px-4 rounded-lg shadow transition duration-300 inline-block text-center">
+                        구매한 아이템 보기
+                    </a>
                 </div>
 
                 <a th:if="${isAdmin}" href="/item/admin"
-                   class="bg-[#4B4B4B] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg shadow transition duration-300 w-full sm:w-auto text-center">
+                   class="bg-main-dark hover-bg-accent-pink text-white font-bold py-2 px-4 rounded-lg shadow transition duration-300 w-full sm:w-auto text-center">
                     관리자 페이지로 이동
                 </a>
             </div>
 
-            <div th:if="${message}" class="bg-[#B5D0E3] border border-[#B5D0E3] text-[#2F4160] px-4 py-3 rounded-lg relative mb-4 text-center" role="alert">
+            <div th:if="${message}" class="bg-soft-blue border border-soft-blue text-main-dark px-4 py-3 rounded-lg relative mb-4 text-center" role="alert">
                 <span th:text="${message}"></span>
             </div>
             <div th:if="${error}" class="bg-red-200 border border-red-400 text-red-800 px-4 py-3 rounded-lg relative mb-4 text-center" role="alert">
@@ -71,15 +85,15 @@
                                  class="item-image item-type-profile border-2 border-[#E0E0E0] rounded-full" />
                         </div>
 
-                        <h3 class="text-xl font-bold text-[#2F4160] mb-1" th:text="${item.itemName}">이름</h3>
-                        <p class="text-2xl font-extrabold text-[#2F4160] mb-2" th:text="${item.price} + ' pt'">0 pt</p>
+                        <h3 class="text-xl font-bold text-main-dark mb-1" th:text="${item.itemName}">이름</h3>
+                        <p class="text-2xl font-extrabold text-main-dark mb-2" th:text="${item.price} + ' pt'">0 pt</p>
                         <p class="text-sm text-gray-600 mb-4 h-12 overflow-hidden" th:text="${item.itemDescription}">설명</p>
 
                         <div th:unless="${isAdmin}">
                             <form th:action="@{/item/purchase}" method="post">
                                 <input type="hidden" name="itemId" th:value="${item.itemId}" />
                                 <button type="submit"
-                                        class="w-full bg-[#2F4160] hover:bg-[#F29DA0] text-white font-bold py-2 rounded-lg transition duration-300">
+                                        class="w-full bg-main-dark hover-bg-accent-pink text-white font-bold py-2 rounded-lg transition duration-300">
                                     구매하기
                                 </button>
                             </form>
@@ -92,9 +106,9 @@
             </div>
         </div>
     </div>
-</div>
+</main>
 
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<div class="py-4 text-gray-500 text-center text-sm bg-gray-100" th:replace="~{fragments/footer :: footerFragment}"></div>
 
 </body>
 </html>
