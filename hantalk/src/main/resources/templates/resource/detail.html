@@ -20,30 +20,24 @@
 <div class="flex flex-1 w-full max-w-5xl mx-auto px-4 py-8 gap-8">
 
   <!-- 사이드바 -->
-  <nav class="w-72 bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm flex-shrink-0">
+  <nav class="w-72 bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm flex-shrink-0 rounded-xl">
     <div class="mb-8">
-      <h2 class="text-2xl font-bold text-[#2F4160]">📁 메뉴</h2>
+      <h2 class="text-2xl font-bold text-[#2F4160]">메뉴</h2>
     </div>
-    <ul class="space-y-2">
-      <li>
-        <a href="/resource/main" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
-          <i class="fas fa-list-alt mr-3"></i>
-          <span>자료 목록</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
-          <i class="fas fa-question-circle mr-3"></i>
-          <span>자주 묻는 질문</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
-          <i class="fas fa-comment-dots mr-3"></i>
-          <span>문의하기</span>
-        </a>
-      </li>
-    </ul>
+    <div class="space-y-4">
+      <a href="/resource/main" class="flex items-center space-x-2 w-full text-left p-3 rounded-lg font-medium text-[#2F4160] text-xl hover:bg-[#F29DA0] transition-colors duration-200">
+        <i class="fas fa-list-alt w-6 h-6 flex justify-center items-center"></i>
+        <span>자료 목록</span>
+      </a>
+      <a href="#" class="flex items-center space-x-2 w-full text-left p-3 rounded-lg font-medium text-[#2F4160] text-xl hover:bg-[#F29DA0] transition-colors duration-200">
+        <i class="fas fa-question-circle w-6 h-6 flex justify-center items-center"></i>
+        <span>자주 묻는 질문</span>
+      </a>
+      <a href="#" class="flex items-center space-x-2 w-full text-left p-3 rounded-lg font-medium text-[#2F4160] text-xl hover:bg-[#F29DA0] transition-colors duration-200">
+        <i class="fas fa-comment-dots w-6 h-6 flex justify-center items-center"></i>
+        <span>문의하기</span>
+      </a>
+    </div>
   </nav>
 
   <!-- 본문 -->

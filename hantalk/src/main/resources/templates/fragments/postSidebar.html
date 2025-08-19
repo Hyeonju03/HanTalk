@@ -2,31 +2,75 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Sidebar</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 <body>
 
-<div th:fragment="postSidebarFragment" class="w-72 bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm flex-shrink-0">
+<aside th:fragment="postSidebarFragment"
+       class="w-72 bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm rounded-xl">
     <div class="mb-8">
-        <h2 class="text-2xl font-bold text-[#2F4160]">📄 게시판</h2>
+        <h2 class="text-2xl font-bold text-[#2F4160]">게시판</h2>
     </div>
-    <ul class="space-y-4">
-        <li>
-            <a href="/post/list/1" class="block py-2 text-lg text-[#2F4160] hover:bg-[#F29DA0] rounded-md px-2 transition-colors">
-                공지사항
-            </a>
-        </li>
-        <li>
-            <a href="/post/list/2" class="block py-2 text-lg text-[#2F4160] hover:bg-[#F29DA0] rounded-md px-2 transition-colors">
-                커뮤니티
-            </a>
-        </li>
-        <li>
-            <a href="/post/list/3" class="block py-2 text-lg text-[#2F4160] hover:bg-[#F29DA0] rounded-md px-2 transition-colors">
-                문의사항
-            </a>
-        </li>
-    </ul>
-</div>
+    <nav class="flex-grow">
+        <ul class="space-y-4">
+            <!-- 공지사항 -->
+            <li>
+                <a th:href="@{/post/list/1}"
+                   th:classappend="${categoryId == 1} ? 'bg-[#2F4160] text-white' : ''"
+                   class="flex items-center p-3 text-lg text-[#2F4160] hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200">
+                    <!-- Info 아이콘 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="16" x2="12" y2="12" />
+                        <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                    <span>공지사항</span>
+                </a>
+            </li>
+
+            <!-- 커뮤니티 -->
+            <li>
+                <a th:href="@{/post/list/2}"
+                   th:classappend="${categoryId == 2} ? 'bg-[#2F4160] text-white' : ''"
+                   class="flex items-center p-3 text-lg text-[#2F4160] hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200">
+                    <!-- Users 아이콘 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M7 21v-2a4 4 0 0 1 3-3.87" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span>커뮤니티</span>
+                </a>
+            </li>
+
+            <!-- 문의사항 -->
+            <li>
+                <a th:href="@{/post/list/3}"
+                   th:classappend="${categoryId == 3} ? 'bg-[#2F4160] text-white' : ''"
+                   class="flex items-center p-3 text-lg text-[#2F4160] hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200">
+                    <!-- Help Circle 아이콘 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 2-3 4" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                    <span>문의사항</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>
 
 </body>
 </html>

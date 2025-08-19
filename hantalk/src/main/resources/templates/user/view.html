@@ -6,6 +6,16 @@
     <title>마이페이지</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        .bg-main-dark { background-color: #2F4160; }
+        .text-main-dark { color: #2F4160; }
+        .bg-accent-pink { background-color: #F29DA0; }
+        .text-accent-pink { color: #F29DA0; }
+        .bg-soft-blue { background-color: #B5D0E3; }
+        .text-soft-blue { color: #B5D0E3; }
+        .hover-bg-soft-blue:hover { background-color: #B5D0E3; }
+        .hover-text-accent-pink:hover { color: #F29DA0; }
+        .container-custom { max-width: 1000px; }
+
         /* 프로필 이미지와 프레임이 겹쳐 보이도록 z-index 설정 */
         .profile-container {
             position: relative;
@@ -22,18 +32,18 @@
         }
     </style>
 </head>
-<body class="bg-[#f3f4f6] min-h-screen flex flex-col text-[#2F4160]">
+<body class="min-h-screen flex flex-col bg-gray-50 font-sans">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex-grow flex justify-center p-8 space-x-8">
+<main class="flex-grow flex justify-center p-8 space-x-8">
 
     <div th:replace="~{fragments/mypageSidebar :: mypageSidebar}"></div>
 
     <div class="container-custom w-full">
-        <div class="bg-white rounded-2xl shadow-2xl">
-            <div class="flex flex-col md:flex-row items-center p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
-                <div class="profile-container mb-4 md:mb-0 md:mr-8 flex-shrink-0">
+        <div class="bg-white p-8 rounded-xl shadow-xl">
+            <div class="flex flex-col md:flex-row items-center px-6 py-6 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
+                <div class="profile-container mb-4 md:mb-0 md:mr-4 flex-shrink-0">
                     <img th:if="${user.profileImage != null}"
                          th:src="@{'/uploads/images/' + ${user.profileImage}}"
                          alt="프로필 이미지"
@@ -54,7 +64,7 @@
                 </div>
             </div>
 
-            <div class="p-8">
+            <div class="p-4">
                 <h2 class="text-xl font-bold mb-4 border-l-4 border-[#F29DA0] pl-3">상세 정보</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
@@ -81,9 +91,37 @@
             </div>
         </div>
     </div>
-</div>
+</main>
 
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<div class="py-4 text-gray-500 text-center text-sm bg-gray-100" th:replace="~{fragments/footer :: footerFragment}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const links = document.querySelectorAll('aside nav a');
+      const currentPath = window.location.pathname;
+
+      links.forEach(link => {
+        // 페이지 로드 시 현재 URL과 일치하는 링크에 스타일을 적용합니다.
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('bg-main-dark', 'text-white');
+          link.classList.remove('text-main-dark', 'hover-bg-accent-pink', 'hover-text-white');
+        }
+      });
+
+      links.forEach(link => {
+        link.addEventListener('click', (e) => {
+          // 모든 링크에서 'active' 스타일을 제거합니다.
+          links.forEach(item => {
+            item.classList.remove('bg-main-dark', 'text-white');
+            item.classList.add('text-main-dark', 'hover:bg-[#2F4160]', 'hover:text-white');
+          });
+          // 클릭된 링크에 'active' 스타일을 추가합니다.
+          e.currentTarget.classList.add('bg-main-dark', 'text-white');
+          e.currentTarget.classList.remove('text-main-dark', 'hover:bg-[#2F4160]', 'hover:text-white');
+        });
+      });
+    });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

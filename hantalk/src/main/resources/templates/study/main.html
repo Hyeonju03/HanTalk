@@ -38,22 +38,79 @@
 
 <main class="flex-grow flex justify-center p-8 space-x-8">
 
-    <div class="w-64">
-        <aside class="bg-soft-blue shadow-xl p-6 rounded-xl">
-            <h2 class="text-xl font-bold mb-4 text-main-dark">학습 목록</h2>
-            <nav class="space-y-2">
-                <button class="sidebar-link w-full text-left p-3 rounded-lg font-medium text-main-dark hover:bg-accent-pink" data-lesson="lesson1">단어 맞추기</button>
-                <button class="sidebar-link w-full text-left p-3 rounded-lg font-medium text-main-dark hover:bg-accent-pink" data-lesson="lesson2">문장 나열하기</button>
-                <button class="sidebar-link w-full text-left p-3 rounded-lg font-medium text-main-dark hover:bg-accent-pink" data-lesson="lesson3">객관식 문제</button>
-                <button class="sidebar-link w-full text-left p-3 rounded-lg font-medium text-main-dark hover:bg-accent-pink" data-lesson="lesson4">받아쓰기</button>
-                <hr class="my-4 border-gray-200" />
-                <button class="sidebar-link w-full text-left p-3 rounded-lg font-medium text-main-dark hover:bg-accent-pink" data-lesson="note">오답노트</button>
-                <button class="sidebar-link w-full text-left p-3 rounded-lg font-medium text-main-dark hover:bg-accent-pink" data-lesson="vocaList">단어장 (단어)</button>
-                <button class="sidebar-link w-full text-left p-3 rounded-lg font-medium text-main-dark hover:bg-accent-pink" data-lesson="sentenceList">단어장 (문장)</button>
+    <!-- 학습 목록 사이드바 -->
+    <div class="w-72">
+        <aside class="bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm rounded-xl h-[690px]">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-[#2F4160]">학습 목록</h2>
+            </div>
+            <nav class="flex-grow">
+                <ul class="space-y-4">
+                    <li>
+                        <button class="sidebar-link flex items-center w-full p-3 text-lg text-[#2F4160] hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200" data-lesson="lesson1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                            <span>단어 맞추기</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-link flex items-center w-full p-3 text-lg text-[#2F4160] hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200" data-lesson="lesson2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                            <span>문장 나열하기</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-link flex items-center w-full p-3 text-lg text-[#2F4160] hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200" data-lesson="lesson3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                            <span>객관식 문제</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-link flex items-center w-full p-3 text-lg text-[#2F4160] hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200" data-lesson="lesson4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                            <span>받아쓰기</span>
+                        </button>
+                    </li>
+
+                    <hr class="my-4 border-gray-200" />
+
+                    <li>
+                        <button class="sidebar-link flex items-center w-full p-3 text-lg text-[#2F4160] hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200" data-lesson="note">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                            <span>오답노트</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-link flex items-center w-full p-3 text-lg text-[#2F4160] hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200" data-lesson="vocaList">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                            <span>단어장 (단어)</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-link flex items-center w-full p-3 text-lg text-[#2F4160] hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200" data-lesson="sentenceList">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                            <span>단어장 (문장)</span>
+                        </button>
+                    </li>
+                </ul>
             </nav>
         </aside>
     </div>
 
+    <!-- 메인 콘텐츠 -->
     <div class="container-custom w-full">
         <div class="bg-white p-8 rounded-xl shadow-xl flex items-center justify-center h-full">
             <div id="main-content-area" class="w-full max-w-2xl text-center">
@@ -118,6 +175,24 @@
     function openSmallWindow(url) {
         window.open(url, "lessonWindow", "width=1000,height=700,left=200,top=100,resizable=yes,scrollbars=yes");
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                // 이전에 활성화된 링크의 스타일을 제거합니다.
+                sidebarLinks.forEach(item => {
+                    item.classList.remove('bg-[#2F4160]', 'text-white');
+                    item.classList.add('text-[#2F4160]');
+                });
+
+                // 클릭된 링크에 활성화 스타일을 추가합니다.
+                event.currentTarget.classList.add('bg-[#2F4160]', 'text-white');
+                event.currentTarget.classList.remove('text-[#2F4160]');
+            });
+        });
+    });
 </script>
 
 <div class="py-4 text-gray-500 text-center text-sm bg-gray-100" th:replace="~{fragments/footer :: footerFragment}"></div>
