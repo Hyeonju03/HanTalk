@@ -5,70 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="${video.title} + ' | 강의 상세 보기'"></title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind CSS 커스텀 설정
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'dark-navy': '#2F4160',
+            'accent-pink': '#F29DA0',
+            'soft-sky': '#B5D0E3',
+            'dark-gray': '#4A5568',
+            'light-gray': '#E5E7EB'
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    /* 커스텀 색상 및 호버 효과 정의 */
-
-    .bg-main-dark { background-color: #2F4160; }
-    .text-main-dark { color: #2F4160; }
-    .bg-accent-pink { background-color: #F29DA0; }
-    .text-accent-pink { color: #F29DA0; }
-    .bg-soft-blue { background-color: #B5D0E3; }
-    .text-soft-blue { color: #B5D0E3; }
-
-    /* 호버 효과 (Tailwind의 hover: 대신 커스텀 CSS로 명확하게 정의) */
-    .hover-bg-main-dark:hover { background-color: #43587A; } /* 메인 다크 호버 색상 */
-    .hover-bg-accent-pink:hover { background-color: #EF8689; }
-    .hover-bg-soft-blue:hover { background-color: #92B8D0; }
+    /* 폰트 최적화를 위한 구글 폰트 임포트 */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+    }
   </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 flex flex-col min-h-screen">
+<body class="bg-gray-50 font-sans text-dark-gray flex flex-col min-h-screen">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<main class="flex-1 container mx-auto px-4 py-8">
-  <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8">
+<!-- ✅ max-w-screen-xl 클래스로 다시 변경하여 데스크톱에 최적화된 너비로 확장 -->
+<main class="flex-1 max-w-screen-xl mx-auto px-4 py-12">
+  <div class="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
 
-    <h1 class="text-3xl font-extrabold text-gray-800 mb-2" th:text="${video.title}">제목</h1>
-
-    <div class="text-gray-500 text-sm mb-6 flex items-center">
-      <span>등록일: <span th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}"></span></span>
-      <span class="ml-4" th:if="${video.updateDate != null}">
-        수정일: <span th:text="${#temporals.format(video.updateDate, 'yyyy-MM-dd')}"></span>
-      </span>
+    <!-- 제목 및 날짜 정보 -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-dark-navy mb-2 leading-tight" th:text="${video.title}">제목</h1>
+      <div class="text-gray-400 text-sm flex items-center space-x-4">
+        <span>등록일: <span th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}"></span></span>
+        <span th:if="${video.updateDate != null}">
+          수정일: <span th:text="${#temporals.format(video.updateDate, 'yyyy-MM-dd')}"></span>
+        </span>
+      </div>
     </div>
 
-    <div class="flex items-center space-x-2 mb-6">
-      <!-- 좋아요 버튼 -->
-      <button id="btnLike" type="button" class="bg-sub hover:bg-[#e6c5d1] text-gray-800 px-4 py-2 rounded-full font-bold transition-colors duration-300">
-        👍 좋아요
-      </button>
-      <span id="likeCount" class="text-lg font-medium text-gray-700">0</span>
-    </div>
-
-    <div class="video-container aspect-video w-full mb-6 rounded-lg overflow-hidden shadow-lg">
+    <!-- 비디오 플레이어 -->
+    <div class="relative video-container aspect-video w-full mb-8 rounded-2xl overflow-hidden">
       <video width="100%" height="100%" controls class="w-full h-full object-cover">
         <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4">
         이 브라우저는 video 태그를 지원하지 않습니다.
       </video>
     </div>
 
-    <p class="text-gray-700 leading-relaxed mb-8" th:text="${video.content}">설명</p>
+    <!-- 영상 설명 -->
+    <div class="border-b pb-6 mb-6 border-gray-200">
+      <h2 class="text-xl md:text-2xl font-bold text-dark-navy mb-3">영상 설명</h2>
+      <p class="text-gray-700 leading-relaxed whitespace-pre-wrap" th:text="${video.content}">설명</p>
+    </div>
 
-    <div class="flex items-center space-x-4">
-      <!-- 관리자 여부에 따라 목록 링크 변경 -->
-      <a th:if="${isAdmin}" th:href="@{/video/admin/list}" class="inline-flex items-center px-4 py-2 bg-soft-blue text-white font-semibold rounded-lg shadow-md hover-bg-soft-blue transition duration-300">
-        <span class="mr-2">←</span> 목록으로
+    <!-- 버튼 그룹 -->
+    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+      <!-- ✅ 목록으로 돌아가기 버튼 디자인 개선 -->
+      <a th:if="${isAdmin}" th:href="@{/video/admin/list}" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-soft-sky text-dark-navy font-semibold rounded-lg shadow-md hover:bg-soft-sky/80 transition duration-300">
+        <span class="mr-2">←</span> 목록으로 돌아가기
       </a>
-      <a th:unless="${isAdmin}" th:href="@{/video/list}" class="inline-flex items-center px-4 py-2 bg-soft-blue text-white font-semibold rounded-lg shadow-md hover-bg-soft-blue transition duration-300">
-        <span class="mr-2">←</span> 목록으로
+      <a th:unless="${isAdmin}" th:href="@{/video/list}" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-soft-sky text-dark-navy font-semibold rounded-lg shadow-md hover:bg-soft-sky/80 transition duration-300">
+        <span class="mr-2">←</span> 목록으로 돌아가기
       </a>
 
       <!-- 관리자일 경우에만 수정 버튼 표시 -->
-      <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}" class="inline-flex items-center px-4 py-2 bg-main-dark text-white rounded-md font-semibold shadow-md hover-bg-main-dark transition duration-300">
-        <span class="mr-2">✏️</span> 수정
+      <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-dark-navy text-white rounded-lg font-semibold shadow-md hover:bg-dark-navy/80 transition duration-300">
+        <span class="mr-2">✏️</span> 영상 수정하기
       </a>
     </div>
-
   </div>
 </main>
 

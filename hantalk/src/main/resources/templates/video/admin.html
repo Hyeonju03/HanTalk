@@ -6,258 +6,414 @@
   <title>관리자 영상 목록</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <!-- Google Fonts for Nanum Gothic -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script th:inline="javascript">
+    // Tailwind CSS 메인 컬러 설정
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'dark-navy': '#2F4160',
+                    'coral-pink': '#F29DA0',
+                    'soft-sky': '#B5D0E3',
+                }
+            }
+        }
+    }
+  </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
-    body {
-        font-family: 'Nanum Gothic', sans-serif;
+    /* 트랜지션 애니메이션을 위한 커스텀 스타일 */
+    .modal-fade-enter-active, .modal-fade-leave-active {
+        transition: opacity 0.3s ease;
     }
-    /* 테이블 행 클릭 시 URL 이동을 위한 커서 스타일 */
-    .table-row-clickable {
-        cursor: pointer;
+    .modal-fade-enter-from, .modal-fade-leave-to {
+        opacity: 0;
     }
-    /* 페이지네이션 활성 버튼 색상 조정 */
-    .pagination a.active {
-        background-color: #B5D0E3; /* 부드러운 하늘색 */
-        color: white;
-        border-radius: 0.5rem;
+    .modal-zoom-enter-active, .modal-zoom-leave-active {
+        transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    .modal-zoom-enter-from, .modal-zoom-leave-to {
+        transform: scale(0.9);
     }
 
-    /* Custom animation for message box */
-    @keyframes fadeOut {
-        0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    /* 토스트 메시지 애니메이션 */
+    .toast {
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
     }
+    @keyframes fadein {
+        from { top: 0; opacity: 0; }
+        to   { top: 2rem; opacity: 1; }
+    }
+    @keyframes fadeout {
+        from { top: 2rem; opacity: 1; }
+        to   { top: 0; opacity: 0; }
+    }
+
+    /* 추가: 클릭 가능한 셀에만 커서 포인터 적용 */
+    .clickable-cell {
+      cursor: pointer;
+    }
+
   </style>
 </head>
-<body class="bg-[#f3f4f6] p-8 font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-gray-100 font-sans flex flex-col min-h-screen">
 
-<!-- Thymeleaf fragments/header :: headerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
-<!-- <div th:replace="~{fragments/header :: headerFragment}"></div> -->
+<!-- 헤더 프래그먼트 삽입 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="max-w-7xl mx-auto bg-white p-8 rounded-xl shadow-lg flex-grow">
-
+<div class="container mx-auto p-4 max-w-7xl flex-1">
+  <!-- 영상 목록 제목과 관리자 페이지 버튼을 한 줄로 배치 -->
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-[#2F4160]">관리자 영상 목록</h1>
-    <a th:href="@{/video/admin/chuga}"
-       class="bg-[#4B4B4B] text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300 flex items-center">
-      <i class="fas fa-plus mr-2"></i> 새 영상 등록
+    <h1 class="text-3xl font-bold text-dark-navy">관리자 영상 목록</h1>
+    <a th:href="@{/admin}"
+       class="inline-block bg-soft-sky text-dark-navy px-6 py-3 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
+      관리자 페이지
     </a>
   </div>
 
-  <!-- 🔍 검색 폼 -->
-  <form method="get" th:action="@{/video/admin/list}" id="searchForm"
-        class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
-    <select name="searchType" id="searchType"
-            class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
-      <option value="title" th:selected="${searchType == 'title'}">제목</option>
-      <option value="content" th:selected="${searchType == 'content'}">내용</option>
-      <option value="filename" th:selected="${searchType == 'filename'}">파일명</option>
-      <option value="all" th:selected="${searchType == 'all'}">제목 + 내용 + 파일명</option>
-    </select>
-    <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" id="keyword"
-           class="flex-grow w-full sm:w-auto border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]"/>
-    <button type="submit"
-            class="w-full sm:w-auto bg-[#4B4B4B] text-white py-2 px-6 rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
-      <i class="fas fa-search mr-1"></i>검색
-    </button>
-    <button type="button" onclick="resetSearch()"
-            class="w-full sm:w-auto bg-gray-200 text-gray-700 py-2 px-6 rounded-lg shadow-md hover:bg-gray-300 transition-colors duration-300">
-      <i class="fas fa-undo mr-1"></i>초기화
-    </button>
-  </form>
+  <!-- 검색 폼과 버튼들을 한 줄로 배치하기 위해 컨테이너 div를 flex로 변경 -->
+  <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0 mb-6">
+    <!-- 새 영상 등록 & 일괄 삭제 버튼 그룹 -->
+    <div class="flex justify-start items-center space-x-2">
+      <!-- 일괄 삭제 버튼 -->
+      <button id="batchDeleteBtn" type="button"
+              class="bg-dark-navy text-white px-6 py-3 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
+        선택 항목 삭제
+      </button>
+      <!-- 새 영상 등록 버튼 -->
+      <a th:href="@{/video/admin/chuga}"
+         class="inline-block bg-coral-pink text-white px-6 py-3 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
+        ➕ 새 영상 등록
+      </a>
+    </div>
+
+    <!-- 검색 폼 그룹 -->
+    <form method="get" th:action="@{/video/admin/list}" id="searchForm" class="flex flex-wrap items-center space-x-2">
+      <select name="searchType" id="searchType"
+              class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-soft-sky focus:border-soft-sky">
+        <option value="title" th:selected="${searchType == 'title'}">제목</option>
+        <option value="content" th:selected="${searchType == 'content'}">내용</option>
+        <option value="filename" th:selected="${searchType == 'filename'}">파일명</option>
+        <option value="all" th:selected="${searchType == 'all'}">제목 + 내용 + 파일명</option>
+      </select>
+      <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" id="keyword"
+             class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-soft-sky focus:border-soft-sky min-w-40"/>
+      <button type="submit" class="bg-coral-pink text-white px-6 py-2 rounded-lg hover:bg-opacity-90 transition-colors duration-200">
+        검색
+      </button>
+      <button type="button" onclick="resetSearch()"
+              class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200">
+        초기화
+      </button>
+    </form>
+  </div>
 
   <!-- 검색 결과 없을 때 -->
-  <p th:if="${#lists.isEmpty(videoPage.content)}" class="text-center py-12 text-gray-500">
-      <span th:if="${not #strings.isEmpty(param.keyword)}">
-        "<span th:text="${param.keyword}"></span>"에 대한 검색 결과가 없습니다.
-      </span>
+  <div th:if="${#lists.isEmpty(videoPage.content)}" class="bg-white p-6 rounded-lg shadow-md text-center text-gray-500">
+        <span th:if="${not #strings.isEmpty(param.keyword)}">
+            "<span th:text="${param.keyword}"></span>"에 대한 검색 결과가 없습니다.
+        </span>
     <span th:unless="${not #strings.isEmpty(param.keyword)}">
-        등록된 영상이 없습니다.
-      </span>
-  </p>
+            등록된 영상이 없습니다.
+        </span>
+  </div>
 
   <!-- 결과가 있을 때 테이블 출력 -->
-  <div class="overflow-x-auto" th:if="${not #lists.isEmpty(videoPage.content)}">
-    <table class="min-w-full bg-white rounded-lg border-collapse shadow-lg">
-      <thead>
-      <tr class="bg-[#FDFBFF] text-[#2F4160] text-left text-sm font-semibold uppercase tracking-wider">
-        <th class="py-3 px-4 rounded-tl-lg">번호</th>
-        <th class="py-3 px-4">제목</th>
-        <th class="py-3 px-4">설명</th>
-        <th class="py-3 px-4">파일명</th>
-        <th class="py-3 px-4">등록일</th>
-        <th class="py-3 px-4">수정일</th>
-        <th class="py-3 px-4 rounded-tr-lg text-right">관리</th>
+  <!-- overflow-x-auto 클래스를 추가하여 수평 스크롤바를 만듭니다. -->
+  <div th:if="${not #lists.isEmpty(videoPage.content)}" class="bg-white rounded-lg shadow-md overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-soft-sky text-dark-navy">
+      <tr>
+        <th scope="col" class="px-2 py-3">
+          <input type="checkbox" id="selectAllCheckbox" class="form-checkbox h-4 w-4 text-dark-navy rounded" />
+        </th>
+        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">번호</th>
+        <!-- 제목, 설명, 파일명에 텍스트 자르기 효과를 주기 위한 클래스 추가 -->
+        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">제목</th>
+        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">설명</th>
+        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">파일명</th>
+        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">등록일</th>
+        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">수정일</th>
+        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">관리</th>
       </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
+      <!-- 변경점: tr에 있던 clickable-row 클래스를 제거합니다. hover 효과는 그대로 유지합니다. -->
       <tr th:each="video, stat : ${videoPage.content}"
           th:id="'row-' + ${video.videoId}"
           th:data-id="${video.videoId}"
-          class="clickable-row border-t border-gray-200 hover:bg-gray-50 transition-colors duration-300">
-        <td th:text="${videoPage.number * videoPage.size + stat.index + 1}" class="px-6 py-4 whitespace-nowrap text-sm text-[#2F4160]">1</td>
-        <td th:text="${video.title}" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#2F4160]">제목</td>
-        <td th:text="${video.content}" class="px-6 py-4 text-sm text-[#2F4160]">설명</td>
-        <td th:text="${video.videoName}" class="px-6 py-4 whitespace-nowrap text-sm text-[#2F4160]">파일명</td>
-        <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">등록일</td>
-        <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">수정일</td>
-        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-          <div class="flex justify-end items-center space-x-2">
-            <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
-               onclick="event.stopPropagation();"
-               class="bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300">
-              <i class="fas fa-edit mr-1"></i>수정
-            </a>
-            <button type="button"
-                    class="bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300"
-                    th:data-id="${video.videoId}">
-              <i class="fas fa-trash"></i> 삭제
-            </button>
-          </div>
+          class="hover:bg-gray-50 transition-colors duration-150">
+        <td class="px-2 py-4">
+          <input type="checkbox" name="selectedVideoIds" th:value="${video.videoId}" class="video-checkbox form-checkbox h-4 w-4 text-dark-navy rounded" onclick="event.stopPropagation();"/>
+        </td>
+        <!-- 변경점: 클릭 가능한 각 td에 clickable-cell 클래스를 추가합니다. -->
+        <td th:text="${videoPage.number * videoPage.size + stat.index + 1}" class="clickable-cell px-6 py-4 text-sm text-gray-900 whitespace-nowrap">1</td>
+        <td class="clickable-cell px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap overflow-hidden max-w-xs">
+          <div th:text="${video.title}" class="truncate w-full">제목</div>
+        </td>
+        <td class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap overflow-hidden max-w-xs">
+          <div th:text="${video.content}" class="truncate w-full">설명</div>
+        </td>
+        <td class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap overflow-hidden max-w-xs">
+          <div th:text="${video.videoName}" class="truncate w-full">파일명</div>
+        </td>
+        <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}" class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap">등록일</td>
+        <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}" class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap">수정일</td>
+        <!-- 이 td는 클릭 동작에서 제외되므로, clickable-cell 클래스를 추가하지 않습니다. -->
+        <td class="px-6 py-4 text-sm font-medium space-x-2 whitespace-nowrap">
+          <!-- 수정 버튼: 호버 시 더 진한 파란색과 굵은 글씨로 변함 -->
+          <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
+             onclick="event.stopPropagation();"
+             class="text-dark-navy hover:text-blue-800 hover:font-bold transition-all duration-200">수정</a>
+          <!-- 삭제 버튼: 호버 시 더 진한 빨간색과 굵은 글씨로 변함 -->
+          <button type="button"
+                  th:attr="data-id=${video.videoId}"
+                  onclick="event.stopPropagation(); showDeleteModal(this);"
+                  class="text-coral-pink hover:text-red-600 hover:font-bold transition-all duration-200">삭제</button>
         </td>
       </tr>
       </tbody>
     </table>
   </div>
 
-  <div class="pagination mt-8 pb-8" th:if="${videoPage.totalPages > 1}">
-    <ul class="flex justify-center items-center space-x-2">
-      <!-- 이전 블록 버튼 (Thymeleaf 변수명 일치) -->
-      <li th:if="${videoPage.number > 0}">
-        <a th:href="@{/video/admin/list(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}"
-           class="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-200 transition-colors duration-300">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-        </a>
-      </li>
-
-      <!-- 페이지 번호 -->
-      <li th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
-        <a th:href="@{/video/admin/list(page=${i}, searchType=${searchType}, keyword=${keyword})}"
-           th:text="${i + 1}"
-           th:classappend="${i == videoPage.number} ? 'bg-[#B5D0E3] text-white rounded-lg font-bold' : 'bg-white text-[#2F4160] rounded-lg hover:bg-gray-200'"
-           class="flex items-center justify-center w-10 h-10 transition-colors duration-300">
-        </a>
-      </li>
-
-      <!-- 다음 블록 버튼 (Thymeleaf 변수명 일치) -->
-      <li th:if="${videoPage.number + 1 < videoPage.totalPages}">
-        <a th:href="@{/video/admin/list(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}"
-           class="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-200 transition-colors duration-300">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
-      </li>
-    </ul>
+  <!-- 페이지네이션 -->
+  <div class="pagination flex justify-center items-center space-x-2 mt-6" th:if="${videoPage.totalPages > 1}">
+    <a th:if="${videoPage.number > 0}"
+       th:href="@{/video/admin/list(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}"
+       class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">
+      이전
+    </a>
+    <span th:unless="${videoPage.number > 0}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">이전</span>
+    <div class="flex space-x-1">
+            <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
+                <a th:href="@{/video/admin/list(page=${i}, searchType=${searchType}, keyword=${keyword})}"
+                   th:classappend="${i == videoPage.number} ? 'bg-dark-navy text-white' : 'text-gray-700 hover:bg-gray-200'"
+                   class="px-4 py-2 rounded-lg transition-colors duration-200"
+                   th:text="${i + 1}">1</a>
+            </span>
+    </div>
+    <a th:if="${videoPage.number + 1 < videoPage.totalPages}"
+       th:href="@{/video/admin/list(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}"
+       class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">
+      다음
+    </a>
+    <span th:unless="${videoPage.number + 1 < videoPage.totalPages}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">다음</span>
   </div>
-
 </div>
 
-<!-- Custom message box and deletion script -->
+<!-- 커스텀 모달 UI -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 modal-fade-leave-to"
+     onclick="if(event.target.id === 'deleteModal') hideModal();">
+  <div id="modal-content" class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6 modal-zoom-leave-to">
+    <h3 class="text-xl font-semibold text-gray-900 mb-4">영상 삭제</h3>
+    <p class="text-gray-700 mb-6">정말로 이 영상을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</p>
+    <div class="flex justify-end space-x-4">
+      <button type="button" onclick="hideModal()"
+              class="bg-gray-300 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200">
+        취소
+      </button>
+      <button type="button" id="confirmDeleteBtn"
+              class="bg-coral-pink text-white px-5 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200">
+        삭제
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 토스트 메시지 UI (초기에 숨겨져 있음) -->
+<div id="toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 w-80 z-50"></div>
+
+<!-- Ajax 삭제 및 모달용 스크립트 -->
 <script>
-  // Custom message box function (reused from other admin pages)
-  function showCustomMessage(message, type = 'info') {
-      const messageBox = document.createElement('div');
-      messageBox.textContent = message;
-      let bgColor = '#2F4160'; // Default: Dark Navy
-      let textColor = 'white';
+  // 검색 폼 초기화 함수
+  function resetSearch() {
+      document.getElementById('searchType').value = 'title';
+      document.getElementById('keyword').value = '';
+      document.getElementById('searchForm').submit();
+  }
 
-      if (type === 'error') {
-          bgColor = '#F29DA0'; // Coral Pink for errors
-      } else if (type === 'success') {
-          bgColor = '#B5D0E3'; // Soft Sky Blue for success
-          textColor = '#2F4160'; // Dark Navy for text on success
-      }
+  // 커스텀 모달 관련 함수
+  const deleteModal = document.getElementById('deleteModal');
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  let videoIdToDelete = null;
 
-      messageBox.style.cssText = `
-          position: fixed;
-          top: 20%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background-color: ${bgColor};
-          color: ${textColor};
-          padding: 15px 30px;
-          border-radius: 8px;
-          z-index: 1000;
-          font-size: 1.1em;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-          animation: fadeOut 3s forwards;
-      `;
-      document.body.appendChild(messageBox);
+  function showDeleteModal(button) {
+      // 모달에 삭제할 영상의 ID 저장
+      videoIdToDelete = $(button).data("id");
 
-      // Ensure the fadeOut keyframes are available (add only once)
-      if (!document.querySelector('style#fadeOutKeyframes')) {
-          const styleSheet = document.createElement("style");
-          styleSheet.id = "fadeOutKeyframes"; // Add an ID to prevent duplicates
-          styleSheet.type = "text/css";
-          styleSheet.innerText = `
-              @keyframes fadeOut {
-                  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-                  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-              }
-          `;
-          document.head.appendChild(styleSheet);
-      }
+      // 기존 이벤트 리스너 제거
+      confirmDeleteBtn.removeEventListener('click', deleteSelectedVideos);
+      confirmDeleteBtn.removeEventListener('click', deleteVideo);
+
+      // 단일 삭제 함수 연결
+      confirmDeleteBtn.addEventListener('click', deleteVideo);
+
+      // 모달 표시
+      document.querySelector('#deleteModal h3').innerText = `영상 삭제`;
+      document.querySelector('#deleteModal p').innerText = `정말로 이 영상을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`;
+      deleteModal.classList.remove('hidden');
+      // 애니메이션 클래스 추가
+      setTimeout(() => {
+          deleteModal.classList.remove('modal-fade-leave-to');
+          document.getElementById('modal-content').classList.remove('modal-zoom-leave-to');
+      }, 10);
+  }
+
+  function hideModal() {
+      // 애니메이션 클래스 추가 후 숨기기
+      deleteModal.classList.add('modal-fade-leave-to');
+      document.getElementById('modal-content').classList.add('modal-zoom-leave-to');
+
+      // 애니메이션이 끝난 후 완전히 숨김
+      setTimeout(() => {
+          deleteModal.classList.add('hidden');
+      }, 300);
+  }
+
+  // 토스트 메시지 표시 함수
+  function showToast(message, type = 'success') {
+      const toastContainer = document.getElementById('toast-container');
+      const bgColor = type === 'success' ? 'bg-soft-sky' : 'bg-coral-pink';
+      const toast = document.createElement('div');
+      toast.className = `toast p-4 mb-2 rounded-lg shadow-lg text-white font-semibold flex items-center justify-between ${bgColor}`;
+      toast.innerHTML = `<span>${message}</span>`;
+      toastContainer.prepend(toast);
 
       setTimeout(() => {
-          messageBox.remove();
-          // Do not remove styleSheet, as it might be used by other messages
-      }, 3000);
+          toast.remove();
+      }, 3000); // 3초 후 삭제
   }
 
-function resetSearch() {
-   document.getElementById('searchType').value = 'title';  // 기본 검색조건
-   document.getElementById('keyword').value = '';
-   document.getElementById('searchForm').submit(); // 초기화 후 바로 재검색
- }
-
-// Modified deleteVideo to use showCustomMessage
-function deleteVideo(button) {
-   const videoId = $(button).data("id");
-   showCustomMessage('정말 이 자료를 삭제하시겠습니까? (이 메시지는 Canvas 환경에서는 확인을 받지 않습니다. 삭제가 진행됩니다.)', 'info');
-
-   $.ajax({
-       url: "/video/admin/" + videoId,
-       type: "DELETE",
-       success: function (result) {
-           showCustomMessage("삭제되었습니다.", 'success');
-           $("#row-" + videoId).remove(); // DOM에서 해당 행 제거
-       },
-       error: function (xhr) {
-           const message = xhr.responseText || "삭제 중 오류가 발생했습니다.";
-           showCustomMessage(message, 'error');
-       }
-   });
-}
-
-// video/admin.html
-// tr 클릭 시 상세 페이지로 이동
-$(document).ready(function() {
-$(".clickable-row").click(function(e) {
-  // Only proceed if the click target is NOT an anchor tag or a button
-  if (!$(e.target).closest("a, button").length) {
-    const videoId = $(this).data("id");
-    if (videoId) {
-      // URL을 "/video/view/"로 통일
-      window.location.href = "/video/view/" + videoId;
-    }
+  // 단일 영상 삭제 로직 (변경사항: alert -> showToast)
+  function deleteVideo() {
+      if (videoIdToDelete) {
+          $.ajax({
+              url: "/video/admin/" + videoIdToDelete,
+              type: "DELETE",
+              success: function (result) {
+                  showToast("영상 삭제 완료!");
+                  // 페이지 새로고침 추가
+                  window.location.reload();
+              },
+              error: function (xhr) {
+                  const message = xhr.responseText || "삭제 중 오류가 발생했습니다.";
+                  showToast("삭제 실패: " + message, 'error');
+              }
+          });
+      }
+      hideModal();
   }
-});
 
-// Attach click event listener to delete buttons specifically
-// Delegated event handling for dynamically added rows or if buttons are not present on initial load
-$('body').on('click', '.bg-red-500.text-white', function(e) {
-    e.stopPropagation(); // Prevent the row click event from firing
-    deleteVideo(this);
-});
-});
+  // 일괄 삭제 로직 추가
+  const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+  const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+  const videoCheckboxes = document.querySelectorAll('.video-checkbox');
 
+  // 일괄 삭제 버튼 클릭 시 모달 표시
+  batchDeleteBtn.addEventListener('click', function() {
+      const selectedIds = Array.from(document.querySelectorAll('input.video-checkbox:checked')).map(cb => cb.value);
+      if (selectedIds.length === 0) {
+          showToast("삭제할 영상을 하나 이상 선택해주세요.", 'error');
+          return;
+      }
+
+      // 모달 내용 변경 및 이벤트 리스너 재설정
+      document.querySelector('#deleteModal h3').innerText = `선택 항목 (${selectedIds.length}개) 삭제`;
+      document.querySelector('#deleteModal p').innerText = `선택된 ${selectedIds.length}개의 영상을 정말로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`;
+
+      // 기존 이벤트 리스너 제거
+      confirmDeleteBtn.removeEventListener('click', deleteVideo);
+      confirmDeleteBtn.removeEventListener('click', deleteSelectedVideos);
+
+      // 일괄 삭제 함수 연결
+      confirmDeleteBtn.addEventListener('click', function() {
+          deleteSelectedVideos(selectedIds);
+          hideModal();
+      });
+
+      showModal();
+  });
+
+  function showModal() {
+      deleteModal.classList.remove('hidden');
+      setTimeout(() => {
+          deleteModal.classList.remove('modal-fade-leave-to');
+          document.getElementById('modal-content').classList.remove('modal-zoom-leave-to');
+      }, 10);
+  }
+
+  function deleteSelectedVideos(ids) {
+      let deletedCount = 0;
+      let failedCount = 0;
+
+      // Promise.all을 사용해 모든 삭제 요청이 완료될 때까지 기다립니다.
+      const promises = ids.map(id => {
+          return new Promise((resolve, reject) => {
+              $.ajax({
+                  url: "/video/admin/" + id,
+                  type: "DELETE",
+                  success: function () {
+                      $("#row-" + id).remove();
+                      deletedCount++;
+                      resolve();
+                  },
+                  error: function () {
+                      failedCount++;
+                      reject();
+                  }
+              });
+          });
+      });
+
+      Promise.allSettled(promises).then(() => {
+          if (deletedCount > 0) {
+              showToast(`${deletedCount}개의 영상이 삭제되었습니다.`, 'success');
+          }
+          if (failedCount > 0) {
+              showToast(`${failedCount}개의 영상 삭제에 실패했습니다.`, 'error');
+          }
+          // 페이지 새로고침 추가
+          window.location.reload();
+      });
+  }
+
+
+  // 체크박스 전체 선택/해제 기능
+  selectAllCheckbox.addEventListener('change', function() {
+      videoCheckboxes.forEach(checkbox => {
+          checkbox.checked = this.checked;
+      });
+  });
+
+  videoCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+          checkAllCheckboxes();
+      });
+  });
+
+
+  function checkAllCheckboxes() {
+      const totalCheckboxes = videoCheckboxes.length;
+      const checkedCheckboxes = document.querySelectorAll('.video-checkbox:checked').length;
+      selectAllCheckbox.checked = totalCheckboxes === checkedCheckboxes;
+  }
+
+  // 변경점: 이제 .clickable-cell에만 클릭 리스너를 추가합니다.
+  $(document).ready(function() {
+      $(".clickable-cell").click(function(e) {
+          // 클릭된 td의 부모인 tr을 찾아서 data-id를 가져옵니다.
+          const row = $(this).closest('tr');
+          const videoId = row.data("id");
+          if (videoId) {
+              window.location.href = "/video/view/" + videoId;
+          }
+      });
+  });
 
 </script>
+
 <!-- 푸터 프래그먼트 삽입 -->
 <!-- <div th:replace="~{fragments/footer :: footerFragment}"></div> -->
 
-<!-- Bootstrap JS (was in original, but not used by Tailwind, so keep only if needed elsewhere) -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
 </body>
 </html>

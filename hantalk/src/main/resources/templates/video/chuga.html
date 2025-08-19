@@ -7,130 +7,115 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <style>
-    /* Nanum Gothic 폰트 설정 */
-    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
-    body {
-        font-family: 'Nanum Gothic', sans-serif;
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script th:inline="javascript">
+    // Tailwind CSS 메인 컬러 설정
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'dark-navy': '#2F4160',
+                    'coral-pink': '#F29DA0',
+                    'soft-sky': '#B5D0E3',
+                }
+            }
+        }
     }
-
-    /* Custom animation for message box */
-    @keyframes fadeOut {
-        0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+  </script>
+  <style>
+    /* 토스트 메시지 애니메이션 */
+    .toast {
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+    @keyframes fadein {
+        from { top: 0; opacity: 0; }
+        to   { top: 2rem; opacity: 1; }
+    }
+    @keyframes fadeout {
+        from { top: 2rem; opacity: 1; }
+        to   { top: 0; opacity: 0; }
     }
   </style>
 </head>
-<body class="bg-[#f3f4f6] text-[#2F4160] min-h-screen flex flex-col items-center p-8">
+<body class="bg-gray-200 font-sans antialiased">
+<div class="container mx-auto p-8 md:p-10 max-w-2xl bg-white rounded-2xl shadow-2xl mt-12 mb-12">
+  <h1 class="text-3xl font-bold text-dark-navy mb-8 text-center">영상 업로드</h1>
 
-<!-- Thymeleaf fragments/header :: headerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
-<!-- <div th:replace="~{fragments/header :: headerFragment}"></div> -->
+  <form id="uploadForm" th:action="@{/video/admin/chugaProc}" method="post" enctype="multipart/form-data" class="space-y-8">
 
-<div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg w-full">
-  <h1 class="text-3xl font-bold text-center text-[#2F4160] mb-8">🎬 영상 업로드</h1>
-
-  <form id="uploadForm" th:action="@{/video/admin/chugaProc}" method="post" enctype="multipart/form-data"
-        class="space-y-6">
-
-    <div class="flex flex-col">
-      <label for="title" class="text-lg font-semibold mb-2">제목:</label>
-      <input type="text" name="title" id="title" required
-             class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3] text-[#2F4160]"/>
+    <!-- 제목 입력 필드 -->
+    <div class="space-y-2">
+      <label for="title" class="block text-gray-700 font-medium">제목:</label>
+      <input type="text" id="title" name="title" required
+             class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-soft-sky focus:border-soft-sky transition-colors duration-200" />
     </div>
 
-    <div class="flex flex-col">
-      <label for="content" class="text-lg font-semibold mb-2">설명:</label>
-      <textarea name="content" id="content" required rows="5"
-                class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3] text-[#2F4160]"></textarea>
+    <!-- 설명 입력 필드 -->
+    <div class="space-y-2">
+      <label for="content" class="block text-gray-700 font-medium">설명:</label>
+      <textarea id="content" name="content" rows="4" required
+                class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg resize-none bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-soft-sky focus:border-soft-sky transition-colors duration-200"></textarea>
     </div>
 
-    <div class="flex flex-col">
-      <label for="fileInput" class="text-lg font-semibold mb-2">영상 파일 (MP4만 가능):</label>
-      <input type="file" name="file" id="fileInput" accept="video/mp4" required
-             class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-                    file:rounded-full file:border-0 file:text-sm file:font-semibold
-                    file:bg-[#4B4B4B] file:text-white hover:file:bg-[#2F4160] hover:file:text-white transition-colors duration-300 cursor-pointer"/>
-      <span id="fileCheckResult" class="text-red-500 text-sm mt-2"></span>
+    <!-- 파일 업로드 필드 -->
+    <div class="space-y-2">
+      <label for="fileInput" class="block text-gray-700 font-medium">영상 파일:</label>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+        <input type="file" name="file" id="fileInput" accept="video/mp4" required
+               class="flex-1 block w-full text-sm text-gray-500
+               file:mr-4 file:py-3 file:px-6
+               file:rounded-full file:border-0
+               file:text-sm file:font-semibold
+               file:bg-soft-sky file:text-dark-navy
+               hover:file:bg-opacity-80 transition-colors duration-200"/>
+        <span id="fileCheckResult" class="text-sm font-medium text-coral-pink mt-2 sm:mt-0"></span>
+      </div>
     </div>
 
-    <!-- 업로드 버튼을 중앙 정렬하는 div 추가 -->
-    <div class="text-center">
+    <!-- 버튼 그룹 -->
+    <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8 pt-6 border-t border-gray-200">
       <button type="submit" id="submitBtn"
-              class="inline-flex items-center justify-center bg-[#4B4B4B] text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-[#2F4160] transition duration-300">
-        <i class="fas fa-upload mr-2"></i> 업로드
+              class="w-full sm:w-auto px-8 py-3 rounded-lg text-white font-semibold shadow-lg bg-dark-navy hover:bg-opacity-95 transition-all duration-200 hover:shadow-xl">
+        업로드
       </button>
+      <a th:href="@{/video/admin/list}"
+         class="w-full sm:w-auto text-center px-8 py-3 rounded-lg text-dark-navy font-semibold shadow-lg bg-gray-300 hover:bg-gray-400 transition-all duration-200 hover:shadow-xl">
+        &larr; 목록으로
+      </a>
     </div>
-  </form>
 
-  <div class="mt-8 text-center">
-    <a th:href="@{/video/admin/list}"
-       class="inline-flex items-center bg-gray-200 text-gray-700 py-2 px-6 rounded-lg shadow-md hover:bg-[#2F4160] hover:text-white transition-colors duration-300">
-      <i class="fas fa-arrow-left mr-2"></i> 목록으로
-    </a>
-  </div>
+  </form>
 </div>
 
+<!-- 토스트 메시지 UI (초기에 숨겨져 있음) -->
+<div id="toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 w-80 z-50"></div>
+
 <script>
-  // Custom message box function
-  function showCustomMessage(message, type = 'info') {
-      const messageBox = document.createElement('div');
-      messageBox.textContent = message;
-      let bgColor = '#2F4160'; // Default: Dark Navy
-      let textColor = 'white';
-
-      if (type === 'error') {
-          bgColor = '#F29DA0'; // Coral Pink for errors
-      } else if (type === 'success') {
-          bgColor = '#B5D0E3'; // Soft Sky Blue for success
-          textColor = '#2F4160'; // Dark Navy for text on success
-      }
-
-      messageBox.style.cssText = `
-          position: fixed;
-          top: 20%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background-color: ${bgColor};
-          color: ${textColor};
-          padding: 15px 30px;
-          border-radius: 8px;
-          z-index: 1000;
-          font-size: 1.1em;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-          animation: fadeOut 3s forwards;
-      `;
-      document.body.appendChild(messageBox);
-
-      // Ensure the fadeOut keyframes are available (add only once)
-      if (!document.querySelector('style#fadeOutKeyframes')) {
-          const styleSheet = document.createElement("style");
-          styleSheet.id = "fadeOutKeyframes"; // Add an ID to prevent duplicates
-          styleSheet.type = "text/css";
-          styleSheet.innerText = `
-              @keyframes fadeOut {
-                  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-                  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-              }
-          `;
-          document.head.appendChild(styleSheet);
-      }
+  // 토스트 메시지 표시 함수
+  function showToast(message, type = 'error') {
+      const toastContainer = document.getElementById('toast-container');
+      const bgColor = type === 'success' ? 'bg-soft-sky' : 'bg-coral-pink';
+      const textColor = type === 'success' ? 'text-dark-navy' : 'text-white';
+      const toast = document.createElement('div');
+      toast.className = `toast p-4 mb-2 rounded-lg shadow-lg font-semibold flex items-center justify-between ${bgColor} ${textColor}`;
+      toast.innerHTML = `<span>${message}</span>`;
+      toastContainer.prepend(toast);
 
       setTimeout(() => {
-          messageBox.remove();
-      }, 3000);
+          toast.remove();
+      }, 3000); // 3초 후 삭제
   }
 
   $(document).ready(function () {
-   let isDuplicate = false;
+    let isDuplicate = false;
 
-   $('#fileInput').on('change', function () {
+    $('#fileInput').on('change', function () {
       const file = this.files[0];
       if (!file) {
-          $('#fileCheckResult').text(''); // 파일 선택 취소 시 메시지 초기화
-          $('#submitBtn').prop('disabled', false); // 버튼 활성화
-          isDuplicate = false;
-          return;
+        $('#fileCheckResult').text('');
+        $('#submitBtn').prop('disabled', false);
+        isDuplicate = false;
+        return;
       }
 
       const filename = file.name;
@@ -141,7 +126,7 @@
         contentType: 'application/json',
         data: JSON.stringify({ filename: filename }),
         success: function(response) {
-          if(response === true) {
+          if (response === true) {
             $('#fileCheckResult').text('이미 동일한 영상이 업로드되어 있습니다.');
             $('#submitBtn').prop('disabled', true);
             isDuplicate = true;
@@ -159,19 +144,15 @@
       });
     });
 
-   $('#uploadForm').on('submit', function (e) {
-     if (isDuplicate) {
-       e.preventDefault();
-       showCustomMessage('중복된 파일명으로 업로드할 수 없습니다.', 'error'); // alert 대신 showCustomMessage 사용
-     }
-   });
- });
-
+    $('#uploadForm').on('submit', function (e) {
+      if (isDuplicate) {
+        e.preventDefault();
+        showToast('중복된 파일명으로 업로드할 수 없습니다.');
+      }
+    });
+  });
 </script>
-<!-- Thymeleaf fragments/footer :: footerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
-<!-- <div th:replace="~{fragments/footer :: footerFragment}"></div> -->
 
-<!-- Bootstrap JS (was in original, but not used by Tailwind, so keep only if needed elsewhere) -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
 </body>
 </html>
