@@ -4,70 +4,152 @@
   <title>관리자 강의 업로드</title>
   <meta charset="UTF-8" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script th:inline="javascript">
+    // Tailwind CSS 메인 컬러 설정
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'dark-navy': '#2F4160',
+                    'coral-pink': '#F29DA0',
+                    'soft-sky': '#B5D0E3',
+                }
+            }
+        }
+    }
+  </script>
+  <style>
+    /* 토스트 메시지 애니메이션 */
+    .toast {
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+    @keyframes fadein {
+        from { top: 0; opacity: 0; }
+        to   { top: 2rem; opacity: 1; }
+    }
+    @keyframes fadeout {
+        from { top: 2rem; opacity: 1; }
+        to   { top: 0; opacity: 0; }
+    }
+  </style>
 </head>
-<body>
-<h1>영상 업로드</h1>
+<body class="bg-gray-200 font-sans antialiased">
+<div class="container mx-auto p-8 md:p-10 max-w-2xl bg-white rounded-2xl shadow-2xl mt-12 mb-12">
+  <h1 class="text-3xl font-bold text-dark-navy mb-8 text-center">영상 업로드</h1>
 
-<form id="uploadForm" th:action="@{/video/admin/chugaProc}" method="post" enctype="multipart/form-data">
+  <form id="uploadForm" th:action="@{/video/admin/chugaProc}" method="post" enctype="multipart/form-data" class="space-y-8">
 
-  <label>제목: <input type="text" name="title" required /></label><br/>
-  <label>설명: <textarea name="content" required></textarea></label><br/>
+    <!-- 제목 입력 필드 -->
+    <div class="space-y-2">
+      <label for="title" class="block text-gray-700 font-medium">제목:</label>
+      <input type="text" id="title" name="title" required
+             class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-soft-sky focus:border-soft-sky transition-colors duration-200" />
+    </div>
 
-  <label>영상 파일:
-    <input type="file" name="file" id="fileInput" accept="video/mp4" required />
-  </label>
-  <span id="fileCheckResult" style="color:red; margin-left: 10px;"></span><br/>
+    <!-- 설명 입력 필드 -->
+    <div class="space-y-2">
+      <label for="content" class="block text-gray-700 font-medium">설명:</label>
+      <textarea id="content" name="content" rows="4" required
+                class="w-full px-5 py-3 border-2 border-gray-300 rounded-lg resize-none bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-soft-sky focus:border-soft-sky transition-colors duration-200"></textarea>
+    </div>
 
-  <button type="submit" id="submitBtn">업로드</button>
-</form>
+    <!-- 파일 업로드 필드 -->
+    <div class="space-y-2">
+      <label for="fileInput" class="block text-gray-700 font-medium">영상 파일:</label>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+        <input type="file" name="file" id="fileInput" accept="video/mp4" required
+               class="flex-1 block w-full text-sm text-gray-500
+               file:mr-4 file:py-3 file:px-6
+               file:rounded-full file:border-0
+               file:text-sm file:font-semibold
+               file:bg-soft-sky file:text-dark-navy
+               hover:file:bg-opacity-80 transition-colors duration-200"/>
+        <span id="fileCheckResult" class="text-sm font-medium text-coral-pink mt-2 sm:mt-0"></span>
+      </div>
+    </div>
 
-<a th:href="@{/video/admin/list}">&larr; 목록으로</a>
+    <!-- 버튼 그룹 -->
+    <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8 pt-6 border-t border-gray-200">
+      <button type="submit" id="submitBtn"
+              class="w-full sm:w-auto px-8 py-3 rounded-lg text-white font-semibold shadow-lg bg-dark-navy hover:bg-opacity-95 transition-all duration-200 hover:shadow-xl">
+        업로드
+      </button>
+      <a th:href="@{/video/admin/list}"
+         class="w-full sm:w-auto text-center px-8 py-3 rounded-lg text-dark-navy font-semibold shadow-lg bg-gray-300 hover:bg-gray-400 transition-all duration-200 hover:shadow-xl">
+        &larr; 목록으로
+      </a>
+    </div>
+
+  </form>
+</div>
+
+<!-- 토스트 메시지 UI (초기에 숨겨져 있음) -->
+<div id="toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 w-80 z-50"></div>
 
 <script>
+  // 토스트 메시지 표시 함수
+  function showToast(message, type = 'error') {
+      const toastContainer = document.getElementById('toast-container');
+      const bgColor = type === 'success' ? 'bg-soft-sky' : 'bg-coral-pink';
+      const textColor = type === 'success' ? 'text-dark-navy' : 'text-white';
+      const toast = document.createElement('div');
+      toast.className = `toast p-4 mb-2 rounded-lg shadow-lg font-semibold flex items-center justify-between ${bgColor} ${textColor}`;
+      toast.innerHTML = `<span>${message}</span>`;
+      toastContainer.prepend(toast);
+
+      setTimeout(() => {
+          toast.remove();
+      }, 3000); // 3초 후 삭제
+  }
+
   $(document).ready(function () {
-   let isDuplicate = false;
+    let isDuplicate = false;
 
-   $('#fileInput').on('change', function () {
-  const file = this.files[0];
-  if (!file) return;
-
-  const filename = file.name;
-
-  $.ajax({
-    url: '/video/admin/check-filename',
-    type: 'POST',
-    contentType: 'application/json',
-    data: JSON.stringify({ filename: filename }),
-    success: function(response) {
-      if(response === true) {
-        $('#fileCheckResult').text('이미 동일한 영상이 업로드되어 있습니다.');
-        $('#submitBtn').prop('disabled', true);
-        isDuplicate = true;
-      } else {
+    $('#fileInput').on('change', function () {
+      const file = this.files[0];
+      if (!file) {
         $('#fileCheckResult').text('');
         $('#submitBtn').prop('disabled', false);
         isDuplicate = false;
+        return;
       }
-    },
-    error: function() {
-      $('#fileCheckResult').text('서버 오류로 중복 체크 실패');
-      $('#submitBtn').prop('disabled', true);
-      isDuplicate = true;
-    }
+
+      const filename = file.name;
+
+      $.ajax({
+        url: '/video/admin/check-filename',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ filename: filename }),
+        success: function(response) {
+          if (response === true) {
+            $('#fileCheckResult').text('이미 동일한 영상이 업로드되어 있습니다.');
+            $('#submitBtn').prop('disabled', true);
+            isDuplicate = true;
+          } else {
+            $('#fileCheckResult').text('');
+            $('#submitBtn').prop('disabled', false);
+            isDuplicate = false;
+          }
+        },
+        error: function() {
+          $('#fileCheckResult').text('서버 오류로 중복 체크 실패');
+          $('#submitBtn').prop('disabled', true);
+          isDuplicate = true;
+        }
+      });
+    });
+
+    $('#uploadForm').on('submit', function (e) {
+      if (isDuplicate) {
+        e.preventDefault();
+        showToast('중복된 파일명으로 업로드할 수 없습니다.');
+      }
+    });
   });
-});
-
-   $('#uploadForm').on('submit', function (e) {
-     if (isDuplicate) {
-       e.preventDefault();
-       alert('중복된 파일명으로 업로드할 수 없습니다.');
-     }
-   });
- });
-
 </script>
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
 </body>
 </html>

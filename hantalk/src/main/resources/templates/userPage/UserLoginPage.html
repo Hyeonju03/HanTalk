@@ -34,10 +34,10 @@
 </head>
 <body class="bg-custom-gray flex flex-col items-center justify-center min-h-screen p-4 text-custom-navy">
 
-<div class="w-full text-center mb-6">
+<!--<div class="w-full text-center mb-6">
     <h1 class="text-3xl font-bold">로그인 / 회원가입 페이지</h1>
     <a href="/user/logout" class="text-sm text-gray-600 hover:underline transition-colors duration-300">로그아웃</a>
-</div>
+</div>-->
 
 <div class="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden min-h-[600px] md:min-h-[500px]">
     <div id="formContainer" class="container-box w-[200%] h-full">
@@ -68,7 +68,7 @@
         <div id="signupContainer" class="flex-shrink-0 w-1/2 p-10 flex flex-col justify-center items-center text-center bg-white">
             <h2 class="text-2xl font-bold mb-6">회원가입</h2>
             <form action="/user/signup" method="post" enctype="multipart/form-data" onsubmit="return checkPasswordMatch();" class="space-y-4 w-full max-w-sm">
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center">
                     <input type="text" id="userId" name="userId" placeholder="아이디" required
                            class="flex-1 h-10 px-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
                     <button type="button" onclick="checkId()"
@@ -81,12 +81,12 @@
                 <input type="text" name="name" placeholder="이름" required
                        class="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
 
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center">
                     <input type="text" id="emailPrefix" placeholder="이메일 아이디" required
-                           class="flex-1 h-10 px-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
-                    <span class="text-gray-500">@</span>
+                           class="flex-1 h-10 px-3 border border-l border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
+                    <span class="text-gray-500 h-10 flex items-center px-2 border-y border-gray-300">@</span>
                     <select id="emailDomain" onchange="toggleCustomDomain(this)"
-                            class="w-32 h-10 px-3 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
+                            class="w-32 h-10 px-3 border border-r border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
                         <option value="gmail.com">gmail.com</option>
                         <option value="naver.com">naver.com</option>
                         <option value="daum.net">daum.net</option>
