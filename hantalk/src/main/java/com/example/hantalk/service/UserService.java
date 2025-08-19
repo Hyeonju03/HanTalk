@@ -9,6 +9,7 @@ import com.example.hantalk.repository.Learning_LogRepository;
 import com.example.hantalk.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -257,6 +258,16 @@ public class UserService {
         dto.setStatus(users.getStatus());
         dto.setPoint(users.getPoint());
         return dto;
+    }
+
+    //포인트 추가
+    @Transactional
+    public void addPoints(String userId, int points) {
+        Users user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with userId: " + userId));
+
+        user.setPoint(user.getPoint() + points);
+        userRepository.save(user);
     }
 
 }

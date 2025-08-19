@@ -1,3 +1,4 @@
+// LearnApiController.java - 수정 없이 기존 코드를 그대로 사용합니다.
 package com.example.hantalk.controller;
 
 import com.example.hantalk.dto.SentenceDTO;
@@ -22,7 +23,6 @@ public class LearnApiController {
     private final VocaService vocaService;
     private final SentenceService sentenceService;
 
-/*    // 단어 or 문장만 선택 가능
     @GetMapping(path="/one", produces="application/json")
     public Map<String, Object> getOne(
             @RequestParam(name="kind", required=false, defaultValue="word") String kind) {
@@ -46,12 +46,11 @@ public class LearnApiController {
     private Map<String, Object> fromSentence(SentenceDTO sentenceDTO) {
         Map<String, Object> map = new HashMap<>();
         map.put("type", "SENTENCE");
-        map.put("text", sentenceDTO.getMunjang());
+        map.put("text", sentenceDTO.getMunjang() == null ? "" : sentenceDTO.getMunjang().replace('^', ' ').trim());
         map.put("mean", sentenceDTO.getDescription());
         return map;
-    }*/
+    }
 
-    // ✅ 최소 수정: 기존 /both 유지 + stage 파라미터로 분기 (기본=3: 단어+문장)
     @GetMapping(path="/both", produces="application/json")
     public Map<String, Object> getBoth(@RequestParam(name="stage", defaultValue="3") int stage) {
         Map<String, Object> map = new LinkedHashMap<>();
@@ -98,5 +97,4 @@ public class LearnApiController {
         if (s == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문장이 없습니다.");
         return s;
     }
-
 }
