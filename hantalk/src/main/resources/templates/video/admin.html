@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관리자 영상 목록</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script th:inline="javascript">
@@ -389,6 +391,7 @@
       });
   });
 
+
   function checkAllCheckboxes() {
       const totalCheckboxes = videoCheckboxes.length;
       const checkedCheckboxes = document.querySelectorAll('.video-checkbox:checked').length;
@@ -410,7 +413,7 @@
 </script>
 
 <!-- 푸터 프래그먼트 삽입 -->
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<!-- <div th:replace="~{fragments/footer :: footerFragment}"></div> -->
 
 </body>
 </html>

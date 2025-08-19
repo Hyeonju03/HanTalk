@@ -56,8 +56,10 @@
         <button type="submit" class="bg-[#4B4B4B] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
           ➕ 추가
         </button>
-        <a th:href="@{/item/admin}" class="text-[#2F4160] hover:underline py-2 px-4">
-          ← 목록으로
+        <!-- '목록으로' 링크를 버튼 스타일로 변경 및 색상 적용 -->
+        <a th:href="@{/item/admin}"
+           class="bg-[#4B4B4B] text-white font-semibold py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
+          목록으로
         </a>
       </div>
     </form>

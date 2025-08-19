@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <title>단어 맞추기</title>
 
-    <!-- Bootstrap과 Tailwind CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap은 사용하지 않으므로 제거하고 Tailwind CSS만 남김 -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script th:inline="javascript">
@@ -13,11 +12,12 @@
         let answered = false;
 
         window.onload = function () {
+            // 문제가 없을 경우 메시지 표시
             if (problems.length > 0) {
                 showProblem(problems[0]);
             } else {
                 document.getElementById('description').textContent = "";
-                document.getElementById('completion-message').textContent = "더 이상 풀 문제는 없습니다.";
+                document.getElementById('completion-message').textContent = "더 이상 풀 문제는 없습니다. 모든 문제를 성공적으로 완료했어요!";
             }
         };
 
@@ -25,24 +25,27 @@
             document.getElementById('description').textContent = problem.description;
             document.getElementById('answer').value = "";
             document.getElementById('result').textContent = "";
-            document.getElementById('feedback-icon').classList.add('hidden');
-            answered = false;
+            document.getElementById('feedback-icon').classList.add('hidden'); // 피드백 아이콘 숨기기
+            answered = false; // 정답 제출 여부 초기화
         }
 
         function submitAnswer() {
+            // 이미 정답을 제출했다면 다시 제출하지 않도록 방지
             if (answered) return;
 
-            const problem = problems[0];
-            const userAnswer = document.getElementById('answer').value.trim();
-            const correctAnswer = problem.vocabulary;
-            const vocaId = problem.vocaId;
-            const isCorrect = userAnswer === correctAnswer;
+            const problem = problems[0]; // 현재 풀 문제
+            const userAnswer = document.getElementById('answer').value.trim(); // 사용자 입력 값
+            const correctAnswer = problem.vocabulary; // 정답 단어
+            const vocaId = problem.vocaId; // 단어 ID
+            const isCorrect = userAnswer === correctAnswer; // 정답 여부 확인
 
+            // 결과 메시지 표시 (정답/오답과 정답 단어)
             document.getElementById('result').textContent = isCorrect
-                ? `정답! (${correctAnswer})`
-                : `오답! 정답은 ${correctAnswer}`;
-            showFeedback(isCorrect);
+                ? `정답이에요! (${correctAnswer})`
+                : `아쉽네요! 정답은 ${correctAnswer} 이었어요.`;
+            showFeedback(isCorrect); // O 또는 X 아이콘 표시
 
+            // 백엔드로 정답 여부 전송 (fetch API 사용)
             fetch('/study/lesson1/check', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -56,55 +59,136 @@
             .then(result => console.log("정답 여부:", result))
             .catch(err => console.error("정답 체크 오류:", err));
 
-            answered = true;
+            answered = true; // 정답 제출 상태로 변경
         }
 
         function showFeedback(isCorrect) {
             const icon = document.getElementById('feedback-icon');
-            icon.textContent = isCorrect ? 'O' : 'X';
+            icon.textContent = isCorrect ? '✔️' : '✖️'; // 이모지 아이콘 사용
             icon.className = isCorrect
-                ? 'text-green-500 text-9xl fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'
-                : 'text-red-500 text-9xl fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2';
+                ? 'text-[#2F4160] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-pulse' // 진한 남색, 펄스 애니메이션
+                : 'text-[#F29DA0] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-bounce'; // 코랄 핑크, 바운스 애니메이션
             icon.classList.remove('hidden');
+
+            // 1.5초 후 아이콘 숨기기
+            setTimeout(() => {
+                icon.classList.add('hidden');
+            }, 1500);
         }
 
         function nextProblem() {
+            // 정답을 제출하지 않았다면 다음 문제로 넘어갈 수 없음
             if (!answered) {
-                alert("먼저 정답을 제출하세요.");
+                // 커스텀 모달 또는 시각적 피드백으로 변경 (alert 대신)
+                const messageBox = document.createElement('div');
+                messageBox.textContent = "먼저 정답을 제출해주세요!";
+                messageBox.style.cssText = `
+                    position: fixed;
+                    top: 20%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background-color: #2F4160; /* 진한 남색 */
+                    color: white;
+                    padding: 15px 30px;
+                    border-radius: 8px;
+                    z-index: 1000;
+                    font-size: 1.1em;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                    animation: fadeOut 3s forwards; /* 3초 후 사라지도록 애니메이션 적용 */
+                `;
+                document.body.appendChild(messageBox);
+
+                // CSS 애니메이션 정의
+                const styleSheet = document.createElement("style");
+                styleSheet.type = "text/css";
+                styleSheet.innerText = `
+                    @keyframes fadeOut {
+                        0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+                    }
+                `;
+                document.head.appendChild(styleSheet);
+
+                setTimeout(() => {
+                    messageBox.remove();
+                    styleSheet.remove();
+                }, 3000); // 3초 후 메시지 박스 제거
                 return;
             }
-            location.reload();
+            location.reload(); // 페이지 새로고침으로 다음 문제 로드
         }
 
         function quitLesson() {
+            // window.opener가 있다면 (팝업 창으로 열렸다면) 창 닫기
             if (window.opener) {
                 window.close();
             } else {
-                alert("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.");
+                // 직접 브라우저에서 열렸다면 메시지 표시 (alert 대신 커스텀 모달)
+                const messageBox = document.createElement('div');
+                messageBox.textContent = "이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.";
+                messageBox.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background-color: #2F4160; /* 진한 남색 */
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    z-index: 1000;
+                    font-size: 1.2em;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                `;
+                document.body.appendChild(messageBox);
+
+                // 3초 후 메시지 박스 제거
+                setTimeout(() => {
+                    messageBox.remove();
+                }, 3000);
             }
         }
     </script>
+    <style>
+        /* Nanum Gothic 폰트 설정 (CDN 대신 Google Fonts 직접 임포트) */
+        @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+        }
+    </style>
 </head>
-<body class="bg-blue-50 min-h-screen flex flex-col items-center p-4">
+<body class="bg-[#FBF9F2] min-h-screen flex flex-col items-center p-4">
 
-<h1 class="text-3xl font-bold text-blue-800 mb-6">단어 맞추기 학습</h1>
+<h1 class="text-4xl font-extrabold text-[#2F4160] mb-8 mt-12">📝 단어 맞추기 학습</h1>
 
-<p id="description" class="text-lg text-gray-700 mb-4"></p>
-<input type="text" id="answer" placeholder="정답 입력" class="border border-gray-300 rounded px-3 py-2 mb-4 w-72 focus:outline-none focus:ring-2 focus:ring-blue-400">
+<div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg flex flex-col items-center space-y-6">
+    <p id="description" class="text-xl text-[#2F4160] font-semibold text-center leading-relaxed"></p>
+    <input type="text" id="answer" placeholder="정답을 입력하세요"
+           class="border-2 border-[#B5D0E3] rounded-lg px-4 py-3 w-full text-lg focus:outline-none focus:ring-4 focus:ring-[#F29DA0] transition duration-300 placeholder-gray-400">
 
-<div class="flex gap-2 mb-4">
-    <button onclick="submitAnswer()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">제출</button>
-    <button onclick="nextProblem()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">다음으로</button>
+    <div class="flex gap-4">
+        <button onclick="submitAnswer()"
+                class="bg-[#F29DA0] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#2F4160] transition duration-300 transform hover:scale-105 shadow-md">
+            제출하기
+        </button>
+        <button onclick="nextProblem()"
+                class="bg-[#B5D0E3] text-[#2F4160] px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#2F4160] hover:text-white transition duration-300 transform hover:scale-105 shadow-md">
+            다음 문제
+        </button>
+    </div>
+
+    <p id="result" class="text-xl font-bold mt-4"></p>
+    <p id="completion-message" class="text-2xl font-extrabold text-[#2F4160] mt-24 text-center"></p>
 </div>
 
-<p id="result" class="text-lg font-medium mb-4"></p>
-<p id="completion-message" class="text-xl font-bold text-blue-600 mt-24 text-center"></p>
 
 <div id="feedback-icon" class="hidden"></div>
 
 <!-- 하단 고정 버튼 -->
-<div class="fixed bottom-4 right-4">
-    <button onclick="quitLesson()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">그만하기</button>
+<div class="fixed bottom-6 right-6">
+    <button onclick="quitLesson()"
+            class="bg-gray-500 text-white px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-700 transition duration-300 transform hover:scale-105 shadow-lg">
+        학습 종료
+    </button>
 </div>
 
 </body>

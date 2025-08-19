@@ -2,50 +2,40 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>4지선다 객관식 학습</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Nanum Gothic -->
     <style>
-        #feedback-icon {
-            position: fixed;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 100px;
-            font-weight: bold;
-            display: none;
-            z-index: 100;
+        @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
         }
 
-        .correct { color: green; }
-        .incorrect { color: red; }
-
-        button {
-            font-size: 16px;
-            padding: 8px 16px;
-            margin-right: 10px;
-            cursor: pointer;
+        /* Custom animations for feedback icon */
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+        .animate-pulse {
+            animation: pulse 1s infinite;
         }
 
-        input[type="radio"] {
-            margin-right: 8px;
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translate(-50%, -50%) translateY(0); opacity: 0.8; }
+            40% { transform: translate(-50%, -50%) translateY(-10px); }
+            60% { transform: translate(-50%, -50%) translateY(-5px); }
+        }
+        .animate-bounce {
+            animation: bounce 1s infinite;
         }
 
-        #result {
-            font-size: 18px;
-            margin-top: 15px;
-        }
-
-        #completion-message {
-            font-size: 22px;
-            font-weight: bold;
-            color: #003366;
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        #bottom-buttons {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+        /* Custom animation for message box */
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
         }
     </style>
 
@@ -59,7 +49,7 @@
                 showQuestion(questions[0]);
             } else {
                 document.getElementById('description').textContent = "";
-                document.getElementById('completion-message').textContent = "더 이상 풀 문제가 없습니다.";
+                document.getElementById('completion-message').textContent = "더 이상 풀 문제가 없습니다. 모든 문제를 성공적으로 완료했어요!";
             }
         };
 
@@ -69,19 +59,34 @@
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = "";
 
-            question.options.forEach(option => {
+            // Shuffle options to ensure random order each time
+            const shuffledOptions = shuffleArray(question.options);
+
+            shuffledOptions.forEach(option => {
                 const optionHtml = `
-                    <label>
-                        <input type="radio" name="option" value="${option}" onclick="selectOption('${option}')">
-                        ${option}
-                    </label><br>
+                    <label class="block p-3 border-2 border-[#B5D0E3] rounded-lg cursor-pointer hover:bg-gray-100 transition duration-200 shadow-sm mb-2">
+                        <input type="radio" name="option" value="${option}" class="mr-3 leading-tight" onclick="selectOption('${option}')">
+                        <span class="text-lg text-[#2F4160]">${option}</span>
+                    </label>
                 `;
                 optionsContainer.innerHTML += optionHtml;
             });
 
             document.getElementById('result').textContent = "";
-            document.getElementById('feedback-icon').style.display = 'none';
+            document.getElementById('feedback-icon').classList.add('hidden'); // Tailwind hidden class
             answered = false;
+            selectedOption = ""; // 선택된 옵션 초기화
+            // 라디오 버튼 선택 해제
+            const radioButtons = document.querySelectorAll('input[name="option"]');
+            radioButtons.forEach(radio => radio.checked = false);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
         }
 
         function selectOption(option) {
@@ -90,7 +95,7 @@
 
         function submitAnswer() {
             if (!selectedOption) {
-                alert("답을 선택해주세요.");
+                showCustomMessage("답을 선택해주세요.", 'error'); // Custom message box
                 return;
             }
             if (answered) return;
@@ -102,8 +107,9 @@
             const isCorrect = selectedOption === correctAnswer;
 
             document.getElementById('result').textContent = isCorrect
-                ? `정답! (${correctAnswer})`
-                : `오답! 정답은 ${correctAnswer}`;
+                ? `정답이에요! (${correctAnswer})`
+                : `아쉽네요! 정답은 ${correctAnswer} 이었어요.`;
+            document.getElementById('result').className = isCorrect ? 'text-green-600 font-bold' : 'text-red-600 font-bold';
             showFeedback(isCorrect);
 
             // 서버에 정답 체크 요청
@@ -123,43 +129,115 @@
 
         function showFeedback(isCorrect) {
             const icon = document.getElementById('feedback-icon');
-            icon.textContent = isCorrect ? 'O' : 'X';
-            icon.className = isCorrect ? 'correct' : 'incorrect';
-            icon.style.display = 'block';
+            icon.textContent = isCorrect ? '✔️' : '✖️'; // 이모지 아이콘 사용
+            icon.className = isCorrect
+                ? 'text-[#2F4160] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-pulse' // 진한 남색, 펄스 애니메이션
+                : 'text-[#F29DA0] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-bounce'; // 코랄 핑크, 바운스 애니메이션
+            icon.classList.remove('hidden');
+
+            setTimeout(() => {
+                icon.classList.add('hidden');
+            }, 1500); // 1.5초 후 아이콘 숨기기
         }
 
         function nextQuestion() {
             if (!answered) {
-                alert("먼저 정답을 제출하세요.");
+                showCustomMessage("먼저 정답을 제출하세요.", 'error'); // Custom message box
                 return;
             }
-            location.reload(); // 다음 문제 요청
+            location.reload(); // 다음 문제 요청 (새로고침으로 problems[0]이 다음 문제로 업데이트되도록)
         }
 
         function quitLesson() {
             if (window.opener) {
                 window.close();
             } else {
-                alert("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.");
+                showCustomMessage("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.", 'info'); // Custom message box
             }
+        }
+
+        // Custom message box function (reused from previous immersive)
+        function showCustomMessage(message, type = 'info') {
+            const messageBox = document.createElement('div');
+            messageBox.textContent = message;
+            let bgColor = '#2F4160'; // Default: Dark Navy
+            let textColor = 'white';
+
+            if (type === 'error') {
+                bgColor = '#F29DA0'; // Coral Pink for errors
+            }
+
+            messageBox.style.cssText = `
+                position: fixed;
+                top: 20%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: ${bgColor};
+                color: ${textColor};
+                padding: 15px 30px;
+                border-radius: 8px;
+                z-index: 1000;
+                font-size: 1.1em;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                animation: fadeOut 3s forwards;
+            `;
+            document.body.appendChild(messageBox);
+
+            const styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @keyframes fadeOut {
+                    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+
+            setTimeout(() => {
+                messageBox.remove();
+                if (styleSheet.parentNode) {
+                    styleSheet.parentNode.removeChild(styleSheet);
+                }
+            }, 3000);
         }
     </script>
 </head>
-<body>
-<h1>4지선다 객관식 학습</h1>
+<body class="bg-[#FBF9F2] min-h-screen flex flex-col items-center p-4">
 
-<p id="description"></p>
-<div id="options"></div>
-<button onclick="submitAnswer()">제출</button>
-<button onclick="nextQuestion()">다음으로</button>
+<h1 class="text-4xl font-extrabold text-[#2F4160] mb-8 mt-12">📚 4지선다 객관식 학습</h1>
 
-<p id="result"></p>
-<p id="completion-message"></p>
-<div id="feedback-icon"></div>
+<div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg flex flex-col items-center space-y-6">
+    <p id="description" class="text-xl text-[#2F4160] font-semibold text-center leading-relaxed"></p>
 
-<!-- ✅ 하단 고정 버튼 -->
-<div id="bottom-buttons">
-    <button onclick="quitLesson()">그만하기</button>
+    <div id="options" class="w-full space-y-3">
+        <!-- Options will be loaded here by JavaScript -->
+    </div>
+
+    <div class="flex gap-4 mt-6">
+        <button onclick="submitAnswer()"
+                class="bg-[#F29DA0] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#2F4160] transition duration-300 transform hover:scale-105 shadow-md">
+            제출
+        </button>
+        <button onclick="nextQuestion()"
+                class="bg-[#B5D0E3] text-[#2F4160] px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#2F4160] hover:text-white transition duration-300 transform hover:scale-105 shadow-md">
+            다음으로
+        </button>
+    </div>
+
+    <p id="result" class="text-xl font-bold mt-4"></p>
+    <p id="completion-message" class="text-2xl font-extrabold text-[#2F4160] mt-12 text-center"></p>
 </div>
+
+<!-- 피드백 아이콘 (O/X) -->
+<div id="feedback-icon" class="hidden text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 z-10"></div>
+
+<!-- 하단 고정 버튼 -->
+<div class="fixed bottom-6 right-6">
+    <button onclick="quitLesson()"
+            class="bg-gray-500 text-white px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-700 transition duration-300 transform hover:scale-105 shadow-lg">
+        그만하기
+    </button>
+</div>
+
 </body>
 </html>

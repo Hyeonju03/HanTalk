@@ -364,4 +364,20 @@ public class UserController {
     public boolean isEmailAvail(@RequestParam String email) {
         return service.isEmailAvail(email);
     }
+
+    // 게임 클라이언트로부터 받은 포인트를 유저 DB에 더하는 API
+    @PutMapping("/api/users/updatePoints/{userId}")
+    public ResponseEntity<String> updatePoints(@PathVariable String userId, @RequestBody Map<String, Integer> payload) {
+        if (!payload.containsKey("points")) {
+            return ResponseEntity.badRequest().body("Point value is missing.");
+        }
+        int pointsToAdd = payload.get("points");
+
+        try {
+            service.addPoints(userId, pointsToAdd);
+            return ResponseEntity.ok("Points updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error updating points: " + e.getMessage());
+        }
+    }
 }

@@ -6,6 +6,16 @@
     <title>보유 아이템 목록</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        .bg-main-dark { background-color: #2F4160; }
+        .text-main-dark { color: #2F4160; }
+        .bg-accent-pink { background-color: #F29DA0; }
+        .text-accent-pink { color: #F29DA0; }
+        .bg-soft-blue { background-color: #B5D0E3; }
+        .text-soft-blue { color: #B5D0E3; }
+        .hover-bg-soft-blue:hover { background-color: #B5D0E3; }
+        .hover-text-accent-pink:hover { color: #F29DA0; }
+        .container-custom { max-width: 1000px; }
+
         /* 프로필 이미지와 프레임이 겹쳐 보이도록 z-index 설정 */
         .profile-container {
           position: relative;
@@ -56,68 +66,68 @@
         }
     </style>
 </head>
-<body class="bg-[#f3f4f6] min-h-screen flex flex-col text-[#2F4160]">
+<body class="min-h-screen flex flex-col bg-gray-50 font-sans text-main-dark">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex-grow flex justify-center p-8 space-x-8">
+<main class="flex-grow flex justify-center p-8 space-x-8">
 
     <div th:replace="~{fragments/mypageSidebar :: mypageSidebar}"></div>
 
     <div class="container-custom w-full">
         <div class="bg-white p-8 rounded-xl shadow-xl">
 
-            <h1 class="text-3xl font-bold text-[#2F4160] mb-6 text-center">구매한 아이템</h1>
+            <h1 class="text-3xl font-bold text-main-dark mb-6 text-center">구매한 아이템</h1>
 
-            <h3 class="text-xl font-semibold mt-6 mb-2 text-[#2F4160] text-center">프로필 이미지 선택</h3>
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-main-dark text-center">프로필 이미지 선택</h3>
             <div class="flex flex-wrap justify-center gap-8">
                 <div th:each="img : ${profileImages}" class="relative w-24 h-24 aspect-square">
                     <img th:src="@{'/uploads/images/' + ${img}}"
                          th:attr="data-img=${img}"
-                         class="item-profile-img cursor-pointer border rounded-full hover:ring-2 ring-offset-2 ring-[#B5D0E3] object-cover transition-all duration-150 ease-in-out w-full h-full"
+                         class="item-profile-img cursor-pointer border rounded-full hover:ring-2 ring-offset-2 ring-soft-blue object-cover transition-all duration-150 ease-in-out w-full h-full"
                          onclick="selectProfileImage(this)">
                 </div>
             </div>
 
-            <h3 class="text-xl font-semibold mt-6 mb-2 text-[#2F4160] text-center">프레임 이미지 선택</h3>
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-main-dark text-center">프레임 이미지 선택</h3>
             <div class="flex flex-wrap justify-center gap-8">
                 <div th:each="frame : ${frameImages}" class="relative w-24 h-24 aspect-square">
                     <img th:src="@{'/uploads/frames/' + ${frame}}"
                          th:attr="data-frame=${frame}"
-                         class="item-frame-img cursor-pointer border hover:ring-2 ring-offset-2 ring-[#B5D0E3] object-cover transition-all duration-150 ease-in-out w-full h-full"
+                         class="item-frame-img cursor-pointer border hover:ring-2 ring-offset-2 ring-soft-blue object-cover transition-all duration-150 ease-in-out w-full h-full"
                          onclick="selectFrameImage(this)">
                 </div>
             </div>
 
-            <h3 class="text-xl font-semibold mt-6 mb-2 text-[#2F4160] text-center">미리보기</h3>
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-main-dark text-center">미리보기</h3>
             <div class="profile-container mx-auto mb-4 responsive">
                 <img id="preview-profile" class="profile-image-preview rounded-full object-cover"/>
                 <img id="preview-frame" class="profile-frame-preview"/>
             </div>
 
             <div class="flex justify-center mt-4">
-                <button id="applyButton" class="bg-[#F29DA0] hover:bg-[#2F4160] text-white px-4 py-2 rounded-lg w-auto max-w-xs transition-colors duration-200">
+                <button id="applyButton" class="bg-accent-pink hover:bg-main-dark text-white px-4 py-2 rounded-lg w-auto max-w-xs transition-colors duration-200">
                     설정하기
                 </button>
             </div>
         </div>
     </div>
-</div>
+</main>
 
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<div class="py-4 text-gray-500 text-center text-sm bg-gray-100" th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <div id="alertModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
     <div class="modal-themed-content">
-        <p id="alertMessage" class="text-[#2F4160] mb-4"></p>
-        <button id="alertCloseButton" class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">확인</button>
+        <p id="alertMessage" class="text-main-dark mb-4"></p>
+        <button id="alertCloseButton" class="bg-accent-pink hover:bg-main-dark text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">확인</button>
     </div>
 </div>
 
 <div id="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
     <div class="modal-themed-content">
-        <p id="confirmMessage" class="text-[#2F4160] mb-4"></p>
+        <p id="confirmMessage" class="text-main-dark mb-4"></p>
         <div class="flex justify-around">
-            <button id="confirmOkButton" class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">확인</button>
+            <button id="confirmOkButton" class="bg-accent-pink hover:bg-main-dark text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">확인</button>
             <button id="confirmCancelButton" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">취소</button>
         </div>
     </div>
@@ -160,9 +170,9 @@
 
     function selectItem(selector, element, dataAttribute, value) {
       document.querySelectorAll(selector).forEach(item => {
-        item.closest('.relative').classList.remove('ring-4', 'ring-[#F29DA0]');
+        item.closest('.relative').classList.remove('ring-4', 'ring-accent-pink');
       });
-      element.closest('.relative').classList.add('ring-4', 'ring-[#F29DA0]');
+      element.closest('.relative').classList.add('ring-4', 'ring-accent-pink');
       return value;
     }
 
