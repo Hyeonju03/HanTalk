@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>관리자 자료실</title>
+  <title>자료실</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,161 +18,227 @@
     .table-row-clickable {
       cursor: pointer;
     }
+    /* 페이지네이션 링크 스타일 (숫자 페이지 버튼용) */
+    .pagination-link-custom {
+      display: inline-block;
+      padding: 0.375rem 0.75rem; /* py-1.5 px-3에 해당 */
+      background-color: #4B4B4B; /* 요청된 색상 */
+      color: white;
+      text-decoration: none;
+      border-radius: 0.375rem; /* rounded-md에 해당 */
+      transition-property: background-color, color;
+      transition-duration: 200ms;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 600; /* 폰트 굵기 조정 */
+      min-width: 36px; /* 버튼 최소 너비 설정 */
+      height: 36px; /* 버튼 높이 설정 */
+      box-sizing: border-box; /* 패딩과 테두리를 너비/높이에 포함 */
+      display: inline-flex; /* content 중앙 정렬 */
+      align-items: center;
+      justify-content: center;
+    }
+    .pagination-link-custom:hover {
+      background-color: #e0e0e0; /* 호버 시 연한 회색 배경 */
+      color: #2F4160; /* 호버 시 진한 남색 텍스트 유지 */
+      border-color: #e0e0e0; /* 호버 시 연한 회색 테두리 */
+    }
+    .pagination-link-custom.active {
+      font-weight: bold; /* font-bold에 해당 */
+      background-color: #4B4B4B; /* 활성 상태의 배경색 */
+      color: white; /* 활성 상태의 텍스트 색상 */
+      border-color: #4B4B4B; /* 활성 상태의 테두리 색상 */
+    }
+    /* 활성 페이지 버튼의 호버 효과는 활성 상태 스타일 유지 */
+    .pagination-link-custom.active:hover {
+      background-color: #4B4B4B; /* 활성 상태에서 호버 시 진한 회색 배경 유지 */
+      color: white; /* 활성 상태에서 호버 시 흰색 텍스트 유지 */
+      border-color: #4B4B4B; /* 활성 상태에서 호버 시 진한 회색 테두리 유지 */
+    }
+
+    /* 페이지네이션 "처음", "이전", "다음", "마지막" 버튼용 스타일 */
+    .pagination-nav-button {
+      display: inline-block;
+      padding: 0.375rem 0.75rem;
+      background-color: transparent; /* 평소에는 배경 투명 */
+      color: #2F4160; /* 평소에는 진한 남색 텍스트 */
+      text-decoration: none;
+      border-radius: 0.375rem;
+      transition-property: background-color, color, border-color;
+      transition-duration: 200ms;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 600; /* 폰트 굵기 조정 */
+      min-width: 36px; /* 버튼 최소 너비 설정 */
+      height: 36px; /* 버튼 높이 설정 */
+      box-sizing: border-box; /* 패딩과 테두리를 너비/높이에 포함 */
+      display: inline-flex; /* content 중앙 정렬 */
+      align-items: center;
+      justify-content: center;
+    }
+    .pagination-nav-button:hover {
+      background-color: #e0e0e0; /* 호버 시 연한 회색 배경 */
+      color: #2F4160; /* 호버 시 진한 남색 텍스트 유지 */
+      border-color: #e0e0e0; /* 호버 시 연한 회색 테두리 */
+    }
+    .pagination-nav-button.disabled {
+        opacity: 0.5; /* 약간 흐리게 */
+        cursor: default !important; /* 마우스 커서를 기본으로 변경하여 빨간색 동그라미 작대기 제거 */
+        background-color: transparent; /* 배경 투명 유지 */
+        color: #2F4160; /* 텍스트 색상 유지 */
+        border-color: transparent; /* 테두리 투명 유지 */
+    }
+    /* 비활성화된 버튼의 호버 효과도 연한 회색으로 */
+    .pagination-nav-button.disabled:hover {
+        background-color: #e0e0e0; /* 호버 시 연한 회색 배경 (비활성화 상태에서도) */
+        color: #2F4160; /* 호버 시 진한 남색 텍스트 유지 (비활성화 상태에서도) */
+        border-color: #e0e0e0; /* 호버 시 연한 회색 테두리 (비활성화 상태에서도) */
+    }
   </style>
 </head>
-<body class="bg-gray-100 text-[#2F4160] min-h-screen flex flex-col">
+<body class="bg-[#f3f4f6] text-[#2F4160] min-h-screen flex flex-col">
 
-<!-- 헤더 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex-grow flex">
-  <!-- 사이드바 -->
-  <nav class="w-72 bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm flex-shrink-0 fixed h-full">
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-[#2F4160]">📁 메뉴</h2>
-    </div>
-    <ul class="space-y-2">
-      <li>
-        <a th:href="@{/resource/admin/main}"
-           class="flex items-center p-3 text-[#2F4160] hover:bg-gray-200 rounded-lg transition-colors duration-200">
-          <i class="fas fa-list-alt mr-3"></i> <span>관리자 메인</span>
-        </a>
-      </li>
-      <li>
-        <a th:href="@{/resource/main}" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-          </svg>
-          <span>사용자 목록</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
+<div class="flex-grow flex justify-center"> <!-- justify-center로 중앙 정렬 -->
+  <!-- 사이드바 제거됨 -->
 
-  <div class="flex-1 ml-72 flex flex-col p-0">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl mx-auto flex-grow">
+  <!-- 본문 영역 (기존 max-w-7xl 제거하여 더 넓은 공간 확보) -->
+  <div class="flex-1 flex flex-col p-4 w-full"> <!-- max-w-7xl 제거 -->
+    <main class="bg-white rounded-xl shadow-xl mx-auto flex-grow w-full">
       <div class="p-8">
         <div class="flex justify-between items-center mb-6">
-          <h1 class="text-3xl font-bold text-[#2F4160]">관리자 자료실</h1>
+          <h1 class="text-3xl font-bold text-[#2F4160]">자료실 목록</h1>
+          <!-- th:if 조건 제거하여 항상 표시 -->
           <a th:href="@{/resource/chuga}" class="bg-[#4B4B4B] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center">
             <i class="fas fa-plus mr-2"></i>
             자료 등록하기
           </a>
         </div>
 
-        <form class="search-form text-center mb-6 flex justify-center items-center space-x-2" th:action="@{/resource/admin/main}" method="get">
+        <form class="search-form text-center mb-6 flex justify-center items-center space-x-2" th:action="@{/resource/main}" method="get">
           <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword} ?: ''"
-                 class="p-2 border border-gray-300 rounded-lg w-72 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]" />
+                 class="p-2 text-base w-[250px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]" />
           <button type="submit"
                   class="bg-[#4B4B4B] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 ml-2">
-            <i class="fas fa-search mr-1"></i>검색
+            <i class="fas fa-search mr-1"></i>
+            검색
           </button>
         </form>
 
-        <div class="overflow-x-auto bg-white rounded-xl shadow-lg">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead>
-            <tr class="bg-[#FDFBFF]">
-              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">번호</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">제목</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">내용</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">파일</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">작성자</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">작성일</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">관리</th>
-            </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-            <tr th:each="resource, iterStat : ${resourcePage.content}"
-                th:attr="data-url=@{'/resource/admin/detail/' + ${resource.resourceId}}"
-                onclick="goToDetail(this)"
-                class="hover:bg-gray-50 transition duration-150 table-row-clickable">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${resourcePage.number * resourcePage.size + iterStat.index + 1}">1</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${resource.title}">제목</td>
-              <td class="px-6 py-4 text-sm text-gray-800 break-words" th:text="${#strings.length(resource.content) > 30 ? #strings.substring(resource.content, 0, 30) + '...' : resource.content}">내용</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                  <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}" class="flex justify-center items-center gap-1.5 text-sm">
-                    <a th:href="@{'/resource/admin/preview/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
-                       th:title="${resource.originalFileName}"
-                       onclick="event.stopPropagation();"
-                       class="text-[#2F4160] hover:text-[#F29DA0] hover:underline transition duration-300">
+        <table class="w-full border-collapse bg-white rounded-xl overflow-hidden shadow-md">
+          <thead>
+          <tr>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">번호</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">제목</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">내용</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">파일</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">작성자</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">작성일</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">관리</th>
+          </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+          <tr th:each="resource, iterStat : ${resourcePage.content}"
+              th:attr="data-url=@{'/resource/admin/detail/' + ${resource.resourceId}}"
+              onclick="goToDetail(this)"
+              class="cursor-pointer hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm text-gray-800 break-words" th:text="${resourcePage.number * resourcePage.size + iterStat.index + 1}">1</td>
+            <td class="px-6 py-4 text-sm font-medium text-gray-900 break-words" th:text="${resource.title}">제목</td>
+            <td class="px-6 py-4 text-sm text-gray-800 break-words" th:text="${#strings.length(resource.content) > 30 ? #strings.substring(resource.content, 0, 30) + '...' : resource.content}">내용</td>
+            <td class="p-3 border-b border-[#E0E0E0] text-center">
+                <span th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}" class="flex justify-center items-center gap-1.5 text-sm">
+                  <a th:href="@{'/resource/admin/preview/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
+                     th:title="${resource.originalFileName}"
+                     onclick="event.stopPropagation();"
+                     class="text-[#2F4160] p-1 px-2 rounded-md hover:bg-[#2F4160] hover:text-white hover:no-underline transition duration-300">
                       <i class="fas fa-eye mr-1"></i>보기
                     </a>
-                    <span class="text-gray-400 select-none">|</span>
-                    <a th:href="@{'/resource/download/file/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
-                       th:title="${resource.originalFileName}"
-                       onclick="event.stopPropagation();"
-                       class="text-[#2F4160] hover:text-[#F29DA0] hover:underline transition duration-300">
+                  <span class="text-gray-400 select-none">|</span>
+                  <a th:href="@{'/resource/download/file/' + ${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}}"
+                     th:title="${resource.originalFileName}"
+                     onclick="event.stopPropagation();"
+                     class="text-[#2F4160] p-1 px-2 rounded-md hover:bg-[#2F4160] hover:text-white hover:no-underline transition duration-300">
                       <i class="fas fa-download mr-1"></i>다운로드
                     </a>
-                  </span>
-                <span th:if="${resource.archive == null or #strings.isEmpty(resource.archive)}" class="text-gray-400">파일 없음</span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">관리자</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div class="flex justify-center items-center space-x-2">
-                  <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
-                     class="bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300"
-                     onclick="event.stopPropagation();"><i class="fas fa-edit"></i> 수정</a>
-                  <button type="button"
-                          class="bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 ml-2"
-                          th:onclick="'event.stopPropagation(); confirmDelete(' + ${resource.resourceId} + ');'">
-                    <i class="fas fa-trash"></i> 삭제
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr th:if="${resourcePage.content.size() == 0}">
-              <td colspan="7" class="text-center p-4 text-gray-600">검색 결과가 없습니다.</td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+                </span>
+              <span th:if="${resource.archive == null or #strings.isEmpty(resource.archive)}" class="text-gray-400">파일 없음</span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-800 break-words">관리자</td>
+            <td class="px-6 py-4 text-sm text-gray-800 break-words" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
+            <td class="px-6 py-4 text-sm font-medium">
+              <!-- th:if 조건 제거 -->
+              <div class="flex justify-center items-center space-x-2">
+                <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
+                   class="bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300"
+                   onclick="event.stopPropagation();"><i class="fas fa-edit"></i> 수정</a>
+                <button type="button"
+                        class="bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 ml-2"
+                        th:onclick="'event.stopPropagation(); confirmDelete(' + ${resource.resourceId} + ');'">
+                  <i class="fas fa-trash"></i> 삭제
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr th:if="${resourcePage.content.size() == 0}">
+            <td colspan="7" class="text-center p-4 text-gray-600">검색 결과가 없습니다.</td>
+          </tr>
+          </tbody>
+        </table>
 
-        <div class="flex justify-center mt-8 space-x-2">
-          <span th:if="${resourcePage.hasPrevious()}" class="inline-flex">
-            <a th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}" class="bg-white text-[#2F4160] font-semibold py-2 px-4 rounded-lg hover:bg-[#f3f4f6] transition duration-300">이전</a>
+        <div class="pagination flex justify-center items-center mt-8 space-x-2">
+          <!-- 처음 버튼 -->
+          <span th:if="${resourcePage.hasPrevious()}">
+                <a th:href="@{|/resource/admin/main?page=0&keyword=${keyword}|}"
+                   class="pagination-nav-button">처음</a>
+            </span>
+          <span th:if="${resourcePage.hasPrevious()}">
+            <a th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}"
+               class="pagination-nav-button">이전</a> <!-- class 변경 -->
           </span>
-
-          <span th:each="pageNum : ${#numbers.sequence(0, resourcePage.totalPages - 1)}" class="inline-flex">
-            <a th:href="@{|/resource/admin/main?page=${pageNum}&keyword=${keyword}|}"
-               th:text="${pageNum + 1}"
-               th:classappend="${pageNum == resourcePage.number} ? 'bg-[#B5D0E3] text-[#2F4160] font-bold py-2 px-4 rounded-lg shadow-md' : 'bg-white text-[#2F4160] font-semibold py-2 px-4 rounded-lg hover:bg-[#f3f4f6] transition duration-300'">1</a>
+          <span th:each="i : ${#numbers.sequence(0, resourcePage.totalPages - 1)}">
+            <a th:href="@{|/resource/main?page=${i}&keyword=${keyword}|}" th:text="${i + 1}"
+               th:classappend="${i == resourcePage.number} ? 'active' : ''"
+               class="pagination-link-custom">1</a>
           </span>
-
-          <span th:if="${resourcePage.hasNext()}" class="inline-flex">
-            <a th:href="@{|/resource/admin/main?page=${resourcePage.number + 1}&keyword=${keyword}|}" class="bg-white text-[#2F4160] font-semibold py-2 px-4 rounded-lg hover:bg-[#f3f4f6] transition duration-300">다음</a>
+          <span th:if="${resourcePage.hasNext()}">
+            <a th:href="@{|/resource/main?page=${resourcePage.number + 1}&keyword=${keyword}|}"
+               class="pagination-nav-button">다음</a> <!-- class 변경 -->
           </span>
+          <!-- 마지막 버튼 -->
+          <span th:if="${resourcePage.hasNext()}">
+                <a th:href="@{|/resource/admin/main?page=${resourcePage.totalPages - 1}&keyword=${keyword}|}"
+                   class="pagination-nav-button">마지막</a>
+            </span>
         </div>
       </div>
-    </div>
+    </main>
   </div>
 </div>
 
 <script>
   function confirmDelete(resourceId) {
-    if (confirm('정말 이 자료를 삭제하시겠습니까?')) {
-      window.location.href = '/resource/delete/' + resourceId;
-    }
+      // Canvas 환경에서는 confirm() 대신 모달 UI를 사용해야 하지만,
+      // 이 예제에서는 기존 코드를 유지하며 주석으로 대체 방법을 안내합니다.
+      if (confirm('정말 이 자료를 삭제하시겠습니까?')) {
+          window.location.href = '/resource/delete/' + resourceId;
+      }
   }
 
   function goToDetail(row) {
-    const url = row.getAttribute('data-url');
-    if (url) {
-      window.location.href = url;
-    }
+      const url = row.getAttribute('data-url');
+      if (url) {
+          window.location.href = url;
+      }
   }
 
   function handlePreviewClick(event) {
-    event.stopPropagation();
-    event.preventDefault();
+      event.stopPropagation();
+      event.preventDefault();
 
-    const target = event.currentTarget;
-    const filename = target.getAttribute('data-filename');
-    if (filename) {
-      window.location.href = '/resource/admin/preview/' + filename;
-    }
+      const target = event.currentTarget;
+      const filename = target.getAttribute('data-filename');
+      if (filename) {
+          window.location.href = '/resource/admin/preview/' + filename;
+      }
   }
 </script>
 

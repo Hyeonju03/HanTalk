@@ -16,30 +16,12 @@
 <!-- 헤더 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex flex-1 w-full max-w-5xl mx-auto px-4 py-8 gap-8">
+<!-- flex-grow flex는 유지하되, ml-72 제거 및 w-full max-w-5xl mx-auto px-4 py-8를 여기에 적용 -->
+<div class="flex flex-1 w-full max-w-5xl mx-auto px-4 py-8">
 
-    <!-- 사이드바 -->
-    <nav class="w-72 bg-[#B5D0E3]/80 border-r border-[#B5D0E3]/50 p-4 shadow-lg flex flex-col backdrop-blur-sm flex-shrink-0">
-        <div class="mb-8">
-            <h2 class="text-2xl font-bold text-[#2F4160]">📁 메뉴</h2>
-        </div>
-        <ul class="space-y-4"> <!-- 간격 조정: space-y-2에서 space-y-4로 변경 -->
-            <li>
-                <a href="/resource/admin/main" class="flex items-center p-3 text-[#2F4160] hover:bg-[#404040]/80 rounded-lg transition-colors duration-200">
-                    <i class="fas fa-bars mr-3"></i> <!-- '관리자 메인' 아이콘은 유지 -->
-                    <span>관리자 메인</span>
-                </a>
-            </li>
-            <li>
-                <a href="/resource/chuga" class="flex items-center p-3 text-[#2F4160] hover:bg-[#F29DA0]/80 rounded-lg transition-colors duration-200">
-                    <i class="fas fa-plus-circle mr-3"></i> <!-- '자료 등록' 아이콘을 fas fa-plus-circle로 복원 -->
-                    <span>자료 등록</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <!-- 사이드바 제거됨 -->
 
-    <!-- 본문 -->
+    <!-- 본문 영역: flex-1만 남기고 ml-72 제거 -->
     <main class="flex-1 p-8 bg-white rounded-xl shadow-xl">
         <h1 class="text-3xl font-bold text-center text-[#2F4160] mb-8 break-words" th:text="${fileName}">파일명</h1>
 

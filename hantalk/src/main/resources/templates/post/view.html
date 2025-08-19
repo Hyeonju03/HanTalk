@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시물 작성</title>
+    <title>HanTalk - 게시물 수정</title>
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -19,14 +19,23 @@
 <div class="w-full max-w-2xl mx-auto px-4 py-8">
     <div class="bg-white p-8 rounded-xl shadow-xl">
         <div class="board-header text-center mb-6">
-            <h1 th:if="${post.category.categoryId == 1}" class="text-3xl font-bold text-[#2F4160]">공지사항 작성</h1>
-            <h1 th:if="${post.category.categoryId == 2}" class="text-3xl font-bold text-[#2F4160]">커뮤니티 글쓰기</h1>
-            <h1 th:if="${post.category.categoryId == 3}" class="text-3xl font-bold text-[#2F4160]">문의사항 작성</h1>
+            <!-- post 및 post.category가 null이 아닐 때만 렌더링하도록 안전 탐색 연산자(?. ) 사용 -->
+            <h1 th:if="${post?.category?.categoryId == 1}" class="text-3xl font-bold text-[#2F4160]">공지사항 수정</h1>
+            <h1 th:if="${post?.category?.categoryId == 2}" class="text-3xl font-bold text-[#2F4160]">커뮤니티 게시물 수정</h1>
+            <h1 th:if="${post?.category?.categoryId == 3}" class="text-3xl font-bold text-[#2F4160]">문의사항 수정</h1>
+            <!-- 게시물 수정 페이지임을 명확히 표시 (post가 null이 아닐 때만) -->
+            <h1 th:if="${post != null}" class="text-3xl font-bold text-[#2F4160]">게시물 수정</h1>
         </div>
-        <hr class="border-t-2 border-[#B5D0E3] mb-8">
+        <hr class="border-t-2 border-[#B5D0E3] mb-4">
 
-        <form th:action="@{|/post/insertProc/${post.category.categoryId}|}" th:object="${post}" method="post" enctype="multipart/form-data" class="space-y-6">
-            <input type="hidden" name="categoryId" th:value="${post.category.categoryId}">
+        <!-- post 객체가 null이 아닐 때만 폼을 렌더링 -->
+        <form th:if="${post != null}"
+              th:attr="action=${post?.id != null ? '/post/updateProc/' + post.id : '#'}"
+              th:object="${post}"
+              method="post" enctype="multipart/form-data" class="space-y-6">
+            <!-- Hidden input for post ID (필수) - post.id가 null이 아닐 때만 value 지정 -->
+            <input type="hidden" name="id" th:if="${post?.id != null}" th:value="${post.id}">
+            <input type="hidden" name="categoryId" th:if="${post?.category?.categoryId != null}" th:value="${post.category.categoryId}">
 
             <div>
                 <label for="title" class="block text-gray-700 text-sm font-semibold mb-2">제목:</label>
@@ -48,13 +57,24 @@
                               hover:file:bg-[#2F4160] focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
             </div>
 
-            <div class="flex items-center justify-center space-x-4 mt-8">
-                <button type="submit"
-                        class="bg-[#4B4B4B] hover:bg-[#2F4160] text-white font-bold py-2 px-6 rounded-lg transition duration-200 flex items-center">
-                    <i class="fas fa-edit mr-2"></i>등록
-                </button>
-                <a th:href="@{|/post/list/${post.category.categoryId}|}"
-                   class="bg-white text-[#2F4160] border border-[#E0E0E0] font-bold py-2 px-6 rounded-lg hover:bg-gray-50 transition duration-200 flex items-center">
+            <!-- 수정, 삭제, 목록으로 버튼을 수직 중앙 정렬 -->
+            <div class="flex flex-col items-center space-y-4 mt-8">
+                <!-- '수정' 및 '삭제' 버튼을 가로로 정렬 -->
+                <div class="flex items-center justify-center space-x-4">
+                    <button type="submit"
+                            class="bg-[#4B4B4B] hover:bg-[#2F4160] text-white font-bold py-2 px-6 rounded-lg transition duration-200 flex items-center">
+                        <i class="fas fa-pencil-alt mr-2"></i>수정
+                    </button>
+                    <!-- 실제 애플리케이션에서는 alert() 대신 커스텀 모달로 확인 절차 구현 권장 -->
+                    <a th:href="@{|/post/deleteProc/${post?.id}|}"
+                       class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 flex items-center">
+                        <i class="fas fa-trash-alt mr-2"></i>삭제
+                    </a>
+                </div>
+
+                <!-- '목록으로' 버튼 -->
+                <a th:href="@{|/post/list/${post?.category?.categoryId}|}"
+                   class="bg-white text-[#2F4160] border border-[#E0E0E0] font-bold py-2 px-6 rounded-lg hover:bg-[#2F4160] hover:text-white transition duration-200 flex items-center">
                     <i class="fas fa-list-ul mr-2"></i>목록으로
                 </a>
             </div>

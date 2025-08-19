@@ -5,81 +5,91 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HanTalk - 로그 데이터</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for Nanum Gothic -->
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
+    body {
+      font-family: 'Nanum Gothic', sans-serif;
+    }
     /* 커스텀 스타일이나 컴포넌트 스타일이 필요하다면 여기에 추가 */
+    /* 테이블 셀 내 텍스트 줄바꿈을 위한 스타일 */
+    .break-words {
+      word-break: break-all;
+      overflow-wrap: break-word;
+    }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center p-8">
+<body class="bg-[#f3f4f6] min-h-screen flex flex-col items-center p-8">
 
 <div th:replace="~{fragments/header :: headerFragment(isLoggedIn=${isLoggedIn})}"></div>
 
-<main class="w-full max-w-7xl mx-auto flex-grow">
-  <div class="container mx-auto px-4 py-8">
+<main class="w-full mx-auto flex-grow"> <!-- max-w-7xl 제거하여 더 넓게 확장 -->
+  <div class="mx-auto px-4 py-8"> <!-- container 클래스 제거 -->
 
     <div class="flex flex-col items-center justify-center mb-10">
-      <h1 class="text-4xl font-bold text-gray-800 mb-4">로그 데이터</h1>
-      <a href="/admin" class="text-lg text-blue-600 hover:text-blue-800 transition duration-300">
+      <h1 class="text-4xl font-bold text-[#2F4160] mb-4">로그 데이터</h1>
+      <a href="/admin" class="text-lg text-[#2F4160] hover:text-[#B5D0E3] transition duration-300">
         &larr; 관리자 페이지로
       </a>
     </div>
 
-    <div th:if="${filter}" class="bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md mb-6 mx-auto w-fit">
+    <div th:if="${filter}" class="bg-[#B5D0E3] text-[#2F4160] font-semibold py-3 px-6 rounded-lg shadow-md mb-6 mx-auto w-fit">
       [[${filter}]]
     </div>
 
     <div class="flex flex-wrap justify-center gap-4 mb-8">
-      <button onclick="showFilter('allLogs')" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
+      <button onclick="showFilter('allLogs')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
         전체 로그 보기
       </button>
-      <button onclick="showFilter('userFilter')" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
+      <button onclick="showFilter('userFilter')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
         사용자별
       </button>
-      <button onclick="showFilter('dateFilter')" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
+      <button onclick="showFilter('dateFilter')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
         기간별
       </button>
-      <button onclick="showFilter('userDateFilter')" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
+      <button onclick="showFilter('userDateFilter')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
         사용자+기간
       </button>
 
     </div>
 
     <div id="userFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
-      <h3 class="text-xl font-semibold mb-4 text-green-700">사용자별 로그 보기</h3>
+      <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">사용자별 로그 보기</h3>
       <form method="get" onsubmit="this.action='/user/' + document.getElementById('userNoInput').value; return true;" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
-        <input type="number" id="userNoInput" placeholder="사용자 번호: 예) 1" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-        <button type="submit" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors duration-300">
+        <input type="number" id="userNoInput" placeholder="사용자 번호: 예) 1" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+        <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
           검색
         </button>
       </form>
     </div>
 
     <div id="dateFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
-      <h3 class="text-xl font-semibold mb-4 text-green-700">기간별 로그 보기</h3>
+      <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">기간별 로그 보기</h3>
       <form method="get" action="/date" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
-        <input type="date" name="start" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-        <input type="date" name="end" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-        <button type="submit" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors duration-300">
+        <input type="date" name="start" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+        <input type="date" name="end" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+        <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
           검색
         </button>
       </form>
     </div>
 
     <div id="userDateFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
-      <h3 class="text-xl font-semibold mb-4 text-green-700">사용자 + 기간별 로그 보기</h3>
+      <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">사용자 + 기간별 로그 보기</h3>
       <form method="get" action="/user-date" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
-        <input type="number" name="userNo" placeholder="사용자 번호: 예) 1" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-        <input type="date" name="start" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-        <input type="date" name="end" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-        <button type="submit" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors duration-300">
+        <input type="number" name="userNo" placeholder="사용자 번호: 예) 1" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+        <input type="date" name="start" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+        <input type="date" name="end" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+        <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
           검색
         </button>
       </form>
     </div>
 
     <div id="allLogs" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
-      <h3 class="text-xl font-semibold mb-4 text-green-700">전체 로그 보기</h3>
+      <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">전체 로그 보기</h3>
       <form method="get" action="/admin/getLogdata">
-        <button type="submit" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors duration-300">
+        <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
           전체 로그 보기
         </button>
       </form>
@@ -96,26 +106,26 @@
         <table class="min-w-full">
           <thead class="bg-gray-200">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">사용자ID</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">사용자</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URI</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">메서드</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">디바이스</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">응답 코드</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">처리 시간(ms)</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">요청 시간</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">사용자ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">사용자</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">URI</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">메서드</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">디바이스</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">응답 코드</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">처리 시간(ms)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">요청 시간</th>
           </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
           <tr th:each="log : ${list}">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.user.userId}]]</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.user.name}]]</td>
-            <td class="px-6 py-4 text-sm text-gray-500">[[${log.uri}]]</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.method}]]</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.device}]]</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.statusCode}]]</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.responseTime}]]</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">[[${log.createDate}]]</td>
+            <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.user.userId}]]</td>
+            <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.user.name}]]</td>
+            <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.uri}]]</td>
+            <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.method}]]</td>
+            <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.device}]]</td>
+            <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.statusCode}]]</td>
+            <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.responseTime}]]</td>
+            <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.createDate}]]</td>
           </tr>
           </tbody>
         </table>

@@ -1,82 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>받아쓰기</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for Nanum Gothic -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
+    body {
+      font-family: 'Nanum Gothic', sans-serif;
+    }
+
+    /* Custom animations for feedback icon */
+    @keyframes pulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+        50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    }
+    .animate-pulse {
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translate(-50%, -50%) translateY(0); opacity: 0.8; }
+        40% { transform: translate(-50%, -50%) translateY(-10px); }
+        60% { transform: translate(-50%, -50%) translateY(-5px); }
+    }
+    .animate-bounce {
+        animation: bounce 1s infinite;
+    }
+
+    /* Custom animation for message box */
+    @keyframes fadeOut {
+        0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    }
+  </style>
 </head>
-<body>
+<body class="bg-[#FBF9F2] min-h-screen flex flex-col items-center p-4">
 
-<div>
-  <h1>받아쓰기</h1>
+<h1 class="text-4xl font-extrabold text-[#2F4160] mb-8 mt-12">👂 받아쓰기 학습</h1>
+
+<div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg flex flex-col items-center space-y-6">
+
+  <div id="question-container" class="flex flex-col items-center space-y-4 w-full">
+    <p id="sentence" class="text-xl text-[#2F4160] font-semibold text-center leading-relaxed">문장을 불러오는 중...</p>
+    <button id="play-btn" style="display: none;"
+            class="bg-[#F29DA0] text-white text-3xl p-4 rounded-full shadow-lg hover:bg-[#2F4160] transition duration-300 transform hover:scale-110">
+      ▶️
+    </button>
+  </div>
+
+  <!-- 오답 시 정답 표시 영역 -->
+  <div id="correct-answer-box" class="hidden text-center mt-4 p-3 bg-gray-100 rounded-lg border border-gray-200">
+    <p class="text-lg text-gray-700 font-medium">정답: <span id="correct-answer-text" class="font-bold text-[#2F4160]"></span></p>
+  </div>
+
+  <div id="answer-input" class="flex flex-col items-center space-y-4 w-full">
+    <input type="text" id="user-answer" placeholder="여기에 입력하세요"
+           class="border-2 border-[#B5D0E3] rounded-lg px-4 py-3 w-full text-lg focus:outline-none focus:ring-4 focus:ring-[#F29DA0] transition duration-300 placeholder-gray-400">
+    <button id="submit-btn"
+            class="bg-[#F29DA0] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#2F4160] transition duration-300 transform hover:scale-105 shadow-md">
+      제출하기
+    </button>
+  </div>
+
+  <!-- 결과 메시지 및 다음 문제 버튼 -->
+  <div class="flex flex-col items-center space-y-4 mt-6 w-full">
+    <button id="next-btn" style="display: none;"
+            class="bg-[#B5D0E3] text-[#2F4160] px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#2F4160] hover:text-white transition duration-300 transform hover:scale-105 shadow-md">
+      다음 문제
+    </button>
+  </div>
+
 </div>
 
-<!-- ✅ 오답 시 정답 표시 영역 -->
-<div id="correct-answer-box" style="display:none; color:gray;">
-  <p>정답: <span id="correct-answer-text"></span></p>
+<!-- 피드백 아이콘 (O/X) -->
+<div id="result-overlay" class="hidden text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 z-10">
+  <span id="result-text"></span>
 </div>
 
-<div id="question-container">
-  <p id="sentence">문장을 불러오는 중...</p>
-  <button id="play-btn" style="display: none;">▶️</button>
+<!-- 하단 고정 버튼 -->
+<div class="fixed bottom-6 right-6">
+  <button onclick="quitLesson()"
+          class="bg-gray-500 text-white px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-700 transition duration-300 transform hover:scale-105 shadow-lg">
+    그만하기
+  </button>
 </div>
-
-<div id="answer-input">
-  <input type="text" id="user-answer" placeholder="여기에 입력하세요">
-  <button id="submit-btn">제출하기</button>
-</div>
-
-<div id="result-overlay" style="display: none; font-size: 100px;">
-  <h1 id="result-text"></h1>
-</div>
-
-<button id="next-btn" style="display: none;">다음 문제</button>
-<button id="quitBtn" onclick="quitLesson()">그만하기</button>
 
 <script>
+  let currentSentence = '';
+  // Web Speech API의 SpeechSynthesis 객체 생성
+  const synth = window.speechSynthesis;
+
+  // Custom message box function
+  function showCustomMessage(message, type = 'info') {
+      const messageBox = document.createElement('div');
+      messageBox.textContent = message;
+      let bgColor = '#2F4160'; // Default: Dark Navy
+      let textColor = 'white';
+
+      if (type === 'error') {
+          bgColor = '#F29DA0'; // Coral Pink for errors
+      }
+
+      messageBox.style.cssText = `
+          position: fixed;
+          top: 20%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: ${bgColor};
+          color: ${textColor};
+          padding: 15px 30px;
+          border-radius: 8px;
+          z-index: 1000;
+          font-size: 1.1em;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+          animation: fadeOut 3s forwards;
+      `;
+      document.body.appendChild(messageBox);
+
+      // Ensure the fadeOut keyframes are available
+      if (!document.querySelector('style#fadeOutKeyframes')) {
+          const styleSheet = document.createElement("style");
+          styleSheet.id = "fadeOutKeyframes"; // Add an ID to prevent duplicates
+          styleSheet.type = "text/css";
+          styleSheet.innerText = `
+              @keyframes fadeOut {
+                  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+              }
+          `;
+          document.head.appendChild(styleSheet);
+      }
+
+      setTimeout(() => {
+          messageBox.remove();
+          // Do not remove styleSheet, as it might be used by other messages
+      }, 3000);
+  }
 
   function quitLesson() {
       if (window.opener) {
           window.close();
       } else {
-          alert("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.");
+          showCustomMessage("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.", 'info');
       }
   }
-
-  let currentSentence = '';
-
-  // Web Speech API의 SpeechSynthesis 객체 생성
-  const synth = window.speechSynthesis;
 
   // 페이지 로드 시, 또는 '다음 문제' 버튼 클릭 시 실행될 함수
   function fetchAndDisplaySentence() {
       document.getElementById('sentence').textContent = '문장을 불러오는 중...';
       document.getElementById('user-answer').value = '';
-      document.getElementById('result-overlay').style.display = 'none';
+      document.getElementById('result-overlay').classList.add('hidden'); // Tailwind hidden class
       document.getElementById('next-btn').style.display = 'none';
       document.getElementById('play-btn').style.display = 'none';
-      document.getElementById('correct-answer-box').style.display = 'none'; // ✅ 정답 박스 숨기기
+      document.getElementById('correct-answer-box').classList.add('hidden'); // 정답 박스 숨김
 
-      fetch('/study/api/get-lesson4-sentence') // RequestMapping("/study")를 고려하여 경로 수정
+      fetch(`${window.location.origin}/study/api/get-lesson4-sentence`) // RequestMapping("/study")를 고려하여 경로 수정
       .then(response => {
           if (!response.ok) {
-              // 응답이 성공(200 OK)이 아닐 경우 오류 발생
               throw new Error('네트워크 응답이 실패했습니다: ' + response.statusText);
           }
           return response.json();
       })
       .then(data => {
-          // 서버에서 받은 데이터에 "sentence" 필드가 있는지 확인
           if (data && data.sentence) {
               currentSentence = data.sentence;
               document.getElementById('sentence').textContent = "문장이 준비되었습니다.";
               document.getElementById('play-btn').style.display = 'inline-block';
           } else {
-              // 서버 응답에 'sentence' 필드가 없을 경우
-              throw new Error('서버 응답 형식이 올바르지 않습니다.');
+              showCustomMessage('더 이상 풀 문제가 없습니다. 모든 문제를 성공적으로 완료했어요!', 'info');
+              document.getElementById('sentence').textContent = ''; // 문장 없으면 초기화
+              document.getElementById('play-btn').style.display = 'none'; // 재생 버튼 숨기기
+              document.getElementById('submit-btn').style.display = 'none'; // 제출 버튼 숨기기
+              document.getElementById('user-answer').style.display = 'none'; // 입력 필드 숨기기
           }
       })
       .catch(error => {
           console.error('문장을 가져오는 중 오류 발생:', error);
+          showCustomMessage('문장 로드에 실패했습니다.', 'error');
           document.getElementById('sentence').textContent = '문장 로드 실패';
       });
   }
@@ -90,7 +195,7 @@
       if (text !== '') {
           const utterThis = new SpeechSynthesisUtterance(text);
 
-          utterThis.lang = 'ko-KR';
+          utterThis.lang = 'ko-KR'; // 한국어 설정
 
           utterThis.onend = function(event) {
               console.log('음성 재생이 종료되었습니다.');
@@ -98,6 +203,7 @@
 
           utterThis.onerror = function(event) {
               console.error('음성 재생 중 오류 발생: ' + event.error);
+              showCustomMessage('음성 재생 중 오류가 발생했습니다.', 'error');
           };
 
           synth.speak(utterThis);
@@ -112,9 +218,14 @@
   });
 
   document.getElementById('submit-btn').addEventListener('click', function() {
-      const userAnswer = document.getElementById('user-answer').value;
+      const userAnswer = document.getElementById('user-answer').value.trim(); // 공백 제거
 
-      fetch('/study/api/check-lesson4-answer', {
+      if (!userAnswer) {
+          showCustomMessage("답변을 입력해주세요.", 'error');
+          return;
+      }
+
+      fetch(`${window.location.origin}/study/api/check-lesson4-answer`, {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -124,27 +235,41 @@
               userAnswer: userAnswer
           })
       })
-      .then(response => response.json())
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('네트워크 응답이 실패했습니다: ' + response.statusText);
+          }
+          return response.json();
+      })
       .then(data => {
           const resultOverlay = document.getElementById('result-overlay');
           const resultText = document.getElementById('result-text');
 
           if (data.isCorrect) {
-              resultText.textContent = 'O';
-              resultOverlay.style.color = 'green';
-              document.getElementById('correct-answer-box').style.display = 'none'; // ✅ 정답이면 박스 숨김
+              resultText.textContent = '✔️'; // 이모지 아이콘
+              resultOverlay.className = 'text-[#2F4160] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-pulse';
+              resultOverlay.classList.remove('hidden');
+              document.getElementById('correct-answer-box').classList.add('hidden'); // 정답이면 박스 숨김
           } else {
-              resultText.textContent = 'X';
-              resultOverlay.style.color = 'red';
-              // ✅ 오답일 경우 정답 문장 표시
-              document.getElementById('correct-answer-box').style.display = 'block';
+              resultText.textContent = '✖️'; // 이모지 아이콘
+              resultOverlay.className = 'text-[#F29DA0] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-bounce';
+              resultOverlay.classList.remove('hidden');
+              // 오답일 경우 정답 문장 표시
+              document.getElementById('correct-answer-box').classList.remove('hidden');
               document.getElementById('correct-answer-text').textContent = currentSentence;
           }
 
-          resultOverlay.style.display = 'flex';
-          document.getElementById('next-btn').style.display = 'block';
+          document.getElementById('next-btn').style.display = 'block'; // 다음 문제 버튼 표시
+
+          // 피드백 아이콘 1.5초 후 숨기기
+          setTimeout(() => {
+              resultOverlay.classList.add('hidden');
+          }, 1500);
       })
-      .catch(error => console.error('답변 확인 중 오류 발생:', error));
+      .catch(error => {
+          console.error('답변 확인 중 오류 발생:', error);
+          showCustomMessage('답변 확인 중 오류가 발생했습니다.', 'error');
+      });
   });
 
   document.getElementById('next-btn').addEventListener('click', function() {
@@ -156,7 +281,7 @@
       if ('speechSynthesis' in window) {
           fetchAndDisplaySentence();
       } else {
-          alert('이 브라우저는 텍스트 음성 변환을 지원하지 않습니다.');
+          showCustomMessage('이 브라우저는 텍스트 음성 변환을 지원하지 않습니다. 다른 브라우저를 사용해주세요.', 'error');
       }
   };
 </script>

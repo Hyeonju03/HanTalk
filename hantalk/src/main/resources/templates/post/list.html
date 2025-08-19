@@ -6,13 +6,11 @@
     <title>게시물 목록</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
         body {
             background-color: #f3f4f6;
             color: #2F4160;
-        }
-        .container-custom {
-            max-width: 1000px;
         }
         .board-header h1 {
             font-weight: bold;
@@ -54,110 +52,193 @@
             justify-content: center;
             margin-top: 20px;
         }
+        /* 숫자 페이지네이션 링크 스타일 */
         .pagination-link {
             padding: 8px 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
+            border: 1px solid #4B4B4B;
+            border-radius: 8px;
             margin: 0 4px;
-            color: #2F4160;
+            color: white;
+            background-color: #4B4B4B;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
         }
         .pagination-link:hover {
-            background-color: #e5e7eb;
+            background-color: #2F4160;
+            color: white;
+            border-color: #2F4160;
         }
         .pagination-link.active {
-            background-color: #B5D0E3;
+            background-color: #4B4B4B;
             color: white;
-            border-color: #B5D0E3;
+            border-color: #4B4B4B;
+        }
+        /* '처음', '이전', '다음', '마지막' 링크를 위한 새로운 스타일 */
+        .pagination-nav-button {
+            text-decoration: none;
+            color: #4B4B4B; /* 기본 글씨색을 검정 (dark gray)으로 변경 */
+            font-weight: 600; /* font-semibold 대신 font-weight: 600; 명시적 적용 */
+            padding: 8px 12px;
+            border: 1px solid transparent; /* 기본 테두리 없음 */
+            border-radius: 8px;
+            margin: 0 4px;
+            transition-property: background-color, color, border-color;
+            transition-duration: 200ms;
+            display: inline-block; /* Ensure proper sizing for padding/margin */
+        }
+        .pagination-nav-button:hover {
+            background-color: #2F4160; /* 호버 시 네이비 배경 */
+            color: white; /* 호버 시 흰색 글씨 */
+            border-color: #2F4160; /* 호버 시 네이비 테두리 */
+        }
+        .pagination-nav-button.disabled {
+            color: #4B4B4B; /* 비활성화 시에도 검정색 글씨를 유지 */
+            cursor: default !important; /* 마우스 커서를 기본으로 변경하여 빨간색 동그라미 작대기 제거 (강력하게 적용) */
+            /* 비활성화 시 opacity 조정은 더 이상 하지 않음 (기본 opacity 1 유지) */
+        }
+        /* 비활성화된 버튼에 대한 호버 효과를 재정의하여 배경색과 글씨색이 변하도록 함 */
+        .pagination-nav-button.disabled:hover {
+            background-color: #2F4160; /* 호버 시 네이비 배경 (비활성화 상태에서도) */
+            color: white; /* 호버 시 흰색 글씨 (비활성화 상태에서도) */
+            border-color: #2F4160; /* 호버 시 네이비 테두리 (비활성화 상태에서도) */
         }
     </style>
 </head>
 <body class="bg-[#f3f4f6] flex flex-col min-h-screen">
 
-<div th:replace="~{fragments/header :: headerFragment}"></div>
+<!-- fragments/header :: headerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
+<!-- <div th:replace="~{fragments/header :: headerFragment}"></div> -->
 
+<!-- 메인 레이아웃: 사이드바와 본문 영역을 포함하며, 전체적인 패딩과 간격을 관리 -->
 <div class="flex-grow flex justify-center p-8 space-x-8">
 
-    <div th:replace="~{fragments/postSidebar :: postSidebarFragment}"></div>
+    <!-- 사이드바 컨테이너 (이제 플렉스 아이템으로, 메인 컨텐츠와 높이 일치) -->
+    <!-- 모든 스타일을 여기에 직접 적용하여 깔끔한 박스 형태를 만듦 -->
+    <nav class="w-72 bg-white rounded-xl shadow-xl p-8 flex flex-col flex-shrink-0">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-[#2F4160]">📋 게시판</h2>
+        </div>
+        <ul class="space-y-4">
+            <li>
+                <a th:href="@{/post/list/1}"
+                   th:classappend="${categoryId == 1} ? 'bg-[#2F4160] text-white' : 'text-[#2F4160]'"
+                   class="flex items-center p-3 hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200">
+                    <i class="fas fa-bullhorn mr-3"></i>
+                    <span>공지사항</span>
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/post/list/2}"
+                   th:classappend="${categoryId == 2} ? 'bg-[#2F4160] text-white' : 'text-[#2F4160]'"
+                   class="flex items-center p-3 hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200">
+                    <i class="fas fa-comments mr-3"></i>
+                    <span>커뮤니티</span>
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/post/list/3}"
+                   th:classappend="${categoryId == 3} ? 'bg-[#2F4160] text-white' : 'text-[#2F4160]'"
+                   class="flex items-center p-3 hover:bg-[#2F4160] hover:text-white rounded-lg transition-colors duration-200">
+                    <i class="fas fa-question-circle mr-3"></i>
+                    <span>문의사항</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 
-    <div class="container-custom w-full">
-        <div class="bg-white rounded-xl shadow-xl p-8">
-            <div class="board-header">
-                <h1 th:if="${categoryId == 1}" class="text-3xl text-center text-[#2F4160] mb-6">공지사항</h1>
-                <h1 th:if="${categoryId == 2}" class="text-3xl text-center text-[#2F4160] mb-6">커뮤니티</h1>
-                <h1 th:if="${categoryId == 3}" class="text-3xl text-center text-[#2F4160] mb-6">문의사항</h1>
-            </div>
+    <!-- 본문 영역 (사이드바와 동등한 플렉스 아이템이 됨) -->
+    <!-- container-custom 클래스 대신 flex-1을 직접 사용하여 공간을 채우고,
+         bg-white, rounded-xl, shadow-xl, p-8을 여기에 직접 적용 -->
+    <div class="flex-1 bg-white rounded-xl shadow-xl p-8">
+        <div class="board-header">
+            <h1 th:if="${categoryId == 1}" class="text-3xl text-center text-[#2F4160] mb-6">공지사항</h1>
+            <h1 th:if="${categoryId == 2}" class="text-3xl text-center text-[#2F4160] mb-6">커뮤니티</h1>
+            <h1 th:if="${categoryId == 3}" class="text-3xl text-center text-[#2F4160] mb-6">문의사항</h1>
+        </div>
 
-            <div class="search-box">
-                <form th:action="@{|/post/list/${categoryId}|}" method="get" class="flex items-center space-x-2">
-                    <select name="searchType" class="form-select border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
-                        <option value="title" th:selected="${searchType == 'title'}">제목</option>
-                        <option value="content" th:selected="${searchType == 'content'}">내용</option>
-                        <option value="author" th:selected="${searchType == 'author'}">작성자</option>
-                    </select>
-                    <input type="text" name="keyword" class="form-control border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]" th:value="${keyword}" placeholder="검색어를 입력하세요">
-                    <button class="bg-[#B5D0E3] hover:bg-[#2F4160] text-white font-semibold py-2 px-4 rounded-lg transition duration-200" type="submit">검색</button>
-                </form>
-            </div>
+        <div class="search-box">
+            <form th:action="@{|/post/list/${categoryId}|}" method="get" class="flex items-center space-x-2">
+                <select name="searchType" class="form-select border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+                    <option value="title" th:selected="${searchType == 'title'}">제목</option>
+                    <option value="content" th:selected="${searchType == 'content'}">내용</option>
+                    <option value="author" th:selected="${searchType == 'author'}">작성자</option>
+                </select>
+                <input type="text" name="keyword" class="form-control border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]" th:value="${keyword}" placeholder="검색어를 입력하세요">
+                <button class="bg-[#4B4B4B] hover:bg-[#2F4160] text-white font-semibold py-2 px-4 rounded-lg transition duration-200" type="submit">
+                    <i class="fas fa-search mr-1"></i> 검색
+                </button>
+            </form>
+        </div>
 
-            <div class="overflow-x-auto">
-                <table class="table-custom">
-                    <thead>
-                    <tr class="text-[#2F4160]">
-                        <th style="width: 60%;">제목</th>
-                        <th style="width: 15%;">작성자</th>
-                        <th style="width: 15%;">작성일</th>
-                        <th style="width: 10%;">조회수</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:if="${postPage.isEmpty()}">
-                        <td colspan="4" class="text-center py-4 text-gray-500">게시물이 없습니다.</td>
-                    </tr>
-                    <tr th:each="post : ${postPage.content}">
-                        <td class="board-title">
-                            <a th:href="@{|/post/view/${post.postId}|}" th:text="${post.title}">제목입니다.</a>
-                        </td>
-                        <td th:text="${post.users != null ? post.users.nickname : '관리자'}">관리자</td>
-                        <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
-                        <td th:text="${post.viewCount}">0</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="overflow-x-auto">
+            <table class="table-custom">
+                <thead>
+                <tr class="text-[#2F4160]">
+                    <th style="width: 60%;">제목</th>
+                    <th style="width: 15%;">작성자</th>
+                    <th style="width: 15%;">작성일</th>
+                    <th style="width: 10%;">조회수</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${postPage.isEmpty()}">
+                    <td colspan="4" class="text-center py-4 text-gray-500">게시물이 없습니다.</td>
+                </tr>
+                <tr th:each="post : ${postPage.content}">
+                    <td class="board-title">
+                        <a th:href="@{|/post/view/${post.postId}|}" th:text="${post.title}">제목입니다.</a>
+                    </td>
+                    <td th:text="${post.users != null ? post.users.nickname : '관리자'}">관리자</td>
+                    <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
+                    <td th:text="${post.viewCount}">0</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-            <div class="flex flex-col md:flex-row justify-between items-center mt-6 space-y-4 md:space-y-0">
-                <a th:href="@{|/post/insert/${categoryId}|}" class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200">새 글 작성</a>
+        <div class="flex flex-col md:flex-row justify-between items-center mt-6 space-y-4 md:space-y-0">
+            <a th:href="@{|/post/insert/${categoryId}|}" class="bg-[#4B4B4B] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200">
+                <i class="fas fa-plus mr-1"></i> 새 글 작성
+            </a>
 
-                <div th:if="${!postPage.isEmpty()}" class="pagination-container">
-                    <nav aria-label="Page navigation">
-                        <ul class="flex space-x-2">
-                            <li class="page-item" th:classappend="${postPage.first} ? 'opacity-50 cursor-not-allowed'">
-                                <a class="pagination-link" th:href="@{|/post/list/${categoryId}|(page=0, keyword=${keyword}, searchType=${searchType})}">처음</a>
-                            </li>
-                            <li class="page-item" th:classappend="${postPage.first} ? 'opacity-50 cursor-not-allowed'">
-                                <a class="pagination-link" th:href="@{|/post/list/${categoryId}|(page=${postPage.number-1}, keyword=${keyword}, searchType=${searchType})}">이전</a>
-                            </li>
-                            <li th:each="pageNumber : ${#numbers.sequence(0, postPage.totalPages - 1)}"
-                                th:classappend="${pageNumber == postPage.number} ? 'active' : ''" class="page-item">
-                                <a th:href="@{|/post/list/${categoryId}|(page=${pageNumber}, keyword=${keyword}, searchType=${searchType})}"
-                                   th:text="${pageNumber + 1}" class="pagination-link" th:classappend="${pageNumber == postPage.number} ? 'bg-[#B5D0E3] text-white' : ''"></a>
-                            </li>
-                            <li class="page-item" th:classappend="${postPage.last} ? 'opacity-50 cursor-not-allowed'">
-                                <a class="pagination-link" th:href="@{|/post/list/${categoryId}|(page=${postPage.number+1}, keyword=${keyword}, searchType=${searchType})}">다음</a>
-                            </li>
-                            <li class="page-item" th:classappend="${postPage.last} ? 'opacity-50 cursor-not-allowed'">
-                                <a class="pagination-link" th:href="@{|/post/list/${categoryId}|(page=${postPage.totalPages - 1}, keyword=${keyword}, searchType=${searchType})}">마지막</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
+            <div th:if="${!postPage.isEmpty()}" class="pagination-container">
+                <nav aria-label="Page navigation">
+                    <ul class="flex space-x-2">
+                        <li class="page-item">
+                            <a class="pagination-nav-button" th:href="${postPage.first} ? '#' : @{|/post/list/${categoryId}|(page=0, keyword=${keyword}, searchType=${searchType})}"
+                               th:classappend="${postPage.first} ? 'disabled'" th:attrappend="onclick=${postPage.first} ? 'event.preventDefault();' : ''">처음</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="pagination-nav-button" th:href="${postPage.first} ? '#' : @{|/post/list/${categoryId}|(page=${postPage.number-1}, keyword=${keyword}, searchType=${searchType})}"
+                               th:classappend="${postPage.first} ? 'disabled'" th:attrappend="onclick=${postPage.first} ? 'event.preventDefault();' : ''">이전</a>
+                        </li>
+                        <li th:each="pageNumber : ${#numbers.sequence(0, postPage.totalPages - 1)}"
+                            th:classappend="${pageNumber == postPage.number} ? 'active' : ''" class="page-item">
+                            <a th:href="@{|/post/list/${categoryId}|(page=${pageNumber}, keyword=${keyword}, searchType=${searchType})}"
+                               th:text="${pageNumber + 1}" class="pagination-link"></a>
+                        </li>
+                        <li class="page-item">
+                            <a class="pagination-nav-button" th:href="${postPage.last} ? '#' : @{|/post/list/${categoryId}|(page=${postPage.number+1}, keyword=${keyword}, searchType=${searchType})}"
+                               th:classappend="${postPage.last} ? 'disabled'" th:attrappend="onclick=${postPage.last} ? 'event.preventDefault();' : ''">다음</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="pagination-nav-button" th:href="${postPage.last} ? '#' : @{|/post/list/${categoryId}|(page=${postPage.totalPages - 1}, keyword=${keyword}, searchType=${searchType})}"
+                               th:classappend="${postPage.last} ? 'disabled'" th:attrappend="onclick=${postPage.last} ? 'event.preventDefault();' : ''">마지막</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
 </div>
+</div>
 
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<!-- fragments/footer :: footerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
+<!-- <div th:replace="~{fragments/footer :: footerFragment}"></div> -->
 
 </body>
 </html>

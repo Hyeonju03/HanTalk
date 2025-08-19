@@ -9,19 +9,27 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
         /* Nanum Gothic 폰트 설정 */
+        @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
         body {
-            font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
+            font-family: 'Nanum Gothic', sans-serif; /* 맑은 고딕 추가 제거 */
         }
 
         /* 테이블 행 클릭 시 URL 이동을 위한 커서 스타일 */
         .table-row-clickable {
             cursor: pointer;
         }
+
+        /* Custom animation for message box (added for consistency) */
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
     </style>
 </head>
-<body class="bg-gray-100 text-[#2F4160] min-h-screen flex flex-col">
+<body class="bg-[#f3f4f6] text-[#2F4160] min-h-screen flex flex-col">
 
-<div th:replace="~{fragments/header :: headerFragment}"></div>
+<!-- Thymeleaf fragments/header :: headerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
+<!-- <div th:replace="~{fragments/header :: headerFragment}"></div> -->
 
 <div class="flex-grow flex justify-center p-8">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl mx-auto flex-grow">
@@ -37,7 +45,7 @@
             <div class="overflow-x-auto bg-white rounded-xl shadow-lg">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead>
-                    <tr class="bg-[#B5D0E3]">
+                    <tr class="bg-[#f3f4f6]"> <!-- 배경색 변경 -->
                         <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">아이디</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">이름</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">닉네임</th>
@@ -50,20 +58,20 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                     <tr th:each="user : ${userList}"
                         class="hover:bg-gray-50 transition duration-150">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${user.userId}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${user.name}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${user.nickname}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${user.email}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${user.status}"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" th:text="${user.point}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#2F4160]" th:text="${user.userId}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#2F4160]" th:text="${user.name}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#2F4160]" th:text="${user.nickname}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#2F4160]" th:text="${user.email}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#2F4160]" th:text="${user.status}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#2F4160]" th:text="${user.point}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex justify-center items-center space-x-2">
                                 <a th:href="@{'/user/admin/read?userId=' + ${user.userId}}"
-                                   class="bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300">
+                                   class="bg-[#A0A0A0] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] hover:text-white transition duration-300"> <!-- 상세 버튼 변경 -->
                                     <i class="fas fa-search"></i> 상세
                                 </a>
                                 <a th:href="@{'/user/admin/update?userId=' + ${user.userId}}"
-                                   class="bg-yellow-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-yellow-600 transition duration-300">
+                                   class="bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300"> <!-- 수정 버튼 변경 -->
                                     <i class="fas fa-edit"></i> 수정
                                 </a>
                                 <a th:href="@{'/user/admin/delete?userId=' + ${user.userId}}"
@@ -81,7 +89,60 @@
     </div>
 </div>
 
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<!-- Thymeleaf fragments/footer :: footerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
+<!-- <div th:replace="~{fragments/footer :: footerFragment}"></div> -->
+
+<!-- Custom message box function (added for consistency with other admin pages) -->
+<script>
+    function showCustomMessage(message, type = 'info') {
+        const messageBox = document.createElement('div');
+        messageBox.textContent = message;
+        let bgColor = '#2F4160'; // Default: Dark Navy
+        let textColor = 'white';
+
+        if (type === 'error') {
+            bgColor = '#F29DA0'; // Coral Pink for errors
+        } else if (type === 'success') {
+            bgColor = '#B5D0E3'; // Soft Sky Blue for success
+            textColor = '#2F4160'; // Dark Navy for text on success
+        }
+
+        messageBox.style.cssText = `
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: ${bgColor};
+            color: ${textColor};
+            padding: 15px 30px;
+            border-radius: 8px;
+            z-index: 1000;
+            font-size: 1.1em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            animation: fadeOut 3s forwards;
+        `;
+        document.body.appendChild(messageBox);
+
+        // Ensure the fadeOut keyframes are available (add only once)
+        if (!document.querySelector('style#fadeOutKeyframes')) {
+            const styleSheet = document.createElement("style");
+            styleSheet.id = "fadeOutKeyframes"; // Add an ID to prevent duplicates
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @keyframes fadeOut {
+                    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        }
+
+        setTimeout(() => {
+            messageBox.remove();
+            // Do not remove styleSheet, as it might be used by other messages
+        }, 3000);
+    }
+</script>
 
 </body>
 </html>

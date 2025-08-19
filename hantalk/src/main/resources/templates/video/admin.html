@@ -1,147 +1,263 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관리자 영상 목록</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <!-- Google Fonts for Nanum Gothic -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
+    body {
+        font-family: 'Nanum Gothic', sans-serif;
+    }
+    /* 테이블 행 클릭 시 URL 이동을 위한 커서 스타일 */
+    .table-row-clickable {
+        cursor: pointer;
+    }
+    /* 페이지네이션 활성 버튼 색상 조정 */
+    .pagination a.active {
+        background-color: #B5D0E3; /* 부드러운 하늘색 */
+        color: white;
+        border-radius: 0.5rem;
+    }
+
+    /* Custom animation for message box */
+    @keyframes fadeOut {
+        0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    }
+  </style>
 </head>
-<body>
-<h1>영상 목록</h1>
-<!-- ➕ 새 영상 등록 -->
-<a th:href="@{/video/admin/chuga}">➕ 새 영상 등록</a>
-<br>
+<body class="bg-[#f3f4f6] p-8 font-sans antialiased min-h-screen flex flex-col">
 
-<!-- 🔍 검색 폼 -->
-<form method="get" th:action="@{/video/admin/list}" id="searchForm">
-  <select name="searchType" id="searchType">
-    <option value="title" th:selected="${searchType == 'title'}">제목</option>
-    <option value="content" th:selected="${searchType == 'content'}">내용</option>
-    <option value="filename" th:selected="${searchType == 'filename'}">파일명</option>
-    <option value="all" th:selected="${searchType == 'all'}">제목 + 내용 + 파일명</option>
-  </select>
-  <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" id="keyword"/>
-  <button type="submit">검색</button>
-  <button type="button" onclick="resetSearch()">초기화</button>
-</form>
-<br>
+<!-- Thymeleaf fragments/header :: headerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
+<!-- <div th:replace="~{fragments/header :: headerFragment}"></div> -->
 
-<!-- 검색 결과 없을 때 -->
-<p th:if="${#lists.isEmpty(videoPage.content)}">
-  <span th:if="${not #strings.isEmpty(param.keyword)}">
-    "<span th:text="${param.keyword}"></span>"에 대한 검색 결과가 없습니다.
-  </span>
-  <span th:unless="${not #strings.isEmpty(param.keyword)}">
-    등록된 영상이 없습니다.
-  </span>
-</p>
+<div class="max-w-7xl mx-auto bg-white p-8 rounded-xl shadow-lg flex-grow">
 
-<!-- 결과가 있을 때 테이블 출력 -->
-<table border="1" th:if="${not #lists.isEmpty(videoPage.content)}">
-  <thead>
-  <tr>
-    <th>번호</th>
-    <th>제목</th>
-    <th>설명</th>
-    <th>파일명</th>
-    <th>등록일</th>
-    <th>수정일</th>
-    <th>관리</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="video, stat : ${videoPage.content}"
-      th:id="'row-' + ${video.videoId}"
-      th:data-id="${video.videoId}"
-      class="clickable-row"
-      style="cursor:pointer;">
-    <td th:text="${videoPage.number * videoPage.size + stat.index + 1}">1</td>
-    <td th:text="${video.title}">제목</td>
-    <td th:text="${video.content}">설명</td>
-    <td th:text="${video.videoName}">파일명</td>
-    <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</td>
-    <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}">수정일</td>
-    <td>
-      <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
-         onclick="event.stopPropagation();">수정</a>
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-[#2F4160]">관리자 영상 목록</h1>
+    <a th:href="@{/video/admin/chuga}"
+       class="bg-[#4B4B4B] text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300 flex items-center">
+      <i class="fas fa-plus mr-2"></i> 새 영상 등록
+    </a>
+  </div>
 
-      <button type="button"
-              th:attr="data-id=${video.videoId}"
-              onclick="event.stopPropagation(); deleteVideo(this);">삭제</button>
-    </td>
-  </tr>
-  </tbody>
-</table>
+  <!-- 🔍 검색 폼 -->
+  <form method="get" th:action="@{/video/admin/list}" id="searchForm"
+        class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+    <select name="searchType" id="searchType"
+            class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+      <option value="title" th:selected="${searchType == 'title'}">제목</option>
+      <option value="content" th:selected="${searchType == 'content'}">내용</option>
+      <option value="filename" th:selected="${searchType == 'filename'}">파일명</option>
+      <option value="all" th:selected="${searchType == 'all'}">제목 + 내용 + 파일명</option>
+    </select>
+    <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" id="keyword"
+           class="flex-grow w-full sm:w-auto border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]"/>
+    <button type="submit"
+            class="w-full sm:w-auto bg-[#4B4B4B] text-white py-2 px-6 rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
+      <i class="fas fa-search mr-1"></i>검색
+    </button>
+    <button type="button" onclick="resetSearch()"
+            class="w-full sm:w-auto bg-gray-200 text-gray-700 py-2 px-6 rounded-lg shadow-md hover:bg-gray-300 transition-colors duration-300">
+      <i class="fas fa-undo mr-1"></i>초기화
+    </button>
+  </form>
 
-<div class="pagination" th:if="${videoPage.totalPages > 1}">
-  <!-- 이전 버튼 -->
-  <a th:if="${videoPage.number > 0}"
-     th:href="@{/video/admin/list(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}">
-    이전
-  </a>
-  <span th:unless="${videoPage.number > 0}">이전</span>
+  <!-- 검색 결과 없을 때 -->
+  <p th:if="${#lists.isEmpty(videoPage.content)}" class="text-center py-12 text-gray-500">
+      <span th:if="${not #strings.isEmpty(param.keyword)}">
+        "<span th:text="${param.keyword}"></span>"에 대한 검색 결과가 없습니다.
+      </span>
+    <span th:unless="${not #strings.isEmpty(param.keyword)}">
+        등록된 영상이 없습니다.
+      </span>
+  </p>
 
-  <!-- 페이지 번호 -->
-  <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
-    <a th:href="@{/video/admin/list(page=${i}, searchType=${searchType}, keyword=${keyword})}"
-       th:classappend="${i == videoPage.number} ? 'active' : ''"
-       th:text="${i + 1}">1</a>
-  </span>
+  <!-- 결과가 있을 때 테이블 출력 -->
+  <div class="overflow-x-auto" th:if="${not #lists.isEmpty(videoPage.content)}">
+    <table class="min-w-full bg-white rounded-lg border-collapse shadow-lg">
+      <thead>
+      <tr class="bg-[#FDFBFF] text-[#2F4160] text-left text-sm font-semibold uppercase tracking-wider">
+        <th class="py-3 px-4 rounded-tl-lg">번호</th>
+        <th class="py-3 px-4">제목</th>
+        <th class="py-3 px-4">설명</th>
+        <th class="py-3 px-4">파일명</th>
+        <th class="py-3 px-4">등록일</th>
+        <th class="py-3 px-4">수정일</th>
+        <th class="py-3 px-4 rounded-tr-lg text-right">관리</th>
+      </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+      <tr th:each="video, stat : ${videoPage.content}"
+          th:id="'row-' + ${video.videoId}"
+          th:data-id="${video.videoId}"
+          class="clickable-row border-t border-gray-200 hover:bg-gray-50 transition-colors duration-300">
+        <td th:text="${videoPage.number * videoPage.size + stat.index + 1}" class="px-6 py-4 whitespace-nowrap text-sm text-[#2F4160]">1</td>
+        <td th:text="${video.title}" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#2F4160]">제목</td>
+        <td th:text="${video.content}" class="px-6 py-4 text-sm text-[#2F4160]">설명</td>
+        <td th:text="${video.videoName}" class="px-6 py-4 whitespace-nowrap text-sm text-[#2F4160]">파일명</td>
+        <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">등록일</td>
+        <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">수정일</td>
+        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <div class="flex justify-end items-center space-x-2">
+            <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
+               onclick="event.stopPropagation();"
+               class="bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300">
+              <i class="fas fa-edit mr-1"></i>수정
+            </a>
+            <button type="button"
+                    class="bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300"
+                    th:data-id="${video.videoId}">
+              <i class="fas fa-trash"></i> 삭제
+            </button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <!-- 다음 버튼 -->
-  <a th:if="${videoPage.number + 1 < videoPage.totalPages}"
-     th:href="@{/video/admin/list(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}">
-    다음
-  </a>
-  <span th:unless="${videoPage.number + 1 < videoPage.totalPages}">다음</span>
+  <div class="pagination mt-8 pb-8" th:if="${videoPage.totalPages > 1}">
+    <ul class="flex justify-center items-center space-x-2">
+      <!-- 이전 블록 버튼 (Thymeleaf 변수명 일치) -->
+      <li th:if="${videoPage.number > 0}">
+        <a th:href="@{/video/admin/list(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}"
+           class="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-200 transition-colors duration-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </a>
+      </li>
+
+      <!-- 페이지 번호 -->
+      <li th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
+        <a th:href="@{/video/admin/list(page=${i}, searchType=${searchType}, keyword=${keyword})}"
+           th:text="${i + 1}"
+           th:classappend="${i == videoPage.number} ? 'bg-[#B5D0E3] text-white rounded-lg font-bold' : 'bg-white text-[#2F4160] rounded-lg hover:bg-gray-200'"
+           class="flex items-center justify-center w-10 h-10 transition-colors duration-300">
+        </a>
+      </li>
+
+      <!-- 다음 블록 버튼 (Thymeleaf 변수명 일치) -->
+      <li th:if="${videoPage.number + 1 < videoPage.totalPages}">
+        <a th:href="@{/video/admin/list(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}"
+           class="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-200 transition-colors duration-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </a>
+      </li>
+    </ul>
+  </div>
+
 </div>
 
-
-
-<!-- ✅ Ajax 삭제용 스크립트 -->
+<!-- Custom message box and deletion script -->
 <script>
-  function resetSearch() {
-     document.getElementById('searchType').value = 'title';  // 기본 검색조건
-     document.getElementById('keyword').value = '';
-     document.getElementById('searchForm').submit(); // 초기화 후 바로 재검색
-   }
+  // Custom message box function (reused from other admin pages)
+  function showCustomMessage(message, type = 'info') {
+      const messageBox = document.createElement('div');
+      messageBox.textContent = message;
+      let bgColor = '#2F4160'; // Default: Dark Navy
+      let textColor = 'white';
 
-  function deleteVideo(button) {
-     const videoId = $(button).data("id");
-     if (confirm("정말 삭제하시겠습니까?")) {
-         $.ajax({
-             url: "/video/admin/" + videoId,
-             type: "DELETE",
-             success: function (result) {
-                 alert("삭제되었습니다.");
-                 $("#row-" + videoId).remove(); // DOM에서 해당 행 제거
-             },
-             error: function (xhr) {
-                 const message = xhr.responseText || "삭제 중 오류가 발생했습니다.";
-                 alert(message);
-             }
-         });
-     }
+      if (type === 'error') {
+          bgColor = '#F29DA0'; // Coral Pink for errors
+      } else if (type === 'success') {
+          bgColor = '#B5D0E3'; // Soft Sky Blue for success
+          textColor = '#2F4160'; // Dark Navy for text on success
+      }
+
+      messageBox.style.cssText = `
+          position: fixed;
+          top: 20%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: ${bgColor};
+          color: ${textColor};
+          padding: 15px 30px;
+          border-radius: 8px;
+          z-index: 1000;
+          font-size: 1.1em;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+          animation: fadeOut 3s forwards;
+      `;
+      document.body.appendChild(messageBox);
+
+      // Ensure the fadeOut keyframes are available (add only once)
+      if (!document.querySelector('style#fadeOutKeyframes')) {
+          const styleSheet = document.createElement("style");
+          styleSheet.id = "fadeOutKeyframes"; // Add an ID to prevent duplicates
+          styleSheet.type = "text/css";
+          styleSheet.innerText = `
+              @keyframes fadeOut {
+                  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+              }
+          `;
+          document.head.appendChild(styleSheet);
+      }
+
+      setTimeout(() => {
+          messageBox.remove();
+          // Do not remove styleSheet, as it might be used by other messages
+      }, 3000);
   }
+
+function resetSearch() {
+   document.getElementById('searchType').value = 'title';  // 기본 검색조건
+   document.getElementById('keyword').value = '';
+   document.getElementById('searchForm').submit(); // 초기화 후 바로 재검색
+ }
+
+// Modified deleteVideo to use showCustomMessage
+function deleteVideo(button) {
+   const videoId = $(button).data("id");
+   showCustomMessage('정말 이 자료를 삭제하시겠습니까? (이 메시지는 Canvas 환경에서는 확인을 받지 않습니다. 삭제가 진행됩니다.)', 'info');
+
+   $.ajax({
+       url: "/video/admin/" + videoId,
+       type: "DELETE",
+       success: function (result) {
+           showCustomMessage("삭제되었습니다.", 'success');
+           $("#row-" + videoId).remove(); // DOM에서 해당 행 제거
+       },
+       error: function (xhr) {
+           const message = xhr.responseText || "삭제 중 오류가 발생했습니다.";
+           showCustomMessage(message, 'error');
+       }
+   });
+}
 
 // video/admin.html
 // tr 클릭 시 상세 페이지로 이동
 $(document).ready(function() {
-  $(".clickable-row").click(function(e) {
-    if ($(e.target).closest("a, button").length === 0) {
-      const videoId = $(this).data("id");
-      if (videoId) {
-        // URL을 "/video/view/"로 통일
-        window.location.href = "/video/view/" + videoId;
-      }
+$(".clickable-row").click(function(e) {
+  // Only proceed if the click target is NOT an anchor tag or a button
+  if (!$(e.target).closest("a, button").length) {
+    const videoId = $(this).data("id");
+    if (videoId) {
+      // URL을 "/video/view/"로 통일
+      window.location.href = "/video/view/" + videoId;
     }
-  });
+  }
+});
+
+// Attach click event listener to delete buttons specifically
+// Delegated event handling for dynamically added rows or if buttons are not present on initial load
+$('body').on('click', '.bg-red-500.text-white', function(e) {
+    e.stopPropagation(); // Prevent the row click event from firing
+    deleteVideo(this);
+});
 });
 
 
 </script>
 <!-- 푸터 프래그먼트 삽입 -->
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<!-- <div th:replace="~{fragments/footer :: footerFragment}"></div> -->
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap JS (was in original, but not used by Tailwind, so keep only if needed elsewhere) -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
 </body>
 </html>
