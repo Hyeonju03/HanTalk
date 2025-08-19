@@ -21,13 +21,15 @@
         .hover-text-accent-pink:hover { color: #F29DA0; }
         .container-custom { max-width: 1000px; }
 
-        /* Sidebar active class */
+        /* Sidebar active class - 클릭 시 네이비색으로 변경 */
         .sidebar-link.active {
-            background-color: #F29DA0;
+            background-color: #2F4160;
             color: #ffffff;
         }
+        /* 마우스 오버 시 네이비색으로 변경 */
         .sidebar-link:not(.active):hover {
-            background-color: #F29DA0;
+            background-color: #2F4160;
+            color: #ffffff; /* 마우스 오버 시 글자색도 흰색으로 변경 */
         }
     </style>
 </head>
@@ -132,67 +134,56 @@
 
 <script>
     const menuData = {
-        lesson1: { title: "Lesson 1 - 단어 맞추기", image: "https://placehold.co/600x400/F29DA0/2F4160?text=단어 맞추기", description: "이미지와 주어진 단어 조각을 활용하여 올바른 단어를 만들어 보세요.", link: "/study/lesson1", type: 'popup' },
-        lesson2: { title: "Lesson 2 - 문장 나열하기", image: "https://placehold.co/600x400/B5D0E3/2F4160?text=문장 나열하기", description: "흩어진 문장들을 순서대로 배열하여 올바른 문장을 완성하세요.", link: "/study/lesson2", type: 'popup' },
-        lesson3: { title: "Lesson 3 - 객관식 문제", image: "https://placehold.co/600x400/F29DA0/2F4160?text=객관식 문제", description: "제공된 보기 중 정답을 선택하여 문제를 풀어보세요.", link: "/study/lesson3", type: 'popup' },
-        lesson4: { title: "Lesson 4 - 받아쓰기", image: "https://placehold.co/600x400/B5D0E3/2F4160?text=받아쓰기", description: "음성을 듣고 들리는 대로 문장을 정확히 받아쓰세요.", link: "/study/lesson4", type: 'popup' },
-        note:    { title: "오답노트", image: "https://placehold.co/600x400/F29DA0/2F4160?text=오답노트", description: "틀렸던 문제들을 다시 풀고 복습하는 공간입니다.", link: "/study/note", type: 'page' },
-        vocaList:{ title: "단어장 (단어)", image: "https://placehold.co/600x400/B5D0E3/2F4160?text=단어장", description: "자주 틀리거나 중요한 단어들을 모아 나만의 단어장을 만들 수 있습니다.", link: "/study/vocaList", type: 'page' },
-        sentenceList:{ title: "단어장 (문장)", image: "https://placehold.co/600x400/F29DA0/2F4160?text=문장장", description: "자주 틀리거나 중요한 문장들을 모아 나만의 문장장을 만들 수 있습니다.", link: "/study/sentenceList", type: 'page' }
-    };
+     lesson1: { title: "Lesson 1 - 단어 맞추기", image: "/images/danu.PNG", description: "이미지와 주어진 단어 조각을 활용하여 올바른 단어를 만들어 보세요.", link: "/study/lesson1", type: 'popup' },
+     lesson2: { title: "Lesson 2 - 문장 나열하기", image: "/images/munjang.PNG", description: "흩어진 문장들을 순서대로 배열하여 올바른 문장을 완성하세요.", link: "/study/lesson2", type: 'popup' },
+     lesson3: { title: "Lesson 3 - 객관식 문제", image: "/images/4jisunda.PNG", description: "제공된 보기 중 정답을 선택하여 문제를 풀어보세요.", link: "/study/lesson3", type: 'popup' },
+     lesson4: { title: "Lesson 4 - 받아쓰기", image: "/images/badassgi.PNG", description: "음성을 듣고 들리는 대로 문장을 정확히 받아쓰세요.", link: "/study/lesson4", type: 'popup' },
+     note:    { title: "오답노트", image: "/images/odabnote.png", description: "틀렸던 문제들을 다시 풀고 복습하는 공간입니다.", link: "/study/note", type: 'page' },
+     vocaList:{ title: "단어장 (단어)", image: "/images/video_study.png", description: "자주 틀리거나 중요한 단어들을 모아 나만의 단어장을 만들 수 있습니다.", link: "/study/vocaList", type: 'page' },
+     sentenceList:{ title: "단어장 (문장)", image: "/images/main.png", description: "자주 틀리거나 중요한 문장들을 모아 나만의 문장장을 만들 수 있습니다.", link: "/study/sentenceList", type: 'page' }
+ };
 
-    const startButton = document.getElementById('start-lesson-button');
-    const mainImage = document.getElementById('main-image');
-    const contentTitle = document.getElementById('content-title');
-    const contentDescription = document.getElementById('content-description');
-    const contentArea = document.getElementById('main-content-area');
+ const startButton = document.getElementById('start-lesson-button');
+ const mainImage = document.getElementById('main-image');
+ const contentTitle = document.getElementById('content-title');
+ const contentDescription = document.getElementById('content-description');
+ const contentArea = document.getElementById('main-content-area');
 
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const lessonId = e.currentTarget.dataset.lesson;
-            const data = menuData[lessonId];
+ document.querySelectorAll('.sidebar-link').forEach(link => {
+     link.addEventListener('click', (e) => {
+         e.preventDefault();
+         const lessonId = e.currentTarget.dataset.lesson;
+         const data = menuData[lessonId];
 
-            // 모든 링크의 active 클래스 제거 후, 현재 클릭된 링크에만 active 클래스 추가
-            document.querySelectorAll('.sidebar-link').forEach(item => item.classList.remove('active'));
-            e.currentTarget.classList.add('active');
+         // 모든 링크의 active 클래스 제거 후, 현재 클릭된 링크에만 active 클래스 추가
+         document.querySelectorAll('.sidebar-link').forEach(item => item.classList.remove('active'));
+         e.currentTarget.classList.add('active');
 
-            contentTitle.textContent = data.title;
-            mainImage.src = data.image;
-            contentDescription.textContent = data.description;
+         contentTitle.textContent = data.title;
+         mainImage.src = data.image;
+         contentDescription.textContent = data.description;
 
-            // 링크 타입에 따라 href 속성 설정
-            if (data.type === 'page') {
-                startButton.href = data.link;
-                startButton.removeAttribute('onclick');
-            } else {
-                startButton.href = '#';
-                startButton.setAttribute('onclick', `openSmallWindow('${data.link}'); return false;`);
-            }
-        });
-    });
+         // 링크 타입에 따라 href 속성 설정
+         if (data.type === 'page') {
+             startButton.href = data.link;
+             startButton.removeAttribute('onclick');
+         } else {
+             startButton.href = '#';
+             startButton.setAttribute('onclick', `openSmallWindow('${data.link}'); return false;`);
+         }
+     });
+ });
 
-    function openSmallWindow(url) {
-        window.open(url, "lessonWindow", "width=1000,height=700,left=200,top=100,resizable=yes,scrollbars=yes");
-    }
+ function openSmallWindow(url) {
+     window.open(url, "lessonWindow", "width=1000,height=700,left=200,top=100,resizable=yes,scrollbars=yes");
+ }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const sidebarLinks = document.querySelectorAll('.sidebar-link');
-
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', (event) => {
-                // 이전에 활성화된 링크의 스타일을 제거합니다.
-                sidebarLinks.forEach(item => {
-                    item.classList.remove('bg-[#2F4160]', 'text-white');
-                    item.classList.add('text-[#2F4160]');
-                });
-
-                // 클릭된 링크에 활성화 스타일을 추가합니다.
-                event.currentTarget.classList.add('bg-[#2F4160]', 'text-white');
-                event.currentTarget.classList.remove('text-[#2F4160]');
-            });
-        });
-    });
+ // 페이지 로드 시 URL에 따라 active 클래스를 적용하는 로직
+ const initialHash = window.location.hash.substring(1);
+ const initialLink = document.querySelector(`.sidebar-link[data-lesson="lesson1"]`);
+ if (initialLink) {
+     initialLink.click();
+ }
 </script>
 
 <div class="py-4 text-gray-500 text-center text-sm bg-gray-100" th:replace="~{fragments/footer :: footerFragment}"></div>
