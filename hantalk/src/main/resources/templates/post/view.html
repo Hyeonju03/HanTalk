@@ -10,6 +10,10 @@
             white-space: pre-wrap; /* 줄바꿈, 공백 유지 */
             min-height: 200px;
         }
+        .post-content {
+            white-space: pre-wrap; /* 줄바꿈, 공백 유지 */
+            min-height: 200px;
+        }
     </style>
 </head>
 <body class="bg-[#f3f4f6] text-[#2F4160] font-sans antialiased min-h-screen flex items-start justify-center py-12">
@@ -57,9 +61,7 @@
 
             <a th:href="@{|/post/list/${post.category.categoryId}|}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">목록</a>
         </div>
-
         <hr class="my-8">
-
         <!-- 공지사항(categoryId=1)이 아닐 때만 댓글 섹션 표시 -->
         <div class="comments-section" th:if="${post.category.categoryId != 1}">
             <h3 class="text-2xl font-bold text-gray-800 mb-4">댓글 (<span id="comment-count">0</span>)</h3>
@@ -80,6 +82,7 @@
                 <!-- JavaScript로 댓글이 동적으로 추가됩니다. -->
             </div>
         </div>
+
     </div>
 </div>
 
@@ -219,6 +222,7 @@
             });
         }
 
+
        // 댓글 HTML 요소를 생성하는 함수
         function createCommentElement(comment) {
             const commentDate = new Date(comment.createDate).toLocaleString('ko-KR');
@@ -247,6 +251,7 @@
             commentHtml += `</div>`;
             return commentHtml;
         }
+      
         function showModal(message, onConfirm) {
             const modalWrapper = $('#modal-wrapper');
             $('#modal-title').text('알림');
