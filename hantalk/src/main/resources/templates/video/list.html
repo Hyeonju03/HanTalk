@@ -105,29 +105,35 @@
   <!-- 카드 섹션 배경 컨테이너 -->
   <div class="video-section">
     <div class="video-list-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <div th:each="video, stat : ${videoPage.content}"
-           class="video-card relative p-4 flex flex-col cursor-pointer"
-           th:data-video-id="${video.videoId}">
-        <a th:href="@{/video/view/{id}(id=${video.videoId})}" class="thumbnail-link relative block w-full aspect-video overflow-hidden rounded-lg mb-3">
+      <a th:each="video, stat : ${videoPage.content}"
+         th:href="@{/video/view/{id}(id=${video.videoId})}"
+         class="video-card relative p-4 flex flex-col cursor-pointer"
+         th:data-video-id="${video.videoId}">
+
+        <div class="thumbnail-link relative block w-full aspect-video overflow-hidden rounded-lg mb-3">
           <video class="video-thumbnail w-full h-full object-cover pointer-events-none" muted playsinline preload="metadata">
             <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
             영상 태그를 지원하지 않는 브라우저입니다.
           </video>
           <div class="play-icon-overlay absolute inset-0 flex items-center justify-center text-5xl text-white pointer-events-none">▶</div>
-        </a>
+        </div>
+
         <strong class="text-lg font-bold text-gray-900 leading-tight mb-1">
-          <a th:href="@{/video/view/{id}(id=${video.videoId})}" th:text="${video.title}" class="no-underline text-main-dark transition duration-300">영상 제목</a>
+          <span th:text="${video.title}" class="no-underline text-main-dark transition duration-300">영상 제목</span>
         </strong>
+
         <p class="text-sm text-gray-500 line-clamp-2" th:text="${video.content}">설명</p>
         <!-- 찜하기 버튼 위치 수정 -->
-        <span class="favorite-btn absolute bottom-2 right-2 text-white text-2xl cursor-pointer" th:data-video-id="${video.videoId}">♡</span>
-      </div>
+        <span class="favorite-btn absolute bottom-2 right-2 text-white text-2xl cursor-pointer z-20" th:data-video-id="${video.videoId}" onclick="event.preventDefault(); event.stopPropagation();">♡</span>
+      </a>
     </div>
 
     <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-white rounded-xl shadow-inner no-results">
       <p class="text-xl font-medium text-main-dark">검색 결과가 없습니다.</p>
     </div>
   </div>
+
+
 
   <!-- 페이징 -->
   <div class="pagination text-center mt-12" th:if="${videoPage.totalPages > 1}">
@@ -193,12 +199,12 @@
           const video = card.querySelector('video');
           if (video) { // video 요소가 존재하는지 확인
               card.addEventListener('mouseenter', () => {
-                  video.currentTime = 0;
+                  video.currentTime = 1;
                   video.play();
               });
               card.addEventListener('mouseleave', () => {
                   video.pause();
-                  video.currentTime = 0;
+                  video.currentTime = 1;
               });
           }
       });

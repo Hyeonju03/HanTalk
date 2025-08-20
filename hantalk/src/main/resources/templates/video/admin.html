@@ -5,54 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관리자 영상 목록</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script th:inline="javascript">
-    // Tailwind CSS 메인 컬러 설정
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    'dark-navy': '#2F4160',
-                    'coral-pink': '#F29DA0',
-                    'soft-sky': '#B5D0E3',
-                }
-            }
-        }
-    }
-  </script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    /* 트랜지션 애니메이션을 위한 커스텀 스타일 */
-    .modal-fade-enter-active, .modal-fade-leave-active {
-        transition: opacity 0.3s ease;
+    /* Tailwind CSS 메인 컬러 설정 */
+    :root {
+      --color-dark-navy: #2F4160;
+      --color-coral-pink: #F29DA0;
+      --color-soft-sky: #B5D0E3;
     }
-    .modal-fade-enter-from, .modal-fade-leave-to {
-        opacity: 0;
-    }
-    .modal-zoom-enter-active, .modal-zoom-leave-active {
-        transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-    }
-    .modal-zoom-enter-from, .modal-zoom-leave-to {
-        transform: scale(0.9);
-    }
-
-    /* 토스트 메시지 애니메이션 */
-    .toast {
-        animation: fadein 0.5s, fadeout 0.5s 2.5s;
-    }
-    @keyframes fadein {
-        from { top: 0; opacity: 0; }
-        to   { top: 2rem; opacity: 1; }
-    }
-    @keyframes fadeout {
-        from { top: 2rem; opacity: 1; }
-        to   { top: 0; opacity: 0; }
-    }
+    .bg-dark-navy { background-color: var(--color-dark-navy); }
+    .text-dark-navy { color: var(--color-dark-navy); }
+    .bg-coral-pink { background-color: var(--color-coral-pink); }
+    .text-coral-pink { color: var(--color-coral-pink); }
+    .bg-soft-sky { background-color: var(--color-soft-sky); }
+    .text-soft-sky { color: var(--color-soft-sky); }
 
     /* 추가: 클릭 가능한 셀에만 커서 포인터 적용 */
     .clickable-cell {
       cursor: pointer;
     }
-
   </style>
 </head>
 <body class="bg-gray-100 font-sans flex flex-col min-h-screen">
@@ -60,33 +32,27 @@
 <!-- 헤더 프래그먼트 삽입 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
+<!-- 전체 페이지 컨테이너 -->
 <div class="container mx-auto p-4 max-w-7xl flex-1">
 
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-dark-navy">관리자 영상 목록</h1>
-
-    <a th:href="@{/admin}"
-       class="inline-block bg-gray-700 text-gray-200 px-6 py-3 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200">
-      관리자 페이지
-    </a>
-  </div>
-
+  <!-- 모든 내용을 담는 흰색 배경 컨테이너 -->
   <div class="bg-white p-6 rounded-lg shadow-md">
 
+    <!-- 관리자 페이지 제목 및 버튼 -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-dark-navy">관리자 영상 목록</h1>
+      <a th:href="@{/admin}"
+         class="inline-block bg-gray-700 text-gray-200 px-4 py-2 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200">
+        관리자 페이지 <i class="fas fa-arrow-right ml-2"></i>
+      </a>
+    </div>
+
     <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0 mb-6">
-      <!-- 새 영상 등록 & 일괄 삭제 버튼 그룹 -->
-      <div class="flex justify-start items-center space-x-2">
-
-        <button id="batchDeleteBtn" type="button"
-                class="bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
-          선택 항목 삭제
-        </button>
-
-        <a th:href="@{/video/admin/chuga}"
-           class="inline-block bg-dark-navy text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
-          ➕ 새 영상 등록
-        </a>
-      </div>
+      <!-- 새 영상 등록 버튼 -->
+      <a th:href="@{/video/admin/chuga}"
+         class="inline-block bg-dark-navy text-white px-4 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
+        ➕ 새 영상 등록
+      </a>
 
       <!-- 검색 폼 그룹 -->
       <form method="get" th:action="@{/video/admin/list}" id="searchForm" class="flex flex-wrap items-center space-x-2">
@@ -99,13 +65,11 @@
         </select>
         <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" id="keyword"
                class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-soft-sky focus:border-soft-sky min-w-40"/>
-        <!-- 검색 버튼 - 가로 크기 미세하게 줄임 (px-6 -> px-5) -->
-        <button type="submit" class="bg-dark-navy text-white px-5 py-2 rounded-lg hover:bg-opacity-90 transition-colors duration-200">
+        <button type="submit" class="bg-dark-navy text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors duration-200">
           검색
         </button>
-        <!-- 초기화 버튼 - 가로 크기 미세하게 줄임 (px-6 -> px-5) -->
         <button type="button" onclick="resetSearch()"
-                class="bg-gray-300 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200">
+                class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200">
           초기화
         </button>
       </form>
@@ -123,20 +87,16 @@
 
     <!-- 결과가 있을 때 테이블 출력 -->
     <div th:if="${not #lists.isEmpty(videoPage.content)}" class="rounded-lg shadow-md overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
+      <table class="min-w-full divide-y divide-gray-200 table-fixed">
         <thead class="bg-gray-200 text-gray-800">
         <tr>
-          <th scope="col" class="px-2 py-3">
-            <input type="checkbox" id="selectAllCheckbox" class="form-checkbox h-4 w-4 text-dark-navy rounded" />
-          </th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">번호</th>
-          <!-- 제목, 설명, 파일명에 텍스트 자르기 효과를 주기 위한 클래스 추가 -->
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">제목</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">설명</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">파일명</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">등록일</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">수정일</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">관리</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap w-12">번호</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">제목</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">설명</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">파일명</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap w-24">등록일</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap w-24">수정일</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap w-36">관리</th>
         </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -144,31 +104,33 @@
             th:id="'row-' + ${video.videoId}"
             th:data-id="${video.videoId}"
             class="hover:bg-gray-50 transition-colors duration-150">
-          <td class="px-2 py-4">
-            <input type="checkbox" name="selectedVideoIds" th:value="${video.videoId}" class="video-checkbox form-checkbox h-4 w-4 text-dark-navy rounded" onclick="event.stopPropagation();"/>
-          </td>
           <td th:text="${videoPage.number * videoPage.size + stat.index + 1}" class="clickable-cell px-6 py-4 text-sm text-gray-900 whitespace-nowrap">1</td>
-          <td class="clickable-cell px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap overflow-hidden max-w-xs" th:title="${video.title}">
+          <td class="clickable-cell px-6 py-4 text-sm font-medium text-gray-900 overflow-hidden" th:title="${video.title}">
             <div th:text="${video.title}" class="truncate w-full">제목</div>
           </td>
-          <td class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap overflow-hidden max-w-xs" th:title="${video.content}">
+          <td class="clickable-cell px-6 py-4 text-sm text-gray-500 overflow-hidden" th:title="${video.content}">
             <div th:text="${video.content}" class="truncate w-full">설명</div>
           </td>
-          <td class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap overflow-hidden max-w-xs" th:title="${video.videoName}">
+          <td class="clickable-cell px-6 py-4 text-sm text-gray-500 overflow-hidden" th:title="${video.videoName}">
             <div th:text="${video.videoName}" class="truncate w-full">파일명</div>
           </td>
           <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}" class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap">등록일</td>
           <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}" class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap">수정일</td>
-          <td class="px-6 py-4 text-sm font-medium space-x-2 whitespace-nowrap">
-            <!-- 수정 버튼: 호버 시 더 진한 파란색과 굵은 글씨로 변함 -->
-            <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
-               onclick="event.stopPropagation();"
-               class="text-dark-navy hover:text-blue-800 hover:font-bold transition-all duration-200">수정</a>
-            <!-- 삭제 버튼: 호버 시 더 진한 빨간색과 굵은 글씨로 변함 -->
-            <button type="button"
-                    th:attr="data-id=${video.videoId}"
-                    onclick="event.stopPropagation(); showDeleteModal(this);"
-                    class="text-coral-pink hover:text-red-600 hover:font-bold transition-all duration-200">삭제</button>
+          <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
+            <div class="flex space-x-2">
+              <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
+                 class="bg-dark-navy text-white px-3 py-1 rounded-lg hover:bg-gray-800 transition-all duration-300"
+                 title="수정">
+                <i class="fas fa-edit"></i> 수정
+              </a>
+              <!-- 삭제 버튼 -->
+              <button type="button"
+                      th:attr="onclick='deleteVideo(' + ${video.videoId} + ')'"
+                      class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-all duration-300"
+                      title="삭제">
+                <i class="fas fa-trash-alt"></i> 삭제
+              </button>
+            </div>
           </td>
         </tr>
         </tbody>
@@ -177,238 +139,66 @@
 
     <!-- 페이지네이션 -->
     <div class="pagination flex justify-center items-center space-x-2 mt-6" th:if="${videoPage.totalPages > 1}">
-      <a th:if="${videoPage.number > 0}"
-         th:href="@{/video/admin/list(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}"
-         class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">
-        이전
-      </a>
+      <a th:if="${videoPage.number > 0}" th:href="@{/video/admin/list(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}"
+         class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">이전</a>
       <span th:unless="${videoPage.number > 0}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">이전</span>
       <div class="flex space-x-1">
-            <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
-                <a th:href="@{/video/admin/list(page=${i}, searchType=${searchType}, keyword=${keyword})}"
-                   th:classappend="${i == videoPage.number} ? 'bg-dark-navy text-white' : 'text-gray-700 hover:bg-gray-200'"
-                   class="px-4 py-2 rounded-lg transition-colors duration-200"
-                   th:text="${i + 1}">1</a>
-            </span>
+        <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
+          <a th:href="@{/video/admin/list(page=${i}, searchType=${searchType}, keyword=${keyword})}"
+             th:classappend="${i == videoPage.number} ? 'bg-dark-navy text-white' : 'text-gray-700 hover:bg-gray-200'"
+             class="px-4 py-2 rounded-lg transition-colors duration-200" th:text="${i + 1}">1</a>
+        </span>
       </div>
-      <a th:if="${videoPage.number + 1 < videoPage.totalPages}"
-         th:href="@{/video/admin/list(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}"
-         class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">
-        다음
-      </a>
+      <a th:if="${videoPage.number + 1 < videoPage.totalPages}" th:href="@{/video/admin/list(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}"
+         class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">다음</a>
       <span th:unless="${videoPage.number + 1 < videoPage.totalPages}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">다음</span>
     </div>
+
   </div>
 </div>
 
-<!-- 커스텀 모달 UI -->
-<div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 modal-fade-leave-to"
-     onclick="if(event.target.id === 'deleteModal') hideModal();">
-  <div id="modal-content" class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6 modal-zoom-leave-to">
-    <h3 class="text-xl font-semibold text-gray-900 mb-4">영상 삭제</h3>
-    <p class="text-gray-700 mb-6">정말로 이 영상을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</p>
-    <div class="flex justify-end space-x-4">
-      <button type="button" onclick="hideModal()"
-              class="bg-gray-300 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200">
-        취소
-      </button>
-      <button type="button" id="confirmDeleteBtn"
-              class="bg-coral-pink text-white px-5 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200">
-        삭제
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- 토스트 메시지 UI (초기에 숨겨져 있음) -->
-<div id="toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 w-80 z-50"></div>
-
-<!-- Ajax 삭제 및 모달용 스크립트 -->
 <script>
-  // 검색 폼 초기화 함수
+  // 검색 폼 초기화
   function resetSearch() {
       document.getElementById('searchType').value = 'title';
       document.getElementById('keyword').value = '';
       document.getElementById('searchForm').submit();
   }
 
-  // 커스텀 모달 관련 함수
-  const deleteModal = document.getElementById('deleteModal');
-  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  let videoIdToDelete = null;
-
-  function showDeleteModal(button) {
-      // 모달에 삭제할 영상의 ID 저장
-      videoIdToDelete = $(button).data("id");
-
-      // 기존 이벤트 리스너 제거
-      confirmDeleteBtn.removeEventListener('click', deleteSelectedVideos);
-      confirmDeleteBtn.removeEventListener('click', deleteVideo);
-
-      // 단일 삭제 함수 연결
-      confirmDeleteBtn.addEventListener('click', deleteVideo);
-
-      // 모달 표시
-      document.querySelector('#deleteModal h3').innerText = `영상 삭제`;
-      document.querySelector('#deleteModal p').innerText = `정말로 이 영상을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`;
-      deleteModal.classList.remove('hidden');
-      // 애니메이션 클래스 추가
-      setTimeout(() => {
-          deleteModal.classList.remove('modal-fade-leave-to');
-          document.getElementById('modal-content').classList.remove('modal-zoom-leave-to');
-      }, 10);
-  }
-
-  function hideModal() {
-      // 애니메이션 클래스 추가 후 숨기기
-      deleteModal.classList.add('modal-fade-leave-to');
-      document.getElementById('modal-content').classList.add('modal-zoom-leave-to');
-
-      // 애니메이션이 끝난 후 완전히 숨김
-      setTimeout(() => {
-          deleteModal.classList.add('hidden');
-      }, 300);
-  }
-
-  // 토스트 메시지 표시 함수
-  function showToast(message, type = 'success') {
-      const toastContainer = document.getElementById('toast-container');
-      const bgColor = type === 'success' ? 'bg-soft-sky' : 'bg-coral-pink';
-      const toast = document.createElement('div');
-      toast.className = `toast p-4 mb-2 rounded-lg shadow-lg text-white font-semibold flex items-center justify-between ${bgColor}`;
-      toast.innerHTML = `<span>${message}</span>`;
-      toastContainer.prepend(toast);
-
-      setTimeout(() => {
-          toast.remove();
-      }, 3000); // 3초 후 삭제
-  }
-
-  // 단일 영상 삭제 로직 (변경사항: alert -> showToast)
-  function deleteVideo() {
-      if (videoIdToDelete) {
-          $.ajax({
-              url: "/video/admin/" + videoIdToDelete,
-              type: "DELETE",
-              success: function (result) {
-                  showToast("영상 삭제 완료!");
-                  // 페이지 새로고침 추가
-                  window.location.reload();
-              },
-              error: function (xhr) {
-                  const message = xhr.responseText || "삭제 중 오류가 발생했습니다.";
-                  showToast("삭제 실패: " + message, 'error');
-              }
-          });
-      }
-      hideModal();
-  }
-
-  // 일괄 삭제 로직 추가
-  const batchDeleteBtn = document.getElementById('batchDeleteBtn');
-  const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-  const videoCheckboxes = document.querySelectorAll('.video-checkbox');
-
-  // 일괄 삭제 버튼 클릭 시 모달 표시
-  batchDeleteBtn.addEventListener('click', function() {
-      const selectedIds = Array.from(document.querySelectorAll('input.video-checkbox:checked')).map(cb => cb.value);
-      if (selectedIds.length === 0) {
-          showToast("삭제할 영상을 하나 이상 선택해주세요.", 'error');
-          return;
-      }
-
-      // 모달 내용 변경 및 이벤트 리스너 재설정
-      document.querySelector('#deleteModal h3').innerText = `선택 항목 (${selectedIds.length}개) 삭제`;
-      document.querySelector('#deleteModal p').innerText = `선택된 ${selectedIds.length}개의 영상을 정말로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`;
-
-      // 기존 이벤트 리스너 제거
-      confirmDeleteBtn.removeEventListener('click', deleteVideo);
-      confirmDeleteBtn.removeEventListener('click', deleteSelectedVideos);
-
-      // 일괄 삭제 함수 연결
-      confirmDeleteBtn.addEventListener('click', function() {
-          deleteSelectedVideos(selectedIds);
-          hideModal();
-      });
-
-      showModal();
-  });
-
-  function showModal() {
-      deleteModal.classList.remove('hidden');
-      setTimeout(() => {
-          deleteModal.classList.remove('modal-fade-leave-to');
-          document.getElementById('modal-content').classList.remove('modal-zoom-leave-to');
-      }, 10);
-  }
-
-  function deleteSelectedVideos(ids) {
-      let deletedCount = 0;
-      let failedCount = 0;
-
-      // Promise.all을 사용해 모든 삭제 요청이 완료될 때까지 기다립니다.
-      const promises = ids.map(id => {
-          return new Promise((resolve, reject) => {
-              $.ajax({
-                  url: "/video/admin/" + id,
-                  type: "DELETE",
-                  success: function () {
-                      $("#row-" + id).remove();
-                      deletedCount++;
-                      resolve();
-                  },
-                  error: function () {
-                      failedCount++;
-                      reject();
-                  }
-              });
-          });
-      });
-
-      Promise.allSettled(promises).then(() => {
-          if (deletedCount > 0) {
-              showToast(`${deletedCount}개의 영상이 삭제되었습니다.`, 'success');
-          }
-          if (failedCount > 0) {
-              showToast(`${failedCount}개의 영상 삭제에 실패했습니다.`, 'error');
-          }
-          // 페이지 새로고침 추가
-          window.location.reload();
-      });
-  }
-
-  // 체크박스 전체 선택/해제 기능
-  selectAllCheckbox.addEventListener('change', function() {
-      videoCheckboxes.forEach(checkbox => {
-          checkbox.checked = this.checked;
-      });
-  });
-
-  videoCheckboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', function() {
-          checkAllCheckboxes();
-      });
-  });
-
-  function checkAllCheckboxes() {
-      const totalCheckboxes = videoCheckboxes.length;
-      const checkedCheckboxes = document.querySelectorAll('.video-checkbox:checked').length;
-      selectAllCheckbox.checked = totalCheckboxes === checkedCheckboxes;
-  }
-
-  $(document).ready(function() {
-      $(".clickable-cell").click(function(e) {
-          const row = $(this).closest('tr');
-          const videoId = row.data("id");
+  // 행 클릭 시 상세페이지 이동
+  document.querySelectorAll(".clickable-cell").forEach(cell => {
+      cell.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const videoId = row.getAttribute('data-id');
           if (videoId) {
               window.location.href = "/video/view/" + videoId;
           }
       });
   });
 
+  // Ajax 삭제
+ function deleteVideo(videoId) {
+      if (!confirm("정말로 이 영상을 삭제하시겠습니까?")) return;
+
+      fetch("/video/admin/" + videoId, {
+          method: 'DELETE',
+          headers: {'Content-Type': 'application/json'}
+      })
+      .then(res => {
+          if (!res.ok) throw new Error("삭제 실패");
+          return res.text();
+      })
+      .then(msg => {
+          const row = document.getElementById('row-' + videoId);
+          if (row) row.remove();
+      })
+      .catch(err => {
+          alert(err);
+          console.error(err);
+      });
+  }
 </script>
 
-<!-- 푸터 프래그먼트 삽입 -->
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 </body>
