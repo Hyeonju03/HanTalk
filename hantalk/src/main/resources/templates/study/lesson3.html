@@ -127,18 +127,29 @@
             .catch(err => console.error("정답 체크 오류:", err));
         }
 
-        function showFeedback(isCorrect) {
-            const icon = document.getElementById('feedback-icon');
-            icon.textContent = isCorrect ? '✔️' : '✖️'; // 이모지 아이콘 사용
-            icon.className = isCorrect
-                ? 'text-[#2F4160] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-pulse' // 진한 남색, 펄스 애니메이션
-                : 'text-[#F29DA0] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-bounce'; // 코랄 핑크, 바운스 애니메이션
-            icon.classList.remove('hidden');
+function showFeedback(isCorrect) {
+      const container = document.getElementById('feedback-icon');
+      container.classList.remove('hidden');
 
-            setTimeout(() => {
-                icon.classList.add('hidden');
-            }, 1500); // 1.5초 후 아이콘 숨기기
-        }
+      // 컨테이너는 중앙정렬만 담당, 애니메이션은 안쪽 span에서만 수행
+      const symbol = isCorrect ? '✔️' : '❌';
+      const color  = isCorrect ? '#2F4160' : '#F29DA0';
+      const anim   = isCorrect ? 'animate-pulse' : 'animate-bounce';
+
+      container.innerHTML = `
+        <span class="${anim} text-9xl font-extrabold drop-shadow"
+              style="color:${color}">
+          ${symbol}
+        </span>
+      `;
+
+      // 1.5초 후 숨김
+      setTimeout(() => {
+          container.classList.add('hidden');
+          container.innerHTML = '';
+      }, 1500);
+  }
+
 
         function nextQuestion() {
             if (!answered) {
@@ -229,7 +240,8 @@
 </div>
 
 <!-- 피드백 아이콘 (O/X) -->
-<div id="feedback-icon" class="hidden text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 z-10"></div>
+<div id="feedback-icon" class="hidden fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center"></div>
+
 
 <!-- 하단 고정 버튼 -->
 <div class="fixed bottom-6 right-6">

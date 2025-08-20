@@ -80,6 +80,7 @@ public class MyPageController {
         return "user/statistics";
     }
 
+    // 마이페이지 수정
     @GetMapping("/update")
     public String update(Model model, HttpSession session) {
         Integer userNo = (Integer) session.getAttribute("userNo");
@@ -88,13 +89,13 @@ public class MyPageController {
         }
 
         UsersDTO dto = myPageService.getMyPageInfo(userNo);
-        model.addAttribute("user", dto);
+        // 여기가 변경되었습니다. "user" 대신 "usersDTO"로 이름을 통일합니다.
+        model.addAttribute("usersDTO", dto);
 
-        return "user/update";  // 수정 폼 페이지 이름 (templates/user/updateForm.html)
+        return "user/update";
     }
 
-
-    // 마이페이지 수정
+    // 마이페이지 수정 처리
     @PostMapping("/update")
     public String updateProc(@ModelAttribute UsersDTO dto, HttpSession session) {
         Integer userNo = (Integer) session.getAttribute("userNo");
