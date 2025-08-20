@@ -39,10 +39,8 @@ public class PostController {
     private final PostService postService;
     private final CategoryService categoryService;
 
-    // ResourceController에서 가져온 파일 저장 경로
     private final String uploadDir = System.getProperty("user.dir") + "/uploads/postFiles";
 
-    // ResourceController에서 가져온 파일 유틸리티 메서드
     private String getExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf('.');
         return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1).toLowerCase();
@@ -84,6 +82,8 @@ public class PostController {
             return "redirect:/user/login";
         }
 
+        boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");
+
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createDate"));
         Page<PostDTO> postPage = postService.searchPosts(categoryId, keyword, searchType, pageable);
 
@@ -93,6 +93,8 @@ public class PostController {
         model.addAttribute("role", SessionUtil.getRole(session));
         model.addAttribute("isEmpty", postPage.isEmpty());
         model.addAttribute("categoryId", categoryId);
+
+        model.addAttribute("isAdmin", isAdmin);
 
         return "post/list";
     }

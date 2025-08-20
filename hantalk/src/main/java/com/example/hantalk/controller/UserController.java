@@ -206,6 +206,7 @@ public class UserController {
         if (service.isRoleOk(userId, sessionUserId, role)) {
             UsersDTO user = service.getUserOne(userId);
             model.addAttribute("user", user);
+            model.addAttribute("usersDTO", user);
             return "userPage/UserUpdatePage";
         }
         return "RoleERROR";
