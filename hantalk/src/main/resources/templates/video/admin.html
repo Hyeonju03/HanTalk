@@ -6,7 +6,6 @@
   <title>관리자 영상 목록</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
   <script th:inline="javascript">
     // Tailwind CSS 메인 컬러 설정
     tailwind.config = {
@@ -62,142 +61,143 @@
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
 <div class="container mx-auto p-4 max-w-7xl flex-1">
-  <!-- 영상 목록 제목과 관리자 페이지 버튼을 한 줄로 배치 -->
+
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold text-dark-navy">관리자 영상 목록</h1>
+
     <a th:href="@{/admin}"
-       class="inline-block bg-soft-sky text-dark-navy px-6 py-3 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
+       class="inline-block bg-gray-700 text-gray-200 px-6 py-3 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200">
       관리자 페이지
     </a>
   </div>
 
-  <!-- 검색 폼과 버튼들을 한 줄로 배치하기 위해 컨테이너 div를 flex로 변경 -->
-  <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0 mb-6">
-    <!-- 새 영상 등록 & 일괄 삭제 버튼 그룹 -->
-    <div class="flex justify-start items-center space-x-2">
-      <!-- 일괄 삭제 버튼 -->
-      <button id="batchDeleteBtn" type="button"
-              class="bg-dark-navy text-white px-6 py-3 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
-        선택 항목 삭제
-      </button>
-      <!-- 새 영상 등록 버튼 -->
-      <a th:href="@{/video/admin/chuga}"
-         class="inline-block bg-coral-pink text-white px-6 py-3 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
-        ➕ 새 영상 등록
-      </a>
+  <div class="bg-white p-6 rounded-lg shadow-md">
+
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0 mb-6">
+      <!-- 새 영상 등록 & 일괄 삭제 버튼 그룹 -->
+      <div class="flex justify-start items-center space-x-2">
+
+        <button id="batchDeleteBtn" type="button"
+                class="bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
+          선택 항목 삭제
+        </button>
+
+        <a th:href="@{/video/admin/chuga}"
+           class="inline-block bg-dark-navy text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-opacity-90 transition-colors duration-200">
+          ➕ 새 영상 등록
+        </a>
+      </div>
+
+      <!-- 검색 폼 그룹 -->
+      <form method="get" th:action="@{/video/admin/list}" id="searchForm" class="flex flex-wrap items-center space-x-2">
+        <select name="searchType" id="searchType"
+                class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-soft-sky focus:border-soft-sky">
+          <option value="title" th:selected="${searchType == 'title'}">제목</option>
+          <option value="content" th:selected="${searchType == 'content'}">내용</option>
+          <option value="filename" th:selected="${searchType == 'filename'}">파일명</option>
+          <option value="all" th:selected="${searchType == 'all'}">제목 + 내용 + 파일명</option>
+        </select>
+        <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" id="keyword"
+               class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-soft-sky focus:border-soft-sky min-w-40"/>
+        <!-- 검색 버튼 - 가로 크기 미세하게 줄임 (px-6 -> px-5) -->
+        <button type="submit" class="bg-dark-navy text-white px-5 py-2 rounded-lg hover:bg-opacity-90 transition-colors duration-200">
+          검색
+        </button>
+        <!-- 초기화 버튼 - 가로 크기 미세하게 줄임 (px-6 -> px-5) -->
+        <button type="button" onclick="resetSearch()"
+                class="bg-gray-300 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200">
+          초기화
+        </button>
+      </form>
     </div>
 
-    <!-- 검색 폼 그룹 -->
-    <form method="get" th:action="@{/video/admin/list}" id="searchForm" class="flex flex-wrap items-center space-x-2">
-      <select name="searchType" id="searchType"
-              class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-soft-sky focus:border-soft-sky">
-        <option value="title" th:selected="${searchType == 'title'}">제목</option>
-        <option value="content" th:selected="${searchType == 'content'}">내용</option>
-        <option value="filename" th:selected="${searchType == 'filename'}">파일명</option>
-        <option value="all" th:selected="${searchType == 'all'}">제목 + 내용 + 파일명</option>
-      </select>
-      <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" id="keyword"
-             class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-soft-sky focus:border-soft-sky min-w-40"/>
-      <button type="submit" class="bg-coral-pink text-white px-6 py-2 rounded-lg hover:bg-opacity-90 transition-colors duration-200">
-        검색
-      </button>
-      <button type="button" onclick="resetSearch()"
-              class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200">
-        초기화
-      </button>
-    </form>
-  </div>
-
-  <!-- 검색 결과 없을 때 -->
-  <div th:if="${#lists.isEmpty(videoPage.content)}" class="bg-white p-6 rounded-lg shadow-md text-center text-gray-500">
+    <!-- 검색 결과 없을 때 -->
+    <div th:if="${#lists.isEmpty(videoPage.content)}" class="p-6 rounded-lg text-center text-gray-500">
         <span th:if="${not #strings.isEmpty(param.keyword)}">
             "<span th:text="${param.keyword}"></span>"에 대한 검색 결과가 없습니다.
         </span>
-    <span th:unless="${not #strings.isEmpty(param.keyword)}">
+      <span th:unless="${not #strings.isEmpty(param.keyword)}">
             등록된 영상이 없습니다.
         </span>
-  </div>
+    </div>
 
-  <!-- 결과가 있을 때 테이블 출력 -->
-  <!-- overflow-x-auto 클래스를 추가하여 수평 스크롤바를 만듭니다. -->
-  <div th:if="${not #lists.isEmpty(videoPage.content)}" class="bg-white rounded-lg shadow-md overflow-x-auto">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-soft-sky text-dark-navy">
-      <tr>
-        <th scope="col" class="px-2 py-3">
-          <input type="checkbox" id="selectAllCheckbox" class="form-checkbox h-4 w-4 text-dark-navy rounded" />
-        </th>
-        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">번호</th>
-        <!-- 제목, 설명, 파일명에 텍스트 자르기 효과를 주기 위한 클래스 추가 -->
-        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">제목</th>
-        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">설명</th>
-        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">파일명</th>
-        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">등록일</th>
-        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">수정일</th>
-        <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">관리</th>
-      </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-      <!-- 변경점: tr에 있던 clickable-row 클래스를 제거합니다. hover 효과는 그대로 유지합니다. -->
-      <tr th:each="video, stat : ${videoPage.content}"
-          th:id="'row-' + ${video.videoId}"
-          th:data-id="${video.videoId}"
-          class="hover:bg-gray-50 transition-colors duration-150">
-        <td class="px-2 py-4">
-          <input type="checkbox" name="selectedVideoIds" th:value="${video.videoId}" class="video-checkbox form-checkbox h-4 w-4 text-dark-navy rounded" onclick="event.stopPropagation();"/>
-        </td>
-        <!-- 변경점: 클릭 가능한 각 td에 clickable-cell 클래스를 추가합니다. -->
-        <td th:text="${videoPage.number * videoPage.size + stat.index + 1}" class="clickable-cell px-6 py-4 text-sm text-gray-900 whitespace-nowrap">1</td>
-        <td class="clickable-cell px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap overflow-hidden max-w-xs">
-          <div th:text="${video.title}" class="truncate w-full">제목</div>
-        </td>
-        <td class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap overflow-hidden max-w-xs">
-          <div th:text="${video.content}" class="truncate w-full">설명</div>
-        </td>
-        <td class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap overflow-hidden max-w-xs">
-          <div th:text="${video.videoName}" class="truncate w-full">파일명</div>
-        </td>
-        <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}" class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap">등록일</td>
-        <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}" class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap">수정일</td>
-        <!-- 이 td는 클릭 동작에서 제외되므로, clickable-cell 클래스를 추가하지 않습니다. -->
-        <td class="px-6 py-4 text-sm font-medium space-x-2 whitespace-nowrap">
-          <!-- 수정 버튼: 호버 시 더 진한 파란색과 굵은 글씨로 변함 -->
-          <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
-             onclick="event.stopPropagation();"
-             class="text-dark-navy hover:text-blue-800 hover:font-bold transition-all duration-200">수정</a>
-          <!-- 삭제 버튼: 호버 시 더 진한 빨간색과 굵은 글씨로 변함 -->
-          <button type="button"
-                  th:attr="data-id=${video.videoId}"
-                  onclick="event.stopPropagation(); showDeleteModal(this);"
-                  class="text-coral-pink hover:text-red-600 hover:font-bold transition-all duration-200">삭제</button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- 결과가 있을 때 테이블 출력 -->
+    <div th:if="${not #lists.isEmpty(videoPage.content)}" class="rounded-lg shadow-md overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-200 text-gray-800">
+        <tr>
+          <th scope="col" class="px-2 py-3">
+            <input type="checkbox" id="selectAllCheckbox" class="form-checkbox h-4 w-4 text-dark-navy rounded" />
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">번호</th>
+          <!-- 제목, 설명, 파일명에 텍스트 자르기 효과를 주기 위한 클래스 추가 -->
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">제목</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">설명</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap max-w-xs">파일명</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">등록일</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">수정일</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">관리</th>
+        </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+        <tr th:each="video, stat : ${videoPage.content}"
+            th:id="'row-' + ${video.videoId}"
+            th:data-id="${video.videoId}"
+            class="hover:bg-gray-50 transition-colors duration-150">
+          <td class="px-2 py-4">
+            <input type="checkbox" name="selectedVideoIds" th:value="${video.videoId}" class="video-checkbox form-checkbox h-4 w-4 text-dark-navy rounded" onclick="event.stopPropagation();"/>
+          </td>
+          <td th:text="${videoPage.number * videoPage.size + stat.index + 1}" class="clickable-cell px-6 py-4 text-sm text-gray-900 whitespace-nowrap">1</td>
+          <td class="clickable-cell px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap overflow-hidden max-w-xs" th:title="${video.title}">
+            <div th:text="${video.title}" class="truncate w-full">제목</div>
+          </td>
+          <td class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap overflow-hidden max-w-xs" th:title="${video.content}">
+            <div th:text="${video.content}" class="truncate w-full">설명</div>
+          </td>
+          <td class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap overflow-hidden max-w-xs" th:title="${video.videoName}">
+            <div th:text="${video.videoName}" class="truncate w-full">파일명</div>
+          </td>
+          <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}" class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap">등록일</td>
+          <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}" class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap">수정일</td>
+          <td class="px-6 py-4 text-sm font-medium space-x-2 whitespace-nowrap">
+            <!-- 수정 버튼: 호버 시 더 진한 파란색과 굵은 글씨로 변함 -->
+            <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
+               onclick="event.stopPropagation();"
+               class="text-dark-navy hover:text-blue-800 hover:font-bold transition-all duration-200">수정</a>
+            <!-- 삭제 버튼: 호버 시 더 진한 빨간색과 굵은 글씨로 변함 -->
+            <button type="button"
+                    th:attr="data-id=${video.videoId}"
+                    onclick="event.stopPropagation(); showDeleteModal(this);"
+                    class="text-coral-pink hover:text-red-600 hover:font-bold transition-all duration-200">삭제</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <!-- 페이지네이션 -->
-  <div class="pagination flex justify-center items-center space-x-2 mt-6" th:if="${videoPage.totalPages > 1}">
-    <a th:if="${videoPage.number > 0}"
-       th:href="@{/video/admin/list(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}"
-       class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">
-      이전
-    </a>
-    <span th:unless="${videoPage.number > 0}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">이전</span>
-    <div class="flex space-x-1">
+    <!-- 페이지네이션 -->
+    <div class="pagination flex justify-center items-center space-x-2 mt-6" th:if="${videoPage.totalPages > 1}">
+      <a th:if="${videoPage.number > 0}"
+         th:href="@{/video/admin/list(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}"
+         class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">
+        이전
+      </a>
+      <span th:unless="${videoPage.number > 0}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">이전</span>
+      <div class="flex space-x-1">
             <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
                 <a th:href="@{/video/admin/list(page=${i}, searchType=${searchType}, keyword=${keyword})}"
                    th:classappend="${i == videoPage.number} ? 'bg-dark-navy text-white' : 'text-gray-700 hover:bg-gray-200'"
                    class="px-4 py-2 rounded-lg transition-colors duration-200"
                    th:text="${i + 1}">1</a>
             </span>
+      </div>
+      <a th:if="${videoPage.number + 1 < videoPage.totalPages}"
+         th:href="@{/video/admin/list(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}"
+         class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">
+        다음
+      </a>
+      <span th:unless="${videoPage.number + 1 < videoPage.totalPages}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">다음</span>
     </div>
-    <a th:if="${videoPage.number + 1 < videoPage.totalPages}"
-       th:href="@{/video/admin/list(page=${videoPage.number + 1}, searchType=${searchType}, keyword=${keyword})}"
-       class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">
-      다음
-    </a>
-    <span th:unless="${videoPage.number + 1 < videoPage.totalPages}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">다음</span>
   </div>
 </div>
 
@@ -377,7 +377,6 @@
       });
   }
 
-
   // 체크박스 전체 선택/해제 기능
   selectAllCheckbox.addEventListener('change', function() {
       videoCheckboxes.forEach(checkbox => {
@@ -391,17 +390,14 @@
       });
   });
 
-
   function checkAllCheckboxes() {
       const totalCheckboxes = videoCheckboxes.length;
       const checkedCheckboxes = document.querySelectorAll('.video-checkbox:checked').length;
       selectAllCheckbox.checked = totalCheckboxes === checkedCheckboxes;
   }
 
-  // 변경점: 이제 .clickable-cell에만 클릭 리스너를 추가합니다.
   $(document).ready(function() {
       $(".clickable-cell").click(function(e) {
-          // 클릭된 td의 부모인 tr을 찾아서 data-id를 가져옵니다.
           const row = $(this).closest('tr');
           const videoId = row.data("id");
           if (videoId) {
@@ -413,7 +409,7 @@
 </script>
 
 <!-- 푸터 프래그먼트 삽입 -->
-<!-- <div th:replace="~{fragments/footer :: footerFragment}"></div> -->
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 </body>
 </html>
