@@ -1,9 +1,9 @@
 package com.example.hantalk.controller;
 
-import com.example.hantalk.SessionUtil;
 import com.example.hantalk.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,38 +20,38 @@ public class GameController {
 
     @GetMapping("/game1")
     public String showGamePage(HttpSession session, Model model) {
-//        if (SessionUtil.isLoggedIn(session)) {
-//            String userId = SessionUtil.getLoginUserId(session);
-//            if (userId != null) {
-//                model.addAttribute("userId", userId);
-//            } else {
-//                return "user/login";
-//            }
-//        } else {
-//            return "user/login";
-//        }
-
-        // templates/game/game1.html 로 이동
         return "game/game1";
     }
 
-//    @PutMapping("/api/users/updatePoints/{userId}")
-//    @ResponseBody
-//    public ResponseEntity<Map<String, Object>> updatePoints(
-//            @PathVariable("userId") String userId,
-//            @RequestBody Map<String, Object> requestBody
-//    ) {
-//        int points = (int) requestBody.get("points");
-//        System.out.println("User '" + userId + "' has updated their points to " + points);
-//
-//        // 실제 저장 로직 (예: userService.addPoints(userId, points));
-//        // userService.addPoints(userId, points);
-//
-//        return ResponseEntity.ok(Map.of(
-//                "status", "success",
-//                "userId", userId,
-//                "points", points,
-//                "message", "Points updated successfully!"
-//        ));
-//    }
+    @PutMapping("/api/users/updatePoints")
+    public ResponseEntity<Map<String, Object>> updatePoints(
+            @RequestBody Map<String, Object> requestBody,
+            HttpSession session
+    ) {
+        // 세션에서 userId 가져오기
+        String userId = (String) session.getAttribute("userId");
+
+        // 세션에 userId가 없으면 인증 실패로 간주
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "User not logged in"));
+        }
+
+        int points;
+        try {
+            points = ((Number) requestBody.get("points")).intValue();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Invalid points data"));
+        }
+
+        userService.addPoints(userId, points);
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "userId", userId,
+                "points", points,
+                "message", "Points updated successfully!"
+        ));
+    }
 }
