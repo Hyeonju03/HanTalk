@@ -235,6 +235,19 @@ public class PostController {
             return "redirect:/post/view/" + postId + "?error=no_permission";
         }
 
+        // 파일이 존재하고 비어있지 않은 경우, DTO에 원본 파일명 추가
+        if (file != null && !file.isEmpty()) {
+            postDTO.setOriginalFileName(file.getOriginalFilename());
+        }
+        // 파일 삭제 옵션이 선택된 경우, 원본 파일명 null로 설정
+        else if (Boolean.TRUE.equals(deleteFile)) {
+            postDTO.setOriginalFileName(null);
+        }
+        // 기존 파일이 유지되는 경우, 기존 원본 파일명 유지
+        else if (existingPost.getArchive() != null) {
+            postDTO.setOriginalFileName(existingPost.getOriginalFileName());
+        }
+
         postService.updatePostWithFile(postId, postDTO, file, deleteFile);
         return "redirect:/post/view/" + postId;
     }

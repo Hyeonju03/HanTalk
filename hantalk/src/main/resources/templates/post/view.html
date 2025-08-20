@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${post.title}">게시물 제목</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
-        .post-content {
-            white-space: pre-wrap; /* 줄바꿈, 공백 유지 */
-            min-height: 200px;
-        }
         .post-content {
             white-space: pre-wrap; /* 줄바꿈, 공백 유지 */
             min-height: 200px;
@@ -20,38 +17,37 @@
 
 <div class="container mx-auto px-4 w-full max-w-4xl">
     <div class="bg-white rounded-lg shadow-lg p-8">
-        <!-- 게시글 헤더 -->
         <div class="post-header border-b-2 border-gray-300 pb-4 mb-6">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-900" th:text="${post.title}">게시물 제목</h1>
             <div class="post-meta text-sm text-gray-500 mt-2 flex items-center space-x-2">
                 <span th:text="${post.users.nickname}">작성자</span>
                 <span>|</span>
                 <span th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}">2025-08-01 12:00</span>
+
+                <th:block th:if="${post.updateDate != null and not #temporals.format(post.updateDate, 'yyyy-MM-dd HH:mm').equals(#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm'))}">
+                    <span>|</span>
+                    <span>(수정: <span th:text="${#temporals.format(post.updateDate, 'yyyy-MM-dd HH:mm')}"></span>)</span>
+                </th:block>
+
                 <span>|</span>
                 <span>조회수: <span th:text="${post.viewCount}">0</span></span>
             </div>
         </div>
 
-        <!-- 게시글 내용 -->
         <div class="post-content p-4 border rounded-lg bg-gray-50 text-gray-700">
             <p th:text="${post.content}">게시물 내용입니다.</p>
         </div>
 
-        <!-- 첨부파일 다운로드 섹션 -->
         <div th:if="${post.archive != null}" class="mb-4 mt-6">
             <h4 class="font-bold text-lg text-gray-800">첨부파일</h4>
             <div class="flex items-center space-x-4 mt-2">
-                <!-- 파일명을 표시하는 부분 -->
-                <span th:text="${#strings.substringAfter(post.archive, '_')}"
-                      class="text-gray-700 font-medium"></span>
+                <span th:text="${post.originalFileName}" class="text-gray-700 font-medium"></span>
 
-                <!-- 다운로드 링크 -->
                 <a th:href="@{|/post/download/file/${post.archive}|}"
-                   class="text-green-600 hover:text-green-800 underline">다운로드</a>
+                   class="bg-[#B5D0E3] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg transition duration-200">다운로드</a>
             </div>
         </div>
 
-        <!-- 버튼 그룹 -->
         <div class="btn-group flex space-x-2 mt-6">
             <a th:if="${isAdmin} or (${loginUserNo != null and post.users.userNo == loginUserNo})"
                th:href="@{|/post/update/${post.postId}|}" class="bg-[#B5D0E3] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg transition duration-200">수정</a>
@@ -62,11 +58,9 @@
             <a th:href="@{|/post/list/${post.category.categoryId}|}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">목록</a>
         </div>
         <hr class="my-8">
-        <!-- 공지사항(categoryId=1)이 아닐 때만 댓글 섹션 표시 -->
         <div class="comments-section" th:if="${post.category.categoryId != 1}">
             <h3 class="text-2xl font-bold text-gray-800 mb-4">댓글 (<span id="comment-count">0</span>)</h3>
 
-            <!-- 댓글 작성 폼 -->
             <div class="mb-6">
                 <div th:if="${loginUserNo != null}">
                     <textarea id="comment-content" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" rows="3" placeholder="댓글을 입력하세요."></textarea>
@@ -77,16 +71,13 @@
                 </div>
             </div>
 
-            <!-- 댓글 목록 표시 영역 -->
             <div id="comments-list" class="divide-y divide-gray-200">
-                <!-- JavaScript로 댓글이 동적으로 추가됩니다. -->
             </div>
         </div>
 
     </div>
 </div>
 
-<!-- 커스텀 모달 UI -->
 <div id="modal-wrapper" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
     <div class="modal-content bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4">
         <div class="flex justify-between items-center pb-3">
@@ -101,7 +92,6 @@
             정말 삭제하시겠습니까?
         </div>
         <div class="modal-footer flex justify-end space-x-2 mt-6" id="modal-buttons">
-            <!-- 버튼은 JS에서 동적으로 생성됩니다. -->
         </div>
     </div>
 </div>
@@ -172,6 +162,46 @@
                     });
                 });
             });
+
+            // 댓글 수정 버튼 이벤트 핸들러
+            $('#comments-list').on('click', '.update-comment-btn', function() {
+                const commentId = $(this).data('comment-id');
+                const currentContent = $(this).data('comment-content');
+
+                const newContent = prompt('새로운 댓글 내용을 입력하세요:', currentContent);
+
+                if (newContent === null || newContent.trim() === '') {
+                    if (newContent === null) {
+                        return;
+                    }
+                    showModal('댓글 내용을 입력해야 합니다.');
+                    return;
+                }
+
+                const updateData = {
+                    content: newContent
+                };
+
+                $.ajax({
+                    url: `/api/comments/${commentId}`,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(updateData),
+                    success: function(updatedComment) {
+                        showModal('댓글이 수정되었습니다.', fetchComments);
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 401) {
+                            showModal('로그인이 필요합니다.');
+                        } else if (xhr.status === 403) {
+                            showModal('수정 권한이 없습니다.');
+                        } else {
+                            showModal('댓글 수정 중 오류가 발생했습니다.');
+                        }
+                        console.error('댓글 수정 오류:', xhr.status, xhr.responseText);
+                    }
+                });
+            });
         }
 
         $('#delete-btn').on('click', function() {
@@ -223,35 +253,40 @@
         }
 
 
-       // 댓글 HTML 요소를 생성하는 함수
+       // 댓글 HTML 요소를 생성하는 함수 (수정 날짜 및 수정/삭제 버튼 포함)
         function createCommentElement(comment) {
-            const commentDate = new Date(comment.createDate).toLocaleString('ko-KR');
+            const createDate = new Date(comment.createDate).toLocaleString('ko-KR');
+            const modifiedDate = comment.updateDate ? new Date(comment.updateDate).toLocaleString('ko-KR') : null;
 
-            // 서버에서 받은 nickname 필드를 사용하도록 수정
             const nickname = comment.nickName || '익명';
             const commentUserNo = comment.userNo;
 
             let commentHtml = `
                 <div class="comment-item py-4 flex justify-between items-start">
-                    <div>
+                    <div class="flex-grow">
                         <p class="text-gray-800 mb-1">${comment.content}</p>
                         <div class="comment-meta text-sm text-gray-500 mt-2 flex items-center space-x-2">
-                            <span class="font-semibold">${nickname}</span>  <span>|</span>
-                            <span>${commentDate}</span>
+                            <span class="font-semibold">${nickname}</span>
+                            <span>|</span>
+                            <span>${createDate}</span>
+                            ${modifiedDate ? `<span>|</span><span>(수정: ${modifiedDate})</span>` : ''}
                         </div>
                     </div>
             `;
 
             if (commentUserNo && commentUserNo == loginUserNo) {
                 commentHtml += `
-                    <button class="delete-comment-btn bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-2 rounded transition duration-200" data-comment-id="${comment.commentId}">삭제</button>
+                    <div class="comment-buttons flex-shrink-0 space-x-2 ml-4">
+                        <button class="update-comment-btn bg-gray-500 hover:bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded transition duration-200" data-comment-id="${comment.commentId}" data-comment-content="${comment.content}">수정</button>
+                        <button class="delete-comment-btn bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-2 rounded transition duration-200" data-comment-id="${comment.commentId}">삭제</button>
+                    </div>
                 `;
             }
 
             commentHtml += `</div>`;
             return commentHtml;
         }
-      
+
         function showModal(message, onConfirm) {
             const modalWrapper = $('#modal-wrapper');
             $('#modal-title').text('알림');
