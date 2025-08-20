@@ -8,10 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
-        body {
-          font-family: 'Nanum Gothic', sans-serif;
-        }
         .btn-delete:hover {
           text-decoration: underline;
         }
@@ -143,12 +139,12 @@
                 <td th:text="${sentence.description}" class="py-4 px-4 text-[#2F4160]"></td>
                 <td th:text="${#temporals.format(sentence.createDate, 'yyyy-MM-dd')}" class="py-4 px-4 text-sm text-gray-600"></td>
                 <td class="py-4 px-4 text-right">
-                    <a th:href="@{'/study/sentenceUpdate/' + ${sentence.sentenceId}(page=${paging.number}, kw=${kw})}" class="text-[#2F4160] hover:underline font-medium text-sm">수정</a>
+                    <a th:href="@{'/study/sentenceUpdate/' + ${sentence.sentenceId}(page=${paging.number}, kw=${kw})}" class="text-[#2F4160] hover:underline font-medium text-sm"><i class="fas fa-edit mr-1"></i>수정</a>
                     <span class="text-gray-400">|</span>
                     <button type="button" class="btn-delete text-red-500 hover:underline font-medium text-sm"
                             th:data-sentence-id="${sentence.sentenceId}"
                             th:data-page="${paging.number}"
-                            th:data-kw="${kw}">삭제</button>
+                            th:data-kw="${kw}"><i class="fas fa-trash-alt mr-1"></i>삭제</button>
                 </td>
             </tr>
             </tbody>

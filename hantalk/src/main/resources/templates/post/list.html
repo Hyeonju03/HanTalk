@@ -130,8 +130,27 @@
             </div>
 
             <div class="flex flex-col md:flex-row justify-between items-center mt-6 space-y-4 md:space-y-0">
-                <a th:href="@{|/post/insert/${categoryId}|}" class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200">새 글 작성</a>
 
+                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                    <!-- '새 글 작성' 버튼 -->
+                    <a th:if="${categoryId == 1 and isAdmin}"
+                       th:href="@{|/post/insert/${categoryId}|}"
+                       class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200">
+                        새 글 작성
+                    </a>
+                    <a th:if="${categoryId != 1}"
+                       th:href="@{|/post/insert/${categoryId}|}"
+                       class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200">
+                        새 글 작성
+                    </a>
+                    <a th:if="${isAdmin}"
+                       href="/admin"
+                       class="bg-[#2F4160] hover:bg-[#4B4B4B] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200">
+                        관리자 페이지로 이동
+                    </a>
+                </div>
+
+                <!-- 페이지네이션 버튼 -->
                 <div th:if="${!postPage.isEmpty()}" class="pagination-container">
                     <nav aria-label="Page navigation">
                         <ul class="flex space-x-2">

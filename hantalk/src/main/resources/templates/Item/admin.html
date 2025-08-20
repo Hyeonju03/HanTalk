@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>아이템 관리</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 <body class="bg-[#f3f4f6] min-h-screen flex flex-col text-[#2F4160]">
 
@@ -14,8 +15,7 @@
     <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl">
 
         <div class="p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
-            <h2 class="text-3xl font-bold mb-4 text-center">관리자 아이템 목록</h2>
-            <!-- Add Item Button remains at the top -->
+            <h2 class="text-3xl font-bold mb-4 text-center">아이템 관리</h2>
             <div class="flex justify-center">
                 <a href="/item/chuga" class="block w-fit bg-[#4B4B4B] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
                     ➕ 아이템 추가
@@ -23,7 +23,6 @@
             </div>
         </div>
 
-        <!-- Success Message Background Color Changed to #B5D0E3 -->
         <div th:if="${message}" class="p-4 text-center text-green-700 bg-[#B5D0E3] rounded-b-xl">
             [[${message}]]
         </div>
@@ -36,8 +35,7 @@
                     <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">이름</th>
                     <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">가격</th>
                     <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">설명</th>
-                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">수정</th>
-                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">삭제</th>
+                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">관리</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -46,18 +44,26 @@
                     <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.itemName}"></td>
                     <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.price}"></td>
                     <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.itemDescription}"></td>
-                    <td class="py-4 px-6 text-sm">
-                        <a th:href="@{'/item/sujung/' + ${item.itemId}}" class="text-[#2F4160] hover:underline">수정</a>
-                    </td>
-                    <td class="py-4 px-6 text-sm">
-                        <a th:href="@{'/item/sakje/' + ${item.itemId}}" class="text-red-500 hover:underline">삭제</a>
+                    <td class="py-4 px-6 text-sm text-center">
+                        <div class="flex space-x-2 justify-center">
+                            <a th:href="@{'/item/sujung/' + ${item.itemId}}"
+                               class="bg-[#4B4B4B] text-white px-3 py-1 rounded-lg hover:bg-[#2F4160] transition duration-300"
+                               title="수정">
+                                <i class="fas fa-edit"></i> 수정
+                            </a>
+                            <a th:href="@{'/item/sakje/' + ${item.itemId}}"
+                               class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300"
+                               onclick="return confirm('정말 이 아이템을 삭제하시겠습니까?');"
+                               title="삭제">
+                                <i class="fas fa-trash-alt"></i> 삭제
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Administrator List Button at the bottom center -->
         <div class="p-8 flex justify-center border-t border-[#E0E0E0] rounded-b-xl bg-[#FDFBFF]">
             <a th:href="@{/admin}"
                class="inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200">

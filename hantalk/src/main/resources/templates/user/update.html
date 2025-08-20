@@ -29,25 +29,28 @@
         <div class="bg-white p-8 rounded-xl shadow-xl max-w-lg mx-auto">
             <h1 class="text-2xl font-bold mb-6 text-center text-main-dark">회원정보 수정</h1>
 
-            <form action="/user/update" method="post" class="space-y-4">
+            <form th:action="@{/user/update}" th:object="${usersDTO}" method="post" class="space-y-4" onsubmit="return validateForm()">
+                <input type="hidden" th:field="*{userNo}">
+                <input type="hidden" th:field="*{userId}">
+
                 <div>
                     <label for="nickname" class="block text-main-dark text-sm font-bold mb-2">닉네임:</label>
-                    <input type="text" id="nickname" name="nickname" th:value="${user.nickname}"
+                    <input type="text" id="nickname" th:field="*{nickname}"
                            class="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-main-dark leading-tight focus:outline-none focus:ring-2 focus:ring-soft-blue focus:border-transparent"/>
                 </div>
                 <div>
-                    <label for="password" class="block text-main-dark text-sm font-bold mb-2">비밀번호:</label>
-                    <input type="password" id="password" name="password"
+                    <label for="password" class="block text-main-dark text-sm font-bold mb-2">새 비밀번호:</label>
+                    <input type="password" id="password" th:field="*{password}" placeholder="변경 시에만 입력"
                            class="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-main-dark leading-tight focus:outline-none focus:ring-2 focus:ring-soft-blue focus:border-transparent"/>
                 </div>
                 <div>
-                    <label for="passwordCheck" class="block text-main-dark text-sm font-bold mb-2">비밀번호 확인:</label>
-                    <input type="password" id="passwordCheck" name="passwordCheck"
+                    <label for="passwordCheck" class="block text-main-dark text-sm font-bold mb-2">새 비밀번호 확인:</label>
+                    <input type="password" id="passwordCheck" name="passwordCheck" placeholder="새 비밀번호를 다시 입력하세요"
                            class="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-main-dark leading-tight focus:outline-none focus:ring-2 focus:ring-soft-blue focus:border-transparent"/>
                 </div>
                 <div>
                     <label for="email" class="block text-main-dark text-sm font-bold mb-2">이메일:</label>
-                    <input type="email" id="email" name="email" th:value="${user.email}"
+                    <input type="email" id="email" th:field="*{email}"
                            class="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-main-dark leading-tight focus:outline-none focus:ring-2 focus:ring-soft-blue focus:border-transparent"/>
                 </div>
                 <button type="submit"
@@ -62,5 +65,24 @@
 <div class="py-4 text-gray-500 text-center text-sm bg-gray-100" th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function validateForm() {
+        const password = document.getElementById('password').value;
+        const passwordCheck = document.getElementById('passwordCheck').value;
+
+        // 비밀번호를 변경하지 않을 경우, 필드를 비워둔 채로 제출
+        if (password.trim() !== '' || passwordCheck.trim() !== '') {
+            if (password !== passwordCheck) {
+                alert('비밀번호가 일치하지 않습니다.');
+                document.getElementById('passwordCheck').focus();
+                return false;
+            }
+        }
+
+        return true;
+    }
+</script>
+
 </body>
 </html>
