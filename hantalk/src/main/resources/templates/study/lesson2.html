@@ -282,7 +282,7 @@
           } else {
               // 3번 틀렸을 경우 (최종 오답)
               if (data.attemptsLeft === 0) { // Assuming backend sends attemptsLeft
-                  feedbackIcon.textContent = '✖️';
+                  feedbackIcon.textContent = '❌';
                   feedbackIcon.className = 'text-[#F29DA0] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-bounce';
                   feedbackIcon.classList.remove('hidden');
                   nextButton.style.display = 'block';

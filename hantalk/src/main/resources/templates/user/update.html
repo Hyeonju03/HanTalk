@@ -29,9 +29,8 @@
         <div class="bg-white p-8 rounded-xl shadow-xl h-full">
             <h1 class="text-2xl font-bold mb-6 text-center text-main-dark">회원정보 수정</h1>
 
-            <form th:action="@{/user/update}" th:object="${usersDTO}" method="post" class="space-y-4" onsubmit="return validateForm()">
-                <!-- 사용자를 식별하기 위한 숨겨진 필드 -->
-                <input type="hidden" name="userNo" th:value="*{userNo}">
+            <form th:action="@{/user/update}" th:object="${user}" method="post" class="space-y-4" onsubmit="return validateForm()">
+                <input type="hidden" th:field="*{userNo}">
                 <input type="hidden" th:field="*{userId}">
                 <input type="hidden" id="originalEmail" th:value="*{email}">
 

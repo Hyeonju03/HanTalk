@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>HanTalk - 단어 목록</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Nanum Gothic 폰트 설정 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
@@ -34,6 +33,16 @@
       background-color: #2F4160;
       color: #ffffff;
     }
+    /* 테이블 레이아웃을 고정하여 열 너비가 변하지 않도록 함 */
+    .fixed-table-layout {
+      table-layout: fixed;
+    }
+    /* 셀 내용이 넘칠 경우 ...으로 표시하고 줄바꿈 방지 */
+    .fixed-cell {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-gray-100">
@@ -55,7 +64,9 @@
   </div>
 
   <div class="rounded-lg shadow-md overflow-hidden" style="background-color: #F8F9FA;">
-    <table class="min-w-full divide-y" style="border-color: #B5D0E3;">
+    <table class="min-w-full divide-y fixed-table-layout" style="border-color: #B5D0E3;">
+      <colgroup>
+        <col style="width: 10%;"> <col style="width: 30%;"> <col style="width: 45%;"> <col style="width: 15%;"> </colgroup>
       <thead class="text-white" style="background-color: #2F4160;">
       <tr>
         <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -79,10 +90,10 @@
         </td>
       </tr>
       <tr th:each="voca, loop : ${paging.content}" th:if="${voca != null}" class="odd:bg-gray-50" style="color: #2F4160;">
-        <td th:text="${paging.number * paging.size + loop.count}" class="px-6 py-4 whitespace-nowrap text-sm"></td>
-        <td th:text="${voca.vocabulary}" class="px-6 py-4 text-sm"></td>
-        <td th:text="${voca.description}" class="px-6 py-4 text-sm"></td>
-        <td th:text="${#temporals.format(voca.createDate, 'yyyy-MM-dd')}" class="px-6 py-4 whitespace-nowrap text-sm"></td>
+        <td th:text="${paging.number * paging.size + loop.count}" class="px-6 py-4 whitespace-nowrap text-sm fixed-cell"></td>
+        <td th:text="${voca.vocabulary}" class="px-6 py-4 text-sm fixed-cell"></td>
+        <td th:text="${voca.description}" class="px-6 py-4 text-sm fixed-cell"></td>
+        <td th:text="${#temporals.format(voca.createDate, 'yyyy-MM-dd')}" class="px-6 py-4 whitespace-nowrap text-sm fixed-cell"></td>
       </tr>
       </tbody>
     </table>

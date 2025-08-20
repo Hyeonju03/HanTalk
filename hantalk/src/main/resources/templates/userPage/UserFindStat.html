@@ -20,24 +20,68 @@
 </head>
 <body class="bg-custom-gray text-custom-navy min-h-screen flex flex-col items-center justify-center p-4">
 
-<header class="w-full max-w-4xl bg-white rounded-b-xl shadow-lg p-4 flex justify-between items-center mb-8">
-    <h1 class="text-2xl font-bold text-custom-navy">HanTalk</h1>
-    <nav>
-        <a href="/login" class="text-gray-600 hover:text-custom-navy transition-colors duration-300 mx-2 font-semibold">로그인</a>
-        <a href="/signup" class="text-gray-600 hover:text-custom-navy transition-colors duration-300 mx-2 font-semibold">회원가입</a>
-    </nav>
+<!-- 기존 헤더를 직접 추가했습니다. -->
+<header class="absolute w-full top-0 bg-white shadow-sm font-bold">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-24 items-center">
+            <div class="flex-shrink-0 flex items-center">
+                <a href="/hantalk/home">
+                    <img th:src="@{/images/logo.png}" alt="HanTalk 로고" class="w-40 h-auto">
+                </a>
+            </div>
+
+            <div class="flex-grow flex justify-center space-x-4 lg:space-x-8">
+                <a href="/user/view" class="text-xl font-bold text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
+                    마이페이지
+                </a>
+                <a href="/study/main" class="text-xl font-bold text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
+                    학습
+                </a>
+                <a href="/video/list" class="text-xl font-bold text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
+                    비디오학습
+                </a>
+                <a href="/resource/main" class="text-xl font-bold text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
+                    자료실
+                </a>
+                <a href="/post/list/1" class="text-xl font-bold text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
+                    게시판
+                </a>
+                <a href="/item/shop" class="text-xl font-bold text-gray-500 hover:text-gray-900 px-4 py-2 rounded-md">
+                    포인트상점
+                </a>
+            </div>
+
+            <div class="flex-shrink-0 flex items-center space-x-4">
+                <div th:unless="${session.userId}">
+                    <a href="/user/login" class="text-lg font-bold text-gray-500 hover:text-gray-900">
+                        로그인/회원가입
+                    </a>
+                </div>
+
+                <div th:if="${session.userId}">
+                    <span class="text-lg font-bold text-gray-900 mr-2" th:text="${session.userId} + '님'"></span>
+                    <a href="/user/logout" class="text-lg font-bold text-gray-500 hover:text-gray-900">
+                        로그아웃
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </header>
 
-<div class="w-full max-w-lg p-8 space-y-8 bg-white rounded-xl shadow-xl">
+<!-- 컨테이너의 max-w-lg를 max-w-4xl로 변경하여 너비를 확장했습니다. -->
+<div class="w-full max-w-4xl p-8 space-y-8 bg-white rounded-xl shadow-xl mt-24">
     <div>
         <h2 class="text-2xl font-bold text-center mb-6">아이디 찾기</h2>
-        <div class="space-y-4">
+        <!-- 버튼을 중앙 정렬하기 위해 flexbox를 사용했습니다. -->
+        <div class="space-y-4 flex flex-col items-center">
             <input type="text" id="findName" placeholder="이름"
                    class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
             <input type="text" id="findEmail" placeholder="이메일"
                    class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
+            <!-- 버튼의 w-full 클래스를 w-64로 변경하여 너비를 줄였습니다. -->
             <button onclick="findId()"
-                    class="w-full h-12 bg-custom-pink text-white font-bold rounded-md hover-bg-custom-navy transition-colors duration-300">
+                    class="w-64 h-12 bg-custom-pink text-white font-bold rounded-md hover-bg-custom-navy transition-colors duration-300">
                 <i class="fas fa-search mr-2"></i> 아이디 찾기
             </button>
         </div>
@@ -48,15 +92,17 @@
 
     <div>
         <h2 class="text-2xl font-bold text-center mb-6">비밀번호 찾기</h2>
-        <div class="space-y-4">
+        <!-- 버튼을 중앙 정렬하기 위해 flexbox를 사용했습니다. -->
+        <div class="space-y-4 flex flex-col items-center">
             <input type="text" id="pwName" placeholder="이름"
                    class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
             <input type="text" id="pwEmail" placeholder="이메일"
                    class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
             <input type="text" id="pwUserId" placeholder="아이디"
                    class="w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-blue">
+            <!-- 버튼의 w-full 클래스를 w-64로 변경하여 너비를 줄였습니다. -->
             <button onclick="findPw()"
-                    class="w-full h-12 bg-custom-darkgray text-white font-bold rounded-md hover-bg-custom-navy transition-colors duration-300">
+                    class="w-64 h-12 bg-custom-darkgray text-white font-bold rounded-md hover-bg-custom-navy transition-colors duration-300">
                 <i class="fas fa-key mr-2"></i> 비밀번호 찾기
             </button>
         </div>

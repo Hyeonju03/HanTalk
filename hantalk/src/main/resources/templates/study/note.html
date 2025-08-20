@@ -19,20 +19,22 @@
       <div class="bg-white p-6 rounded-xl shadow-lg border-t-4" style="border-color: #F29DA0;">
         <h3 class="text-2xl font-bold mb-4" style="color: #F29DA0;">📘 단어 오답</h3>
         <div th:if="${!#lists.isEmpty(wordNotes)}" class="overflow-x-auto">
-          <table class="min-w-full rounded-xl overflow-hidden">
-            <thead style="background-color: #2F4160;" class="text-white">
-            <tr>
-              <th class="px-4 py-3 text-left font-semibold">단어</th>
-              <th class="px-4 py-3 text-left font-semibold">뜻</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="note : ${wordNotes}" class="odd:bg-white even:bg-gray-50" style="color: #2F4160;">
-              <td class="px-4 py-3 border-b border-gray-200" th:text="${note.voca.vocabulary}"></td>
-              <td class="px-4 py-3 border-b border-gray-200" th:text="${note.voca.description}"></td>
-            </tr>
-            </tbody>
-          </table>
+          <div class="max-h-[30rem] overflow-y-auto">
+            <table class="min-w-full rounded-xl overflow-hidden">
+              <thead style="background-color: #2F4160;" class="text-white">
+              <tr>
+                <th class="px-4 py-3 text-left font-semibold sticky top-0" style="background-color: #2F4160;">단어</th>
+                <th class="px-4 py-3 text-left font-semibold sticky top-0" style="background-color: #2F4160;">뜻</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="note : ${wordNotes}" class="odd:bg-white even:bg-gray-50" style="color: #2F4160;">
+                <td class="px-4 py-3 border-b border-gray-200" th:text="${note.voca.vocabulary}"></td>
+                <td class="px-4 py-3 border-b border-gray-200" th:text="${note.voca.description}"></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div th:if="${#lists.isEmpty(wordNotes)}" class="p-4 rounded-lg text-center" style="background-color: #B5D0E3; border-color: #B5D0E3; color: #2F4160;">
           <p>단어 오답노트가 비어 있습니다. 열심히 학습하고 오답노트를 채워보세요!</p>
@@ -42,20 +44,22 @@
       <div class="bg-white p-6 rounded-xl shadow-lg border-t-4" style="border-color: #B5D0E3;">
         <h3 class="text-2xl font-bold mb-4" style="color: #B5D0E3;">📙 문장 오답</h3>
         <div th:if="${!#lists.isEmpty(sentenceNotes)}" class="overflow-x-auto">
-          <table class="min-w-full rounded-xl overflow-hidden">
-            <thead style="background-color: #2F4160;" class="text-white">
-            <tr>
-              <th class="px-4 py-3 text-left font-semibold">문장</th>
-              <th class="px-4 py-3 text-left font-semibold">해석</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="note : ${sentenceNotes}" class="odd:bg-white even:bg-gray-50" style="color: #2F4160;">
-              <td class="px-4 py-3 border-b border-gray-200" th:text="${note.sentence.munjang?.replace('^', ' ')}"></td>
-              <td class="px-4 py-3 border-b border-gray-200" th:text="${note.sentence.description?.replace('^', ' ')}"></td>
-            </tr>
-            </tbody>
-          </table>
+          <div class="max-h-[30rem] overflow-y-auto">
+            <table class="min-w-full rounded-xl overflow-hidden">
+              <thead style="background-color: #2F4160;" class="text-white">
+              <tr>
+                <th class="px-4 py-3 text-left font-semibold sticky top-0" style="background-color: #2F4160;">문장</th>
+                <th class="px-4 py-3 text-left font-semibold sticky top-0" style="background-color: #2F4160;">해석</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="note : ${sentenceNotes}" class="odd:bg-white even:bg-gray-50" style="color: #2F4160;">
+                <td class="px-4 py-3 border-b border-gray-200" th:text="${note.sentence.munjang?.replace('^', ' ')}"></td>
+                <td class="px-4 py-3 border-b border-gray-200" th:text="${note.sentence.description?.replace('^', ' ')}"></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div th:if="${#lists.isEmpty(sentenceNotes)}" class="p-4 rounded-lg text-center" style="background-color: #B5D0E3; border-color: #B5D0E3; color: #2F4160;">
           <p>문장 오답노트가 비어 있습니다. 열심히 학습하고 오답노트를 채워보세요!</p>
