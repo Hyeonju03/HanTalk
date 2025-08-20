@@ -31,6 +31,12 @@ public class VocaController {
         return "study/main";
     }
 
+    // 게임학습 & 한글 테스트 선택 페이지
+    @GetMapping("/contact")
+    public String contactPage() {
+        return folderName + "/contact";
+    }
+
     // 문장 목록
     @GetMapping("/vocaList")
     public String vocaList(Model model,

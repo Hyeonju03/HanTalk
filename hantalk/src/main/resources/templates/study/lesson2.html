@@ -13,16 +13,32 @@
     body {
       font-family: 'Nanum Gothic', sans-serif;
     }
+
+    /* 기본 컨테이너 스타일 */
+    .container {
+        min-height: 80px;
+        border: 2px dashed #ccc;
+        margin-bottom: 20px;
+        padding: 10px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    /* 문장 조각 스타일 */
     .sentence-piece {
         cursor: grab;
         user-select: none;
     }
+
+    /* 드래그 중인 요소 스타일 */
     .is-dragging {
         opacity: 0.5;
-        border-style: dashed !important; /* 드래그 중에는 테두리를 점선으로 */
+        border-style: dashed !important;
     }
 
-    /* Custom animations for feedback icon */
+    /* 피드백 아이콘 애니메이션 */
     @keyframes pulse {
         0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
         50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
@@ -31,16 +47,20 @@
         animation: pulse 1s infinite;
     }
 
-    @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% { transform: translate(-50%, -50%) translateY(0); opacity: 0.8; }
+    /* 오답 bounce (위치 고정 버전) */
+    @keyframes bounce-fixed {
+        0%, 20%, 50%, 80%, 100% {
+          transform: translate(-50%, -50%) translateY(0);
+          opacity: 0.8;
+        }
         40% { transform: translate(-50%, -50%) translateY(-10px); }
         60% { transform: translate(-50%, -50%) translateY(-5px); }
     }
-    .animate-bounce {
-        animation: bounce 1s infinite;
+    .bounce-fixed {
+        animation: bounce-fixed 1s infinite;
     }
 
-    /* Shake animation for incorrect answer */
+    /* 오답 시 흔들림 애니메이션 */
     @keyframes shake {
         0%, 100% { transform: translateX(0); }
         10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -64,8 +84,7 @@
 
   <!-- 드래그 가능한 조각들이 있는 컨테이너 -->
   <div id="shuffled-container"
-       class="container min-h-[80px] w-full border-2 border-[#B5D0E3] rounded-lg p-3 flex flex-wrap gap-2 justify-center bg-gray-50 shadow-inner">
-    <!-- 문장 조각들이 여기에 동적으로 로드됩니다 -->
+       class="min-h-[80px] w-full border-2 border-dashed border-[#B5D0E3] rounded-lg p-3 flex flex-wrap gap-2 justify-center bg-gray-50 shadow-inner">
   </div>
 
   <!-- 구분선 -->
@@ -73,8 +92,7 @@
 
   <!-- 사용자가 정렬할 컨테이너 -->
   <div id="sorted-container"
-       class="container min-h-[80px] w-full border-2 border-[#F29DA0] rounded-lg p-3 flex flex-wrap gap-2 justify-center bg-gray-50 shadow-inner">
-    <!-- 문장 조각들이 여기에 드롭됩니다 -->
+       class="min-h-[80px] w-full border-2 border-dashed border-[#F29DA0] rounded-lg p-3 flex flex-wrap gap-2 justify-center bg-gray-50 shadow-inner">
   </div>
 
   <div class="flex gap-4">
@@ -95,27 +113,24 @@
 <!-- 피드백 아이콘 (O/X) -->
 <div id="feedback-icon" class="hidden text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 z-10"></div>
 
-<!-- 하단 고정 버튼 -->
+
 <div class="fixed bottom-6 right-6">
-  <button id="quitBtn" onclick="quitLesson()"
+  <button onclick="quitLesson()"
           class="bg-gray-500 text-white px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-700 transition duration-300 transform hover:scale-105 shadow-lg">
-    그만하기
+    학습 종료
   </button>
 </div>
 
 <script>
-  // 'let' 대신 'var'를 사용하여 전역 변수 재선언 오류 방지
-  var sentenceId = null; // 모든 함수 위에서 선언
-
-  // Custom message box functions (from previous immersive)
+  // Custom message box function
   function showCustomMessage(message, type = 'info') {
       const messageBox = document.createElement('div');
       messageBox.textContent = message;
-      let bgColor = '#2F4160'; // Default: Dark Navy
+      let bgColor = '#2F4160';
       let textColor = 'white';
 
       if (type === 'error') {
-          bgColor = '#F29DA0'; // Coral Pink for errors
+          bgColor = '#F29DA0';
       }
 
       messageBox.style.cssText = `
@@ -152,66 +167,49 @@
       }, 3000);
   }
 
-  function quitLesson() {
-      if (window.opener) {
-          window.close();
-      } else {
-          showCustomMessage("이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.", 'info');
-      }
-  }
-
   document.addEventListener('DOMContentLoaded', function() {
       loadNewProblem();
 
       document.getElementById('check-button').addEventListener('click', checkAnswer);
       document.getElementById('next-problem-button').addEventListener('click', loadNewProblem);
 
-      const containers = document.querySelectorAll('.container');
+      const containers = document.querySelectorAll('#shuffled-container, #sorted-container');
       containers.forEach(container => {
           container.addEventListener('dragover', e => {
               e.preventDefault();
               const draggable = document.querySelector('.is-dragging');
-              if (draggable) { // Ensure a draggable element exists
-                  const afterElement = getDragAfterElement(container, e.clientX);
-                  if (afterElement == null) {
-                      container.appendChild(draggable);
-                  } else {
-                      container.insertBefore(draggable, afterElement);
-                  }
+              const afterElement = getDragAfterElement(container, e.clientX);
+              if (afterElement == null) {
+                  container.appendChild(draggable);
+              } else {
+                  container.insertBefore(draggable, afterElement);
               }
           });
       });
   });
 
   function loadNewProblem() {
-      document.getElementById('feedback-icon').classList.add('hidden'); // Tailwind hidden class
+      document.getElementById('feedback-icon').classList.add('hidden');
       document.getElementById('next-problem-button').style.display = 'none';
-      document.getElementById('result-message').textContent = '';
       document.getElementById('check-button').style.display = 'block';
+      document.getElementById('result-message').textContent = '';
 
-      // Reset containers
-      document.getElementById('shuffled-container').innerHTML = '';
+      const shuffledContainer = document.getElementById('shuffled-container');
+      shuffledContainer.innerHTML = '';
       document.getElementById('sorted-container').innerHTML = '';
 
-      // 절대 경로로 fetch 요청 수정
-      fetch(`${window.location.origin}/study/api/get-lesson2-sentence`)
-          .then(response => {
-              if (!response.ok) {
-                  throw new Error('Network response was not ok ' + response.statusText);
-              }
-              return response.json();
-          })
+      fetch('/study/api/get-lesson2-sentence')
+          .then(response => response.json())
           .then(data => {
               if (data.error) {
-                  showCustomMessage(data.error, 'error'); // Use custom message
+                  showCustomMessage(data.error, 'error');
                   return;
               }
-              sentenceId = data.sentenceId; // 전역 변수에 저장
               displayPieces(data.pieces);
           })
           .catch(error => {
               console.error('Error loading problem:', error);
-              showCustomMessage('문제 로딩에 실패했습니다.', 'error'); // Use custom message
+              showCustomMessage('문제 로딩에 실패했습니다.', 'error');
           });
   }
 
@@ -221,7 +219,6 @@
 
       pieces.forEach(pieceText => {
           const pieceDiv = document.createElement('div');
-          // Tailwind classes for styling sentence pieces
           pieceDiv.className = 'sentence-piece bg-white text-[#2F4160] px-4 py-2 rounded-lg shadow-md border border-gray-200 transition-all duration-200 hover:scale-105';
           pieceDiv.textContent = pieceText;
           pieceDiv.setAttribute('draggable', true);
@@ -243,24 +240,18 @@
                               .map(el => el.textContent);
 
       if (userPieces.length === 0) {
-          showCustomMessage('먼저 문장 조각을 배치해주세요.', 'error'); // Use custom message
+          showCustomMessage('먼저 문장 조각을 배치해주세요.', 'error');
           return;
       }
 
-      // 절대 경로로 fetch 요청 수정
-      fetch(`${window.location.origin}/study/api/check-lesson2-answer`, {
+      fetch('/study/api/check-lesson2-answer', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ userPieces: userPieces, sentenceId: sentenceId }) // sentenceId 추가
+          body: JSON.stringify({ userPieces: userPieces })
       })
-      .then(response => {
-          if (!response.ok) {
-              throw new Error('Network response was not ok ' + response.statusText);
-          }
-          return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
           const feedbackIcon = document.getElementById('feedback-icon');
           const nextButton = document.getElementById('next-problem-button');
@@ -269,32 +260,26 @@
 
           if (data.isCorrect) {
               feedbackIcon.textContent = '✔️';
-              feedbackIcon.className = 'text-[#2F4160] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-pulse';
+              feedbackIcon.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-9xl font-bold opacity-80 text-[#2F4160] animate-pulse';
               feedbackIcon.classList.remove('hidden');
+
               nextButton.style.display = 'block';
               checkButton.style.display = 'none';
+              document.getElementById('result-message').textContent = '정답입니다! 다음 문제로 넘어갈 수 있습니다.';
 
-              setTimeout(() => { feedbackIcon.classList.add('hidden'); }, 1500); // 1.5초 후 아이콘 숨기기
-
-              if (data.nextSentenceId) {
-                  sentenceId = data.nextSentenceId; // 다음 문제 id 업데이트
-              }
+              setTimeout(() => { feedbackIcon.classList.add('hidden'); }, 1500);
           } else {
-              // 3번 틀렸을 경우 (최종 오답)
-              if (data.attemptsLeft === 0) { // Assuming backend sends attemptsLeft
+              if (data.message.includes('3번 틀렸습니다.')) {
                   feedbackIcon.textContent = '❌';
-                  feedbackIcon.className = 'text-[#F29DA0] text-9xl font-bold fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80 animate-bounce';
+                  feedbackIcon.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-9xl font-bold opacity-80 text-[#F29DA0] bounce-fixed';
                   feedbackIcon.classList.remove('hidden');
+
                   nextButton.style.display = 'block';
                   checkButton.style.display = 'none';
+                  document.getElementById('result-message').textContent = data.message;
 
-                  setTimeout(() => { feedbackIcon.classList.add('hidden'); }, 1500); // 1.5초 후 아이콘 숨기기
-
-                  if (data.nextSentenceId) {
-                      sentenceId = data.nextSentenceId; // 다음 문제 id 업데이트
-                  }
+                  setTimeout(() => { feedbackIcon.classList.add('hidden'); }, 1500);
               } else {
-                  // 아직 기회가 남았을 경우 (흔들림 효과 및 재배치)
                   sortedContainer.classList.add('shake');
                   sortedContainer.addEventListener('animationend', () => {
                       sortedContainer.classList.remove('shake');
@@ -303,19 +288,18 @@
                           shuffledContainer.appendChild(sortedContainer.firstChild);
                       }
                   }, { once: true });
+                  document.getElementById('result-message').textContent = data.message;
               }
           }
-          document.getElementById('result-message').textContent = data.message;
       })
       .catch(error => {
           console.error('Error checking answer:', error);
-          showCustomMessage('정답 확인 중 오류가 발생했습니다.', 'error'); // Use custom message
+          showCustomMessage('정답 확인 중 오류가 발생했습니다.', 'error');
       });
   }
 
   function getDragAfterElement(container, x) {
       const draggableElements = [...container.querySelectorAll('.sentence-piece:not(.is-dragging)')];
-
       return draggableElements.reduce((closest, child) => {
           const box = child.getBoundingClientRect();
           const offset = x - box.left - box.width / 2;
@@ -326,6 +310,11 @@
           }
       }, { offset: Number.NEGATIVE_INFINITY }).element;
   }
+
+  document.getElementById('quit-button').addEventListener('click', () => {
+    window.location.href = "/"; // 메인 페이지로 바로 이동
+});
+
 </script>
 </body>
 </html>
