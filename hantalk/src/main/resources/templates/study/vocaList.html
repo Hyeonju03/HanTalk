@@ -9,11 +9,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
   <style>
-
-    .search-container {
-        max-width: 600px;
-        margin: 0 auto 2rem;
+    /* Custom text shadow for titles */
+    .text-shadow-custom {
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
+    /* Pagination styles */
     .pagination a, .pagination span {
         display: flex;
         justify-content: center;
@@ -29,11 +29,6 @@
         color: #ffffff; /* 흰색 */
         pointer-events: none;
     }
-    /* 검색 버튼 호버 스타일 */
-    .search-button:hover {
-      background-color: #2F4160;
-      color: #ffffff;
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-gray-100">
@@ -43,15 +38,26 @@
 <main class="flex-grow p-8 container mx-auto">
   <h1 class="text-4xl font-extrabold text-center mb-10" style="color: #2F4160; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">단어 목록</h1>
 
-  <div class="search-container">
-    <form th:action="@{/study/vocaList}" method="get" class="flex items-center gap-2">
+  <!-- Container for search bar, search button, and learning main button -->
+  <!-- flex, items-center, justify-end를 사용하여 모든 요소들을 오른쪽으로 정렬, gap으로 간격 부여 -->
+  <div class="flex items-center justify-end w-full mb-10 gap-4">
+    <!-- Search input and search button form -->
+    <!-- max-width를 유지하여 검색창 길이 조절 -->
+    <form th:action="@{/study/vocaList}" method="get" class="flex items-center gap-2" style="max-width: 750px;">
       <input type="text" name="kw" th:value="${kw}" placeholder="단어 또는 의미 검색"
              class="flex-grow p-3 border rounded-lg focus:outline-none focus:ring-2"
              style="border-color: #2F4160; background-color: #F8F9FA; color: #2F4160; focus:ring-color: #F29DA0;">
-      <button type="submit" class="px-6 py-3 font-semibold rounded-lg shadow-md transition-colors bg-[#F29DA0] text-[#2F4160] hover:bg-[#d18a8d] hover:text-white">
+      <!-- Search button: pink background, navy text, hovers to navy background, white text -->
+      <button type="submit" class="px-6 py-3 font-semibold rounded-lg shadow-md transition-colors bg-[#F29DA0] text-[#2F4160] hover:bg-[#2F4160] hover:text-white">
         검색
       </button>
     </form>
+    <!-- Learning main button: Navy background, white text, hovers to sky blue background, navy text -->
+    <a th:href="@{/study/main}"
+       class="inline-block px-4 py-3 rounded-lg shadow-md transition-colors duration-300
+              font-semibold bg-[#2F4160] text-white hover:bg-[#B5D0E3] hover:text-[#2F4160] whitespace-nowrap">
+      학습 메인 &#x2192;
+    </a>
   </div>
 
   <div class="rounded-lg shadow-md overflow-hidden" style="background-color: #F8F9FA;">
@@ -114,6 +120,7 @@
       </li>
     </ul>
   </div>
+
 </main>
 
 <div th:replace="~{fragments/footer :: footerFragment}"></div>

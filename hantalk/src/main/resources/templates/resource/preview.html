@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body>
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
@@ -35,20 +36,7 @@
 
       <pre th:if="${isText}" th:text="${textContent}" class="bg-[#B5D0E3] text-[#2F4160] p-4 rounded-md max-h-96 overflow-auto mb-4 font-mono whitespace-pre-wrap"></pre>
 
-      <p th:if="${!isImage and !isDocument and !isText}" class="text-red-500 font-semibold text-center">미리보기를 지원하지 않는 파일입니다. 목록에서 다운로드해 주세요.</p>
     </section>
-
-    <div class="mb-6 flex flex-col sm:flex-row sm:items-start">
-      <span class="font-semibold text-gray-700 sm:w-28 sm:flex-shrink-0 mb-1 sm:mb-0">파일 다운로드</span>
-      <span>
-          <a th:if="${resource != null and resource.archive != null and !#strings.isEmpty(resource.archive)}"
-             th:href="@{|/resource/download/file/${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}|}"
-             download
-             class="text-[#2F4160] hover:underline font-semibold"
-             th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
-        <span th:unless="${resource != null and resource.archive != null and !#strings.isEmpty(resource.archive)}" class="text-gray-500">목록에 가서 다운하기</span>
-        </span>
-    </div>
 
     <div class="mb-6 flex flex-col sm:flex-row sm:items-start" th:if="${resource != null}">
       <span class="font-semibold text-gray-700 sm:w-28 sm:flex-shrink-0 mb-1 sm:mb-0">등록일</span>
@@ -59,7 +47,7 @@
       <button type="button"
               th:text="${isAdmin} ? '관리자 목록으로' : '사용자 목록으로'"
               th:onclick="${isAdmin} ? 'location.href=\'/resource/admin/main\'' : 'location.href=\'/resource/main\''"
-              class="bg-[#F29DA0] hover:bg-[#2F4160] text-white px-4 py-2 rounded-lg font-semibold transition duration-300">
+              class="bg-[#B5D0E3] hover:bg-[#2F4160] text-white px-4 py-2 rounded-lg font-semibold transition duration-300">
         목록으로
       </button>
     </div>
