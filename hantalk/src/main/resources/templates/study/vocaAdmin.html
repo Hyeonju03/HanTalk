@@ -120,11 +120,11 @@
         <table class="min-w-full bg-white rounded-lg border-collapse">
             <thead>
             <tr class="bg-[#FDFBFF] text-[#2F4160] text-left text-sm font-semibold uppercase tracking-wider">
-                <th class="py-3 px-4 rounded-tl-lg">순번</th>
-                <th class="py-3 px-4">단어</th>
-                <th class="py-3 px-4">의미</th>
-                <th class="py-3 px-4">등록일</th>
-                <th class="py-3 px-4 rounded-tr-lg text-right">관리</th>
+                <th class="py-3 px-4 rounded-tl-lg text-center">순번</th>
+                <th class="py-3 px-4 text-center">단어</th>
+                <th class="py-3 px-4 text-center">의미</th>
+                <th class="py-3 px-4 text-center">등록일</th>
+                <th class="py-3 px-4 rounded-tr-lg text-center">관리</th>
             </tr>
             </thead>
             <tbody>
@@ -140,15 +140,14 @@
                 <td th:text="${voca.description}" class="py-4 px-4 text-[#2F4160]"></td>
                 <td th:text="${#temporals.format(voca.createDate, 'yyyy-MM-dd')}" class="py-4 px-4 text-sm text-gray-600"></td>
                 <td class="py-4 px-4 text-right space-x-2">
-                    <a th:href="@{|/study/vocaUpdate/${voca.vocaId}|}" class="text-[#2F4160] hover:underline font-medium text-sm">
-                        <i class="fas fa-edit mr-1"></i>수정 <!-- Font Awesome 아이콘 추가 -->
+                    <a th:href="@{|/study/vocaUpdate/${voca.vocaId}|}"
+                       class="bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300">
+                        <i class="fas fa-edit"></i> 수정
                     </a>
-                    <span class="text-gray-400">|</span>
-                    <button type="button" class="btn-delete text-red-500 hover:underline font-medium text-sm"
-                            th:data-voca-id="${voca.vocaId}"
-                            th:data-page="${paging.number}"
-                            th:data-kw="${kw}">
-                        <i class="fas fa-trash-alt mr-1"></i>삭제 <!-- Font Awesome 아이콘 추가 -->
+                    <button type="button"
+                            class="bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300"
+                            th:onclick="'return confirm(\'정말 이 단어를 삭제하시겠습니까?\') ? window.location.href=\'' + @{|/study/vocaDelete/${voca.vocaId}?page=${paging.number}&kw=${kw}|} + '\' : false;'">
+                        <i class="fas fa-trash"></i> 삭제
                     </button>
                 </td>
             </tr>

@@ -38,10 +38,10 @@
 
 <main class="flex-grow flex justify-center p-8 space-x-8">
 
-    <div th:replace="~{fragments/mypageSidebar :: mypageSidebar}"></div>
+    <div th:replace="~{fragments/mypageSidebar :: mypageSidebar}" class="h-full"></div>
 
     <div class="container-custom w-full">
-        <div class="bg-white p-8 rounded-xl shadow-xl">
+        <div class="bg-white p-8 rounded-xl shadow-xl h-full">
             <div class="flex flex-col md:flex-row items-center px-6 py-6 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
                 <div class="profile-container mb-4 md:mb-0 md:mr-4 flex-shrink-0">
                     <img th:if="${user.profileImage != null}"

@@ -13,9 +13,12 @@
         }
     </style>
 </head>
-<body class="bg-[#f3f4f6] text-[#2F4160] font-sans antialiased min-h-screen flex items-start justify-center py-12">
 
-<div class="container mx-auto px-4 w-full max-w-4xl">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+
+<body class="bg-[#f3f4f6] text-[#2F4160] font-sans antialiased min-h-screen">
+
+<div class="container mx-auto px-4 w-full max-w-4xl mt-12">
     <div class="bg-white rounded-lg shadow-lg p-8">
         <div class="post-header border-b-2 border-gray-300 pb-4 mb-6">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-900" th:text="${post.title}">게시물 제목</h1>
@@ -50,10 +53,11 @@
 
         <div class="btn-group flex space-x-2 mt-6">
             <a th:if="${isAdmin} or (${loginUserNo != null and post.users.userNo == loginUserNo})"
-               th:href="@{|/post/update/${post.postId}|}" class="bg-[#B5D0E3] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg transition duration-200">수정</a>
+               th:href="@{|/post/update/${post.postId}|}" class="bg-[#B5D0E3] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg transition duration-200"><i class="fas fa-edit"></i>수정</a>
 
             <button th:if="${isAdmin} or (${loginUserNo != null and post.users.userNo == loginUserNo})"
-                    th:data-post-id="${post.postId}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200" id="delete-btn">삭제</button>
+                    class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
+                    th:onclick="|confirmDelete(${post.postId}, ${post.category.categoryId})|"><i class="fas fa-trash"></i>삭제</button>
 
             <a th:href="@{|/post/list/${post.category.categoryId}|}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">목록</a>
         </div>
@@ -95,6 +99,8 @@
         </div>
     </div>
 </div>
+
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script th:inline="javascript">
@@ -204,28 +210,27 @@
             });
         }
 
-        $('#delete-btn').on('click', function() {
-            showConfirmModal('정말로 삭제하시겠습니까?', () => {
-                const postIdToDelete = $(this).data('post-id');
+        // 게시물 삭제 함수
+        window.confirmDelete = function(postIdToDelete, categoryId) {
+            if (confirm('정말로 이 게시물을 삭제하시겠습니까?')) {
                 $.ajax({
                     url: `/post/deleteProc/${postIdToDelete}`,
                     type: 'DELETE',
                     success: function(result) {
-                        showModal('게시물이 삭제되었습니다.', () => {
-                            window.location.href = `/post/list/${postCategory}`;
-                        });
+                        alert('게시물이 삭제되었습니다.');
+                        window.location.href = `/post/list/${categoryId}`;
                     },
                     error: function(xhr) {
                         if (xhr.status === 403) {
-                            showModal('삭제 권한이 없습니다.');
+                            alert('삭제 권한이 없습니다.');
                         } else {
-                            showModal('오류가 발생했습니다.');
+                            alert('오류가 발생했습니다.');
                         }
                         console.error('Error:', xhr.status, xhr.responseText);
                     }
                 });
-            });
-        });
+            }
+        };
 
         // 댓글 목록을 불러와서 화면에 렌더링하는 함수
         function fetchComments() {
@@ -322,11 +327,6 @@
             });
 
             modalWrapper.removeClass('hidden');
-        }
-
-        // 페이지 로드 시 댓글을 불러옵니다.
-        if (postCategory != 1) {
-            fetchComments();
         }
     });
     /*]]>*/
