@@ -189,7 +189,7 @@ public class UserController {
         String role = SessionUtil.getRole(session);
         if (service.isRoleOk(userid, sessionUserId, role)) {
             UsersDTO user = service.getUserOne(userId);
-            List<LogDataDTO> logList = logService.getLogToUser(user.getUserNo(),session);
+            List<LogDataDTO> logList = logService.getLogToUser(user.getUserNo());
             model.addAttribute("user", user);
             model.addAttribute("logList", logList);
             return "userPage/UserDetailPage";
@@ -206,7 +206,6 @@ public class UserController {
         if (service.isRoleOk(userId, sessionUserId, role)) {
             UsersDTO user = service.getUserOne(userId);
             model.addAttribute("user", user);
-            model.addAttribute("usersDTO", user);
             return "userPage/UserUpdatePage";
         }
         return "RoleERROR";
@@ -215,7 +214,7 @@ public class UserController {
     @PostMapping("/user/admin/update")
     public String updateProc(@ModelAttribute UsersDTO usersDTO) {
         service.update(usersDTO);
-        return "userPage/UserTestPage";
+        return "redirect:/user/admin/list";
     }
 
     //삭제
@@ -225,8 +224,7 @@ public class UserController {
         String role = SessionUtil.getRole(session);
         if (service.isRoleOk(userId, sessionUserId, role)) {
             service.signOut(userId);
-            session.invalidate();
-            return "redirect:/user/login";
+            return "redirect:/user/admin/list";
         }
 
         return "RoleERROR";

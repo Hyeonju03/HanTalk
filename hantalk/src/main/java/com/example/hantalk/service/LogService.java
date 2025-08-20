@@ -10,7 +10,6 @@ import com.example.hantalk.repository.UsersRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,30 +57,31 @@ public class LogService {
     }
 
     // ✅ 전체 로그 조회 (Entity → DTO 변환 후 반환)
-    public List<LogDataDTO> getLog(HttpSession session) {
+    public List<LogDataDTO> getLog() {
         List<LogData> logs = logRepository.findAll();
         List<LogDataDTO> dtoList = new ArrayList<>(logs.size());
         for (LogData e : logs) {
-            dtoList.add(toDto(e,session));
+            dtoList.add(toDto(e));
         }
         return dtoList;
     }
 
     // ✅ 특정 사용자 로그 조회
-    public List<LogDataDTO> getLogToUser(int userNo,HttpSession session) {
+    public List<LogDataDTO> getLogToUser(int userNo) {
         Optional<List<LogData>> logList = logRepository.findByUserNo(userNo);
         if (logList.isPresent()) {
-            List<LogData> logs = logRepository.findAll();
+            List<LogData> logs = logRepository.findByUserNo(userNo).get();
             List<LogDataDTO> dtoList = new ArrayList<>(logs.size());
             for (LogData e : logs) {
-                dtoList.add(toDto(e,session));
+                dtoList.add(toDto(e));
             }
+            return dtoList;
         }
         return null;
     }
 
     // ✅ 특정 날짜 로그 조회
-    public List<LogDataDTO> getLogToDate(LocalDate startDate, LocalDate endDate,HttpSession session) {
+    public List<LogDataDTO> getLogToDate(LocalDate startDate, LocalDate endDate) {
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
         Optional<List<LogData>> logList = logRepository.findByCreateDateBetween(start, end);
@@ -89,14 +89,15 @@ public class LogService {
             List<LogData> logs = logRepository.findAll();
             List<LogDataDTO> dtoList = new ArrayList<>(logs.size());
             for (LogData e : logs) {
-                dtoList.add(toDto(e,session));
+                dtoList.add(toDto(e));
             }
+            return dtoList;
         }
         return null;
     }
 
     // ✅ 특정 사용자 + 날짜 로그 조회
-    public List<LogDataDTO> getLogToUserAndDate(int userNo, LocalDate startDate, LocalDate endDate,HttpSession session) {
+    public List<LogDataDTO> getLogToUserAndDate(int userNo, LocalDate startDate, LocalDate endDate) {
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
         Optional<List<LogData>> logList = logRepository.findByUserNoAndCreateDateBetween(userNo, start, end);
@@ -104,45 +105,58 @@ public class LogService {
             List<LogData> logs = logRepository.findAll();
             List<LogDataDTO> dtoList = new ArrayList<>(logs.size());
             for (LogData e : logs) {
-                dtoList.add(toDto(e,session));
+                dtoList.add(toDto(e));
             }
+            return dtoList;
         }
         return null;
     }
 
-    private LogDataDTO toDto(LogData entity, HttpSession session) {
+    private LogDataDTO toDto(LogData entity) {
         LogDataDTO dto = new LogDataDTO();
         dto.setUri(entity.getUri());
         dto.setMethod(entity.getMethod());
-        dto.setDevice(entity.getDevice()); // ✅ ip → device
+        dto.setDevice(entity.getDevice());
         dto.setResponseTime(entity.getResponseTime());
         dto.setStatusCode(entity.getStatusCode());
         dto.setCreateDate(entity.getCreateDate());
 
-        Optional<Users> userOpt = usersRepository.findByUserNo(entity.getUserNo());
-        if(SessionUtil.hasRole(session,"ADMIN")){
-            UsersDTO admin = new UsersDTO();
-            admin.setUserId("ADMIN");
-            admin.setName("관리자");
-            dto.setUser(admin);
-        }
-        else if (!userOpt.isPresent() || entity.getUserNo() == 0) {
+        Integer userNo = entity.getUserNo(); // userNo 가져오기
+
+        if (userNo == null || userNo == 0) {
+            // 게스트
             UsersDTO guest = new UsersDTO();
             guest.setUserId("GUEST");
             guest.setName("게스트");
             dto.setUser(guest);
+
+        } else if (userNo == 1) {
+            // 관리자
+            UsersDTO admin = new UsersDTO();
+            admin.setUserId("ADMIN");
+            admin.setName("관리자");
+            dto.setUser(admin);
+
         } else {
-            Users userEntity = userOpt.get();
-            UsersDTO safeDto = new UsersDTO();
-            safeDto.setUserId(userEntity.getUserId());
-            safeDto.setUserNo(userEntity.getUserNo());
-            safeDto.setName(userEntity.getName());
-            safeDto.setNickname(userEntity.getNickname());
-            safeDto.setStatus(userEntity.getStatus());
-
-            dto.setUser(safeDto);
+            // 일반 사용자
+            Optional<Users> userOpt = usersRepository.findByUserNo(userNo);
+            if (userOpt.isPresent()) {
+                Users userEntity = userOpt.get();
+                UsersDTO safeDto = new UsersDTO();
+                safeDto.setUserId(userEntity.getUserId());
+                safeDto.setUserNo(userEntity.getUserNo());
+                safeDto.setName(userEntity.getName());
+                safeDto.setNickname(userEntity.getNickname());
+                safeDto.setStatus(userEntity.getStatus());
+                dto.setUser(safeDto);
+            } else {
+                // 혹시 DB에 없는 userNo일 경우 fallback → 게스트 처리
+                UsersDTO guest = new UsersDTO();
+                guest.setUserId("GUEST");
+                guest.setName("게스트");
+                dto.setUser(guest);
+            }
         }
-
         return dto;
     }
 

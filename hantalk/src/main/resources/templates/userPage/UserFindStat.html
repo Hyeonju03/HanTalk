@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>아이디 / 비밀번호 찾기</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
-        /* Nanum Gothic 폰트 설정 */
-        body {
-            font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
-        }
-
         /* Custom Colors based on the provided theme */
         .bg-custom-gray { background-color: #f3f4f6; }
         .text-custom-navy { color: #2F4160; }
@@ -166,7 +162,7 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === "success") {
-                resultElement.textContent = "임시 비밀번호가 이메일로 전송되었습니다.";
+                resultElement.textContent = "임시 비밀번호 : " + data.tempPw;
                 resultElement.classList.remove("text-red-500");
                 resultElement.classList.add("text-green-500");
             } else {

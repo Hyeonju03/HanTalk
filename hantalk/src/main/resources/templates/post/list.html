@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시물 목록</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
         body {
             background-color: #f3f4f6;
@@ -81,11 +81,18 @@
     <div th:replace="~{fragments/postSidebar :: postSidebarFragment}"></div>
 
     <div class="container-custom w-full">
-        <div class="bg-white rounded-xl shadow-xl p-8">
-            <div class="board-header">
-                <h1 th:if="${categoryId == 1}" class="text-3xl text-center text-[#2F4160] mb-6">공지사항</h1>
-                <h1 th:if="${categoryId == 2}" class="text-3xl text-center text-[#2F4160] mb-6">커뮤니티</h1>
-                <h1 th:if="${categoryId == 3}" class="text-3xl text-center text-[#2F4160] mb-6">문의사항</h1>
+        <div class="bg-white rounded-xl shadow-xl p-8 h-full">
+            <div class="board-header flex justify-between items-center mb-6">
+                <div class="flex-grow flex justify-center">
+                    <h1 th:if="${categoryId == 1}" class="text-3xl text-center text-[#2F4160]">공지사항</h1>
+                    <h1 th:if="${categoryId == 2}" class="text-3xl text-center text-[#2F4160]">커뮤니티</h1>
+                    <h1 th:if="${categoryId == 3}" class="text-3xl text-center text-[#2F4160]">문의사항</h1>
+                </div>
+                <a th:if="${isAdmin}"
+                   href="/admin"
+                   class="bg-[#2F4160] hover:bg-[#4B4B4B] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200">
+                    관리자 페이지로<i class="fas fa-arrow-right ml-2"></i>
+                </a>
             </div>
 
             <div class="search-box">
@@ -114,9 +121,9 @@
                     <tr th:if="${postPage.isEmpty()}">
                         <td colspan="4" class="text-center py-4 text-gray-500">게시물이 없습니다.</td>
                     </tr>
-                    <tr th:each="post : ${postPage.content}">
+                    <tr th:each="post : ${postPage.content}" th:data-post-id="${post.postId}" class="cursor-pointer post-row">
                         <td class="board-title">
-                            <a th:href="@{|/post/view/${post.postId}|}" th:text="${post.title}">제목입니다.</a>
+                            <span th:text="${post.title}">제목입니다.</span>
                             <th:block th:if="${post.updateDate != null and not #temporals.format(post.updateDate, 'yyyy-MM-dd').equals(#temporals.format(post.createDate, 'yyyy-MM-dd'))}">
                                 <span class="text-sm text-red-500 font-bold ml-2">[수정]</span>
                             </th:block>
@@ -132,7 +139,6 @@
             <div class="flex flex-col md:flex-row justify-between items-center mt-6 space-y-4 md:space-y-0">
 
                 <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-                    <!-- '새 글 작성' 버튼 -->
                     <a th:if="${categoryId == 1 and isAdmin}"
                        th:href="@{|/post/insert/${categoryId}|}"
                        class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200">
@@ -143,14 +149,9 @@
                        class="bg-[#F29DA0] hover:bg-[#2F4160] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200">
                         새 글 작성
                     </a>
-                    <a th:if="${isAdmin}"
-                       href="/admin"
-                       class="bg-[#2F4160] hover:bg-[#4B4B4B] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200">
-                        관리자 페이지로 이동
-                    </a>
+
                 </div>
 
-                <!-- 페이지네이션 버튼 -->
                 <div th:if="${!postPage.isEmpty()}" class="pagination-container">
                     <nav aria-label="Page navigation">
                         <ul class="flex space-x-2">
@@ -180,6 +181,20 @@
 </div>
 
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rows = document.querySelectorAll('.post-row');
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                const postId = row.getAttribute('data-post-id');
+                if (postId) {
+                    window.location.href = `/post/view/${postId}`;
+                }
+            });
+        });
+    });
+</script>
 
 </body>
 </html>
