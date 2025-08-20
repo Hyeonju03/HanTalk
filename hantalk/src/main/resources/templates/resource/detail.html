@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>사용자 자료 상세 보기</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-[#f3f4f6] text-[#2F4160] min-h-screen flex flex-col">
+<body class="text-[#2F4160] min-h-screen flex flex-col bg-[#f3f4f6]">
 
 <!-- 헤더 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
@@ -14,49 +15,65 @@
 <div class="flex flex-1 w-full max-w-5xl mx-auto px-4 py-8 gap-8">
 
   <!-- 본문 -->
-  <main class="flex-1 p-8 bg-white rounded-xl shadow-xl">
-    <h1 class="text-3xl font-bold text-center text-[#2F4160] mb-8">자료 상세 보기</h1>
+  <main class="flex-1 p-8 bg-white rounded-xl shadow-2xl border border-[#B5D0E3]">
+    <h1 class="text-3xl font-bold text-center text-[#2F4160] mb-8 border-b-4 border-[#B5D0E3] pb-4">
+      자료 상세 보기
+    </h1>
 
-    <div class="space-y-6 text-lg">
-      <div class="detail-item flex items-start">
-        <span class="font-bold text-[#2F4160] w-24 flex-shrink-0">제목:</span>
+    <div class="space-y-4 text-lg"> <!-- 제목-내용 간격 좁힘 -->
+
+      <!-- 제목 -->
+      <div class="detail-item p-6 bg-[#B5D0E3] bg-opacity-20 rounded-lg shadow-md flex items-start gap-4 min-h-[80px]">
+        <i class="fas fa-file-alt text-[#2F4160] mt-1"></i>
+        <span class="font-bold text-[#2F4160] w-28 flex-shrink-0">제목 :</span>
         <span class="flex-1 break-words text-gray-800" th:text="${resource.title}">제목이 표시됩니다</span>
       </div>
 
-      <div class="detail-item flex items-start">
-        <span class="font-bold text-[#2F4160] w-24 flex-shrink-0">내용:</span>
+      <!-- 내용 -->
+      <div class="detail-item p-6 bg-[#B5D0E3] bg-opacity-10 rounded-lg shadow-md flex items-start gap-4 min-h-[250px]">
+        <i class="fas fa-align-left text-[#2F4160] mt-1"></i>
+        <span class="font-bold text-[#2F4160] w-28 flex-shrink-0">내용 :</span>
         <span class="flex-1 break-words whitespace-pre-wrap text-gray-800" th:text="${resource.content}">내용이 표시됩니다</span>
       </div>
 
-      <div class="detail-item flex items-start">
-        <span class="font-bold text-[#2F4160] w-24 flex-shrink-0">파일 링크:</span>
+      <!-- 파일 링크 -->
+      <div class="detail-item p-6 bg-[#B5D0E3] bg-opacity-20 rounded-lg shadow-md flex items-start gap-4 min-h-[80px]">
+        <i class="fas fa-file-download text-[#2F4160] mt-1"></i>
+        <span class="font-bold text-[#2F4160] w-28 flex-shrink-0">파일 링크 :</span>
         <span class="flex-1">
           <a th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
              th:href="@{${resource.archive}}"
              download
-             class="text-[#2F4160] hover:underline transition duration-300 font-semibold"
-             th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">파일 다운로드</a>
+             class="inline-flex items-center gap-2 bg-[#2F4160] text-white px-5 py-3 rounded-lg hover:bg-[#B5D0E3] transition duration-300 shadow-md"
+             th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">
+            <i class="fas fa-download"></i> 파일 다운로드
+          </a>
           <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}" class="text-gray-500">파일이 없습니다.</span>
         </span>
       </div>
 
-      <div class="detail-item flex items-start">
-        <span class="font-bold text-[#2F4160] w-24 flex-shrink-0">등록일:</span>
+      <!-- 등록일 -->
+      <div class="detail-item p-6 bg-[#B5D0E3] bg-opacity-10 rounded-lg shadow-md flex items-start gap-4 min-h-[60px]">
+        <i class="fas fa-calendar-alt text-[#2F4160] mt-1"></i>
+        <span class="font-bold text-[#2F4160] w-28 flex-shrink-0">등록일 :</span>
         <span class="flex-1 text-gray-800" th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}">2025-08-01</span>
       </div>
+
     </div>
 
     <!-- 버튼 그룹 -->
     <div class="flex justify-center mt-10 space-x-4">
-      <a href="/resource/main" class="bg-[#F29DA0] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md">
-        <i class="fas fa-list mr-2"></i>목록으로
+      <a href="/resource/main"
+         class="inline-flex items-center gap-2 bg-[#F29DA0] text-white font-semibold py-3 px-8 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md">
+        <i class="fas fa-list"></i> 목록으로
       </a>
       <a th:if="${session.loginUser != null and session.loginUser.role == 'ROLE_ADMIN'}"
          th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
-         class="bg-[#2F4160] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#F29DA0] transition duration-300 shadow-md">
-        <i class="fas fa-edit mr-2"></i>수정
+         class="inline-flex items-center gap-2 bg-[#2F4160] text-white font-semibold py-3 px-8 rounded-lg hover:bg-[#B5D0E3] transition duration-300 shadow-md">
+        <i class="fas fa-edit"></i> 수정
       </a>
     </div>
+
   </main>
 </div>
 
