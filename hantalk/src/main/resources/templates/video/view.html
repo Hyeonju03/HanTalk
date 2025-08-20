@@ -22,33 +22,47 @@
     }
   </script>
   <style>
-    /* 폰트 최적화를 위한 구글 폰트 임포트 */
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
     body {
       font-family: 'Noto Sans KR', sans-serif;
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-50 font-sans text-dark-gray flex flex-col min-h-screen">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<!-- ✅ max-w-screen-xl 클래스로 다시 변경하여 데스크톱에 최적화된 너비로 확장 -->
 <main class="flex-1 max-w-screen-xl mx-auto px-4 py-12">
   <div class="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
 
-    <!-- 제목 및 날짜 정보 -->
-    <div class="mb-8">
-      <h1 class="text-3xl md:text-4xl font-extrabold text-dark-navy mb-2 leading-tight" th:text="${video.title}">제목</h1>
-      <div class="text-gray-400 text-sm flex items-center space-x-4">
-        <span>등록일: <span th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}"></span></span>
-        <span th:if="${video.updateDate != null}">
-          수정일: <span th:text="${#temporals.format(video.updateDate, 'yyyy-MM-dd')}"></span>
-        </span>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-dark-navy mb-2 leading-tight" th:text="${video.title}">제목</h1>
+        <div class="text-gray-400 text-sm flex items-center space-x-4">
+          <span>등록일: <span th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}"></span></span>
+          <span th:if="${video.updateDate != null}">
+            수정일: <span th:text="${#temporals.format(video.updateDate, 'yyyy-MM-dd')}"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="mt-4 sm:mt-0 flex space-x-2">
+        <!-- 관리자일 때만 보이는 수정하기 버튼 -->
+        <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}" class="inline-flex items-center justify-center px-4 py-2 bg-dark-navy text-white font-semibold rounded-lg shadow-md hover:bg-dark-navy/80 transition duration-300">
+          <span class="mr-2">✏️</span> 영상 수정
+        </a>
+        <!-- 관리자일 때 목록으로 버튼 -->
+        <a th:if="${isAdmin}" th:href="@{/video/admin/list}" class="inline-flex items-center justify-center px-4 py-2 bg-dark-navy text-white font-semibold rounded-lg shadow-md hover:bg-dark-navy/80 transition duration-300">
+          <i class="fas fa-bars mr-2"></i> 목록으로
+        </a>
+        <!-- 일반 사용자일 때 목록으로 버튼 -->
+        <a th:unless="${isAdmin}" th:href="@{/video/list}" class="inline-flex items-center justify-center px-4 py-2 bg-dark-navy text-white font-semibold rounded-lg shadow-md hover:bg-dark-navy/80 transition duration-300">
+          <i class="fas fa-bars mr-2"></i> 목록으로
+        </a>
       </div>
     </div>
 
-    <!-- 비디오 플레이어 -->
     <div class="relative video-container aspect-video w-full mb-8 rounded-2xl overflow-hidden">
       <video width="100%" height="100%" controls class="w-full h-full object-cover">
         <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4">
@@ -56,26 +70,9 @@
       </video>
     </div>
 
-    <!-- 영상 설명 -->
     <div class="border-b pb-6 mb-6 border-gray-200">
       <h2 class="text-xl md:text-2xl font-bold text-dark-navy mb-3">영상 설명</h2>
       <p class="text-gray-700 leading-relaxed whitespace-pre-wrap" th:text="${video.content}">설명</p>
-    </div>
-
-    <!-- 버튼 그룹 -->
-    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-      <!-- ✅ 목록으로 돌아가기 버튼 디자인 개선 -->
-      <a th:if="${isAdmin}" th:href="@{/video/admin/list}" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-soft-sky text-dark-navy font-semibold rounded-lg shadow-md hover:bg-soft-sky/80 transition duration-300">
-        <span class="mr-2">←</span> 목록으로 돌아가기
-      </a>
-      <a th:unless="${isAdmin}" th:href="@{/video/list}" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-soft-sky text-dark-navy font-semibold rounded-lg shadow-md hover:bg-soft-sky/80 transition duration-300">
-        <span class="mr-2">←</span> 목록으로 돌아가기
-      </a>
-
-      <!-- 관리자일 경우에만 수정 버튼 표시 -->
-      <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-dark-navy text-white rounded-lg font-semibold shadow-md hover:bg-dark-navy/80 transition duration-300">
-        <span class="mr-2">✏️</span> 영상 수정하기
-      </a>
     </div>
   </div>
 </main>
