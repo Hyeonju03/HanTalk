@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>Typing Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: #222;
+            color: white;
+            font-family: sans-serif;
+        }
+        #unity-container {
+            width: 100%;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #unity-canvas {
+            width: 1920px;
+            height: 1080px;
+            border: 2px solid white;
+        }
+        /* input은 보이지 않지만 IME(한글 입력기) 동작 가능해야 함 */
+        #external-input {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 200px;
+            height: 30px;
+            opacity: 0; /* 눈에는 안 보이게 */
+            color: transparent;
+            background: transparent;
+            border: none;
+            z-index: 10;
+        }
+        #loading-bar {
+            width: 50%;
+            height: 20px;
+            background: #444;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        #loading-bar-progress {
+            width: 0%;
+            height: 100%;
+            background: #00ff00;
+        }
+        #loading-text {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="unity-container">
+    <div id="loading-bar">
+        <div id="loading-bar-progress"></div>
+    </div>
+    <div id="loading-text">Loading...</div>
+    <canvas id="unity-canvas"></canvas>
+</div>
+
+<input type="text" id="external-input" autocomplete="off">
+
+<script>
+    const canvas = document.getElementById("unity-canvas");
+    const loadingBar = document.getElementById("loading-bar-progress");
+    const loadingText = document.getElementById("loading-text");
+    const externalInput = document.getElementById("external-input");
+    // Unity Build 경로
+    const buildUrl = "/unity-builds/game1/Build";
+    const loaderUrl = buildUrl + "/Build.loader.js";
+    const config = {
+        dataUrl: buildUrl + "/Build.data",
+        frameworkUrl: buildUrl + "/Build.framework.js",
+        codeUrl: buildUrl + "/Build.wasm",
+        streamingAssetsUrl: "/unity-builds/game1/StreamingAssets",
+        companyName: "YourCompany",
+        productName: "YourProduct",
+        productVersion: "1.0"
+    };
+
+    // Unity 로딩
+    const script = document.createElement("script");
+    script.src = loaderUrl;
+    script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+            loadingBar.style.width = (progress * 100).toFixed(0) + "%";
+            loadingText.textContent = `Loading... ${(progress * 100).toFixed(0)}%`;
+        }).then((unityInstance) => {
+            window.unityInstance = unityInstance;
+            loadingText.style.display = "none";
+            document.getElementById("loading-bar").style.display = "none";
+            canvas.style.display = "block";
+            // 캔버스가 키 입력 안 가로채도록
+            canvas.tabIndex = -1;
+            // 처음 포커스 강제
+            externalInput.focus();
+        }).catch((err) => console.error(err));
+    };
+    document.body.appendChild(script);
+
+    // 항상 input으로 포커스 유지
+    function _FocusExternalInput() {
+        setTimeout(() => externalInput.focus(), 0);
+    }
+
+    // 캔버스 클릭 시 input 다시 포커스
+    canvas.addEventListener('mousedown', () => _FocusExternalInput());
+
+    // =======================
+    // 엔터 입력 기준 전송
+    // =======================
+
+    // 입력창에 글자가 입력될 때마다 Unity로 텍스트 전송
+    externalInput.addEventListener('input', (e) => {
+        if (window.unityInstance) {
+            // Unity 스크립트의 ReceiveInputFromWeb 메서드 호출
+            window.unityInstance.SendMessage('InputManager', 'ReceiveInputFromWeb', e.target.value);
+        }
+    });
+    externalInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            let text = externalInput.value.trim();
+            if (text.length > 0 && window.unityInstance) {
+                window.unityInstance.SendMessage('InputManager', 'SubmitInputFromWeb', text);
+            }
+            externalInput.value = '';
+        }
+    });
+
+    // Unity에서 호출할 함수 (포인트 값을 전달받아 서버에 전송)
+    function ReceivePointsFromUnity(points) {
+        console.log(`[JS] Received points from Unity: ${points}`);
+
+        const url = "/game/api/users/updatePoints";
+
+        fetch(url, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ points: parseInt(points) })
+        })
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(errorData => {
+                    throw new Error(JSON.stringify(errorData));
+                });
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log("[JS] Server response:", data);
+            // alert("포인트가 성공적으로 저장되었습니다!");
+        })
+        .catch(err => {
+            console.error("[JS] Error:", err);
+            // alert("포인트 저장 실패: " + err.message);
+        });
+    }
+
+</script>
+</body>
+</html>
