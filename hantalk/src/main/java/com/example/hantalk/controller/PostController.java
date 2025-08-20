@@ -84,7 +84,7 @@ public class PostController {
 
         boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");
 
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createDate"));
+        Pageable pageable = PageRequest.of(page, 7, Sort.by(Sort.Direction.DESC, "createDate"));
         Page<PostDTO> postPage = postService.searchPosts(categoryId, keyword, searchType, pageable);
 
         model.addAttribute("postPage", postPage);
