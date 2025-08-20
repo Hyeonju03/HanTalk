@@ -22,79 +22,63 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UsersRepository usersRepository;
 
-    /**
-     * 댓글을 등록합니다.
-     * @param dto 댓글 정보가 담긴 DTO
-     * @return 생성된 댓글 정보가 담긴 DTO
-     */
     @Transactional
     public CommentDTO createComment(CommentDTO dto) {
-        // 게시물 ID로 게시글 엔티티를 찾습니다.
         Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
-
-        // 사용자 ID로 사용자 엔티티를 찾습니다.
         Users user = usersRepository.findById(dto.getUserNo())
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
-        // DTO를 엔티티로 변환합니다.
-        Comment comment = new Comment();
-        comment.setContent(dto.getContent());
-        comment.setPost(post);
-        comment.setUsers(user);
+        Comment comment = toEntity(dto, post, user);
 
-        // 댓글을 저장하고 저장된 엔티티를 다시 DTO로 변환하여 반환합니다.
         Comment savedComment = commentRepository.save(comment);
         return toDto(savedComment);
     }
 
-    /**
-     * 특정 게시물의 댓글 목록을 조회합니다.
-     * @param postId 게시물 ID
-     * @return 해당 게시물의 댓글 목록 DTO
-     */
     @Transactional(readOnly = true)
     public List<CommentDTO> getCommentsByPostId(int postId) {
-        // 게시물 ID로 모든 댓글 엔티티를 찾습니다.
         List<Comment> comments = commentRepository.findByPost_PostId(postId);
-        // 엔티티 목록을 DTO 목록으로 변환하여 반환합니다.
         return comments.stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    /**
-     * 댓글을 삭제합니다.
-     * @param commentId 삭제할 댓글 ID
-     */
-    @Transactional
-    public void deleteComment(int commentId) {
-        commentRepository.deleteById(commentId);
-    }
-
-    /**
-     * 댓글을 수정합니다.
-     * @param commentId 수정할 댓글 ID
-     * @param dto 수정 정보가 담긴 DTO
-     * @return 수정된 댓글 정보가 담긴 DTO
-     */
+    // 댓글 수정 (DTO를 매개변수로 받도록 변경)
     @Transactional
     public CommentDTO updateComment(int commentId, CommentDTO dto) {
-        // 댓글 ID로 기존 댓글을 찾습니다.
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
-        // 댓글 내용을 업데이트합니다.
+        // DTO에서 userNo를 가져와 권한 확인
+        if (!comment.getUsers().getUserNo().equals(dto.getUserNo())) {
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        }
+
         comment.setContent(dto.getContent());
 
-        // JPA의 변경 감지(Dirty Checking) 기능으로 인해 save()를 호출할 필요가 없습니다.
         return toDto(comment);
     }
 
+    // 댓글 삭제 (DTO를 매개변수로 받도록 변경)
+    @Transactional
+    public void deleteComment(int commentId, CommentDTO dto) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
-    /**
-     * 엔티티를 DTO로 변환합니다.
-     * @param comment 변환할 Comment 엔티티
-     * @return 변환된 CommentDTO
-     */
+        // DTO에서 userNo를 가져와 권한 확인
+        if (!comment.getUsers().getUserNo().equals(dto.getUserNo())) {
+            throw new IllegalArgumentException("삭제 권한이 없습니다.");
+        }
+
+        commentRepository.delete(comment);
+    }
+
+    private Comment toEntity(CommentDTO dto, Post post, Users user) {
+        Comment comment = new Comment();
+        comment.setContent(dto.getContent());
+        comment.setPost(post);
+        comment.setUsers(user);
+        return comment;
+    }
+
     private CommentDTO toDto(Comment comment) {
         CommentDTO dto = new CommentDTO();
         dto.setCommentId(comment.getCommentId());

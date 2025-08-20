@@ -81,9 +81,10 @@ public class PostService {
             if (post.getArchive() != null) {
                 deleteFile(post.getArchive());
             }
-            // 새 파일을 저장하고 archive 필드 업데이트
+            // 새 파일을 저장하고 archive와 originalFileName 필드 업데이트
             String savedFileName = saveFile(file);
             post.setArchive(savedFileName);
+            post.setOriginalFileName(file.getOriginalFilename());
         }
         // case 2: 파일 삭제 체크박스가 선택된 경우
         else if (Boolean.TRUE.equals(deleteFile)) {
@@ -91,11 +92,12 @@ public class PostService {
             if (post.getArchive() != null) {
                 deleteFile(post.getArchive());
             }
-            // archive 필드를 null로 설정
+            // archive와 originalFileName 필드를 모두 null로 설정
             post.setArchive(null);
+            post.setOriginalFileName(null);
         }
         // case 3: 아무런 파일 변경이 없는 경우
-        // 기존 archive 값은 변경하지 않습니다.
+        // 기존 archive 값과 originalFileName 값은 변경하지 않습니다.
         else {
             post.setArchive(dto.getArchive());
         }
@@ -167,6 +169,7 @@ public class PostService {
         dto.setViewCount(post.getViewCount());
         dto.setCreateDate(post.getCreateDate());
         dto.setUpdateDate(post.getUpdateDate());
+        dto.setOriginalFileName(post.getOriginalFileName());
 
         if (post.getUsers() != null) {
             dto.setUsers(post.getUsers());
@@ -185,6 +188,7 @@ public class PostService {
         post.setContent(dto.getContent());
         post.setArchive(dto.getArchive());
         post.setUsers(dto.getUsers());
+        post.setOriginalFileName(dto.getOriginalFileName());
 
         // Category 엔티티 조회 및 설정
         if (dto.getCategory().getCategoryId() > 0) {

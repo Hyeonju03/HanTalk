@@ -117,6 +117,9 @@
                     <tr th:each="post : ${postPage.content}">
                         <td class="board-title">
                             <a th:href="@{|/post/view/${post.postId}|}" th:text="${post.title}">제목입니다.</a>
+                            <th:block th:if="${post.updateDate != null and not #temporals.format(post.updateDate, 'yyyy-MM-dd').equals(#temporals.format(post.createDate, 'yyyy-MM-dd'))}">
+                                <span class="text-sm text-red-500 font-bold ml-2">[수정]</span>
+                            </th:block>
                         </td>
                         <td th:text="${post.users != null ? post.users.nickname : '관리자'}">관리자</td>
                         <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
