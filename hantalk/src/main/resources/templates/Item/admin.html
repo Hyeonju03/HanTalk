@@ -15,9 +15,12 @@
 
         <div class="p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
             <h2 class="text-3xl font-bold mb-4 text-center">관리자 아이템 목록</h2>
-            <a href="/item/chuga" class="block w-fit mx-auto bg-[#4B4B4B] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
-                ➕ 아이템 추가
-            </a>
+            <!-- Add Item Button remains at the top -->
+            <div class="flex justify-center">
+                <a href="/item/chuga" class="block w-fit bg-[#4B4B4B] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
+                    ➕ 아이템 추가
+                </a>
+            </div>
         </div>
 
         <!-- Success Message Background Color Changed to #B5D0E3 -->
@@ -53,6 +56,15 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Administrator List Button at the bottom center -->
+        <div class="p-8 flex justify-center border-t border-[#E0E0E0] rounded-b-xl bg-[#FDFBFF]">
+            <a th:href="@{/admin}"
+               class="inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200">
+                관리자 페이지
+            </a>
+        </div>
+
     </div>
 </div>
 
