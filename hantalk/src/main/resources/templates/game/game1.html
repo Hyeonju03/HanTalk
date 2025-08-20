@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"> <!-- ✅ Thymeleaf 네임스페이스 추가 -->
+<html lang="ko">
 <head>
     <meta charset="utf-8">
     <title>Typing Game</title>
@@ -20,52 +20,73 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
         }
         #unity-canvas {
-            width: 100%;
+            width: 1920px;
+            height: 1080px;
+            display: none;
+        }
+        #loading-bar {
+            width: 50%;
+            height: 20px;
+            background: #444;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        #loading-bar-progress {
+            width: 0%;
             height: 100%;
+            background: #00ff00;
+        }
+        #loading-text {
+            color: white;
         }
     </style>
 </head>
 <body>
 <div id="unity-container">
-    <canvas id="unity-canvas" width="960" height="600"></canvas>
+    <div id="loading-bar">
+        <div id="loading-bar-progress"></div>
+    </div>
+    <div id="loading-text">Loading...</div>
+    <canvas id="unity-canvas"></canvas>
 </div>
 
-<script src="/unity-builds/game1/Build/UnityLoader.js"></script>
-<script th:inline="javascript"> <!-- ✅ th:inline="javascript" 추가 -->
-    var buildUrl = "/unity-builds/game1/Build";
-    var loaderUrl = buildUrl + "/WebGL.json";
-    var config = {
-        dataUrl: buildUrl + "/WebGL.data",
-        frameworkUrl: buildUrl + "/WebGL.framework.js",
-        codeUrl: buildUrl + "/WebGL.wasm",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "TypingGame",
+<script>
+    // static 기준 절대 경로
+    const buildUrl = "/unity-builds/game1/Build";
+    const loaderUrl = buildUrl + "/Build.loader.js";
+    const config = {
+        dataUrl: buildUrl + "/Build.data",
+        frameworkUrl: buildUrl + "/Build.framework.js",
+        codeUrl: buildUrl + "/Build.wasm",
+        streamingAssetsUrl: "/StreamingAssets",
+        companyName: "YourCompany",
+        productName: "YourProduct",
         productVersion: "1.0",
     };
 
-    var container = document.querySelector("#unity-container");
-    var canvas = document.querySelector("#unity-canvas");
+    const canvas = document.getElementById("unity-canvas");
+    const loadingBar = document.getElementById("loading-bar-progress");
+    const loadingText = document.getElementById("loading-text");
 
-    UnityLoader.instantiate("unity-container", loaderUrl, config).then((unityInstance) => {
-        window.unityInstance = unityInstance;
-    });
-
-    // ✅ Thymeleaf를 사용하여 userNo 값을 모델에서 가져와 JavaScript 변수에 할당
-    var userId = [[${userNo}]];
-
-    window.updatePoints = (points) => {
-        console.log("Updating points:", points);
-        fetch('/game/api/users/updatePoints/' + userId, {
-            method: 'PUT', // ✅ PUT으로 수정
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ points: points }) // ✅ userId를 URL에 포함했으므로 body에서 제거
-        }).then(response => response.json())
-          .then(data => console.log('Success:', data))
-          .catch((error) => console.error('Error:', error));
+    const script = document.createElement("script");
+    script.src = loaderUrl;
+    script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+            loadingBar.style.width = (progress * 100).toFixed(0) + "%";
+            loadingText.textContent = `Loading... ${(progress * 100).toFixed(0)}%`;
+        }).then((unityInstance) => {
+            loadingText.style.display = "none";
+            document.getElementById("loading-bar").style.display = "none";
+            canvas.style.display = "block";
+        }).catch((message) => {
+            console.error("Failed to load Unity: " + message);
+        });
     };
+    document.body.appendChild(script);
 </script>
 </body>
 </html>
