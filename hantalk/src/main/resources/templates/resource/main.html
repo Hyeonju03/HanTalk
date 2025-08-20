@@ -7,11 +7,6 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <style>
-    body {
-        font-family: 'Nanum Gothic', '맑은 고딕', sans-serif;
-    }
-  </style>
 </head>
 <body class="bg-[#f3f4f6] text-[#2F4160] min-h-screen flex flex-col">
 
@@ -32,7 +27,7 @@
       <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword} ?: ''"
              class="p-2 text-base w-[250px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]" />
       <button type="submit"
-              class="bg-[#F29DA0] hover:bg-[#2F4160] text-white py-2 px-4 rounded-lg font-semibold transition duration-300">
+              class="bg-[#B5D0E3] hover:bg-[#2F4160] text-white py-2 px-4 rounded-lg font-semibold transition duration-300">
         검색
       </button>
     </form>
@@ -47,7 +42,6 @@
           <th class="p-3 border-b border-[#E0E0E0] text-center font-bold">파일</th>
           <th class="p-3 border-b border-[#E0E0E0] text-center font-bold">작성자</th>
           <th class="p-3 border-b border-[#E0E0E0] text-center font-bold">작성일</th>
-          <th class="p-3 border-b border-[#E0E0E0] text-center font-bold">관리</th>
         </tr>
         </thead>
         <tbody>
@@ -75,41 +69,27 @@
           </td>
           <td class="p-3 border-b border-[#E0E0E0] text-center text-gray-800">관리자</td>
           <td th:text="${#temporals.format(resource.createDate, 'yyyy-MM-dd')}" class="p-3 border-b border-[#E0E0E0] text-center text-gray-800">2025-08-01</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-            <div th:if="${session.loginUser != null and session.loginUser.role == 'ROLE_ADMIN'}" class="flex justify-center items-center space-x-2">
-              <a th:href="@{'/resource/sujung/' + ${resource.resourceId}}"
-                 class="bg-[#2F4160] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#F29DA0] transition duration-300"
-                 onclick="event.stopPropagation();"><i class="fas fa-edit"></i> 수정</a>
-              <button type="button"
-                      class="bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300"
-                      th:onclick="'event.stopPropagation(); confirmDelete(' + ${resource.resourceId} + ');'">
-                <i class="fas fa-trash"></i> 삭제
-              </button>
-            </div>
-            <span th:unless="${session.loginUser != null and session.loginUser.role == 'ROLE_ADMIN'}" class="text-gray-400"></span>
-          </td>
         </tr>
         <tr th:if="${resourcePage.content.size() == 0}">
-          <td colspan="7" class="text-center p-4 text-gray-600">검색 결과가 없습니다.</td>
+          <td colspan="6" class="text-center p-4 text-gray-600">검색 결과가 없습니다.</td>
         </tr>
         </tbody>
       </table>
     </div>
 
     <div class="pagination flex justify-center items-center mt-8 space-x-2">
-            <span th:if="${resourcePage.hasPrevious()}">
-              <a th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}"
-                 class="inline-block px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md hover:bg-[#f3f4f6] transition-colors duration-200">이전</a>
-            </span>
-      <span th:each="i : ${#numbers.sequence(0, resourcePage.totalPages - 1)}"
-            th:classappend="${i == resourcePage.number} ? 'bg-[#B5D0E3] font-bold text-[#2F4160]' : 'bg-white text-[#2F4160]'"
-            class="inline-block px-3 py-1.5 no-underline rounded-md hover:bg-[#f3f4f6] transition-colors duration-200">
-              <a th:href="@{|/resource/main?page=${i}&keyword=${keyword}|}" th:text="${i + 1}">1</a>
-            </span>
-      <span th:if="${resourcePage.hasNext()}">
-              <a th:href="@{|/resource/main?page=${resourcePage.number + 1}&keyword=${keyword}|}"
-                 class="inline-block px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md hover:bg-[#f3f4f6] transition-colors duration-200">다음</a>
-            </span>
+      <a th:if="${resourcePage.hasPrevious()}"
+         th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}"
+         class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">이전</a>
+
+      <a th:each="i : ${#numbers.sequence(0, resourcePage.totalPages - 1)}"
+         th:href="@{|/resource/main?page=${i}&keyword=${keyword}|}" th:text="${i + 1}"
+         th:classappend="${i == resourcePage.number} ? 'bg-[#B5D0E3] text-white font-bold' : 'bg-white text-[#2F4160] border border-gray-300'"
+         class="block w-8 h-8 flex items-center justify-center rounded-md no-underline transition-colors duration-200 hover:bg-[#f3f4f6] hover:text-[#2F4160]"></a>
+
+      <a th:if="${resourcePage.hasNext()}"
+         th:href="@{|/resource/main?page=${resourcePage.number + 1}&keyword=${keyword}|}"
+         class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">다음</a>
     </div>
   </main>
 </div>

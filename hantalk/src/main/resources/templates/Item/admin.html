@@ -16,9 +16,13 @@
 
         <div class="p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
             <h2 class="text-3xl font-bold mb-4 text-center">아이템 관리</h2>
-            <div class="flex justify-center">
+            <div class="relative flex justify-center items-center min-h-[48px]"> <!-- Added min-h to prevent collapse -->
                 <a href="/item/chuga" class="block w-fit bg-[#4B4B4B] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
                     ➕ 아이템 추가
+                </a>
+                <a th:href="@{/admin}"
+                   class="absolute right-0 inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200">
+                    관리자 페이지<i class="fas fa-arrow-right ml-2"></i>
                 </a>
             </div>
         </div>
@@ -64,11 +68,9 @@
             </table>
         </div>
 
+        <!-- This div is now empty as the button has been moved -->
         <div class="p-8 flex justify-center border-t border-[#E0E0E0] rounded-b-xl bg-[#FDFBFF]">
-            <a th:href="@{/admin}"
-               class="inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200">
-                관리자 페이지
-            </a>
+            <!-- Content moved -->
         </div>
 
     </div>
