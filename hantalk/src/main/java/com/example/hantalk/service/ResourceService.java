@@ -150,8 +150,11 @@ public class ResourceService {
         }
     }
 
+    // 💡💡💡 이 메서드를 수정했습니다. 💡💡💡
+    // archive 경로를 온전히 구성해서 DB에서 조회하도록 변경
     public String getOriginalFileName(String storedFileName) {
-        return resourceRepository.findByArchiveEndingWith(storedFileName)
+        String fullPath = "/uploads/ResourceFile/" + storedFileName;
+        return resourceRepository.findByArchive(fullPath)
                 .map(Resource::getOriginalFileName)
                 .orElse("다운로드파일.txt");
     }
@@ -164,5 +167,4 @@ public class ResourceService {
         return resourceRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(trimmedKeyword, trimmedKeyword, pageable)
                 .map(this::toDTO);
     }
-
 }

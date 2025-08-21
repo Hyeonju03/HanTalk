@@ -19,7 +19,7 @@
 
     <div class="mb-4 flex flex-col sm:flex-row sm:items-start">
       <span class="font-semibold text-gray-700 sm:w-28 sm:flex-shrink-0 mb-1 sm:mb-0">제목</span>
-      <span class="text-[#2F4160]" th:text="${resource?.title} ?: ${fileName}">제목이 표시됩니다</span>
+      <span class="text-[#2F4160]" th:text="${resource?.title} ?: ${originalFileName}">제목이 표시됩니다</span>
     </div>
 
     <div class="mb-4 flex flex-col sm:flex-row sm:items-start" th:if="${resource != null}">

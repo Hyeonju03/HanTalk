@@ -229,8 +229,13 @@ public class ResourceController {
                 return isAdminPath ? "redirect:/resource/admin" : "redirect:/resource/main";
             }
 
+            String originalFileName = resourceService.getOriginalFileName(fileName);
+
             String ext = getExtension(fileName);
             model.addAttribute("fileName", fileName);
+            model.addAttribute("originalFileName", originalFileName);
+
+            // 💡💡💡 아래 4줄을 추가해야 합니다. 💡💡💡
             model.addAttribute("isImage", isImage(fileName));
             model.addAttribute("isDocument", ext.matches("pdf|xls|xlsx|hwp|doc|docx|ppt|pptx"));
             model.addAttribute("isText", isTextFile(fileName));

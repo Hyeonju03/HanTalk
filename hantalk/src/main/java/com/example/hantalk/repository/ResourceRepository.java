@@ -14,5 +14,8 @@ public interface ResourceRepository extends JpaRepository<Resource, Integer> {
 
     // 제목 또는 내용에 검색어가 포함된 자료 검색
     Page<Resource> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(String titleKeyword, String contentKeyword, Pageable pageable);
+
+    // 💡💡💡 추가해야 할 메서드 💡💡💡
+    Optional<Resource> findByArchive(String fullPath);
 }
 
