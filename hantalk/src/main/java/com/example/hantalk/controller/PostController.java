@@ -22,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
@@ -29,7 +30,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -47,15 +47,6 @@ public class PostController {
         return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1).toLowerCase();
     }
 
-    private boolean isImage(String fileName) {
-        return getExtension(fileName).matches("png|jpg|jpeg|gif|bmp|webp");
-    }
-
-    private boolean isTextFile(String fileName) {
-        return getExtension(fileName).matches("txt|csv|log|md|java|xml|json|html|css|js");
-    }
-
-    // DB에 있는 CATEGORY 테이블의 ID를 상수로 정의 (실제 ID와 맞게 수정 필요)
     private static final int NOTICE_CATEGORY_ID = 1;
     private static final int COMMUNITY_CATEGORY_ID = 2;
     private static final int INQUIRY_CATEGORY_ID = 3;
@@ -69,12 +60,12 @@ public class PostController {
         }
     }
 
-    // 공통: 게시물 목록 페이지 (카테고리별 조회)
+    // 게시물 목록 페이지 (카테고리별 조회)
     @GetMapping("/list/{categoryId}")
     public String listPost(
             @PathVariable int categoryId,
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "searchType", defaultValue = "title") String searchType,
+            @RequestParam(value = "searchType", defaultValue = "titleAndContent") String searchType,
             @RequestParam(value = "page", defaultValue = "0") int page,
             HttpSession session,
             Model model) {
@@ -84,9 +75,13 @@ public class PostController {
         }
 
         boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");
+        Integer loginUserNo = SessionUtil.getLoginUserNo(session);
 
         Pageable pageable = PageRequest.of(page, 7, Sort.by(Sort.Direction.DESC, "createDate"));
-        Page<PostDTO> postPage = postService.searchPosts(categoryId, keyword, searchType, pageable);
+        Page<PostDTO> postPage;
+
+        // isAdmin 값을 함께 전달하여 관리자는 모든 문의사항을 볼 수 있도록 로직 수정
+        postPage = postService.searchPosts(categoryId, keyword, searchType, loginUserNo, isAdmin, pageable);
 
         model.addAttribute("postPage", postPage);
         model.addAttribute("keyword", keyword);
@@ -94,29 +89,26 @@ public class PostController {
         model.addAttribute("role", SessionUtil.getRole(session));
         model.addAttribute("isEmpty", postPage.isEmpty());
         model.addAttribute("categoryId", categoryId);
-
         model.addAttribute("isAdmin", isAdmin);
 
         return "post/list";
     }
 
-    // 공통: 게시물 상세 페이지
+    // 게시물 상세 페이지
     @GetMapping("/view/{postId}")
     public String viewPost(@PathVariable int postId, HttpSession session, Model model) {
         if (!SessionUtil.isLoggedIn(session)) {
             return "redirect:/user/login";
         }
-        PostDTO post = postService.getPost(postId);
         try {
+            PostDTO post = postService.getPost(postId);
             model.addAttribute("post", post);
             model.addAttribute("role", SessionUtil.getRole(session));
-
             Integer loginUserNo = SessionUtil.getLoginUserNo(session);
             model.addAttribute("loginUserNo", loginUserNo);
-
             model.addAttribute("isAdmin", SessionUtil.hasRole(session, "ADMIN"));
         } catch (IllegalArgumentException e) {
-            return "redirect:/post/list/" + post.getCategory().getCategoryId() + "?error=notfound";
+            return "redirect:/error/404"; // 존재하지 않는 게시물에 대한 예외 처리
         }
         return "post/view";
     }
@@ -127,7 +119,6 @@ public class PostController {
         if (!SessionUtil.isLoggedIn(session)) {
             return "redirect:/user/login";
         }
-
         if (categoryId == NOTICE_CATEGORY_ID && !SessionUtil.hasRole(session, "ADMIN")) {
             return "redirect:/post/list/" + categoryId + "?error=no_permission";
         }
@@ -140,11 +131,13 @@ public class PostController {
         return "post/insert";
     }
 
+    // 게시물 등록 처리 (파일 첨부, 예외 처리 추가)
     @PostMapping("/insertProc/{categoryId}")
     public String insertProcWithFile(@PathVariable int categoryId,
                                      @ModelAttribute PostDTO postDTO,
                                      @RequestParam(value = "file", required = false) MultipartFile file,
-                                     HttpSession session) {
+                                     HttpSession session,
+                                     RedirectAttributes redirectAttributes) {
         try {
             boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");
             if (categoryId == NOTICE_CATEGORY_ID && !isAdmin) {
@@ -165,21 +158,19 @@ public class PostController {
 
             PostDTO createdPost;
             if (file != null && !file.isEmpty()) {
-
-                // 파일을 포함하여 게시물 등록 서비스를 호출
                 createdPost = postService.createPostWithFile(postDTO, file);
             } else {
-
-                // 파일이 없는 경우 게시물 등록 서비스를 호출
                 createdPost = postService.createPost(postDTO);
             }
 
-            // 서비스에서 파일 정보가 담긴 PostDTO를 반환하므로,
-            // 이 반환값을 사용하면 DB에 파일 정보가 올바르게 저장됩니다.
             return "redirect:/post/view/" + createdPost.getPostId();
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", "파일 업로드 오류: " + e.getMessage());
+            return "redirect:/post/insert/" + categoryId;
         } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/post/list/" + categoryId + "?error=create_failed";
+            redirectAttributes.addFlashAttribute("error", "게시물 등록 중 오류가 발생했습니다.");
+            return "redirect:/post/list/" + categoryId;
         }
     }
 
@@ -209,50 +200,50 @@ public class PostController {
         return "post/update";
     }
 
-    // 게시물 수정 처리 (파일 첨부, 파일 삭제 옵션 추가)
+    // 게시물 수정 처리 (파일 첨부, 파일 삭제 옵션, 예외 처리 추가)
     @PostMapping("/updateProc/{postId}")
     public String updateProcWithFile(
             @PathVariable int postId,
             @ModelAttribute PostDTO postDTO,
             @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestParam(value = "deleteFile", required = false) Boolean deleteFile,
-            HttpSession session) {
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        try {
+            if (!SessionUtil.isLoggedIn(session)) {
+                return "redirect:/user/login";
+            }
 
-        if (!SessionUtil.isLoggedIn(session)) {
-            return "redirect:/user/login";
-        }
+            PostDTO existingPost = postService.getPost(postId);
+            Integer loginUserNo = SessionUtil.getLoginUserNo(session);
+            boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");
 
-        PostDTO existingPost = postService.getPost(postId);
-        Integer loginUserNo = SessionUtil.getLoginUserNo(session);
-        boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");
+            if (loginUserNo == null) {
+                return "redirect:/user/login";
+            }
 
-        if (loginUserNo == null) {
-            return "redirect:/user/login";
-        }
+            if (existingPost.getCategory().getCategoryId() == NOTICE_CATEGORY_ID && !isAdmin) {
+                return "redirect:/post/view/" + postId + "?error=no_permission";
+            }
+            if ((existingPost.getCategory().getCategoryId() == COMMUNITY_CATEGORY_ID || existingPost.getCategory().getCategoryId() == INQUIRY_CATEGORY_ID)
+                    && !isAdmin && !loginUserNo.equals(existingPost.getUsers().getUserNo())) {
+                return "redirect:/post/view/" + postId + "?error=no_permission";
+            }
 
-        if (existingPost.getCategory().getCategoryId() == NOTICE_CATEGORY_ID && !isAdmin) {
-            return "redirect:/post/view/" + postId + "?error=no_permission";
-        }
-        if ((existingPost.getCategory().getCategoryId() == COMMUNITY_CATEGORY_ID || existingPost.getCategory().getCategoryId() == INQUIRY_CATEGORY_ID)
-                && !isAdmin && !loginUserNo.equals(existingPost.getUsers().getUserNo())) {
-            return "redirect:/post/view/" + postId + "?error=no_permission";
-        }
+            if (file != null && !file.isEmpty()) {
+                postDTO.setOriginalFileName(file.getOriginalFilename());
+            } else if (Boolean.TRUE.equals(deleteFile)) {
+                postDTO.setOriginalFileName(null);
+            } else if (existingPost.getArchive() != null) {
+                postDTO.setOriginalFileName(existingPost.getOriginalFileName());
+            }
 
-        // 파일이 존재하고 비어있지 않은 경우, DTO에 원본 파일명 추가
-        if (file != null && !file.isEmpty()) {
-            postDTO.setOriginalFileName(file.getOriginalFilename());
+            postService.updatePostWithFile(postId, postDTO, file, deleteFile);
+            return "redirect:/post/view/" + postId;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", "파일 업로드 오류: " + e.getMessage());
+            return "redirect:/post/update/" + postId;
         }
-        // 파일 삭제 옵션이 선택된 경우, 원본 파일명 null로 설정
-        else if (Boolean.TRUE.equals(deleteFile)) {
-            postDTO.setOriginalFileName(null);
-        }
-        // 기존 파일이 유지되는 경우, 기존 원본 파일명 유지
-        else if (existingPost.getArchive() != null) {
-            postDTO.setOriginalFileName(existingPost.getOriginalFileName());
-        }
-
-        postService.updatePostWithFile(postId, postDTO, file, deleteFile);
-        return "redirect:/post/view/" + postId;
     }
 
     // 게시물 삭제 처리 (DELETE)
@@ -295,10 +286,8 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
 
-        // PostService를 통해 원본 파일명을 가져오도록 수정
         String originalFileName = postService.getOriginalFileName(fileName);
         if (originalFileName == null) {
-            // 원본 파일명이 없을 경우를 대비하여 저장된 파일명을 사용
             originalFileName = fileName;
         }
 
@@ -313,10 +302,8 @@ public class PostController {
 
     // HomeController에서 호출될 최신 게시물 조회용 메서드
     public List<PostDTO> getLatestPostsByCategory(int categoryId, int count) {
-        // Pageable 객체를 사용하여 최신순으로 'count'개만 가져오도록 설정
         Pageable pageable = PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, "createDate"));
-        Page<PostDTO> postPage = postService.searchPosts(categoryId, null, "title", pageable);
+        Page<PostDTO> postPage = postService.searchPosts(categoryId, null, "title", null, false, pageable);
         return postPage.getContent();
     }
-
 }

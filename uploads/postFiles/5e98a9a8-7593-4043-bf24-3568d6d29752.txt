@@ -1,7 +1,0 @@
-최프 엑셀링크
-https://docs.google.com/spreadsheets/d/1j6RW9TQi-m0DFqZU5GWjQZaA_LFJDdAP2U8oSijEIco/edit?usp=sharing
-
-
-08-08
-출석체크 시 10포인트 적립 AttendanceService에 추가
-
