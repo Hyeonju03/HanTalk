@@ -106,11 +106,40 @@
             box-shadow: 0 8px 24px rgba(47, 65, 96, 0.4);
             transform: translateY(-2px);
         }
+
+        /* 자세히 보기 버튼 디자인 (파란색 그라데이션) */
+        .detail-btn {
+            background-image: linear-gradient(to right, #B5D0E3 0%, #2F4160 100%);
+            transition: all 0.5s ease;
+            background-size: 200% auto;
+            border-radius: 9999px; /* rounded-full */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-lg */
+        }
+        .detail-btn:hover {
+            background-position: right center;
+            box-shadow: 0 8px 24px rgba(47, 65, 96, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* 모달 오버레이 */
+        .modal {
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease;
+        }
+
+        /* 모달 내용 */
+        .modal-content {
+            animation: slide-in 0.3s ease-out;
+        }
+
+        @keyframes slide-in {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-100 to-gray-50 min-h-screen flex flex-col text-[#2F4160]">
 
-<!-- 배경 캔버스 -->
 <canvas id="bgCanvas"></canvas>
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
@@ -118,18 +147,21 @@
 <main class="flex-grow flex justify-center p-8">
     <div class="container-custom w-full">
         <div class="bg-white/80 backdrop-blur-md rounded-xl shadow-2xl p-8 relative z-10 border border-gray-200">
-            <!-- 제목 -->
             <h1 class="text-4xl font-extrabold text-center mb-6 text-main-dark drop-shadow-lg">
                 아이템 상점
             </h1>
 
-            <!-- 상단 상태 영역 -->
             <div class="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-                <div th:if="${isAdmin}" class="bg-soft-blue text-main-dark px-4 py-2 rounded-lg font-semibold w-full sm:w-auto text-center">
-                    관리자입니다. 구매는 불가능합니다.
+                <div class="flex justify-center sm:justify-start space-x-4">
+                    <button id="show-frames-btn" class="bg-soft-blue hover:bg-main-dark text-white font-bold py-2 px-6 rounded-full transition-colors duration-300">
+                        프로필 프레임
+                    </button>
+                    <button id="show-images-btn" class="bg-soft-blue hover:bg-main-dark text-white font-bold py-2 px-6 rounded-full transition-colors duration-300">
+                        프로필 이미지
+                    </button>
                 </div>
 
-                <div th:unless="${isAdmin}" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:flex-grow">
+                <div th:unless="${isAdmin}" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto mt-4 sm:mt-0">
                     <div class="bg-soft-blue text-main-dark px-4 py-2 rounded-lg font-semibold text-center inline-block">
                         보유 포인트: <span th:text="${point}" class="text-main-dark font-extrabold"></span> pt
                     </div>
@@ -145,7 +177,6 @@
                 </a>
             </div>
 
-            <!-- 메시지 영역 -->
             <div th:if="${message}" class="bg-soft-blue/80 border border-soft-blue text-main-dark px-4 py-3 rounded-lg relative mb-4 text-center" role="alert">
                 <span th:text="${message}"></span>
             </div>
@@ -153,59 +184,69 @@
                 <span th:text="${error}"></span>
             </div>
 
-            <!-- 프로필 프레임 섹션 -->
-            <h2 class="text-2xl font-bold text-main-dark mt-8 mb-4 border-b-2 border-gray-300 pb-2">프로필 프레임</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <div th:each="item : ${items}" th:if="${item.itemType == 'frame'}" class="bg-white rounded-xl shadow-lg transition duration-300 overflow-hidden border border-gray-200 card-hover-effect">
-                    <div class="p-4">
-                        <div class="item-image-container mb-4">
-                            <img th:src="@{'/uploads/frames/' + ${item.itemImage}}"
-                                 th:alt="${item.itemName}"
-                                 class="item-image item-type-frame border-2 border-accent-pink rounded-md" />
-                        </div>
-                        <h3 class="text-xl font-bold mb-1 text-main-dark" th:text="${item.itemName}">이름</h3>
-                        <p class="text-3xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600 drop-shadow-lg"><span th:text="${item.price}"></span> pt</p>
-                        <p class="text-sm text-gray-600 mb-4 h-12 overflow-hidden" th:text="${item.itemDescription}">설명</p>
-                        <div th:unless="${isAdmin}">
-                            <form th:action="@{/item/purchase}" method="post">
-                                <input type="hidden" name="itemId" th:value="${item.itemId}" />
-                                <button type="submit"
-                                        class="purchase-btn w-full text-white px-8 py-3 font-bold shadow-lg flex items-center justify-center">
-                                    구매하기 🛒
+            <div id="frames-section">
+                <h2 class="text-2xl font-bold text-main-dark mt-8 mb-4 border-b-2 border-gray-300 pb-2">프로필 프레임</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+                    <div th:each="item : ${items}" th:if="${item.itemType == 'frame'}" class="bg-white rounded-xl shadow-lg transition duration-300 overflow-hidden border border-gray-200 card-hover-effect">
+                        <div class="p-4">
+                            <div class="item-image-container mb-4">
+                                <img th:src="@{'/uploads/frames/' + ${item.itemImage}}"
+                                     th:alt="${item.itemName}"
+                                     class="item-image item-type-frame border-2 border-accent-pink rounded-md" />
+                            </div>
+                            <h3 class="text-xl font-bold mb-1 text-main-dark" th:text="${item.itemName}">이름</h3>
+                            <p class="text-3xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600 drop-shadow-lg"><span th:text="${item.price}"></span> pt</p>
+                            <p class="text-sm text-gray-600 mb-4 h-12 overflow-hidden" th:text="${item.itemDescription}">설명</p>
+                            <div th:unless="${isAdmin}">
+                                <button
+                                        type="button"
+                                        th:data-item-id="${item.itemId}"
+                                        th:data-item-name="${item.itemName}"
+                                        th:data-item-image="${item.itemImage}"
+                                        th:data-item-price="${item.price}"
+                                        th:data-item-description="${item.itemDescription}"
+                                        th:data-item-type="${item.itemType}"
+                                        class="detail-btn w-full text-white px-6 py-2 font-bold shadow-lg flex items-center justify-center">
+                                    자세히 보기 👀
                                 </button>
-                            </form>
-                        </div>
-                        <div th:if="${isAdmin}" class="text-center">
-                            <span class="text-gray-500">-</span>
+                            </div>
+                            <div th:if="${isAdmin}" class="text-center">
+                                <span class="text-gray-500">-</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 프로필 이미지 섹션 -->
-            <h2 class="text-2xl font-bold text-main-dark mt-8 mb-4 border-b-2 border-gray-300 pb-2">프로필 이미지</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <div th:each="item : ${items}" th:if="${item.itemType != 'frame'}" class="bg-white rounded-xl shadow-lg transition duration-300 overflow-hidden border border-gray-200 card-hover-effect">
-                    <div class="p-4">
-                        <div class="item-image-container mb-4">
-                            <img th:src="@{'/uploads/images/' + ${item.itemImage}}"
-                                 th:alt="${item.itemName}"
-                                 class="item-image item-type-profile border-2 border-accent-pink rounded-full" />
-                        </div>
-                        <h3 class="text-xl font-bold mb-1 text-main-dark" th:text="${item.itemName}">이름</h3>
-                        <p class="text-3xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600 drop-shadow-lg"><span th:text="${item.price}"></span> pt</p>
-                        <p class="text-sm text-gray-600 mb-4 h-12 overflow-hidden" th:text="${item.itemDescription}">설명</p>
-                        <div th:unless="${isAdmin}">
-                            <form th:action="@{/item/purchase}" method="post">
-                                <input type="hidden" name="itemId" th:value="${item.itemId}" />
-                                <button type="submit"
-                                        class="purchase-btn w-full text-white px-8 py-3 font-bold shadow-lg flex items-center justify-center">
-                                    구매하기 🛒
+            <div id="images-section">
+                <h2 class="text-2xl font-bold text-main-dark mt-8 mb-4 border-b-2 border-gray-300 pb-2">프로필 이미지</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+                    <div th:each="item : ${items}" th:if="${item.itemType != 'frame'}" class="bg-white rounded-xl shadow-lg transition duration-300 overflow-hidden border border-gray-200 card-hover-effect">
+                        <div class="p-4">
+                            <div class="item-image-container mb-4">
+                                <img th:src="@{'/uploads/images/' + ${item.itemImage}}"
+                                     th:alt="${item.itemName}"
+                                     class="item-image item-type-profile border-2 border-accent-pink rounded-full" />
+                            </div>
+                            <h3 class="text-xl font-bold mb-1 text-main-dark" th:text="${item.itemName}">이름</h3>
+                            <p class="text-3xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600 drop-shadow-lg"><span th:text="${item.price}"></span> pt</p>
+                            <p class="text-sm text-gray-600 mb-4 h-12 overflow-hidden" th:text="${item.itemDescription}">설명</p>
+                            <div th:unless="${isAdmin}">
+                                <button
+                                        type="button"
+                                        th:data-item-id="${item.itemId}"
+                                        th:data-item-name="${item.itemName}"
+                                        th:data-item-image="${item.itemImage}"
+                                        th:data-item-price="${item.price}"
+                                        th:data-item-description="${item.itemDescription}"
+                                        th:data-item-type="${item.itemType}"
+                                        class="detail-btn w-full text-white px-6 py-2 font-bold shadow-lg flex items-center justify-center">
+                                    자세히 보기 👀
                                 </button>
-                            </form>
-                        </div>
-                        <div th:if="${isAdmin}" class="text-center">
-                            <span class="text-gray-500">-</span>
+                            </div>
+                            <div th:if="${isAdmin}" class="text-center">
+                                <span class="text-gray-500">-</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -214,9 +255,29 @@
     </div>
 </main>
 
+<div id="detail-modal" class="modal fixed inset-0 hidden justify-center items-center z-50">
+    <div class="modal-content bg-white rounded-lg p-6 max-w-lg w-full mx-4 shadow-2xl">
+        <div class="flex justify-end">
+            <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-3xl font-bold leading-none">&times;</button>
+        </div>
+        <div class="text-center mt-4">
+            <img id="modal-item-image" src="" alt="아이템 이미지" class="mx-auto w-32 h-32 rounded-lg border-2 border-gray-200 mb-4" />
+            <h3 id="modal-item-name" class="text-2xl font-bold mb-2 text-main-dark"></h3>
+            <p id="modal-item-price" class="text-3xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600"></p>
+            <p id="modal-item-description" class="text-sm text-gray-600 mb-6 whitespace-pre-wrap"></p>
+
+            <form id="modal-purchase-form" th:action="@{/item/purchase}" method="post">
+                <input type="hidden" name="itemId" id="modal-item-id" />
+                <button type="submit" class="purchase-btn w-full text-white px-8 py-3 font-bold shadow-lg flex items-center justify-center">
+                    구매하기 🛒
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="py-4 text-gray-500 text-center text-sm bg-gray-100" th:replace="~{fragments/footer :: footerFragment}"></div>
 
-<!-- 배경 및 상호작용 스크립트 -->
 <script>
     const canvas = document.getElementById("bgCanvas");
     const ctx = canvas.getContext("2d");
@@ -234,7 +295,6 @@
     // 다이아몬드/보석 모양을 그리는 함수
     function drawDiamond(ctx, x, y, size, color) {
         ctx.beginPath();
-        // 다이아몬드 상단 부분
         ctx.moveTo(x, y - size);
         ctx.lineTo(x + size * 0.6, y);
         ctx.lineTo(x, y + size);
@@ -265,10 +325,10 @@
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 5 + 3; // 크기 조정
+        this.size = Math.random() * 5 + 3;
         this.speedX = (Math.random() - 0.5) * 0.5;
         this.speedY = (Math.random() - 0.5) * 0.5;
-        this.color = Math.random() > 0.5 ? "#F29DA0" : "#B5D0E3"; // 기존 색상 사용
+        this.color = Math.random() > 0.5 ? "#F29DA0" : "#B5D0E3";
       }
       update() {
         this.x += this.speedX;
@@ -277,7 +337,6 @@
         if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
       }
       draw() {
-        // 배경 파티클은 다이아몬드/보석 모양으로 그립니다.
         drawDiamond(ctx, this.x, this.y, this.size, this.color);
       }
     }
@@ -290,7 +349,7 @@
             this.speedX = (Math.random() - 0.5) * 8;
             this.speedY = (Math.random() - 0.5) * 8;
             this.life = 100;
-            this.color = '#FFD700'; // 황금 코인 색상
+            this.color = '#FFD700';
         }
         update() {
             this.x += this.speedX;
@@ -305,27 +364,15 @@
         }
     }
 
-    // 초기 배경 파티클 생성
     for (let i = 0; i < 150; i++) {
       particlesArray.push(new Particle());
     }
 
-    // 클릭 파티클 생성 함수
     function createParticles(x, y) {
         for (let i = 0; i < 20; i++) {
             clickParticlesArray.push(new ClickParticle(x, y));
         }
     }
-
-    // 버튼에 클릭 이벤트 추가
-    document.querySelectorAll('.purchase-btn').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const rect = event.target.getBoundingClientRect();
-            const x = rect.left + rect.width / 2;
-            const y = rect.top + rect.height / 2;
-            createParticles(x, y);
-        });
-    });
 
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -334,7 +381,6 @@
         p.draw();
       });
 
-      // 클릭 파티클 업데이트 및 제거
       for (let i = clickParticlesArray.length - 1; i >= 0; i--) {
           clickParticlesArray[i].update();
           clickParticlesArray[i].draw();
@@ -346,6 +392,106 @@
       requestAnimationFrame(animate);
     }
     animate();
+
+    const detailBtns = document.querySelectorAll('.detail-btn');
+    const modal = document.getElementById('detail-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const modalItemImage = document.getElementById('modal-item-image');
+    const modalItemName = document.getElementById('modal-item-name');
+    const modalItemPrice = document.getElementById('modal-item-price');
+    const modalItemDescription = document.getElementById('modal-item-description');
+    const modalItemId = document.getElementById('modal-item-id');
+    const modalPurchaseBtn = document.querySelector('#modal-purchase-form .purchase-btn');
+
+    detailBtns.forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            const itemId = event.currentTarget.getAttribute('data-item-id');
+            const itemName = event.currentTarget.getAttribute('data-item-name');
+            const itemImage = event.currentTarget.getAttribute('data-item-image');
+            const itemPrice = event.currentTarget.getAttribute('data-item-price');
+            const itemDescription = event.currentTarget.getAttribute('data-item-description');
+            const itemType = event.currentTarget.getAttribute('data-item-type');
+
+            modalItemId.value = itemId;
+            modalItemName.textContent = itemName;
+            modalItemPrice.textContent = itemPrice + ' pt';
+            modalItemDescription.textContent = itemDescription;
+
+            if (itemType === 'frame') {
+                modalItemImage.src = `/uploads/frames/${itemImage}`;
+                modalItemImage.classList.remove('rounded-full');
+                modalItemImage.classList.add('rounded-lg');
+            } else {
+                modalItemImage.src = `/uploads/images/${itemImage}`;
+                modalItemImage.classList.remove('rounded-lg');
+                modalItemImage.classList.add('rounded-full');
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    });
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    });
+
+    if (modalPurchaseBtn) {
+        modalPurchaseBtn.addEventListener('click', (event) => {
+            const rect = event.target.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            createParticles(x, y);
+        });
+    }
+
+    // ✨ 새로 추가된 섹션 전환 로직
+    document.addEventListener('DOMContentLoaded', () => {
+        const framesSection = document.getElementById('frames-section');
+        const imagesSection = document.getElementById('images-section');
+        const showFramesBtn = document.getElementById('show-frames-btn');
+        const showImagesBtn = document.getElementById('show-images-btn');
+
+        function setActiveButton(button) {
+            // 모든 버튼의 활성화 클래스 제거
+            showFramesBtn.classList.remove('bg-main-dark', 'text-white');
+            showFramesBtn.classList.add('bg-soft-blue', 'text-white');
+            showImagesBtn.classList.remove('bg-main-dark', 'text-white');
+            showImagesBtn.classList.add('bg-soft-blue', 'text-white');
+
+            // 클릭된 버튼에 활성화 클래스 추가
+            button.classList.remove('bg-soft-blue');
+            button.classList.add('bg-main-dark', 'text-white');
+        }
+
+        // 초기 상태: 프레임 섹션만 보이고 이미지 섹션은 숨기기
+        imagesSection.classList.add('hidden');
+        framesSection.classList.remove('hidden');
+        setActiveButton(showFramesBtn);
+
+        // 버튼 클릭 이벤트 리스너 추가
+        showFramesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            framesSection.classList.remove('hidden');
+            imagesSection.classList.add('hidden');
+            setActiveButton(showFramesBtn);
+        });
+
+        showImagesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            framesSection.classList.add('hidden');
+            imagesSection.classList.remove('hidden');
+            setActiveButton(showImagesBtn);
+        });
+    });
 </script>
 </body>
 </html>
