@@ -2,10 +2,11 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
 
-<nav th:fragment="navFragment" class="bg-white shadow-sm font-bold">
+<nav th:fragment="navFragment" class="bg-white shadow-sm font-bold relative z-50 group">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-24 items-center">
             <div class="flex-shrink-0 flex items-center">
@@ -36,22 +37,76 @@
             </div>
 
             <div class="flex-shrink-0 flex items-center space-x-4">
-                <div th:unless="${session.userId}">
-                    <a href="/user/login" class="text-lg font-bold text-gray-500 hover:text-gray-900">
+                <div th:unless="${session.userId}" class="bg-[#F29DA0] rounded-xl p-2 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-full h-full transform scale-x-0 origin-right transition-transform duration-500 ease-out z-0
+                    bg-gradient-to-r from-transparent to-[#B5D0E3] group-hover:scale-x-100">
+                    </div>
+                    <a href="/user/login" class="text-lg font-bold text-gray-500 group-hover:text-white transition-colors duration-300 relative z-10">
                         로그인/회원가입
                     </a>
                 </div>
 
-                <div th:if="${session.userId}">
+                <div th:if="${session.userId}" class="flex items-center space-x-4">
                     <span class="text-lg font-bold text-gray-900 mr-2" th:text="${session.userId} + '님'"></span>
-                    <a href="/user/logout" class="text-lg font-bold text-gray-500 hover:text-gray-900">
-                        로그아웃
-                    </a>
+
+                    <div class="bg-[#F29DA0] rounded-xl p-2 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-full h-full transform scale-x-0 origin-right transition-transform duration-500 ease-out z-0
+                        bg-gradient-to-r from-transparent to-[#B5D0E3] group-hover:scale-x-100">
+                        </div>
+                        <a href="/user/logout" class="text-lg font-bold text-gray-500 group-hover:text-white transition-colors duration-300 relative z-10">
+                            로그아웃
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</nav>
 
+    <div class="absolute inset-x-0 top-full overflow-hidden z-40
+                transition-all duration-500 ease-in-out
+                max-h-0 opacity-0
+                group-hover:max-h-96 group-hover:opacity-100">
+        <div class="bg-white bg-opacity-90 w-full py-5 shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-around">
+                <div class="flex flex-col">
+                    <a href="/user/view" class="text-lg font-bold text-gray-900 px-4 py-2">마이페이지</a>
+                    <a href="/user/view" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">회원정보</a>
+                    <a href="/user/update" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">회원정보 수정</a>
+                    <a href="/user/calendar" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">출석 캘린더</a>
+                    <a href="/user/items" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">구매 아이템 목록</a>
+                    <a href="/user/statistics" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">학습 통계</a>
+                </div>
+                <div class="flex flex-col">
+                    <a href="/study/contact" class="text-lg font-bold text-gray-900 px-4 py-2">학습</a>
+                    <a href="/study/contact" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">게임 학습</a>
+                    <a href="/study/main" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">한글 테스트</a>
+                    <a href="/study/note" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">오답 노트</a>
+                    <a href="/study/vocaList" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">단어장 (단어)</a>
+                    <a href="/study/sentenceList" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">단어장 (문장)</a>
+                </div>
+                <div class="flex flex-col">
+                    <a hef="/video/list" class="text-lg font-bold text-gray-900 px-4 py-2">비디오 학습</a>
+                    <a href="/video/list" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">비디오 목록</a>
+                </div>
+                <div class="flex flex-col">
+                    <a href="/resource/main" class="text-lg font-bold text-gray-900 px-4 py-2">자료실</a>
+                    <a href="/resource/main" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">자료 목록</a>
+                </div>
+                <div class="flex flex-col">
+                    <a href="/post/list/1" class="text-lg font-bold text-gray-900 px-4 py-2">게시판</a>
+                    <a href="/post/list/1" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">공지사항</a>
+                    <a href="/post/list/2" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">커뮤니티</a>
+                    <a href="/post/list/3" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">문의사항</a>
+                </div>
+                <div class="flex flex-col">
+                    <a href="/item/shop" class="text-lg font-bold text-gray-900 px-4 py-2">포인트 상점</a>
+                    <a href="/item/shop" class="text-lg font-bold text-gray-500 hover:text-gray-900 px-4 py-1 rounded-md">상점 바로가기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full h-1 bg-gradient-to-r from-[#F29DA0] to-[#B5D0E3]"></div>
+</nav>
 </body>
 </html>
