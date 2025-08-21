@@ -229,7 +229,7 @@ public class VideoController {
         dto.setVideoName(originalFilename);
 
         int createdId = videoService.createVideo(dto);
-        return "redirect:/video/view/" + createdId; // 상세 페이지 URL 통일
+        return "redirect:/video/admin/list?page=0";
     }
 
     // 관리자 영상 수정 폼 (URL 유지)

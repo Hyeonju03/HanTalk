@@ -54,7 +54,7 @@
         </a>
         <!-- 관리자일 때 목록으로 버튼 -->
         <a th:if="${isAdmin}" th:href="@{/video/admin/list}" class="inline-flex items-center justify-center px-4 py-2 bg-dark-navy text-white font-semibold rounded-lg shadow-md hover:bg-dark-navy/80 transition duration-300">
-          <i class="fas fa-bars mr-2"></i> 목록으로
+          <i class="fas fa-bars mr-2"></i> 관리자페이지
         </a>
         <!-- 일반 사용자일 때 목록으로 버튼 -->
         <a th:unless="${isAdmin}" th:href="@{/video/list}" class="inline-flex items-center justify-center px-4 py-2 bg-dark-navy text-white font-semibold rounded-lg shadow-md hover:bg-dark-navy/80 transition duration-300">
