@@ -292,7 +292,8 @@ public class PostController {
         }
 
         String encodedFileName = UriUtils.encode(originalFileName, StandardCharsets.UTF_8);
-        String contentDisposition = "attachment; filename=\"" + originalFileName + "\"; filename*=UTF-8''" + encodedFileName;
+        //filename*=UTF-8'' 인코딩된 파일명만 사용
+        String contentDisposition = "attachment; filename*=UTF-8''" + encodedFileName;
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
