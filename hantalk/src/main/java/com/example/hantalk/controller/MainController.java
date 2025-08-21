@@ -43,11 +43,11 @@ public class MainController {
         }
 
         // 최신 공지사항 3개를 가져와 모델에 추가
-        List<PostDTO> notices = postService.getLatestPosts(NOTICE_CATEGORY_ID, 3);
+        List<PostDTO> notices = postService.getLatestPosts(NOTICE_CATEGORY_ID, 5);
         model.addAttribute("notices", notices);
 
         // 최신 커뮤니티 게시물 3개를 가져와 모델에 추가
-        List<PostDTO> communityPosts = postService.getLatestPosts(COMMUNITY_CATEGORY_ID, 3);
+        List<PostDTO> communityPosts = postService.getLatestPosts(COMMUNITY_CATEGORY_ID, 5);
         model.addAttribute("communityPosts", communityPosts);
 
         return "hantalk/home";
