@@ -18,6 +18,11 @@ public class GameController {
 
     private final UserService userService;
 
+    @GetMapping("/main")
+    public String gameMain() {
+        return "game/main";
+    }
+
     @GetMapping("/game1")
     public String showGamePage(HttpSession session, Model model) {
         return "game/game1";
