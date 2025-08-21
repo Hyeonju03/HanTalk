@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,29 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final String uploadDir = System.getProperty("user.dir") + "/uploads/postFiles";
+
+    // 허용된 파일 확장자 목록 정의
+    private static final Set<String> ALLOWED_EXTENSIONS = new HashSet<>();
+    static {
+        // 문서 파일
+        ALLOWED_EXTENSIONS.add("pdf");
+        ALLOWED_EXTENSIONS.add("doc");
+        ALLOWED_EXTENSIONS.add("docx");
+        ALLOWED_EXTENSIONS.add("xls");
+        ALLOWED_EXTENSIONS.add("xlsx");
+        ALLOWED_EXTENSIONS.add("ppt");
+        ALLOWED_EXTENSIONS.add("pptx");
+        ALLOWED_EXTENSIONS.add("hwp");
+        // 이미지 파일
+        ALLOWED_EXTENSIONS.add("jpg");
+        ALLOWED_EXTENSIONS.add("jpeg");
+        ALLOWED_EXTENSIONS.add("png");
+        ALLOWED_EXTENSIONS.add("gif");
+        // 기타
+        ALLOWED_EXTENSIONS.add("zip");
+        ALLOWED_EXTENSIONS.add("rar");
+        ALLOWED_EXTENSIONS.add("txt");
+    }
 
     // 게시물 등록
     @Transactional
@@ -46,14 +71,13 @@ public class PostService {
             // 원본 파일명을 DTO에 저장
             dto.setOriginalFileName(file.getOriginalFilename());
         }
-        Post post = toEntity(dto); // DTO를 Entity로 변환하는 메서드
+        Post post = toEntity(dto);
         Post savedPost = postRepository.save(post);
-        return toDto(savedPost); // Entity를 DTO로 변환
+        return toDto(savedPost);
     }
 
     // UUID 파일명으로 원본 파일명을 찾아주는 메서드
     public String getOriginalFileName(String savedFileName) {
-        // savedFileName에 UUID_원본파일명 형식이므로, _ 이후의 문자열을 반환
         int underscoreIndex = savedFileName.indexOf("_");
         if (underscoreIndex != -1) {
             return savedFileName.substring(underscoreIndex + 1);
@@ -69,7 +93,6 @@ public class PostService {
         post.setTitle(dto.getTitle());
         post.setContent(dto.getContent());
         post.setArchive(dto.getArchive());
-        // `postRepository.save(post)`는 생략 가능 (JPA 변경 감지 기능)
         return toDto(post);
     }
 
@@ -82,48 +105,32 @@ public class PostService {
         post.setTitle(dto.getTitle());
         post.setContent(dto.getContent());
 
-        // case 1: 새로운 파일이 업로드된 경우
         if (file != null && !file.isEmpty()) {
-            // 기존 파일이 있다면 삭제
             if (post.getArchive() != null) {
                 deleteFile(post.getArchive());
             }
-            // 새 파일을 저장하고 archive와 originalFileName 필드 업데이트
             String savedFileName = saveFile(file);
             post.setArchive(savedFileName);
             post.setOriginalFileName(file.getOriginalFilename());
-        }
-        // case 2: 파일 삭제 체크박스가 선택된 경우
-        else if (Boolean.TRUE.equals(deleteFile)) {
-            // 기존 파일이 있다면 삭제
+        } else if (Boolean.TRUE.equals(deleteFile)) {
             if (post.getArchive() != null) {
                 deleteFile(post.getArchive());
             }
-            // archive와 originalFileName 필드를 모두 null로 설정
             post.setArchive(null);
             post.setOriginalFileName(null);
-        }
-        // case 3: 아무런 파일 변경이 없는 경우
-        // 기존 archive 값과 originalFileName 값은 변경하지 않습니다.
-        else {
+        } else {
             post.setArchive(dto.getArchive());
         }
-
-        // JPA의 변경 감지(Dirty Checking) 기능으로 인해 postRepository.save(post)는 생략 가능
         return toDto(post);
     }
 
-
     // 단일 게시물 조회 및 조회수 증가
-    @Transactional // readOnly = true 제거 또는 false로 변경
+    @Transactional
     public PostDTO getPost(int postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
 
-        // 조회수 증가 로직
         post.setViewCount(post.getViewCount() + 1);
-
-        // 변경 감지(Dirty Checking) 기능으로 인해 postRepository.save(post)는 생략 가능
 
         return toDto(post);
     }
@@ -141,26 +148,51 @@ public class PostService {
         return posts.map(this::toDto);
     }
 
-    // 키워드, 검색 타입, 카테고리로 검색 (통합 메서드)
+    // ✅ 키워드, 검색 타입, 카테고리, 유저 번호, isAdmin으로 검색 (통합 메서드)
     @Transactional(readOnly = true)
-    public Page<PostDTO> searchPosts(int categoryId, String keyword, String searchType, Pageable pageable) {
+    public Page<PostDTO> searchPosts(int categoryId, String keyword, String searchType, Integer userNo, boolean isAdmin, Pageable pageable) {
         Page<Post> posts;
-        if (keyword == null || keyword.trim().isEmpty()) {
-            posts = postRepository.findByCategory_CategoryId(categoryId, pageable);
-        } else {
-            switch (searchType) {
-                case "title":
-                    posts = postRepository.findByCategory_CategoryIdAndTitleContaining(categoryId, keyword, pageable);
-                    break;
-                case "content":
-                    posts = postRepository.findByCategory_CategoryIdAndContentContaining(categoryId, keyword, pageable);
-                    break;
-                case "author":
-                    posts = postRepository.findByCategory_CategoryIdAndUsers_UsernameContaining(categoryId, keyword, pageable);
-                    break;
-                default: // 제목 또는 내용으로 검색
-                    posts = postRepository.findByCategory_CategoryIdAndContentContaining(categoryId, keyword, pageable);
-                    break;
+
+        // ✅ case 1: 문의사항(ID 3) 게시판이고, 로그인한 사용자가 **관리자가 아닌 경우**
+        if (categoryId == 3 && userNo != null && !isAdmin) {
+            if (keyword == null || keyword.trim().isEmpty()) {
+                posts = postRepository.findByCategory_CategoryIdAndUsers_UserNo(categoryId, userNo, pageable);
+            } else {
+                switch (searchType) {
+                    case "title":
+                        posts = postRepository.findByCategory_CategoryIdAndUsers_UserNoAndTitleContaining(categoryId, userNo, keyword, pageable);
+                        break;
+                    case "content":
+                        posts = postRepository.findByCategory_CategoryIdAndUsers_UserNoAndContentContaining(categoryId, userNo, keyword, pageable);
+                        break;
+                    case "author":
+                        posts = postRepository.searchByUserAndAuthor(categoryId, userNo, keyword, pageable);
+                        break;
+                    default:
+                        posts = postRepository.searchByTitleOrContentAndUser(categoryId, userNo, keyword, pageable);
+                        break;
+                }
+            }
+        }
+        // ✅ case 2: 관리자이거나, 그 외 일반 게시판인 경우
+        else {
+            if (keyword == null || keyword.trim().isEmpty()) {
+                posts = postRepository.findByCategory_CategoryId(categoryId, pageable);
+            } else {
+                switch (searchType) {
+                    case "title":
+                        posts = postRepository.findByCategory_CategoryIdAndTitleContaining(categoryId, keyword, pageable);
+                        break;
+                    case "content":
+                        posts = postRepository.findByCategory_CategoryIdAndContentContaining(categoryId, keyword, pageable);
+                        break;
+                    case "author":
+                        posts = postRepository.findByCategory_CategoryIdAndUsers_NicknameContaining(categoryId, keyword, pageable);
+                        break;
+                    default:
+                        posts = postRepository.searchByTitleOrContent(categoryId, keyword, pageable);
+                        break;
+                }
             }
         }
         return posts.map(this::toDto);
@@ -207,9 +239,7 @@ public class PostService {
         post.setUsers(dto.getUsers());
         post.setOriginalFileName(dto.getOriginalFileName());
 
-        // Category 엔티티 조회 및 설정
         if (dto.getCategory().getCategoryId() > 0) {
-
             Category category = categoryRepository.findById(dto.getCategory().getCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
             post.setCategory(category);
@@ -233,7 +263,11 @@ public class PostService {
                 return null;
             }
 
-            // UUID와 원본 파일명을 조합하여 고유한 파일명 생성
+            String fileExtension = getExtension(originalFilename);
+            if (!ALLOWED_EXTENSIONS.contains(fileExtension)) {
+                throw new IllegalArgumentException("허용되지 않는 파일 확장자입니다: " + fileExtension);
+            }
+
             String savedFileName = UUID.randomUUID().toString() + "_" + originalFilename;
 
             Path filePath = uploadPath.resolve(savedFileName);
@@ -246,6 +280,12 @@ public class PostService {
         }
     }
 
+    // 파일 확장자 추출 메서드
+    private String getExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1).toLowerCase();
+    }
+
     // 파일 삭제 로직 추가
     private void deleteFile(String fileName) {
         if (fileName != null && !fileName.isEmpty()) {
@@ -253,11 +293,9 @@ public class PostService {
             try {
                 Files.deleteIfExists(filePath);
             } catch (IOException e) {
-                // 로그를 남기거나 예외 처리를 추가할 수 있습니다.
                 System.err.println("파일 삭제 실패: " + filePath);
                 e.printStackTrace();
             }
         }
     }
-
 }

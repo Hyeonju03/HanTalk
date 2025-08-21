@@ -66,12 +66,12 @@
             <h3 class="text-2xl font-bold text-gray-800 mb-4">댓글 (<span id="comment-count">0</span>)</h3>
 
             <div class="mb-6">
-                <div th:if="${loginUserNo != null}">
+                <div th:if="${isAdmin} or (${loginUserNo != null and post.users.userNo == loginUserNo})">
                     <textarea id="comment-content" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" rows="3" placeholder="댓글을 입력하세요."></textarea>
                     <button id="submit-comment-btn" class="w-full mt-2 bg-[#2F4160] hover:bg-[#2F4160] text-white font-bold py-3 px-4 rounded-lg transition duration-200">댓글 작성</button>
                 </div>
-                <div th:if="${loginUserNo == null}" class="p-4 bg-blue-100 text-blue-700 rounded-lg">
-                    댓글을 작성하려면 <a th:href="@{/login}" class="font-bold underline">로그인</a>이 필요합니다.
+                <div th:if="${!(isAdmin or (loginUserNo != null and post.users.userNo == loginUserNo))}" class="p-4 bg-blue-100 text-blue-700 rounded-lg">
+                    문의사항 댓글은 작성자 또는 관리자만 작성할 수 있습니다.
                 </div>
             </div>
 
@@ -109,15 +109,24 @@
         const postId = /*[[${post.postId}]]*/ '1';
         const loginUserNo = /*[[${loginUserNo}]]*/ null;
         const postCategory = /*[[${post.category.categoryId}]]*/ '1';
+        const postAuthorUserNo = /*[[${post.users.userNo}]]*/ null;
+        const isAdmin = /*[[${isAdmin}]]*/ false;
 
-        // 공지사항이 아닐 경우에만 댓글 관련 기능 활성화
+        // 공지사항(카테고리 ID 1)이 아닐 경우에만 댓글 관련 기능 활성화
         if (postCategory != 1) {
             fetchComments();
 
+            // 댓글 작성 버튼 이벤트 핸들러
             $('#submit-comment-btn').on('click', function() {
                 const commentContent = $('#comment-content').val().trim();
                 if (!commentContent) {
                     showModal('댓글 내용을 입력해주세요.');
+                    return;
+                }
+
+                // 권한 확인 (클라이언트 측에서 한 번 더 체크)
+                if (!(isAdmin || (loginUserNo != null && postAuthorUserNo === loginUserNo))) {
+                    showModal('댓글 작성 권한이 없습니다.');
                     return;
                 }
 
@@ -133,11 +142,13 @@
                     data: JSON.stringify(commentData),
                     success: function(createdComment) {
                         $('#comment-content').val('');
-                        fetchComments(); // 댓글 작성 후 목록을 새로고침
+                        fetchComments();
                     },
                     error: function(xhr) {
                         if (xhr.status === 401) {
                             showModal('로그인이 필요합니다.');
+                        } else if (xhr.status === 403) {
+                            showModal('댓글 작성 권한이 없습니다.');
                         } else {
                             showModal('댓글 작성 중 오류가 발생했습니다.');
                         }
@@ -146,6 +157,7 @@
                 });
             });
 
+            // 댓글 삭제 버튼 이벤트 핸들러
             $('#comments-list').on('click', '.delete-comment-btn', function() {
                 const commentId = $(this).data('comment-id');
                 showConfirmModal('정말 이 댓글을 삭제하시겠습니까?', () => {
@@ -279,7 +291,7 @@
                     </div>
             `;
 
-            if (commentUserNo && commentUserNo == loginUserNo) {
+            if (commentUserNo && (commentUserNo == loginUserNo || isAdmin)) {
                 commentHtml += `
                     <div class="comment-buttons flex-shrink-0 space-x-2 ml-4">
                         <button class="update-comment-btn bg-gray-500 hover:bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded transition duration-200" data-comment-id="${comment.commentId}" data-comment-content="${comment.content}">수정</button>

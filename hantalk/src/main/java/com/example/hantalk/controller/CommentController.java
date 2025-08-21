@@ -52,6 +52,8 @@ public class CommentController {
             HttpSession session) {
 
         Integer loginUserNo = SessionUtil.getLoginUserNo(session);
+        boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");
+
         if (loginUserNo == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -59,10 +61,17 @@ public class CommentController {
         updateDTO.setUserNo(loginUserNo);
 
         try {
-            CommentDTO updatedComment = commentService.updateComment(commentId, updateDTO);
-            return ResponseEntity.ok(updatedComment);
+            // ADMIN 권한을 가진 사용자는 모든 댓글 수정 가능
+            if (isAdmin) {
+                CommentDTO updatedComment = commentService.updateCommentForAdmin(commentId, updateDTO);
+                return ResponseEntity.ok(updatedComment);
+            } else {
+                // 일반 사용자는 자신의 댓글만 수정 가능
+                CommentDTO updatedComment = commentService.updateComment(commentId, updateDTO);
+                return ResponseEntity.ok(updatedComment);
+            }
+
         } catch (IllegalArgumentException e) {
-            // "댓글이 존재하지 않습니다." 또는 "수정 권한이 없습니다."
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -71,6 +80,8 @@ public class CommentController {
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable int commentId, HttpSession session) {
         Integer loginUserNo = SessionUtil.getLoginUserNo(session);
+        boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");
+
         if (loginUserNo == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -80,8 +91,15 @@ public class CommentController {
         dto.setUserNo(loginUserNo);
 
         try {
-            commentService.deleteComment(commentId, dto);
-            return ResponseEntity.noContent().build();
+            // ADMIN 권한을 가진 사용자는 모든 댓글 삭제 가능
+            if (isAdmin) {
+                commentService.deleteCommentForAdmin(commentId);
+                return ResponseEntity.noContent().build();
+            } else {
+                // 일반 사용자는 자신의 댓글만 삭제 가능
+                commentService.deleteComment(commentId, dto);
+                return ResponseEntity.noContent().build();
+            }
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

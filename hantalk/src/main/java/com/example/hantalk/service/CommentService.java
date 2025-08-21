@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
     private final UsersRepository usersRepository;
+    private final PostRepository postRepository;
 
     @Transactional
     public CommentDTO createComment(CommentDTO dto) {
@@ -41,7 +41,7 @@ public class CommentService {
         return comments.stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    // 댓글 수정 (DTO를 매개변수로 받도록 변경)
+    // 일반 사용자용 댓글 수정
     @Transactional
     public CommentDTO updateComment(int commentId, CommentDTO dto) {
         Comment comment = commentRepository.findById(commentId)
@@ -53,11 +53,25 @@ public class CommentService {
         }
 
         comment.setContent(dto.getContent());
+        // JPA 변경 감지 외에 명시적으로 .save() 호출하여 코드 명확성 향상
+        commentRepository.save(comment);
 
         return toDto(comment);
     }
 
-    // 댓글 삭제 (DTO를 매개변수로 받도록 변경)
+    // ADMIN 전용 댓글 수정 (권한 확인 로직 생략)
+    @Transactional
+    public CommentDTO updateCommentForAdmin(int commentId, CommentDTO dto) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+
+        comment.setContent(dto.getContent());
+        commentRepository.save(comment);
+
+        return toDto(comment);
+    }
+
+    // 일반 사용자용 댓글 삭제
     @Transactional
     public void deleteComment(int commentId, CommentDTO dto) {
         Comment comment = commentRepository.findById(commentId)
@@ -67,6 +81,15 @@ public class CommentService {
         if (!comment.getUsers().getUserNo().equals(dto.getUserNo())) {
             throw new IllegalArgumentException("삭제 권한이 없습니다.");
         }
+
+        commentRepository.delete(comment);
+    }
+
+    // ADMIN 전용 댓글 삭제 (권한 확인 로직 생략)
+    @Transactional
+    public void deleteCommentForAdmin(int commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
         commentRepository.delete(comment);
     }
