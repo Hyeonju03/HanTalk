@@ -53,9 +53,12 @@ public class PostService {
 
     // UUID 파일명으로 원본 파일명을 찾아주는 메서드
     public String getOriginalFileName(String savedFileName) {
-        return postRepository.findByArchive(savedFileName)
-                .map(Post::getOriginalFileName)
-                .orElse(null);
+        // savedFileName에 UUID_원본파일명 형식이므로, _ 이후의 문자열을 반환
+        int underscoreIndex = savedFileName.indexOf("_");
+        if (underscoreIndex != -1) {
+            return savedFileName.substring(underscoreIndex + 1);
+        }
+        return null;
     }
 
     // 게시물 수정
@@ -217,30 +220,26 @@ public class PostService {
         return post;
     }
 
-    // 파일 저장 로직 (ResourceService의 saveFile을 참고)
+    // 파일 저장 로직
     private String saveFile(MultipartFile file) {
         try {
-
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-
             String originalFilename = file.getOriginalFilename();
-            String fileExtension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            if (originalFilename == null || originalFilename.isEmpty()) {
+                return null;
             }
 
+            // UUID와 원본 파일명을 조합하여 고유한 파일명 생성
+            String savedFileName = UUID.randomUUID().toString() + "_" + originalFilename;
 
-            String savedFileName = UUID.randomUUID().toString() + fileExtension;
             Path filePath = uploadPath.resolve(savedFileName);
             file.transferTo(filePath.toFile());
 
-
             return savedFileName;
-
         } catch (IOException e) {
             e.printStackTrace();
             return null;
