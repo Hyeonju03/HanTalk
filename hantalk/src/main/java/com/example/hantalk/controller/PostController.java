@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/post")
@@ -309,4 +310,13 @@ public class PostController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
+
+    // HomeController에서 호출될 최신 게시물 조회용 메서드
+    public List<PostDTO> getLatestPostsByCategory(int categoryId, int count) {
+        // Pageable 객체를 사용하여 최신순으로 'count'개만 가져오도록 설정
+        Pageable pageable = PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, "createDate"));
+        Page<PostDTO> postPage = postService.searchPosts(categoryId, null, "title", pageable);
+        return postPage.getContent();
+    }
+
 }

@@ -7,7 +7,9 @@ import com.example.hantalk.repository.CategoryRepository;
 import com.example.hantalk.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +17,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -157,6 +161,16 @@ public class PostService {
             }
         }
         return posts.map(this::toDto);
+    }
+
+    // 홈 화면에 표시할 최신 게시물 리스트를 가져오는 메서드
+    @Transactional(readOnly = true)
+    public List<PostDTO> getLatestPosts(int categoryId, int count) {
+        Pageable pageable = PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, "createDate"));
+        Page<Post> latestPosts = postRepository.findByCategory_CategoryId(categoryId, pageable);
+        return latestPosts.getContent().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     // Entity → DTO 변환
