@@ -31,22 +31,27 @@
     .animate-pulse-slow {
       animation: pulse-slow 2s ease-in-out infinite;
     }
+
+    /* 배경 이미지에 투명 오버레이를 추가하여 글씨를 돋보이게 함 */
+    .bg-center-cover.relative::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.2); /* 불투명도를 20%로 설정 */
+      z-index: 1; /* 오버레이가 콘텐츠 위에 위치하도록 설정 */
+    }
   </style>
 </head>
 <body>
 
-<div class="fixed top-12 right-12 z-50">
+<a href="#home" class="fixed top-12 right-12 z-50">
   <div class="w-24 h-24 bg-[#F29DA0] rounded-xl shadow-lg flex items-center justify-center text-center animate-float-slow">
     <p class="text-white text-lg font-bold">Han Talk!</p>
   </div>
-</div>
-
-<!-- <div class="fixed top-12 right-12 z-50">
-  <img src="https://placehold.co/200x200/F29DA0/FFFFFF?text=Han+Talk!"
-       alt="한 톡!"
-       class="w-32 h-auto animate-float-slow"
-       style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
-</div> -->
+</a>
 
 <div id="fullpage">
 
@@ -147,10 +152,10 @@
   </div>
 
   <div class="section" data-anchor="community">
-    <div class="flex flex-col items-center justify-center p-8 h-full bg-center-cover bg-[url('https://placehold.co/1920x1080/5C6BC0/FFFFFF?text=COMMUNITY')]">
-      <h2 class="text-6xl font-extrabold text-white text-shadow-lg drop-shadow-md mb-4">함께 배우는 커뮤니티</h2>
-      <p class="text-xl text-white text-shadow-md mb-8">질문을 공유하고, 다른 학습자들과 소통하며 함께 성장하세요.</p>
-      <button class="px-8 py-4 bg-white text-yellow-600 font-bold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">한톡과 함께해요!</button>
+    <div class="relative flex flex-col items-center justify-center p-8 h-full bg-center-cover bg-[url('https://placehold.co/1920x1080/5C6BC0/FFFFFF?text=COMMUNITY')]">
+      <h2 class="text-6xl font-extrabold text-white text-shadow-lg drop-shadow-lg mb-4 relative z-10">함께 배우는 커뮤니티</h2>
+      <p class="text-xl text-white text-shadow-md mb-8 relative z-10">질문을 공유하고, 다른 학습자들과 소통하며 함께 성장하세요.</p>
+      <button class="px-8 py-4 bg-white text-yellow-600 font-bold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105 relative z-10">한톡과 함께해요!</button>
     </div>
   </div>
 

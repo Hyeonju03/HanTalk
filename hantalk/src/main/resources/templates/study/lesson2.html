@@ -117,7 +117,7 @@
 <div class="fixed bottom-6 right-6">
   <button onclick="quitLesson()"
           class="bg-gray-500 text-white px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-700 transition duration-300 transform hover:scale-105 shadow-lg">
-    학습 종료
+    그만 하기
   </button>
 </div>
 
@@ -269,17 +269,20 @@
 
               setTimeout(() => { feedbackIcon.classList.add('hidden'); }, 1500);
           } else {
-              if (data.message.includes('3번 틀렸습니다.')) {
-                  feedbackIcon.textContent = '❌';
-                  feedbackIcon.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-9xl font-bold opacity-80 text-[#F29DA0] bounce-fixed';
-                  feedbackIcon.classList.remove('hidden');
+          if (data.message.includes('3번 틀렸습니다.')) {
+            feedbackIcon.textContent = '❌';
+            feedbackIcon.className =
+              'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ' +
+              'text-9xl font-bold opacity-80 text-[#F29DA0] bounce-fixed';
+            feedbackIcon.classList.remove('hidden');
 
-                  nextButton.style.display = 'block';
-                  checkButton.style.display = 'none';
-                  document.getElementById('result-message').textContent = data.message;
+            nextButton.style.display = 'block';
+            checkButton.style.display = 'none';
+            document.getElementById('result-message').textContent = data.message;
 
-                  setTimeout(() => { feedbackIcon.classList.add('hidden'); }, 1500);
-              } else {
+            setTimeout(() => { feedbackIcon.classList.add('hidden'); }, 1500);
+
+            } else {
                   sortedContainer.classList.add('shake');
                   sortedContainer.addEventListener('animationend', () => {
                       sortedContainer.classList.remove('shake');
@@ -311,9 +314,35 @@
       }, { offset: Number.NEGATIVE_INFINITY }).element;
   }
 
-  document.getElementById('quit-button').addEventListener('click', () => {
-    window.location.href = "/"; // 메인 페이지로 바로 이동
-});
+ function quitLesson() {
+            // window.opener가 있다면 (팝업 창으로 열렸다면) 창 닫기
+            if (window.opener) {
+                window.close();
+            } else {
+                // 직접 브라우저에서 열렸다면 메시지 표시 (alert 대신 커스텀 모달)
+                const messageBox = document.createElement('div');
+                messageBox.textContent = "이 창은 브라우저에서 직접 열렸기 때문에 자동으로 닫을 수 없습니다.";
+                messageBox.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background-color: #2F4160; /* 진한 남색 */
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    z-index: 1000;
+                    font-size: 1.2em;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                `;
+                document.body.appendChild(messageBox);
+
+                // 3초 후 메시지 박스 제거
+                setTimeout(() => {
+                    messageBox.remove();
+                }, 3000);
+            }
+        }
 
 </script>
 </body>
