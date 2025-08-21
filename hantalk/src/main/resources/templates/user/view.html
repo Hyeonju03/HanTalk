@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>마이페이지</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         .bg-main-dark { background-color: #2F4160; }
         .text-main-dark { color: #2F4160; }
@@ -16,55 +17,84 @@
         .hover-text-accent-pink:hover { color: #F29DA0; }
         .container-custom { max-width: 1000px; }
 
-        /* 프로필 이미지와 프레임이 겹쳐 보이도록 z-index 설정 */
+        /* 프로필 이미지와 프레임 */
         .profile-container {
-            position: relative;
-            width: 112px; /* 28 * 4px */
-            height: 112px; /* 28 * 4px */
-            margin: 0 auto;
+          position: relative;
+          width: 160px;
+          height: 160px;
+          margin: 0 auto;
         }
         .profile-image, .profile-frame {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .profile-image.empty {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          background-color: #f7f7f7;
+          color: #718096;
+          font-size: 0.9rem;
+        }
+
+        /* 무난한 패턴 배경 */
+        .bg-pattern {
+          background-color: #ffffff;
+          background-image: radial-gradient(#dbeafe 1px, transparent 1px);
+          background-size: 20px 20px;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-gray-50 font-sans">
+
+<body class="min-h-screen flex flex-col font-sans bg-gradient-to-b from-[#FDFBFF] via-[#F7F7FB] to-[#EDEDF8]">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
 <main class="flex-grow flex justify-center p-8 space-x-8">
-
     <div th:replace="~{fragments/mypageSidebar :: mypageSidebar}" class="h-full"></div>
 
     <div class="container-custom w-full">
         <div class="bg-white p-8 rounded-xl shadow-xl h-full">
-            <div class="flex flex-col md:flex-row items-center px-6 py-6 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
-                <div class="profile-container mb-4 md:mb-0 md:mr-4 flex-shrink-0">
+
+            <!-- 프로필 영역 -->
+            <div class="flex flex-col items-center py-12 border-b border-[#E0E0E0] rounded-t-xl w-full relative overflow-hidden bg-pattern">
+
+                <!-- 프로필 컨테이너 -->
+                <div class="profile-container mb-4 flex-shrink-0 relative z-10">
                     <img th:if="${user.profileImage != null}"
                          th:src="@{'/uploads/images/' + ${user.profileImage}}"
                          alt="프로필 이미지"
-                         class="profile-image rounded-full object-cover z-0"/>
+                         class="profile-image rounded-full object-cover relative z-10"/>
+
                     <img th:if="${user.profileFrame != null}"
                          th:src="@{'/uploads/frames/' + ${user.profileFrame}}"
                          alt="프레임 이미지"
-                         class="profile-frame pointer-events-none z-10"/>
+                         class="profile-frame pointer-events-none z-20"/>
+
                     <div th:if="${user.profileImage == null and user.profileFrame == null}"
-                         class="profile-image flex items-center justify-center text-[#2F4160] text-sm text-center z-20 bg-white bg-opacity-80 rounded-full">
+                         class="profile-image empty rounded-full z-20">
                         프로필 이미지 및<br/>프레임이 설정되지 않았습니다.
                     </div>
                 </div>
 
-                <div class="text-center md:text-left flex-grow">
-                    <h1 class="text-3xl font-bold mb-1" th:text="${user.nickname}">닉네임</h1>
-                    <p class="text-sm" th:text="${user.userId}">아이디</p>
+                <!-- 닉네임 영역 (세련되면서 포인트 컬러 적용) -->
+                <div class="text-center relative z-10">
+                    <h1 class="inline-block text-3xl font-semibold mb-1 px-6 py-2
+             rounded-lg border border-[#B5D0E3]
+             bg-white text-[#2F4160] shadow-sm">
+                        <span th:text="${user.nickname}">닉네임</span>
+                    </h1>
                 </div>
+
             </div>
 
-            <div class="p-4">
+            <!-- 상세 정보 -->
+            <div class="p-8">
                 <h2 class="text-xl font-bold mb-4 border-l-4 border-[#F29DA0] pl-3">상세 정보</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
@@ -72,17 +102,22 @@
                         <strong class="block text-sm">이름</strong>
                         <span class="text-lg font-semibold" th:text="${user.name}">이름</span>
                     </div>
-
+                    <div>
+                        <strong class="block text-sm">닉네임</strong>
+                        <span class="text-lg font-semibold" th:text="${user.nickname}">닉네임</span>
+                    </div>
+                    <div>
+                        <strong class="block text-sm">아이디</strong>
+                        <span class="text-lg font-semibold" th:text="${user.userId}">아이디</span>
+                    </div>
                     <div>
                         <strong class="block text-sm">이메일</strong>
                         <span class="text-lg font-semibold" th:text="${user.email}">이메일</span>
                     </div>
-
                     <div>
                         <strong class="block text-sm">포인트</strong>
                         <span class="text-lg font-bold text-[#F29DA0]" th:text="${user.point}">0</span> pt
                     </div>
-
                     <div>
                         <strong class="block text-sm">가입일</strong>
                         <span class="text-lg font-semibold" th:text="${#temporals.format(user.JoinDate, 'yyyy-MM-dd')}">2025-08-01</span>
@@ -101,7 +136,6 @@
       const currentPath = window.location.pathname;
 
       links.forEach(link => {
-        // 페이지 로드 시 현재 URL과 일치하는 링크에 스타일을 적용합니다.
         if (link.getAttribute('href') === currentPath) {
           link.classList.add('bg-main-dark', 'text-white');
           link.classList.remove('text-main-dark', 'hover-bg-accent-pink', 'hover-text-white');
@@ -110,12 +144,10 @@
 
       links.forEach(link => {
         link.addEventListener('click', (e) => {
-          // 모든 링크에서 'active' 스타일을 제거합니다.
           links.forEach(item => {
             item.classList.remove('bg-main-dark', 'text-white');
             item.classList.add('text-main-dark', 'hover:bg-[#2F4160]', 'hover:text-white');
           });
-          // 클릭된 링크에 'active' 스타일을 추가합니다.
           e.currentTarget.classList.add('bg-main-dark', 'text-white');
           e.currentTarget.classList.remove('text-main-dark', 'hover:bg-[#2F4160]', 'hover:text-white');
         });
