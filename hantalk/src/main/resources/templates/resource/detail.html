@@ -35,13 +35,12 @@
 
       <div class="detail-item p-6 bg-[#B5D0E3] bg-opacity-20 rounded-lg shadow-md flex items-start gap-4 min-h-[80px]">
         <i class="fas fa-file-download text-[#2F4160] mt-1"></i>
-        <span class="font-bold text-[#2F4160] w-28 flex-shrink-0">파일 링크</span>
         <span class="flex-1">
           <a th:if="${resource.archive != null and !#strings.isEmpty(resource.archive)}"
              th:href="@{${resource.archive}}"
              download
              class="inline-flex items-center gap-2 bg-[#2F4160] text-white px-5 py-3 rounded-lg transition duration-300 shadow-md"
-             th:text="${#strings.substring(resource.archive, resource.archive.lastIndexOf('/') + 1)}">
+             th:text="${resource.originalFileName}">
             <i class="fas fa-download"></i>
           </a>
           <span th:unless="${resource.archive != null and !#strings.isEmpty(resource.archive)}" class="text-gray-500">파일이 없습니다.</span>
