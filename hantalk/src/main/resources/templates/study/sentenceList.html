@@ -34,28 +34,31 @@
     <!-- 제목만 중앙에 위치 -->
     <h1 class="text-4xl font-extrabold text-center mb-10" style="color: #2F4160; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">문장 목록</h1>
 
-    <!-- 검색창, 검색 버튼, 학습 메인으로 가기 버튼을 포함하는 컨테이너 -->
-    <!-- flex, items-center, justify-end를 사용하여 모든 요소들을 오른쪽으로 정렬 -->
+    <!-- 검색창, 검색 버튼, 학습 메인 버튼을 포함하는 컨테이너 -->
+    <!-- flex, items-center, justify-end로 오른쪽 정렬, gap으로 간격 부여 -->
     <div class="flex items-center justify-end w-full mb-10 gap-4">
         <!-- 검색 입력창과 검색 버튼을 묶는 form -->
-        <!-- flex-grow 제거, max-width 750px는 그대로 유지하여 적절한 길이 유지 -->
-        <form th:action="@{/study/sentenceList/admin}" method="get" class="flex items-center gap-2" style="max-width: 750px;">
-            <!-- 검색 입력창: flex-grow를 사용하여 폼 안에서 최대한 확장 -->
+        <!-- max-width 유지하여 검색창 길이 제한 -->
+        <form th:action="@{/study/sentenceList}" method="get"
+              class="flex items-center gap-2" style="max-width: 750px;">
+            <!-- 검색 입력창 -->
             <input type="text" name="kw" th:value="${kw}" placeholder="문장 또는 의미 검색"
                    class="flex-grow p-3 border rounded-lg focus:outline-none focus:ring-2"
                    style="border-color: #2F4160; background-color: #F8F9FA; color: #2F4160; focus:ring-color: #F29DA0;">
-            <!-- 검색 버튼: 핑크 -> 네이비 호버 -->
-            <button type="submit" class="px-6 py-3 font-semibold rounded-lg shadow-md transition-colors bg-[#F29DA0] text-[#2F4160] hover:bg-[#2F4160] hover:text-white">
+            <!-- 검색 버튼: 핑크 배경 → 호버 시 네이비 -->
+            <button type="submit"
+                    class="px-6 py-3 font-semibold rounded-lg shadow-md transition-colors bg-[#F29DA0] text-[#2F4160] hover:bg-[#2F4160] hover:text-white">
                 검색
             </button>
         </form>
-        <!-- 학습 메인으로 가기 버튼: 이제 justify-end에 의해 오른쪽 끝에 배치되므로 ml-auto 불필요 -->
+        <!-- 학습 메인 버튼 -->
         <a th:href="@{/study/main}"
            class="inline-block px-4 py-3 rounded-lg shadow-md transition-colors duration-300
-                  font-semibold bg-[#2F4160] text-white hover:bg-[#B5D0E3] hover:text-[#2F4160] whitespace-nowrap">
+            font-semibold bg-[#2F4160] text-white hover:bg-[#B5D0E3] hover:text-[#2F4160] whitespace-nowrap">
             학습 메인 &#x2192;
         </a>
     </div>
+
 
     <div class="rounded-lg shadow-md overflow-hidden" style="background-color: #F8F9FA;">
         <table class="min-w-full divide-y" style="border-color: #B5D0E3;">
