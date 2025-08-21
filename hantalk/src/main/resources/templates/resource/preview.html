@@ -30,11 +30,11 @@
     <section class="mb-6">
       <img th:if="${isImage}" th:src="@{|/resource/image/${fileName}|}" alt="이미지 미리보기" class="max-w-full rounded-md shadow border border-[#E0E0E0] mb-4" />
 
-      <iframe th:if="${isOfficeFile}" th:src="@{${googleViewerUrl}}" class="w-full h-96 rounded-md shadow border border-[#E0E0E0] mb-4"></iframe>
+      <iframe th:if="${isOfficeFile}" th:src="@{${googleViewerUrl}}" class="w-full h-[80vh] rounded-md shadow border border-[#E0E0E0] mb-4"></iframe>
 
-      <iframe th:if="${isDocument and !isOfficeFile and !isText}" th:src="@{|/resource/view/file/${fileName}|}" class="w-full h-96 rounded-md shadow border border-[#E0E0E0] mb-4"></iframe>
+      <iframe th:if="${isDocument and !isOfficeFile and !isText}" th:src="@{|/resource/view/file/${fileName}|}" class="w-full h-[80vh] rounded-md shadow border border-[#E0E0E0] mb-4"></iframe>
 
-      <pre th:if="${isText}" th:text="${textContent}" class="bg-[#B5D0E3] text-[#2F4160] p-4 rounded-md max-h-96 overflow-auto mb-4 font-mono whitespace-pre-wrap"></pre>
+      <pre th:if="${isText}" th:text="${textContent}" class="bg-[#B5D0E3] text-[#2F4160] p-4 rounded-md h-[80vh] overflow-auto mb-4 font-mono whitespace-pre-wrap"></pre>
 
     </section>
 
