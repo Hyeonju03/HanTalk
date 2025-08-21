@@ -28,6 +28,12 @@ public class GameController {
         return "game/game1";
     }
 
+    @GetMapping("/game2")
+    public String showGamePage2(HttpSession session, Model model) {
+        return "game/game2";
+    }
+
+
     @PutMapping("/api/users/updatePoints")
     public ResponseEntity<Map<String, Object>> updatePoints(
             @RequestBody Map<String, Object> requestBody,
