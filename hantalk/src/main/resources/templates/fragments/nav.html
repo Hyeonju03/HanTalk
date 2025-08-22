@@ -37,28 +37,31 @@
             </div>
 
             <div class="flex-shrink-0 flex items-center space-x-4">
-                <div th:unless="${session.userId}" class="bg-[#F29DA0] rounded-xl p-2 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-full h-full transform scale-x-0 origin-right transition-transform duration-500 ease-out z-0
-                    bg-gradient-to-r from-transparent to-[#B5D0E3] group-hover:scale-x-100">
-                    </div>
-                    <a href="/user/login" class="text-lg font-bold text-gray-500 group-hover:text-white transition-colors duration-300 relative z-10">
+                <!-- 로그인/회원가입 버튼 (세션 없을 때) -->
+                <div th:unless="${session.userId}">
+                    <a href="/user/login"
+                       class="text-white px-6 py-2 rounded-full font-bold flex items-center justify-center
+                  bg-gradient-to-r from-[#F29DA0] to-[#B5D0E3]
+                  bg-[length:200%_auto] transition-all duration-500
+                  hover:bg-right">
                         로그인/회원가입
                     </a>
                 </div>
 
+                <!-- 로그아웃 버튼 (세션 있을 때) -->
                 <div th:if="${session.userId}" class="flex items-center space-x-4">
                     <span class="text-lg font-bold text-gray-900 mr-2" th:text="${session.userId} + '님'"></span>
 
-                    <div class="bg-[#F29DA0] rounded-xl p-2 relative overflow-hidden group">
-                        <div class="absolute top-0 right-0 w-full h-full transform scale-x-0 origin-right transition-transform duration-500 ease-out z-0
-                        bg-gradient-to-r from-transparent to-[#B5D0E3] group-hover:scale-x-100">
-                        </div>
-                        <a href="/user/logout" class="text-lg font-bold text-gray-500 group-hover:text-white transition-colors duration-300 relative z-10">
-                            로그아웃
-                        </a>
-                    </div>
+                    <a href="/user/logout"
+                       class="text-white px-6 py-2 rounded-full font-bold flex items-center justify-center
+                  bg-gradient-to-r from-[#F29DA0] to-[#B5D0E3]
+                  bg-[length:200%_auto] transition-all duration-500
+                  hover:bg-right">
+                        로그아웃
+                    </a>
                 </div>
             </div>
+
         </div>
     </div>
 
