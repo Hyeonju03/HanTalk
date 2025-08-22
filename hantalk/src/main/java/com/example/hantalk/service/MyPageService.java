@@ -46,32 +46,23 @@ public class MyPageService {
         usersRepository.save(user);
     }
 
-    // 탈퇴
-    public void deactivateUser(Integer userNo) {
+    // 이 메서드는 컨트롤러에 맞춰 비밀번호 검증과 탈퇴를 동시에 처리합니다.
+    @Transactional
+    public void deactivateUser(Integer userNo, String password) {
+        // 1. 사용자 엔티티 조회
         Users user = usersRepository.findById(userNo)
-                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        user.setStatus("1"); // 비활성화
+        // 2. 입력된 비밀번호를 해시하여 DB의 비밀번호와 비교
+        String encodedPassword = encode(password);
+        if (!user.getPassword().equals(encodedPassword)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. 비밀번호가 일치하면 사용자 상태를 비활성화합니다.
+        user.setStatus("SignOut"); // 비활성화
         usersRepository.save(user);
     }
-
-//    private Users toEntity(UsersDTO dto) {
-//        if (dto == null) return null;
-//
-//        Users users = new Users();
-//        users.setUserNo(dto.getUserNo());
-//        users.setUserId(dto.getUserId());
-//        users.setName(dto.getName());
-//        users.setEmail(dto.getEmail());
-//        users.setPassword(dto.getPassword());
-//        users.setNickname(dto.getNickname());
-//        users.setProfileImage(dto.getProfileImage());
-//        users.setJoinDate(dto.getJoinDate());
-//        users.setBirth(dto.getBirth());
-//        users.setStatus(dto.getStatus());
-//        users.setPoint(dto.getPoint());
-//        return users;
-//    }
 
     private UsersDTO toDTO(Users users) {
         if (users == null) return null;
@@ -91,6 +82,8 @@ public class MyPageService {
         dto.setPoint(users.getPoint());
         return dto;
     }
+
+    // SHA-256 암호화 메서드
     private String encode(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -106,7 +99,7 @@ public class MyPageService {
     }
 
 
-    /**  구매한 아이템 목록 (항상 최신 Item 이미지 반영) */
+    /** 구매한 아이템 목록 (항상 최신 Item 이미지 반영) */
     public List<ItemDTO> getUserOwnedItems(Integer userNo) {
         List<User_Items> userItems = userItemRepository.findByUsers_UserNo(userNo);
 
@@ -139,5 +132,4 @@ public class MyPageService {
     public void applyProfileFrameByImageName(int userNo, String frameName) {
         usersRepository.updateProfileFrame(userNo, frameName);
     }
-
 }
