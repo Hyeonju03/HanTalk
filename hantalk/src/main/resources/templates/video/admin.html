@@ -21,9 +21,22 @@
     .bg-soft-sky { background-color: var(--color-soft-sky); }
     .text-soft-sky { color: var(--color-soft-sky); }
 
-    /* 추가: 클릭 가능한 셀에만 커서 포인터 적용 */
-    .clickable-cell {
+
+    .clickable-row {
       cursor: pointer;
+    }
+
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    @media (max-width: 767px) {
+        .search-form-flex-wrap {
+            flex-wrap: wrap;
+        }
     }
   </style>
 </head>
@@ -33,16 +46,16 @@
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
 <!-- 전체 페이지 컨테이너 -->
-<div class="container mx-auto p-4 max-w-7xl flex-1">
+<div class="container mx-auto p-4 max-w-7xl flex-1 mt-4">
 
   <!-- 모든 내용을 담는 흰색 배경 컨테이너 -->
-  <div class="bg-white p-6 rounded-lg shadow-md">
+  <div class="bg-white rounded-xl shadow-xl p-8">
 
     <!-- 관리자 페이지 제목 및 버튼 -->
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold text-dark-navy">관리자 영상 목록</h1>
       <a th:href="@{/admin}"
-         class="inline-block bg-gray-700 text-gray-200 px-4 py-2 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200">
+         class="inline-block bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg shadow-md transition-colors duration-200">
         관리자 페이지 <i class="fas fa-arrow-right ml-2"></i>
       </a>
     </div>
@@ -55,16 +68,16 @@
       </a>
 
       <!-- 검색 폼 그룹 -->
-      <form method="get" th:action="@{/video/admin/list}" id="searchForm" class="flex flex-wrap items-center space-x-2">
+      <form method="get" th:action="@{/video/admin/list}" id="searchForm" class="flex items-center space-x-2 search-form-flex-wrap">
         <select name="searchType" id="searchType"
-                class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-soft-sky focus:border-soft-sky">
+                class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-soft-sky">
           <option value="title" th:selected="${searchType == 'title'}">제목</option>
           <option value="content" th:selected="${searchType == 'content'}">내용</option>
           <option value="filename" th:selected="${searchType == 'filename'}">파일명</option>
           <option value="all" th:selected="${searchType == 'all'}">제목 + 내용 + 파일명</option>
         </select>
         <input type="text" name="keyword" placeholder="검색어를 입력해주세요" th:value="${keyword}" id="keyword"
-               class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-soft-sky focus:border-soft-sky min-w-40"/>
+               class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-soft-sky min-w-40"/>
         <button type="submit" class="bg-dark-navy text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors duration-200">
           검색
         </button>
@@ -85,59 +98,58 @@
         </span>
     </div>
 
-    <!-- 결과가 있을 때 테이블 출력 -->
-    <div th:if="${not #lists.isEmpty(videoPage.content)}" class="rounded-lg shadow-md overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200 table-fixed">
-        <thead class="bg-gray-200 text-gray-800">
-        <tr>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap w-12">번호</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">제목</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">설명</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap">파일명</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap w-24">등록일</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap w-24">수정일</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap w-36">관리</th>
-        </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-        <tr th:each="video, stat : ${videoPage.content}"
-            th:id="'row-' + ${video.videoId}"
-            th:data-id="${video.videoId}"
-            class="hover:bg-gray-50 transition-colors duration-150">
-          <td th:text="${videoPage.number * videoPage.size + stat.index + 1}" class="clickable-cell px-6 py-4 text-sm text-gray-900 whitespace-nowrap">1</td>
-          <td class="clickable-cell px-6 py-4 text-sm font-medium text-gray-900 overflow-hidden" th:title="${video.title}">
-            <div th:text="${video.title}" class="truncate w-full">제목</div>
-          </td>
-          <td class="clickable-cell px-6 py-4 text-sm text-gray-500 overflow-hidden" th:title="${video.content}">
-            <div th:text="${video.content}" class="truncate w-full">설명</div>
-          </td>
-          <td class="clickable-cell px-6 py-4 text-sm text-gray-500 overflow-hidden" th:title="${video.videoName}">
-            <div th:text="${video.videoName}" class="truncate w-full">파일명</div>
-          </td>
-          <td th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}" class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap">등록일</td>
-          <td th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}" class="clickable-cell px-6 py-4 text-sm text-gray-500 whitespace-nowrap">수정일</td>
-          <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-            <div class="flex space-x-2">
+    <div th:if="${not #lists.isEmpty(videoPage.content)}" class="rounded-xl shadow-xl">
+      <!-- 헤더 (Flexbox) -->
+      <div class="flex bg-gray-200 text-[#2F4160] rounded-t-xl font-semibold text-sm uppercase tracking-wider">
+
+        <div class="px-6 py-3 w-[6%] flex-none whitespace-nowrap">번호</div>
+
+        <div class="px-6 py-3 flex-1 min-w-0">제목</div>
+        <div class="px-6 py-3 flex-1 min-w-0">설명</div>
+        <div class="px-6 py-3 flex-1 min-w-0">파일명</div>
+        <div class="px-6 py-3 w-[10%] flex-none">등록일</div>
+        <div class="px-6 py-3 w-[10%] flex-none">수정일</div>
+        <div class="px-6 py-3 w-48 flex-none text-center">관리</div>
+      </div>
+
+      <div class="bg-white divide-y divide-gray-200">
+        <div th:each="video, stat : ${videoPage.content}"
+             th:id="'row-' + ${video.videoId}"
+             th:data-id="${video.videoId}"
+             class="flex hover:bg-gray-50 transition-colors duration-150 clickable-row"
+             th:attr="onclick='window.location.href=\'/video/view/\' + ' + ${video.videoId}">
+          <div class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap w-[6%] flex-none" th:text="${videoPage.number * videoPage.size + stat.index + 1}">1</div>
+          <div class="px-6 py-4 text-sm font-medium text-gray-900 overflow-hidden flex-1 min-w-0" th:title="${video.title}">
+            <div th:text="${video.title}" class="w-full line-clamp-2">제목</div>
+          </div>
+          <div class="px-6 py-4 text-sm text-gray-500 overflow-hidden flex-1 min-w-0" th:title="${video.content}">
+            <div th:text="${video.content}" class="w-full line-clamp-2">설명</div>
+          </div>
+          <div class="px-6 py-4 text-sm text-gray-500 overflow-hidden flex-1 min-w-0" th:title="${video.videoName}">
+            <div th:text="${video.videoName}" class="w-full line-clamp-2">파일명</div>
+          </div>
+          <div class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap w-[10%] flex-none" th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</div>
+          <div class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap w-[10%] flex-none" th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}">수정일</div>
+          <div class="px-6 py-4 text-sm font-medium whitespace-nowrap w-48 flex-none text-center" onclick="event.stopPropagation()">
+            <div class="flex space-x-1 justify-center">
               <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
-                 class="bg-dark-navy text-white px-3 py-1 rounded-lg hover:bg-gray-800 transition-all duration-300"
+                 class="bg-dark-navy text-white px-2 py-1 rounded-lg hover:bg-gray-800 transition-all duration-300"
                  title="수정">
                 <i class="fas fa-edit"></i> 수정
               </a>
-              <!-- 삭제 버튼 -->
+
               <button type="button"
                       th:attr="onclick='deleteVideo(' + ${video.videoId} + ')'"
-                      class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-all duration-300"
+                      class="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600 transition-all duration-300"
                       title="삭제">
                 <i class="fas fa-trash-alt"></i> 삭제
               </button>
             </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- 페이지네이션 -->
     <div class="pagination flex justify-center items-center space-x-2 mt-6" th:if="${videoPage.totalPages > 1}">
       <a th:if="${videoPage.number > 0}" th:href="@{/video/admin/list(page=${videoPage.number - 1}, searchType=${searchType}, keyword=${keyword})}"
          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors duration-200">이전</a>
@@ -165,18 +177,6 @@
       document.getElementById('searchForm').submit();
   }
 
-  // 행 클릭 시 상세페이지 이동
-  document.querySelectorAll(".clickable-cell").forEach(cell => {
-      cell.addEventListener('click', function() {
-          const row = this.closest('tr');
-          const videoId = row.getAttribute('data-id');
-          if (videoId) {
-              window.location.href = "/video/view/" + videoId;
-          }
-      });
-  });
-
-  // Ajax 삭제
  function deleteVideo(videoId) {
       if (!confirm("정말로 이 영상을 삭제하시겠습니까?")) return;
 
@@ -189,8 +189,7 @@
           return res.text();
       })
       .then(msg => {
-          const row = document.getElementById('row-' + videoId);
-          if (row) row.remove();
+          window.location.reload();
       })
       .catch(err => {
           alert(err);
