@@ -1,64 +1,41 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>Typing Game (game2)</title>
+    <title>Game 2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body{
-          margin:0; padding:0;
-          display:flex; justify-content:center; align-items:flex-start;
-          min-height:100vh; background-color:#222; color:#fff; font-family:sans-serif;
-        }
-
-        /* 화면 전체 높이를 쓰며 가운데 정렬 */
-        #unity-container{
-          width:100%;
-          height:100vh; /* 필요 시 80vh로 바꾸되 아래 canvas width 식도 같이 조정 */
-          display:flex; justify-content:center; align-items:center;
-          flex-direction:column;
-          gap:10px;
-        }
-
-        /* 잘림 방지: 16:9 비율 유지 + 화면에 맞게 축소/확대 */
-        #unity-canvas{
-          display:none;              /* 로딩 완료 후 JS에서 block 처리 */
-          aspect-ratio: 16 / 9;
-          width: min(100vw, 100vh * 16 / 9);
-          height: auto;              /* aspect-ratio에 의해 자동 계산 */
-          max-width: 100vw;
-          max-height: 100vh;
-          border: 2px solid #fff;
-          box-sizing: border-box;
-        }
-
-        /* input은 보이지 않지만 IME(한글 입력기) 동작 가능해야 함 */
-        #external-input{
-          position:absolute; bottom:10px; left:10px;
-          width:200px; height:30px;
-          opacity:0; color:transparent; background:transparent; border:none;
-          z-index:10;
-        }
-
-        #loading-bar{
-          width:min(600px, 80vw);
-          height:20px;
-          background:#444;
-          border-radius:10px;
-          overflow:hidden;
-        }
-        #loading-bar-progress{ width:0%; height:100%; background:#00ff00; }
-        #loading-text{ color:#fff; }
-    </style>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div id="unity-container">
-    <div id="loading-bar"><div id="loading-bar-progress"></div></div>
-    <div id="loading-text">Loading...</div>
-    <canvas id="unity-canvas"></canvas>
-</div>
+<body class="min-h-screen font-sans flex flex-col">
 
-<input type="text" id="external-input" autocomplete="off">
+<!-- header.html의 headerFragment 삽입 -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+
+<main class="w-full flex justify-center">
+    <div class="w-full max-w-7xl flex flex-col items-end p-5">
+        <a href="/game/main" class="inline-block bg-[#B5D0E3] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#93b4cc] transition-colors duration-200">
+            돌아가기
+        </a>
+
+        <div id="unity-container" class="w-full flex flex-col justify-center items-center mt-4 gap-2">
+            <!-- 로딩바 -->
+            <div id="loading-bar" class="w-1/2 h-5 bg-[#444] rounded-lg overflow-hidden">
+                <div id="loading-bar-progress" class="h-full w-0 bg-green-500 transition-all duration-300 ease-in-out"></div>
+            </div>
+            <div id="loading-text" class="text-white">Loading...</div>
+
+            <!-- Unity Canvas -->
+            <canvas id="unity-canvas"
+                    class="hidden w-full aspect-video border-2 border-white box-border"></canvas>
+        </div>
+
+        <!-- IME 입력용 숨김 input -->
+        <input type="text" id="external-input"
+               class="absolute bottom-2 left-2 w-52 h-8 opacity-0 text-transparent bg-transparent border-none z-10"
+               autocomplete="off">
+    </div>
+</main>
 
 <script>
     const canvas = document.getElementById("unity-canvas");
@@ -71,20 +48,10 @@
     const BUILD_URL  = BUILD_BASE + "/Build";
     const STREAMING_ASSETS_URL = BUILD_BASE + "/StreamingAssets";
 
-    // ✅ 폴더 안 파일 베이스명 후보(스크린샷 기준 둘 다 존재 가능)
-    const BASE_NAME_CANDIDATES = ["unity_build_webgl", "buildUnity"]; // 순서대로 시도
-
-    // ✅ 압축 산출물 사용 여부 (운영 권장: true)
-    // true  → *.unityweb 파일들을 로드(서버에서 Content-Encoding 헤더 필요; 임시는 Fallback로 완화)
-    // false → 비압축 *.data/*.framework.js/*.wasm 로드
+    const BASE_NAME_CANDIDATES = ["unity_build_webgl", "buildUnity"];
     const USE_UNITYWEB = true;
+    const DECOMPRESSION_FALLBACK = false;
 
-    // ✅ 서버가 *.unityweb에 Content-Encoding 헤더를 아직 못 달아줄 때 임시 완화
-    //   - 임시 테스트: true
-    //   - 운영(헤더 세팅 완료): false
-    const DECOMPRESSION_FALLBACK = false; // 필요시 true로
-
-    // ====== 공통 설정 생성 ======
     function makeConfig(baseName){
       return {
         dataUrl:      `${BUILD_URL}/${baseName}.data` + (USE_UNITYWEB ? `.unityweb` : ``),
@@ -95,14 +62,11 @@
         productName: "Typing Game (game2)",
         productVersion: "1.0",
         decompressionFallback: DECOMPRESSION_FALLBACK,
-
-        /* ▼ 잘림 방지 세팅: CSS 크기에 내부 렌더 버퍼를 맞추고, DPR=1로 과도한 해상도 방지 */
         matchWebGLToCanvasSize: true,
         devicePixelRatio: 1
       };
     }
 
-    // ====== 로더 스크립트 동적 주입 + 베이스명 폴백 ======
     function loadUnityWithBase(baseNameIndex){
       if (baseNameIndex >= BASE_NAME_CANDIDATES.length){
         loadingText.textContent = "Failed to load Unity loader.js (no baseName matched)";
@@ -118,23 +82,19 @@
       script.src = loaderUrl;
 
       script.onload = () => {
-        // Unity 로딩
         createUnityInstance(canvas, config, (progress) => {
           const pct = (progress * 100).toFixed(0);
           loadingBar.style.width = pct + "%";
           loadingText.textContent = `Loading... ${pct}%`;
         }).then((unityInstance) => {
           window.unityInstance = unityInstance;
-          document.getElementById("loading-bar").style.display = "none";
-          loadingText.style.display = "none";
-          canvas.style.display = "block";
-
-          // 캔버스가 키 입력 안 가로채도록 & 포커스 초기화
+          document.getElementById("loading-bar").classList.add('hidden');
+          loadingText.classList.add('hidden');
+          canvas.classList.remove('hidden');
           canvas.tabIndex = -1;
           externalInput.focus();
         }).catch((err) => {
           console.error(`[Unity] createUnityInstance failed with base "${baseName}"`, err);
-          // 로더는 로드됐지만 내부 리소스 실패 등일 경우 다음 후보 시도
           loadUnityWithBase(baseNameIndex + 1);
         });
       };
@@ -147,21 +107,17 @@
       document.body.appendChild(script);
     }
 
-    // 시작: 첫 후보부터 시도
     loadUnityWithBase(0);
 
-    // ====== 외부 입력창 포커스 유지 & Unity로 전달 ======
     function _FocusExternalInput(){ setTimeout(() => externalInput.focus(), 0); }
     canvas.addEventListener('mousedown', _FocusExternalInput);
 
-    // 입력 변화 시 Unity로 텍스트 전달
     externalInput.addEventListener('input', (e) => {
       if (window.unityInstance){
         window.unityInstance.SendMessage('InputManager', 'ReceiveInputFromWeb', e.target.value);
       }
     });
 
-    // 엔터 시 확정 전송
     externalInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter'){
         const text = externalInput.value.trim();
@@ -172,8 +128,7 @@
       }
     });
 
-    // ====== Unity → JS 콜백 (포인트 수신 후 서버 반영) ======
-    function ReceivePointsFromUnity(points){
+    window.ReceivePointsFromUnity = function(points){
       console.log(`[JS] Received points from Unity: ${points}`);
       fetch("/game/api/users/updatePoints", {
         method: "PUT",
@@ -186,7 +141,7 @@
       })
       .then(data => console.log("[JS] Server response:", data))
       .catch(err => console.error("[JS] Error:", err));
-    }
+    };
 </script>
 </body>
 </html>
