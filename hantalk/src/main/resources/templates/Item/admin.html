@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,12 +11,14 @@
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex-grow flex justify-center p-8">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl">
+<!-- 메인 컨테이너를 관리자 자료실 페이지와 동일한 크기로 변경 -->
+<div class="flex-grow flex justify-center w-full">
+    <main class="bg-white rounded-xl shadow-xl w-full max-w-7xl mx-auto flex-grow p-8 box-border">
 
+        <!-- 페이지 제목 및 버튼 섹션 -->
         <div class="p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
             <h2 class="text-3xl font-bold mb-4 text-center">아이템 관리</h2>
-            <div class="relative flex justify-center items-center min-h-[48px]"> <!-- Added min-h to prevent collapse -->
+            <div class="relative flex justify-center items-center min-h-[48px]">
                 <a href="/item/chuga" class="block w-fit bg-[#4B4B4B] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
                     ➕ 아이템 추가
                 </a>
@@ -31,36 +33,35 @@
             [[${message}]]
         </div>
 
+        <!-- 아이템 목록 테이블 -->
         <div class="p-8 overflow-x-auto">
             <table class="min-w-full bg-white border-collapse">
                 <thead>
-                <tr class="bg-[#FDFBFF] border-b border-[#E0E0E0]">
-                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">ID</th>
-                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">이름</th>
-                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">가격</th>
-                    <th class="py-3 px-6 text-left text-sm font-semibold text-[#2F4160] uppercase tracking-wider">설명</th>
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">관리</th>
+                <tr class="bg-gray-200 border-b border-[#E0E0E0]">
+                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">ID</th>
+                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">이름</th>
+                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/12">가격</th>
+                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">설명</th>
+                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">관리</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="item : ${items}" class="border-b border-gray-200 hover:bg-gray-50">
-                    <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.itemId}"></td>
-                    <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.itemName}"></td>
-                    <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.price}"></td>
+                    <td class="py-4 px-6 text-sm text-gray-800 text-center" th:text="${item.itemId}"></td>
+                    <td class="py-4 px-6 text-sm text-gray-800 w-1/6 text-center" th:text="${item.itemName}"></td>
+                    <td class="py-4 px-6 text-sm text-gray-800 w-1/12 text-center" th:text="${item.price}"></td>
                     <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.itemDescription}"></td>
-                    <td class="py-4 px-6 text-sm text-center">
-                        <div class="flex space-x-2 justify-center">
+                    <td class="py-4 px-6 text-sm font-medium text-center">
+                        <div class="flex justify-center items-center space-x-2">
                             <a th:href="@{'/item/sujung/' + ${item.itemId}}"
-                               class="bg-[#4B4B4B] text-white px-3 py-1 rounded-lg hover:bg-[#2F4160] transition duration-300"
-                               title="수정">
-                                <i class="fas fa-edit"></i> 수정
+                               class="inline-flex items-center space-x-1 bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300 whitespace-nowrap">
+                                <i class="fas fa-edit"></i> <span>수정</span>
                             </a>
-                            <a th:href="@{'/item/sakje/' + ${item.itemId}}"
-                               class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300"
-                               onclick="return confirm('정말 이 아이템을 삭제하시겠습니까?');"
-                               title="삭제">
-                                <i class="fas fa-trash-alt"></i> 삭제
-                            </a>
+                            <button type="button"
+                                    class="inline-flex items-center space-x-1 bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 whitespace-nowrap"
+                                    th:onclick="'confirmDelete(' + ${item.itemId} + ');'">
+                                <i class="fas fa-trash"></i> <span>삭제</span>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -68,15 +69,108 @@
             </table>
         </div>
 
-        <!-- This div is now empty as the button has been moved -->
+        <!-- 푸터와의 간격을 위해 비어 있는 div 유지 (optional) -->
         <div class="p-8 flex justify-center border-t border-[#E0E0E0] rounded-b-xl bg-[#FDFBFF]">
-            <!-- Content moved -->
         </div>
 
-    </div>
+        <!-- 페이지네이션 컨트롤 추가 -->
+        <div id="pagination-controls" class="flex flex-col md:flex-row justify-center items-center mt-6 space-y-4 md:space-y-0 md:space-x-4">
+            <!-- 페이지네이션 버튼이 여기에 동적으로 추가됩니다 -->
+        </div>
+
+    </main>
 </div>
 
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
+
+<script>
+    // 페이지네이션 기능을 위한 JavaScript 코드
+    document.addEventListener("DOMContentLoaded", function() {
+        const tableBody = document.querySelector("tbody");
+        const allRows = Array.from(tableBody.querySelectorAll("tr"));
+        const paginationWrapper = document.getElementById("pagination-controls");
+
+        const rowsPerPage = 10;
+        let currentPage = 1;
+
+        function renderPage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            const paginatedRows = allRows.slice(start, end);
+
+            tableBody.innerHTML = '';
+            paginatedRows.forEach(row => tableBody.appendChild(row));
+
+            updatePaginationButtons(page);
+        }
+
+        function updatePaginationButtons(page) {
+            paginationWrapper.innerHTML = '';
+            const pageCount = Math.ceil(allRows.length / rowsPerPage);
+
+            // '이전' 버튼
+            const prevButton = document.createElement('a');
+            prevButton.textContent = '이전';
+            prevButton.className = `inline-flex items-center justify-center px-3 py-1.5 no-underline rounded-md transition-colors duration-200`;
+            if (page === 1) {
+                prevButton.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            } else {
+                prevButton.classList.add('bg-white', 'text-[#2F4160]', 'border', 'border-gray-300', 'hover:bg-[#f3f4f6]', 'hover:text-[#2F4160]');
+            }
+            if (page > 1) {
+                prevButton.href = '#'; // 실제 URL 대신 스크롤을 막는 임시 링크
+                prevButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage--;
+                    renderPage(currentPage);
+                });
+            }
+            paginationWrapper.appendChild(prevButton);
+
+            // 페이지 번호 버튼
+            for (let i = 1; i <= pageCount; i++) {
+                const btn = document.createElement('a');
+                btn.textContent = i;
+                btn.className = `block w-8 h-8 flex items-center justify-center rounded-md no-underline transition-colors duration-200`;
+                if (i === page) {
+                    btn.classList.add('bg-[#B5D0E3]', 'text-white', 'font-bold');
+                } else {
+                    btn.classList.add('bg-white', 'text-[#2F4160]', 'border', 'border-gray-300', 'hover:bg-[#f3f4f6]', 'hover:text-[#2F4160]');
+                }
+                btn.href = '#'; // 실제 URL 대신 스크롤을 막는 임시 링크
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = i;
+                    renderPage(currentPage);
+                });
+                paginationWrapper.appendChild(btn);
+            }
+
+            // '다음' 버튼
+            const nextButton = document.createElement('a');
+            nextButton.textContent = '다음';
+            nextButton.className = `inline-flex items-center justify-center px-3 py-1.5 no-underline rounded-md transition-colors duration-200`;
+            if (page === pageCount) {
+                nextButton.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            } else {
+                nextButton.classList.add('bg-white', 'text-[#2F4160]', 'border', 'border-gray-300', 'hover:bg-[#f3f4f6]', 'hover:text-[#2F4160]');
+            }
+            if (page < pageCount) {
+                nextButton.href = '#'; // 실제 URL 대신 스크롤을 막는 임시 링크
+                nextButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage++;
+                    renderPage(currentPage);
+                });
+            }
+            paginationWrapper.appendChild(nextButton);
+        }
+
+        // 초기 페이지를 렌더링합니다.
+        renderPage(currentPage);
+    });
+</script>
 
 </body>
 </html>
