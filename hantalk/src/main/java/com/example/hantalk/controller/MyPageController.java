@@ -111,21 +111,34 @@ public class MyPageController {
         return "redirect:/user/view";
     }
 
-    @GetMapping("/delete")
-    public String delete(Model model, HttpSession session) {
-        Integer userNo = (Integer) session.getAttribute("userNo");
-        if (userNo == null) {
-            return "redirect:/user/login";  // 로그인 안 되어 있으면 로그인 페이지로 이동
-        }
-        return "user/delete";
-    }
-    // 탈퇴
     @PostMapping("/delete")
-    public String deleteProc(HttpSession session) {
-        Integer userNo = (Integer) session.getAttribute("userNo");
-        myPageService.deactivateUser(userNo);
-        session.invalidate(); // 세션 만료
-        return "redirect:/user/login"; // 로그인페이지로
+    @ResponseBody
+    public ResponseEntity<?> deleteProc(@RequestBody Map<String, String> payload, HttpSession session) {
+        Integer userNo = SessionUtil.getLoginUserNo(session);
+        if (userNo == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "로그인이 필요합니다."));
+        }
+
+        String password = payload.get("password");
+        if (password == null || password.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "비밀번호를 입력해주세요."));
+        }
+
+        try {
+            // 서비스 레이어에 비밀번호를 검증하고 탈퇴를 처리하는 새로운 메서드 추가가 필요합니다.
+            myPageService.deactivateUser(userNo, password);
+
+            // 탈퇴 성공 시 세션 무효화
+            session.invalidate();
+            return ResponseEntity.ok().body(Map.of("message", "회원 탈퇴가 성공적으로 완료되었습니다."));
+
+        } catch (IllegalArgumentException e) {
+            // 비밀번호 불일치 등 오류 발생 시
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            // 기타 서버 오류
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "회원 탈퇴 중 오류가 발생했습니다."));
+        }
     }
 
     @PostMapping("/apply-setting")

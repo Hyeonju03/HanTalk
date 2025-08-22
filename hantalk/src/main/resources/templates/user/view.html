@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>마이페이지</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
+        /* 사용자 정의 색상 변수 (Tailwind 클래스화) */
         .bg-main-dark { background-color: #2F4160; }
         .text-main-dark { color: #2F4160; }
         .bg-accent-pink { background-color: #F29DA0; }
@@ -15,9 +18,8 @@
         .text-soft-blue { color: #B5D0E3; }
         .hover-bg-soft-blue:hover { background-color: #B5D0E3; }
         .hover-text-accent-pink:hover { color: #F29DA0; }
-        .container-custom { max-width: 1000px; }
 
-        /* 프로필 컨테이너 */
+        /* 기존 CSS와 Tailwind의 통합을 위해 몇 가지 스타일은 유지 */
         .profile-container {
             position: relative;
             width: 160px;
@@ -44,7 +46,6 @@
             font-size: 0.9rem;
         }
 
-        /* 무난한 패턴 배경 */
         .bg-pattern {
             background-color: #ffffff;
             background-image: radial-gradient(#dbeafe 1px, transparent 1px);
@@ -55,13 +56,15 @@
 
 <body class="min-h-screen flex flex-col bg-gray-50 font-sans text-main-dark">
 
+<!-- 헤더와 푸터는 기존처럼 th:replace를 사용합니다 -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
 <main class="flex-grow flex justify-center p-8 space-x-8">
 
+    <!-- 사이드바도 기존처럼 th:replace를 사용합니다 -->
     <div th:replace="~{fragments/mypageSidebar :: mypageSidebar}" class="h-full"></div>
 
-    <div class="container-custom w-full">
+    <div class="max-w-[1000px] w-full">
         <div class="bg-white p-8 rounded-xl shadow-xl h-full">
 
             <div class="flex flex-col items-center py-12 border-b border-[#E0E0E0] rounded-t-xl w-full relative overflow-hidden bg-pattern">
@@ -95,7 +98,7 @@
             <div class="p-8">
                 <h2 class="text-xl font-bold mb-4 border-l-4 border-[#F29DA0] pl-3">상세 정보</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 mb-8">
                     <div>
                         <strong class="block text-sm">이름</strong>
                         <span class="text-lg font-semibold" th:text="${user.name}">이름</span>
@@ -121,6 +124,16 @@
                         <span class="text-lg font-semibold" th:text="${#temporals.format(user.JoinDate, 'yyyy-MM-dd')}">2025-08-01</span>
                     </div>
                 </div>
+
+                <!-- 탈퇴하기 버튼 -->
+                <div class="flex justify-end mt-4">
+                    <button id="showDeleteModalBtn"
+                            class="px-4 py-2 font-bold rounded-lg transition-all duration-200
+                                   border-2 border-red-500 bg-white text-red-500
+                                   hover:bg-red-500 hover:text-white hover:scale-105 hover:shadow-lg">
+                        <i class="fa-solid fa-user-xmark mr-2"></i>회원 탈퇴하기
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -128,8 +141,35 @@
 
 <div class="py-4 text-gray-500 text-center text-sm bg-gray-100" th:replace="~{fragments/footer :: footerFragment}"></div>
 
+
+<!-- Tailwind CSS 기반 비밀번호 확인 모달 -->
+<!-- 기존 Bootstrap Modal 클래스를 모두 제거하고 Tailwind로 재구성 -->
+<div id="deleteModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 m-4">
+        <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+            <h5 class="text-xl font-semibold">회원 탈퇴</h5>
+            <button type="button" id="closeDeleteModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="py-4">
+            <p class="text-gray-700 mb-4">회원 탈퇴를 진행하시려면 비밀번호를 입력해주세요.</p>
+            <div class="mb-4">
+                <label for="passwordInput" class="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
+                <input type="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="passwordInput">
+            </div>
+            <div id="deleteAlert" class="hidden p-3 rounded-lg bg-red-100 text-red-700 border border-red-200 mt-2" role="alert"></div>
+        </div>
+        <div class="flex justify-end space-x-2">
+            <button type="button" id="cancelDeleteBtn" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">취소</button>
+            <button type="button" class="px-4 py-2 font-bold rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors" id="confirmDeleteBtn">탈퇴하기</button>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // 사이드바 활성화 로직 (기존 코드)
       const links = document.querySelectorAll('aside nav a');
       const currentPath = window.location.pathname;
 
@@ -150,9 +190,71 @@
           e.currentTarget.classList.remove('text-main-dark', 'hover:bg-[#2F4160]', 'hover:text-white');
         });
       });
+
+      // Tailwind CSS 기반 모달 로직
+      const showDeleteModalBtn = document.getElementById('showDeleteModalBtn');
+      const deleteModal = document.getElementById('deleteModal');
+      const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+      const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+      const passwordInput = document.getElementById('passwordInput');
+      const deleteAlert = document.getElementById('deleteAlert');
+
+      // 모달 열기
+      showDeleteModalBtn.addEventListener('click', () => {
+        passwordInput.value = '';
+        deleteAlert.classList.add('hidden');
+        deleteAlert.classList.remove('block');
+        deleteModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // 스크롤 방지
+      });
+
+      // 모달 닫기
+      const closeModal = () => {
+        deleteModal.classList.add('hidden');
+        document.body.style.overflow = ''; // 스크롤 복구
+      };
+
+      closeDeleteModalBtn.addEventListener('click', closeModal);
+      cancelDeleteBtn.addEventListener('click', closeModal);
+
+      // 회원 탈퇴 로직
+      confirmDeleteBtn.addEventListener('click', async () => {
+        const password = passwordInput.value;
+
+        if (password.trim() === '') {
+          deleteAlert.textContent = '비밀번호를 입력해주세요.';
+          deleteAlert.classList.remove('hidden');
+          deleteAlert.classList.add('block');
+          return;
+        }
+
+        try {
+          const response = await fetch('/user/delete', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password: password })
+          });
+
+          if (response.ok) {
+            alert('회원 탈퇴가 완료되었습니다.');
+            window.location.href = '/hantalk/home';
+          } else {
+            const error = await response.json();
+            deleteAlert.textContent = error.message || '비밀번호가 일치하지 않습니다.';
+            deleteAlert.classList.remove('hidden');
+            deleteAlert.classList.add('block');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          deleteAlert.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+          deleteAlert.classList.remove('hidden');
+          deleteAlert.classList.add('block');
+          }
+      });
     });
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
