@@ -49,27 +49,6 @@
             margin-top: 20px;
             margin-bottom: 20px;
         }
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .pagination-link {
-            padding: 8px 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            margin: 0 4px;
-            color: #2F4160;
-            text-decoration: none;
-        }
-        .pagination-link:hover {
-            background-color: #e5e7eb;
-        }
-        .pagination-link.active {
-            background-color: #B5D0E3;
-            color: white;
-            border-color: #B5D0E3;
-        }
     </style>
 </head>
 <body class="bg-[#f3f4f6] flex flex-col min-h-screen">
@@ -152,28 +131,21 @@
 
                 </div>
 
-                <div th:if="${!postPage.isEmpty()}" class="pagination-container">
-                    <nav aria-label="Page navigation">
-                        <ul class="flex space-x-2">
-                            <li class="page-item" th:classappend="${postPage.first} ? 'opacity-50 cursor-not-allowed'">
-                                <a class="pagination-link" th:href="@{|/post/list/${categoryId}|(page=0, keyword=${keyword}, searchType=${searchType})}">처음</a>
-                            </li>
-                            <li class="page-item" th:classappend="${postPage.first} ? 'opacity-50 cursor-not-allowed'">
-                                <a class="pagination-link" th:href="@{|/post/list/${categoryId}|(page=${postPage.number-1}, keyword=${keyword}, searchType=${searchType})}">이전</a>
-                            </li>
-                            <li th:each="pageNumber : ${#numbers.sequence(0, postPage.totalPages - 1)}"
-                                th:classappend="${pageNumber == postPage.number} ? 'active' : ''" class="page-item">
-                                <a th:href="@{|/post/list/${categoryId}|(page=${pageNumber}, keyword=${keyword}, searchType=${searchType})}"
-                                   th:text="${pageNumber + 1}" class="pagination-link" th:classappend="${pageNumber == postPage.number} ? 'bg-[#B5D0E3] text-white' : ''"></a>
-                            </li>
-                            <li class="page-item" th:classappend="${postPage.last} ? 'opacity-50 cursor-not-allowed'">
-                                <a class="pagination-link" th:href="@{|/post/list/${categoryId}|(page=${postPage.number+1}, keyword=${keyword}, searchType=${searchType})}">다음</a>
-                            </li>
-                            <li class="page-item" th:classappend="${postPage.last} ? 'opacity-50 cursor-not-allowed'">
-                                <a class="pagination-link" th:href="@{|/post/list/${categoryId}|(page=${postPage.totalPages - 1}, keyword=${keyword}, searchType=${searchType})}">마지막</a>
-                            </li>
-                        </ul>
-                    </nav>
+                <!-- 페이지네이션 디자인 통일 -->
+                <div th:if="${!postPage.isEmpty()}" class="pagination flex justify-center items-center mt-8 space-x-2">
+                    <a th:if="${postPage.hasPrevious()}"
+                       th:href="@{|/post/list/${categoryId}|(page=${postPage.number - 1}, keyword=${keyword}, searchType=${searchType})}"
+                       class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">이전</a>
+
+                    <a th:each="pageNumber : ${#numbers.sequence(0, postPage.totalPages - 1)}"
+                       th:href="@{|/post/list/${categoryId}|(page=${pageNumber}, keyword=${keyword}, searchType=${searchType})}"
+                       th:text="${pageNumber + 1}"
+                       th:classappend="${pageNumber == postPage.number} ? 'bg-[#B5D0E3] text-white font-bold' : 'bg-white text-[#2F4160] border border-gray-300'"
+                       class="block w-8 h-8 flex items-center justify-center rounded-md no-underline transition-colors duration-200 hover:bg-[#f3f4f6] hover:text-[#2F4160]"></a>
+
+                    <a th:if="${postPage.hasNext()}"
+                       th:href="@{|/post/list/${categoryId}|(page=${postPage.number + 1}, keyword=${keyword}, searchType=${searchType})}"
+                       class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">다음</a>
                 </div>
             </div>
         </div>

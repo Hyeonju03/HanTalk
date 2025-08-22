@@ -138,8 +138,17 @@
     </section>
 
     <section class="container mx-auto px-4 py-8 mt-12 flex flex-col md:flex-row justify-center items-start space-y-8 md:space-y-0 md:space-x-8">
+        <!-- 공지사항 섹션 -->
         <div class="w-full md:w-1/2 flex flex-col">
-            <h2 class="text-2xl font-bold text-hantalk-navy mb-4">공지사항</h2>
+            <!-- 제목과 바로가기 버튼을 감싸는 div에 px-4 추가 -->
+            <div class="flex justify-between items-center mb-4 px-4">
+                <h2 class="text-2xl font-bold text-hantalk-navy">공지사항</h2>
+                <!-- '+ 바로가기' 버튼 추가 -->
+                <!-- th:href는 Thymeleaf 구문으로 실제 링크는 서버에서 처리됩니다. -->
+                <a th:href="@{/post/list/1}" class="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                    <span class="mr-1">+</span>바로가기
+                </a>
+            </div>
             <div class="bg-white p-6 rounded-2xl shadow-xl space-y-2">
                 <div th:each="notice : ${notices}" class="clickable-div flex justify-between items-center">
                     <a th:href="@{/post/view/__${notice.postId}__}"></a>
@@ -149,8 +158,17 @@
             </div>
         </div>
 
+        <!-- 커뮤니티 섹션 -->
         <div class="w-full md:w-1/2 flex flex-col">
-            <h2 class="text-2xl font-bold text-hantalk-navy mb-4">커뮤니티</h2>
+            <!-- 제목과 바로가기 버튼을 감싸는 div에 px-4 추가 -->
+            <div class="flex justify-between items-center mb-4 px-4">
+                <h2 class="text-2xl font-bold text-hantalk-navy">커뮤니티</h2>
+                <!-- '+ 바로가기' 버튼 추가 -->
+                <!-- th:href는 Thymeleaf 구문으로 실제 링크는 서버에서 처리됩니다. -->
+                <a th:href="@{/post/list/2}" class="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                    <span class="mr-1">+</span>바로가기
+                </a>
+            </div>
             <div class="bg-white p-6 rounded-2xl shadow-xl space-y-2">
                 <div th:each="post : ${communityPosts}" class="clickable-div flex justify-between items-center">
                     <a th:href="@{/post/view/__${post.postId}__}"></a>
