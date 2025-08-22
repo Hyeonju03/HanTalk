@@ -1,297 +1,294 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>강의 목록</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    .bg-main-dark { background-color: #2F4160; }
-    .text-main-dark { color: #2F4160; }
-    .bg-accent-pink { background-color: #F29DA0; }
-    .text-accent-pink { color: #F29DA0; }
-    .bg-soft-blue { background-color: #B5D0E3; }
-    .text-soft-blue { color: #B5D0E3; }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영상 목록</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .bg-main-dark { background-color: #2F4160; }
+        .text-main-dark { color: #2F4160; }
+        .bg-accent-pink { background-color: #F29DA0; }
+        .text-accent-pink { color: #F29DA0; }
+        .bg-soft-blue { background-color: #B5D0E3; }
+        .text-soft-blue { color: #B5D0E3; }
 
-    .all-videos-btn-hover:hover {
-        background-color: #2F4160;
-        color: #ffffff;
-    }
-    .favorite-btn-hover:hover {
-        background-color: #F29DA0;
-        color: #ffffff;
-    }
+        .all-videos-btn-hover:hover {
+            background-color: #2F4160;
+            color: #ffffff;
+        }
+        .favorite-btn-hover:hover {
+            background-color: #F29DA0;
+            color: #ffffff;
+        }
 
-    .video-card {
-        transition: all 0.3s ease;
-        border-radius: 1rem;
-        border: 1px solid rgba(181, 208, 227, 0.3);
-        background-color: rgba(255, 255, 255, 0.9);
-    }
+        .video-card {
+            transition: all 0.3s ease;
+            border-radius: 1rem;
+            border: 1px solid rgba(181, 208, 227, 0.3);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
 
-    .video-card:hover {
-        border-color: #2F4160;
-        transform: scale(1.03);
-        box-shadow: 0 12px 20px rgba(0,0,0,0.15);
-    }
+        .video-card:hover {
+            border-color: #2F4160;
+            transform: scale(1.03);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
 
-    .play-icon-overlay {
-        transition: background 0.3s ease, transform 0.3s ease;
-        font-size: 3rem;
-        text-shadow: 0 0 5px rgba(0,0,0,0.4);
-    }
-    .thumbnail-link:hover .play-icon-overlay {
-        background-color: rgba(0, 0, 0, 0.3);
-        transform: scale(1.1);
-    }
+        .play-icon-overlay {
+            transition: background 0.3s ease, transform 0.3s ease;
+            font-size: 3rem;
+            text-shadow: 0 0 5px rgba(0,0,0,0.4);
+        }
+        .thumbnail-link:hover .play-icon-overlay {
+            background-color: rgba(0, 0, 0, 0.3);
+            transform: scale(1.1);
+        }
 
-    .video-section {
-        background-color: rgba(181, 208, 227, 0.1);
-        padding: 3rem 1.5rem;
-        border-radius: 1.5rem;
-        border: 1px solid rgba(181, 208, 227, 0.3);
-    }
+        .video-section {
+            background-color: rgba(181, 208, 227, 0.1);
+            padding: 3rem 1.5rem;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(181, 208, 227, 0.3);
+        }
 
-    /* 찜한 영상 표시 - 테두리 및 재생 버튼 색상 효과 제거 */
-    .favorite-video {
-        /*border-color: #F29DA0;
-        transform: scale(1.03);*/
-    }
-    .favorite-video .play-icon-overlay {
-        /*color: #F29DA0;*/
-    }
+        /* 찜한 영상 표시 - 테두리 및 재생 버튼 색상 효과 제거 */
+        .favorite-video {
+            /*border-color: #F29DA0;
+            transform: scale(1.03);*/
+        }
+        .favorite-video .play-icon-overlay {
+            /*color: #F29DA0;*/
+        }
 
-    /* 찜하기 버튼 스타일 수정 */
-    .favorite-btn {
-        text-shadow: 0px 1px 3px rgba(0,0,0,0.5);
-        color: #ffffff; /* 기본 하트 색상을 다시 흰색으로 변경 */
-    }
-    .favorite-btn-active {
-        color: #EF4444; /* Tailwind red-500 */
-    }
+        /* 찜하기 버튼 스타일 수정 */
+        .favorite-btn {
+            text-shadow: 0px 1px 3px rgba(0,0,0,0.5);
+            color: #ffffff; /* 기본 하트 색상을 다시 흰색으로 변경 */
+        }
+        .favorite-btn-active {
+            color: #EF4444; /* Tailwind red-500 */
+        }
 
-    /* 여러 줄 텍스트 말줄임표 CSS */
-    .clamp-2-lines {
-        display: -webkit-box;
-        -webkit-line-clamp: 2; /* 두 줄로 제한 */
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        word-break: break-all; /* 이 부분 추가 */
-    }
-  </style>
+        /* 여러 줄 텍스트 말줄임표 CSS */
+        .clamp-2-lines {
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* 두 줄로 제한 */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-all; /* 이 부분 추가 */
+        }
+    </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex flex-col min-h-screen">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
 <main class="flex-1 container mx-auto px-4 py-8">
-  <!-- 카드 섹션 배경 컨테이너 -->
-  <div class="video-section">
-    <!-- 상단 버튼 + 검색 -->
-    <h1 class="text-3xl font-extrabold text-center mb-8 text-gray-700">영상 목록</h1>
-    <div class="max-w-screen-xl mx-auto mb-8 flex flex-col md:flex-row items-center justify-between gap-6 px-4">
-      <div class="flex gap-2">
-        <!-- '전체 영상' 버튼을 자바스크립트 함수 호출로 변경 -->
-        <a href="javascript:void(0)" onclick="showAllVideos()" class="px-6 py-2 bg-white text-main-dark font-semibold rounded-lg shadow-md all-videos-btn-hover transition duration-300">
-          전체 영상
-        </a>
-        <!-- 찜한 영상 링크를 자바스크립트 함수 호출로 변경 -->
-        <a href="javascript:void(0)" onclick="filterFavorites()" class="px-6 py-2 bg-white text-accent-pink font-semibold rounded-lg shadow-md favorite-btn-hover transition duration-300">
-          찜한 영상
-        </a>
-      </div>
-      <form method="get" th:action="@{/video/list}" class="flex gap-2 w-full md:w-auto">
-        <select name="searchType" class="flex-shrink p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark">
-          <option value="title" th:selected="${searchType == 'title'}">제목</option>
-          <option value="content" th:selected="${searchType == 'content'}">내용</option>
-          <option value="all" th:selected="${searchType == 'all'}">제목 + 내용</option>
-        </select>
-        <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력"
-               class="flex-grow min-w-0 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark" />
-        <button type="submit"
-                class="px-6 py-2 bg-accent-pink text-white font-semibold rounded-lg shadow-md hover:bg-accent-pink transition duration-300">
-          검색
-        </button>
-      </form>
-    </div>
-    <div class="video-list-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+    <!-- 카드 섹션 배경 컨테이너 -->
+    <div class="video-section">
+        <!-- 상단 버튼 + 검색 -->
+        <h1 class="text-3xl font-extrabold text-center mb-8 text-gray-700">영상 목록</h1>
+        <div class="max-w-screen-xl mx-auto mb-8 flex flex-col md:flex-row items-center justify-between gap-6 px-4">
+            <div class="flex gap-2">
+                <!-- '전체 영상' 버튼을 자바스크립트 함수 호출로 변경 -->
+                <a href="javascript:void(0)" onclick="showAllVideos()" class="px-6 py-2 bg-white text-main-dark font-semibold rounded-lg shadow-md all-videos-btn-hover transition duration-300">
+                    전체 영상
+                </a>
+                <!-- 찜한 영상 링크를 자바스크립트 함수 호출로 변경 -->
+                <a href="javascript:void(0)" onclick="filterFavorites()" class="px-6 py-2 bg-white text-accent-pink font-semibold rounded-lg shadow-md favorite-btn-hover transition duration-300">
+                    찜한 영상
+                </a>
+            </div>
+            <form method="get" th:action="@{/video/list}" class="flex gap-2 w-full md:w-auto">
+                <select name="searchType" class="flex-shrink p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark">
+                    <option value="title" th:selected="${searchType == 'title'}">제목</option>
+                    <option value="content" th:selected="${searchType == 'content'}">내용</option>
+                    <option value="all" th:selected="${searchType == 'all'}">제목 + 내용</option>
+                </select>
+                <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력"
+                       class="flex-grow min-w-0 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark" />
+                <button type="submit"
+                        class="px-6 py-2 bg-accent-pink text-white font-semibold rounded-lg shadow-md hover:bg-accent-pink transition duration-300">
+                    검색
+                </button>
+            </form>
+        </div>
+        <div class="video-list-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
 
-      <a th:each="video, stat : ${videoPage.content}"
-         th:if="${stat.index < 9}"
-         th:href="@{/video/view/{id}(id=${video.videoId})}"
-         class="video-card relative p-4 flex flex-col cursor-pointer"
-         th:data-video-id="${video.videoId}">
+            <a th:each="video, stat : ${videoPage.content}"
+               th:href="@{/video/view/{id}(id=${video.videoId})}"
+               class="video-card relative p-4 flex flex-col cursor-pointer"
+               th:data-video-id="${video.videoId}">
 
-        <div class="thumbnail-link relative block w-full aspect-video overflow-hidden rounded-lg mb-3">
-          <video class="video-thumbnail w-full h-full object-cover pointer-events-none" muted playsinline preload="metadata">
-            <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
-            영상 태그를 지원하지 않는 브라우저입니다.
-          </video>
-          <div class="play-icon-overlay absolute inset-0 flex items-center justify-center text-5xl text-white pointer-events-none">▶</div>
+                <div class="thumbnail-link relative block w-full aspect-video overflow-hidden rounded-lg mb-3">
+                    <video class="video-thumbnail w-full h-full object-cover pointer-events-none" muted playsinline preload="metadata">
+                        <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
+                        영상 태그를 지원하지 않는 브라우저입니다.
+                    </video>
+                    <div class="play-icon-overlay absolute inset-0 flex items-center justify-center text-5xl text-white pointer-events-none">▶</div>
+                </div>
+
+                <div class="flex items-start justify-between">
+                    <strong class="video-title text-lg font-bold text-gray-900 leading-tight mb-1 min-w-0 flex-grow">
+
+                        <span th:text="${video.title}" class="no-underline text-main-dark transition duration-300 clamp-2-lines">영상 제목</span>
+                    </strong>
+
+                    <span class="favorite-btn text-2xl cursor-pointer z-20 ml-2" th:data-video-id="${video.videoId}" onclick="event.preventDefault(); event.stopPropagation();">♡</span>
+                </div>
+
+                <p class="text-sm text-gray-500 invisible h-0">공간 확보를 위한 빈 태그</p>
+            </a>
         </div>
 
-        <div class="flex items-start justify-between">
-          <strong class="video-title text-lg font-bold text-gray-900 leading-tight mb-1 min-w-0 flex-grow">
-
-            <span th:text="${video.title}" class="no-underline text-main-dark transition duration-300 clamp-2-lines">영상 제목</span>
-          </strong>
-
-          <span class="favorite-btn text-2xl cursor-pointer z-20 ml-2" th:data-video-id="${video.videoId}" onclick="event.preventDefault(); event.stopPropagation();">♡</span>
+        <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-white rounded-xl shadow-inner no-results">
+            <p class="text-xl font-medium text-main-dark">검색 결과가 없습니다.</p>
         </div>
-
-        <p class="text-sm text-gray-500 invisible h-0">공간 확보를 위한 빈 태그</p>
-      </a>
     </div>
 
-    <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-white rounded-xl shadow-inner no-results">
-      <p class="text-xl font-medium text-main-dark">검색 결과가 없습니다.</p>
+    <!-- 디자인이 통일된 페이지네이션 -->
+    <div class="pagination flex justify-center items-center mt-8 space-x-2" th:if="${videoPage.totalPages > 1}">
+        <a th:if="${videoPage.hasPrevious()}"
+           th:href="@{|/video/list?page=${videoPage.number - 1}&keyword=${keyword}|}"
+           class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">이전</a>
+
+        <a th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}"
+           th:href="@{|/video/list?page=${i}&keyword=${keyword}|}" th:text="${i + 1}"
+           th:classappend="${i == videoPage.number} ? 'bg-[#B5D0E3] text-white font-bold' : 'bg-white text-[#2F4160] border border-gray-300'"
+           class="block w-8 h-8 flex items-center justify-center rounded-md no-underline transition-colors duration-200 hover:bg-[#f3f4f6] hover:text-[#2F4160]"></a>
+
+        <a th:if="${videoPage.hasNext()}"
+           th:href="@{|/video/list?page=${videoPage.number + 1}&keyword=${keyword}|}"
+           class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">다음</a>
     </div>
-  </div>
 
-  <div class="pagination text-center mt-12" th:if="${videoPage.totalPages > 1}">
-        <span th:if="${!videoPage.first}">
-            <a th:href="@{/video/list(page=${videoPage.number - 1}, keyword=${keyword}, searchType=${searchType})}" class="inline-block px-4 py-2 mx-1 bg-soft-blue text-white font-semibold rounded-lg hover:bg-soft-blue transition-colors duration-300">&laquo; 이전</a>
-        </span>
-    <span th:if="${videoPage.first}" class="inline-block px-4 py-2 mx-1 bg-gray-200 text-gray-400 rounded-lg cursor-not-allowed">&laquo; 이전</span>
-
-    <span th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}">
-            <a th:href="@{/video/list(page=${i}, keyword=${keyword}, searchType=${searchType})}"
-               th:classappend="${i == videoPage.number} ? 'bg-accent-pink text-white font-bold shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'"
-               class="inline-block px-4 py-2 mx-1 rounded-lg transition-colors duration-300"
-               th:text="${i + 1}">1</a>
-        </span>
-
-    <span th:if="${!videoPage.last}">
-            <a th:href="@{/video/list(page=${videoPage.number + 1}, keyword=${keyword}, searchType=${searchType})}" class="inline-block px-4 py-2 mx-1 bg-soft-blue text-white font-semibold rounded-lg hover:bg-soft-blue transition-colors duration-300">다음 &raquo;</a>
-        </span>
-    <span th:if="${videoPage.last}" class="inline-block px-4 py-2 mx-1 bg-gray-200 text-gray-400 rounded-lg cursor-not-allowed">다음 &raquo;</span>
-  </div>
 </main>
 
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-      // 썸네일 동영상 재생 로직: 마우스를 올리면 1초 지점에서 재생
-      document.querySelectorAll('.video-card').forEach(card => {
-          const video = card.querySelector('video');
-          if (video) {
-              card.addEventListener('mouseenter', () => {
-                  video.currentTime = 1;
-                  video.play();
-              });
-              card.addEventListener('mouseleave', () => {
-                  video.pause();
-                  video.currentTime = 1;
-              });
-          }
-      });
+    document.addEventListener("DOMContentLoaded", function () {
+        // 썸네일 동영상 재생 로직: 마우스를 올리면 1초 지점에서 재생
+        document.querySelectorAll('.video-card').forEach(card => {
+            const video = card.querySelector('video');
+            if (video) {
+                card.addEventListener('mouseenter', () => {
+                    video.currentTime = 1;
+                    video.play();
+                });
+                card.addEventListener('mouseleave', () => {
+                    video.pause();
+                    video.currentTime = 1;
+                });
+            }
+        });
 
-      // 비디오 모달 로직
-      const modal = document.createElement('div');
-      modal.id = 'videoModal';
-      modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden';
-      document.body.appendChild(modal);
+        // 비디오 모달 로직
+        const modal = document.createElement('div');
+        modal.id = 'videoModal';
+        modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden';
+        document.body.appendChild(modal);
 
-      document.querySelectorAll('.video-card a').forEach(link => {
-          link.addEventListener('click', e => {
-              e.preventDefault();
-              const videoSrc = link.querySelector('video source').src;
-              modal.innerHTML = `
-                  <div class="relative w-11/12 md:w-2/3 lg:w-1/2 bg-black rounded-lg p-4">
-                      <button id="closeModal" class="absolute top-2 right-2 text-white text-2xl">&times;</button>
-                      <video src="${videoSrc}" controls autoplay class="w-full rounded-lg"></video>
-                  </div>`;
-              modal.classList.remove('hidden');
+        document.querySelectorAll('.video-card a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const videoSrc = link.querySelector('video source').src;
+                modal.innerHTML = `
+                    <div class="relative w-11/12 md:w-2/3 lg:w-1/2 bg-black rounded-lg p-4">
+                        <button id="closeModal" class="absolute top-2 right-2 text-white text-2xl">&times;</button>
+                        <video src="${videoSrc}" controls autoplay class="w-full rounded-lg"></video>
+                    </div>`;
+                modal.classList.remove('hidden');
 
-              document.getElementById('closeModal').addEventListener('click', () => {
-                  modal.classList.add('hidden');
-                  modal.innerHTML = '';
-              });
-          });
-      });
+                document.getElementById('closeModal').addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    modal.innerHTML = '';
+                });
+            });
+        });
 
-      // 찜하기 기능 로직: 로컬 스토리지를 이용해 찜한 영상 목록 관리
-      document.querySelectorAll('.favorite-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-              e.stopPropagation(); // 카드 클릭 이벤트와 중복 방지
-              const videoId = e.target.getAttribute('data-video-id');
-              let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-              const videoCard = e.target.closest('.video-card');
+        // 찜하기 기능 로직: 로컬 스토리지를 이용해 찜한 영상 목록 관리
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // 카드 클릭 이벤트와 중복 방지
+                const videoId = e.target.getAttribute('data-video-id');
+                let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+                const videoCard = e.target.closest('.video-card');
 
-              if (favorites.includes(videoId)) {
-                  // 찜 해제: 배열에서 제거하고 하트 색상 변경
-                  favorites = favorites.filter(id => id !== videoId);
-                  e.target.innerHTML = '♡';
-                  e.target.classList.remove('favorite-btn-active');
-                  videoCard.classList.remove('favorite-video');
-              } else {
-                  // 찜하기: 배열에 추가하고 하트 색상 변경
-                  favorites.push(videoId);
-                  e.target.innerHTML = '♥';
-                  e.target.classList.add('favorite-btn-active');
-                  videoCard.classList.add('favorite-video');
-              }
-              localStorage.setItem('favorites', JSON.stringify(favorites));
-          });
-      });
+                if (favorites.includes(videoId)) {
+                    // 찜 해제: 배열에서 제거하고 하트 색상 변경
+                    favorites = favorites.filter(id => id !== videoId);
+                    e.target.innerHTML = '♡';
+                    e.target.classList.remove('favorite-btn-active');
+                    videoCard.classList.remove('favorite-video');
+                } else {
+                    // 찜하기: 배열에 추가하고 하트 색상 변경
+                    favorites.push(videoId);
+                    e.target.innerHTML = '♥';
+                    e.target.classList.add('favorite-btn-active');
+                    videoCard.classList.add('favorite-video');
+                }
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+            });
+        });
 
-      // 페이지 로딩 시 찜한 영상 상태 반영
-      function loadFavorites() {
-          const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-          document.querySelectorAll('.video-card').forEach(card => {
-              const videoId = card.getAttribute('data-video-id');
-              const favBtn = card.querySelector('.favorite-btn');
-              if (favBtn) {
-                  if (favorites.includes(videoId)) {
-                      favBtn.innerHTML = '♥';
-                      favBtn.classList.add('favorite-btn-active');
-                      card.classList.add('favorite-video');
-                  } else {
-                      favBtn.innerHTML = '♡';
-                      favBtn.classList.remove('favorite-btn-active');
-                      card.classList.remove('favorite-video');
-                  }
-              }
-          });
-      }
-      loadFavorites();
+        // 페이지 로딩 시 찜한 영상 상태 반영
+        function loadFavorites() {
+            const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            document.querySelectorAll('.video-card').forEach(card => {
+                const videoId = card.getAttribute('data-video-id');
+                const favBtn = card.querySelector('.favorite-btn');
+                if (favBtn) {
+                    if (favorites.includes(videoId)) {
+                        favBtn.innerHTML = '♥';
+                        favBtn.classList.add('favorite-btn-active');
+                        card.classList.add('favorite-video');
+                    } else {
+                        favBtn.innerHTML = '♡';
+                        favBtn.classList.remove('favorite-btn-active');
+                        card.classList.remove('favorite-video');
+                    }
+                }
+            });
+        }
+        loadFavorites();
 
-      // '찜한 영상' 버튼 클릭 시 찜한 영상만 표시
-      window.filterFavorites = function() {
-          const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-          const videoCards = document.querySelectorAll('.video-card');
-          let hasFavorites = false;
+        // '찜한 영상' 버튼 클릭 시 찜한 영상만 표시
+        window.filterFavorites = function() {
+            const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            const videoCards = document.querySelectorAll('.video-card');
+            let hasFavorites = false;
 
-          videoCards.forEach(card => {
-              const videoId = card.getAttribute('data-video-id');
-              if (favorites.includes(videoId)) {
-                  card.style.display = 'flex';
-                  hasFavorites = true;
-              } else {
-                  card.style.display = 'none';
-              }
-          });
+            videoCards.forEach(card => {
+                const videoId = card.getAttribute('data-video-id');
+                if (favorites.includes(videoId)) {
+                    card.style.display = 'flex';
+                    hasFavorites = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
 
-          const noResults = document.querySelector('.no-results');
-          if (noResults) {
-              noResults.style.display = hasFavorites ? 'none' : 'block';
-          }
-      }
+            const noResults = document.querySelector('.no-results');
+            if (noResults) {
+                noResults.style.display = hasFavorites ? 'none' : 'block';
+            }
+        }
 
-      // '전체 영상' 버튼 클릭 시 모든 영상 표시
-      window.showAllVideos = function() {
-          document.querySelectorAll('.video-card').forEach(card => {
-              card.style.display = 'flex';
-          });
-          const noResults = document.querySelector('.no-results');
-          if (noResults) {
-              noResults.style.display = 'none';
-          }
-      }
-  });
+        // '전체 영상' 버튼 클릭 시 모든 영상 표시
+        window.showAllVideos = function() {
+            document.querySelectorAll('.video-card').forEach(card => {
+                card.style.display = 'flex';
+            });
+            const noResults = document.querySelector('.no-results');
+            if (noResults) {
+                noResults.style.display = 'none';
+            }
+        }
+    });
 </script>
 </body>
 </html>
