@@ -136,6 +136,15 @@
             }
             externalInput.value = '';
         }
+        if (e.key === ' ') {
+            e.preventDefault();
+            let currentKey = externalInput.value;
+            console.log("현재:" + currentKey + ".");
+            let newKey = currentKey + ' ';
+            console.log("스페이스:" + newKey + ".");
+
+            externalInput.value = newKey;
+        }
     });
 
     // Unity에서 호출할 함수 (포인트 값을 전달받아 서버에 전송)
