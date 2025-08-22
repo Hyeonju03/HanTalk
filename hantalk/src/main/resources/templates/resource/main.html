@@ -79,7 +79,7 @@
 
     <div class="pagination flex justify-center items-center mt-8 space-x-2">
       <a th:if="${resourcePage.hasPrevious()}"
-         th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}"
+         th:href="@{|/resource/main?page=${resourcePage.number - 1}&keyword=${keyword}|}"
          class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">이전</a>
 
       <a th:each="i : ${#numbers.sequence(0, resourcePage.totalPages - 1)}"
