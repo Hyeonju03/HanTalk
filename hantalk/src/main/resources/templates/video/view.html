@@ -37,8 +37,8 @@
   <div class="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-      <div>
-        <h1 class="text-3xl md:text-4xl font-extrabold text-dark-navy mb-2 leading-tight" th:text="${video.title}">제목</h1>
+      <div class="sm:w-3/4 sm:pr-4">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-dark-navy mb-2 leading-tight break-words" th:text="${video.title}">제목</h1>
         <div class="text-gray-400 text-sm flex items-center space-x-4">
           <span>등록일: <span th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}"></span></span>
           <span th:if="${video.updateDate != null}">
@@ -47,16 +47,13 @@
         </div>
       </div>
 
-      <div class="mt-4 sm:mt-0 flex space-x-2">
-        <!-- 관리자일 때만 보이는 수정하기 버튼 -->
+      <div class="mt-4 sm:mt-0 flex space-x-2 flex-shrink-0">
         <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}" class="inline-flex items-center justify-center px-4 py-2 bg-dark-navy text-white font-semibold rounded-lg shadow-md hover:bg-dark-navy/80 transition duration-300">
           <span class="mr-2">✏️</span> 영상 수정
         </a>
-        <!-- 관리자일 때 목록으로 버튼 -->
         <a th:if="${isAdmin}" th:href="@{/video/admin/list}" class="inline-flex items-center justify-center px-4 py-2 bg-dark-navy text-white font-semibold rounded-lg shadow-md hover:bg-dark-navy/80 transition duration-300">
           <i class="fas fa-bars mr-2"></i> 관리자페이지
         </a>
-        <!-- 일반 사용자일 때 목록으로 버튼 -->
         <a th:unless="${isAdmin}" th:href="@{/video/list}" class="inline-flex items-center justify-center px-4 py-2 bg-dark-navy text-white font-semibold rounded-lg shadow-md hover:bg-dark-navy/80 transition duration-300">
           <i class="fas fa-bars mr-2"></i> 목록으로
         </a>

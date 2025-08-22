@@ -11,171 +11,208 @@
     body {
       font-family: 'Nanum Gothic', sans-serif;
     }
-    /* 테이블 셀 내 텍스트 줄바꿈을 위한 스타일 */
+
     .break-words {
       word-break: break-all;
       overflow-wrap: break-word;
     }
+
+    .no-wrap {
+      white-space: nowrap;
+    }
   </style>
 </head>
-<body class="bg-[#f3f4f6] min-h-screen flex flex-col items-center p-8">
+<body class="bg-[#f3f4f6] min-h-screen">
 
-<div th:replace="~{fragments/header :: headerFragment}"></div>
+<div class="fixed top-0 left-0 w-full z-10">
+  <div th:replace="~{fragments/header :: headerFragment}"></div>
+</div>
 
-<div class="container mx-auto p-4 max-w-7xl flex-1">
-  <div class="bg-white p-6 rounded-lg shadow-md">
+<div class="p-8 mt-20">
+  <div class="container mx-auto max-w-7xl">
+    <div class="bg-white p-6 rounded-lg shadow-md">
 
-    <main class="w-full mx-auto flex-grow">
-      <div class="mx-auto px-4 py-8">
+      <main class="w-full mx-auto flex-grow">
+        <div class="mx-auto px-4 py-8">
 
-        <!-- '로그 데이터' 제목은 중앙에, '관리자 페이지' 버튼은 오른쪽에 배치 -->
-        <div class="relative flex items-center mb-10">
-          <h1 class="text-4xl font-bold text-[#2F4160] w-full text-center">로그 데이터</h1>
-          <a th:href="@{/admin}" class="absolute right-0 top-1/2 -translate-y-1/2 inline-block bg-[#2F4160] text-white px-6 py-3 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-300 flex items-center">
-            관리자 페이지로 <i class="fas fa-arrow-right ml-2"></i>
-          </a>
-        </div>
-
-        <div th:if="${filter}" class="bg-[#B5D0E3] text-[#2F4160] font-semibold py-3 px-6 rounded-lg shadow-md mb-6 mx-auto w-fit">
-          [[${filter}]]
-        </div>
-
-        <div class="flex flex-wrap justify-center gap-4 mb-8">
-          <button onclick="showFilter('allLogs')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
-            전체 로그 보기
-          </button>
-          <button onclick="showFilter('userFilter')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
-            사용자별
-          </button>
-          <button onclick="showFilter('dateFilter')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
-            기간별
-          </button>
-          <button onclick="showFilter('userDateFilter')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
-            사용자+기간
-          </button>
-
-        </div>
-
-        <div id="userFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
-          <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">사용자별 로그 보기</h3>
-          <form method="get" onsubmit="this.action='/user/' + document.getElementById('userNoInput').value; return true;" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
-            <input type="number" id="userNoInput" placeholder="사용자 번호: 예) 1" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
-            <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
-              검색
-            </button>
-          </form>
-        </div>
-
-        <div id="dateFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
-          <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">기간별 로그 보기</h3>
-          <form method="get" action="/date" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
-            <input type="date" name="start" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
-            <input type="date" name="end" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
-            <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
-              검색
-            </button>
-          </form>
-        </div>
-
-        <div id="userDateFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
-          <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">사용자 + 기간별 로그 보기</h3>
-          <form method="get" action="/user-date" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
-            <input type="number" name="userNo" placeholder="사용자 번호: 예) 1" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
-            <input type="date" name="start" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
-            <input type="date" name="end" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
-            <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
-              검색
-            </button>
-          </form>
-        </div>
-
-        <div id="allLogs" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
-          <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">전체 로그 보기</h3>
-          <form method="get" action="/admin/getLogdata">
-            <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
-              전체 로그 보기
-            </button>
-          </form>
-        </div>
-
-        <div class="text-center mb-8">
-          <button id="toggleLog" class="px-8 py-4 bg-gray-700 text-white font-bold rounded-lg shadow-lg hover:bg-gray-800 transition-colors duration-300">
-            로그 보기
-          </button>
-        </div>
-
-        <div id="logContainer" class="hidden">
-          <div class="bg-white rounded-lg shadow-md overflow-hidden mx-auto">
-            <div class="h-96 overflow-y-auto">
-              <table class="min-w-full">
-                <thead class="bg-gray-200 sticky top-0">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">사용자ID</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">사용자</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">URI</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">메서드</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">디바이스</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">응답 코드</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">처리 시간(ms)</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider break-words">요청 시간</th>
-                </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                <tr th:each="log : ${list}">
-                  <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.user.userId}]]</td>
-                  <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.user.name}]]</td>
-                  <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.uri}]]</td>
-                  <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.method}]]</td>
-                  <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.device}]]</td>
-                  <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.statusCode}]]</td>
-                  <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.responseTime}]]</td>
-                  <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.createDate}]]</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Paging Controls -->
-        <div class="flex justify-center items-center mt-8 space-x-2" th:if="${totalPages > 1}">
-          <a th:if="${currentPage > 0}" th:href="@{/admin/getLogdata(page=${currentPage - 1}, size=${10})}" class="px-4 py-2 bg-[#4B4B4B] text-white rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
-            Previous
-          </a>
-          <div th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-            <a th:href="@{/admin/getLogdata(page=${i}, size=${10})}" th:text="${i + 1}" class="px-4 py-2 rounded-lg"
-               th:classappend="${i == currentPage} ? 'bg-[#2F4160] text-white' : 'bg-gray-200 text-[#2F4160] hover:bg-gray-300'">
+          <div class="relative flex items-center mb-10">
+            <h1 class="text-4xl font-bold text-[#2F4160] w-full text-center">로그 데이터</h1>
+            <a th:href="@{/admin}" class="absolute right-0 top-1/2 -translate-y-1/2 inline-block bg-[#2F4160] text-white px-6 py-3 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-300 flex items-center">
+              관리자 페이지로 <i class="fas fa-arrow-right ml-2"></i>
             </a>
           </div>
-          <a th:if="${currentPage < totalPages - 1}" th:href="@{/admin/getLogdata(page=${currentPage + 1}, size=${10})}" class="px-4 py-2 bg-[#4B4B4B] text-white rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
-            Next
-          </a>
+
+          <div th:if="${filter}" class="bg-[#B5D0E3] text-[#2F4160] font-semibold py-3 px-6 rounded-lg shadow-md mb-6 mx-auto w-fit">
+            [[${filter}]]
+          </div>
+
+          <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <button onclick="showAllLogs()" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
+              전체 로그 보기
+            </button>
+            <button onclick="showFilter('userFilter')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
+              사용자별
+            </button>
+            <button onclick="showFilter('dateFilter')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
+              기간별
+            </button>
+            <button onclick="showFilter('userDateFilter')" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300">
+              사용자+기간
+            </button>
+          </div>
+
+          <div id="userFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
+            <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">사용자별 로그 보기</h3>
+            <form onsubmit="handleUserSearch(event)" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+              <input type="number" id="userNoInput" placeholder="사용자 번호: 예) 1" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+              <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
+                검색
+              </button>
+            </form>
+          </div>
+
+          <div id="dateFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
+            <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">기간별 로그 보기</h3>
+            <form onsubmit="handleDateSearch(event)" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+              <input type="date" name="start" id="startDateInput" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+              <input type="date" name="end" id="endDateInput" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+              <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
+                검색
+              </button>
+            </form>
+          </div>
+
+          <div id="userDateFilter" class="filter-section bg-white p-6 rounded-lg shadow-md mx-auto mb-8 hidden">
+            <h3 class="text-xl font-semibold mb-4 text-[#2F4160]">사용자 + 기간별 로그 보기</h3>
+            <form onsubmit="handleUserDateSearch(event)" class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+              <input type="number" name="userNo" id="userNoDateInput" placeholder="사용자 번호: 예) 1" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+              <input type="date" name="start" id="startDateUserDateInput" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+              <input type="date" name="end" id="endDateUserDateInput" required class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+              <button type="submit" class="px-6 py-3 bg-[#4B4B4B] text-white font-semibold rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
+                검색
+              </button>
+            </form>
+          </div>
+
+          <div id="logContainer" th:classappend="${list.size() > 0 or filter != null} ? '' : 'hidden'">
+            <div class="text-center mb-8">
+              <button onclick="toggleLogs()" class="px-8 py-4 bg-gray-700 text-white font-bold rounded-lg shadow-lg hover:bg-gray-800 transition-colors duration-300">
+                <span id="logToggleButtonText">로그 숨기기</span>
+              </button>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md overflow-hidden mx-auto">
+              <div class="h-96 overflow-y-auto">
+                <table class="min-w-full">
+                  <thead class="bg-gray-200 sticky top-0">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-wrap">사용자ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-wrap min-w-[100px]">사용자</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-wrap max-w-[150px]">URI</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-wrap">메서드</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-wrap">디바이스</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-wrap">응답 코드</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-wrap">처리 시간(ms)</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-wrap min-w-[120px]">요청 시간</th>
+                  </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                  <tr th:each="log : ${list}">
+                    <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.user.userId}]]</td>
+                    <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.user.name}]]</td>
+                    <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.uri}]]</td>
+                    <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.method}]]</td>
+                    <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.device}]]</td>
+                    <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.statusCode}]]</td>
+                    <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.responseTime}]]</td>
+                    <td class="px-6 py-4 text-sm text-[#2F4160] break-words">[[${log.createDate}]]</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paging Controls -->
+          <div class="flex justify-center items-center mt-8 space-x-2" th:if="${totalPages > 1}">
+            <a th:if="${currentPage > 0}" th:href="@{/admin/getLogdata(page=${currentPage - 1}, size=${10})}" class="px-4 py-2 bg-[#4B4B4B] text-white rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
+              Previous
+            </a>
+            <div th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+              <a th:href="@{/admin/getLogdata(page=${i}, size=${10})}" th:text="${i + 1}" class="px-4 py-2 rounded-lg"
+                 th:classappend="${i == currentPage} ? 'bg-[#2F4160] text-white' : 'bg-gray-200 text-[#2F4160] hover:bg-gray-300'">
+              </a>
+            </div>
+            <a th:if="${currentPage < totalPages - 1}" th:href="@{/admin/getLogdata(page=${currentPage + 1}, size=${10})}" class="px-4 py-2 bg-[#4B4B4B] text-white rounded-lg hover:bg-[#2F4160] transition-colors duration-300">
+              Next
+            </a>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 </div>
 
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
-<script>
+<script th:inline="javascript">
+
+  document.addEventListener("DOMContentLoaded", function() {
+      const logContainer = document.getElementById("logContainer");
+      const logToggleButtonText = document.getElementById("logToggleButtonText");
+
+      if (logContainer.classList.contains("hidden")) {
+          logToggleButtonText.textContent = "로그 보기";
+      } else {
+          logToggleButtonText.textContent = "로그 숨기기";
+      }
+  });
+
   function showFilter(id) {
       document.querySelectorAll(".filter-section").forEach(section => {
           section.classList.add("hidden");
       });
       document.getElementById(id).classList.remove("hidden");
+      document.getElementById("logContainer").classList.add("hidden");
+      document.getElementById("logToggleButtonText").textContent = "로그 보기";
   }
 
-  document.addEventListener("DOMContentLoaded", function() {
-      const toggleBtn = document.getElementById("toggleLog");
-      const logContainer = document.getElementById("logContainer");
-
-      toggleBtn.addEventListener("click", function() {
-          logContainer.classList.toggle("hidden");
-          const isHidden = logContainer.classList.contains("hidden");
-          toggleBtn.textContent = isHidden ? "로그 보기" : "로그 접기";
+  function showAllLogs() {
+      document.querySelectorAll(".filter-section").forEach(section => {
+          section.classList.add("hidden");
       });
-  });
+      document.getElementById("logContainer").classList.remove("hidden");
+      document.getElementById("logToggleButtonText").textContent = "로그 숨기기";
+  }
+
+  function toggleLogs() {
+      const logContainer = document.getElementById("logContainer");
+      const logToggleButtonText = document.getElementById("logToggleButtonText");
+      logContainer.classList.toggle("hidden");
+      const isHidden = logContainer.classList.contains("hidden");
+      logToggleButtonText.textContent = isHidden ? "로그 보기" : "로그 숨기기";
+  }
+
+  function handleUserSearch(event) {
+      event.preventDefault();
+      const userNo = document.getElementById('userNoInput').value;
+      window.location.href = `/admin/getLogdata?userNo=${userNo}`;
+  }
+
+  function handleDateSearch(event) {
+      event.preventDefault();
+      const startDate = document.getElementById('startDateInput').value;
+      const endDate = document.getElementById('endDateInput').value;
+      window.location.href = `/admin/getLogdata?start=${startDate}&end=${endDate}`;
+  }
+
+  function handleUserDateSearch(event) {
+      event.preventDefault();
+      const userNo = document.getElementById('userNoDateInput').value;
+      const startDate = document.getElementById('startDateUserDateInput').value;
+      const endDate = document.getElementById('endDateUserDateInput').value;
+      window.location.href = `/admin/getLogdata?userNo=${userNo}&start=${startDate}&end=${endDate}`;
+  }
 </script>
 </body>
 </html>

@@ -86,9 +86,8 @@ public class LogService {
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
         Optional<List<LogData>> logList = logRepository.findByCreateDateBetween(start, end);
         if (logList.isPresent()) {
-            List<LogData> logs = logRepository.findAll();
-            List<LogDataDTO> dtoList = new ArrayList<>(logs.size());
-            for (LogData e : logs) {
+            List<LogDataDTO> dtoList = new ArrayList<>(logList.get().size());
+            for (LogData e : logList.get()) {
                 dtoList.add(toDto(e));
             }
             return dtoList;
@@ -102,9 +101,8 @@ public class LogService {
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
         Optional<List<LogData>> logList = logRepository.findByUserNoAndCreateDateBetween(userNo, start, end);
         if (logList.isPresent()) {
-            List<LogData> logs = logRepository.findAll();
-            List<LogDataDTO> dtoList = new ArrayList<>(logs.size());
-            for (LogData e : logs) {
+            List<LogDataDTO> dtoList = new ArrayList<>(logList.get().size());
+            for (LogData e : logList.get()) {
                 dtoList.add(toDto(e));
             }
             return dtoList;

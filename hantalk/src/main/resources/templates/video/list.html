@@ -70,6 +70,16 @@
     .favorite-btn-active {
         color: #EF4444; /* Tailwind red-500 */
     }
+
+    /* 여러 줄 텍스트 말줄임표 CSS */
+    .clamp-2-lines {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* 두 줄로 제한 */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-all; /* 이 부분 추가 */
+    }
   </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex flex-col min-h-screen">
@@ -107,14 +117,13 @@
       </form>
     </div>
     <div class="video-list-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-      <!-- 이 부분이 올바르게 수정된 반복문입니다. -->
+
       <a th:each="video, stat : ${videoPage.content}"
          th:if="${stat.index < 9}"
          th:href="@{/video/view/{id}(id=${video.videoId})}"
          class="video-card relative p-4 flex flex-col cursor-pointer"
          th:data-video-id="${video.videoId}">
 
-        <!-- 모든 카드 내용이 <a> 태그 안에 포함됩니다. -->
         <div class="thumbnail-link relative block w-full aspect-video overflow-hidden rounded-lg mb-3">
           <video class="video-thumbnail w-full h-full object-cover pointer-events-none" muted playsinline preload="metadata">
             <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
@@ -123,14 +132,17 @@
           <div class="play-icon-overlay absolute inset-0 flex items-center justify-center text-5xl text-white pointer-events-none">▶</div>
         </div>
 
-        <strong class="text-lg font-bold text-gray-900 leading-tight mb-1">
-          <span th:text="${video.title}" class="no-underline text-main-dark transition duration-300">영상 제목</span>
-        </strong>
+        <div class="flex items-start justify-between">
+          <strong class="video-title text-lg font-bold text-gray-900 leading-tight mb-1 min-w-0 flex-grow">
 
-        <p class="text-sm text-gray-500 line-clamp-2" th:text="${video.content}">설명</p>
-        <!-- 찜하기 버튼 위치 수정 -->
-        <span class="favorite-btn absolute bottom-2 right-2 text-2xl cursor-pointer z-20" th:data-video-id="${video.videoId}" onclick="event.preventDefault(); event.stopPropagation();">♡</span>
-      </a> <!-- <a> 태그가 여기서 올바르게 닫힙니다. -->
+            <span th:text="${video.title}" class="no-underline text-main-dark transition duration-300 clamp-2-lines">영상 제목</span>
+          </strong>
+
+          <span class="favorite-btn text-2xl cursor-pointer z-20 ml-2" th:data-video-id="${video.videoId}" onclick="event.preventDefault(); event.stopPropagation();">♡</span>
+        </div>
+
+        <p class="text-sm text-gray-500 invisible h-0">공간 확보를 위한 빈 태그</p>
+      </a>
     </div>
 
     <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-white rounded-xl shadow-inner no-results">
@@ -138,9 +150,6 @@
     </div>
   </div>
 
-
-
-  <!-- 페이징 -->
   <div class="pagination text-center mt-12" th:if="${videoPage.totalPages > 1}">
         <span th:if="${!videoPage.first}">
             <a th:href="@{/video/list(page=${videoPage.number - 1}, keyword=${keyword}, searchType=${searchType})}" class="inline-block px-4 py-2 mx-1 bg-soft-blue text-white font-semibold rounded-lg hover:bg-soft-blue transition-colors duration-300">&laquo; 이전</a>
