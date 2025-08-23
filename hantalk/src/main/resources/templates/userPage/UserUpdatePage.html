@@ -14,12 +14,13 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 text-[#2F4160] min-h-screen flex flex-col items-center justify-center p-8">
+<body class="bg-[#f3f4f6] font-sans antialiased min-h-screen flex flex-col justify-between">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
+<div class="bg-white rounded-xl shadow-lg p-8 mt-6 w-full max-w-7xl w-full mx-auto">
     <h1 class="text-3xl font-bold text-[#2F4160] mb-6 text-center">회원 정보 수정</h1>
 
-    <form action="/user/admin/update" method="post" class="space-y-4">
+    <form action="/user/admin/update" method="post" class="space-y-4 px-96">
         <input type="hidden" name="userId" th:value="${user.userId}">
 
         <div>

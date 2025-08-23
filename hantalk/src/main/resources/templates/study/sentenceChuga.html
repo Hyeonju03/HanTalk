@@ -20,14 +20,13 @@
         }
     </style>
 </head>
-<body class="bg-[#f3f4f6] p-8 font-sans antialiased flex flex-col min-h-screen">
+<body class="bg-[#f3f4f6] font-sans antialiased min-h-screen flex flex-col justify-between">
 
-<!-- Thymeleaf fragments/header :: headerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
-<!-- <div th:replace="~{fragments/header :: headerFragment}"></div> -->
+<div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-3xl mx-auto">
+<div class="max-w-7xl w-full mx-auto bg-white p-8 rounded-xl shadow-lg mt-6">
 
-    <h1 class="text-3xl font-bold text-[#2F4160] mb-8 text-center">📝 문장 추가</h1>
+    <h1 class="text-3xl font-bold text-[#2F4160] mb-6 text-center">📝 문장 추가</h1>
 
     <form id="sentenceForm" th:action="@{/study/sentenceInsertProc}" method="post" class="space-y-6">
 
@@ -76,9 +75,8 @@
         </div>
     </form>
 </div>
-
-<!-- Thymeleaf fragments/footer :: footerFragment 가 없으므로 주석 처리 (HTML 단독 실행용) -->
-<!-- <div th:replace="~{fragments/footer :: footerFragment}" class="mt-auto"></div> -->
+<!-- 푸터 삽입 -->
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script>
     // Custom message box function (reused from other admin pages)

@@ -327,12 +327,6 @@
     </section>
 </main>
 
-<div th:if="${session.isAdmin}" class="container mx-auto px-4 py-8 mt-12 text-center">
-    <a th:href="@{/admin}" class="inline-block px-8 py-4 bg-[#2F4160] text-white font-semibold rounded-full shadow-lg hover:bg-[#4B4B4B] transition duration-300 transform hover:scale-105">
-        관리자 페이지
-    </a>
-</div>
-
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <!-- Swiper JS -->

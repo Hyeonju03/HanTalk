@@ -5,9 +5,9 @@
     <title>단어 수정</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-8 font-sans antialiased">
-
-<div class="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-lg mt-16">
+<body class="bg-[#f3f4f6] font-sans antialiased min-h-screen flex flex-col justify-between">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<div class="bg-white rounded-xl shadow-lg p-8 mt-6 max-w-7xl w-1/2 mx-auto">
 
     <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">단어 수정</h1>
 
@@ -34,14 +34,14 @@
         </div>
 
         <div class="flex justify-end space-x-4">
-            <button type="submit"
-                    class="bg-blue-500 text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
-                수정
-            </button>
             <a href="/study/vocaList/admin"
                class="bg-gray-300 text-gray-700 font-medium py-2 px-6 rounded-lg shadow-md hover:bg-gray-400 transition-colors duration-300">
                 취소
             </a>
+            <button type="submit"
+                    class="bg-blue-500 text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300">
+                수정
+            </button>
         </div>
     </form>
 

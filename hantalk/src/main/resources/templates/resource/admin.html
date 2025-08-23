@@ -13,106 +13,87 @@
         cursor: pointer;
     }
     /* 페이지네이션 링크 스타일 (숫자 페이지 버튼용) */
-    .pagination-link-custom {
-        display: inline-block;
-        padding: 0.375rem 0.75rem; /* py-1.5 px-3에 해당 */
-        background-color: #4B4B4B; /* 요청된 색상 */
-        color: white;
-        text-decoration: none;
-        border-radius: 0.375rem; /* rounded-md에 해당 */
-        transition-property: background-color, color;
-        transition-duration: 200ms;
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        font-weight: 600; /* 폰트 굵기 조정 */
-        min-width: 36px; /* 버튼 최소 너비 설정 */
-        height: 36px; /* 버튼 높이 설정 */
-        box-sizing: border-box; /* 패딩과 테두리를 너비/높이에 포함 */
-        display: inline-flex; /* content 중앙 정렬 */
-        align-items: center;
-        justify-content: center;
-    }
-    .pagination-link-custom:hover {
-        background-color: #e0e0e0; /* 호버 시 연한 회색 배경 */
-        color: #2F4160; /* 호버 시 진한 남색 텍스트 유지 */
-        border-color: #e0e0e0; /* 호버 시 연한 회색 테두리 */
-    }
-    .pagination-link-custom.active {
-        font-weight: bold; /* font-bold에 해당 */
-        background-color: #4B4B4B; /* 활성 상태의 배경색 */
-        color: white; /* 활성 상태의 텍스트 색상 */
-        border-color: #4B4B4B; /* 활성 상태의 테두리 색상 */
-    }
-    /* 활성 페이지 버튼의 호버 효과는 활성 상태 스타일 유지 */
-    .pagination-link-custom.active:hover {
-        background-color: #4B4B4B; /* 활성 상태에서 호버 시 진한 회색 배경 유지 */
-        color: white; /* 활성 상태에서 호버 시 흰색 텍스트 유지 */
-        border-color: #4B4B4B; /* 활성 상태에서 호버 시 진한 회색 테두리 유지 */
-    }
+    .pagination-item-base {
+          display: inline-flex; /* content를 중앙에 정렬하기 위해 inline-flex 사용 */
+          align-items: center;
+          justify-content: center;
+          padding: 0.375rem 0.75rem; /* py-1.5 px-3에 해당 */
+          background-color: transparent; /* 기본: 배경 투명 */
+          color: #2F4160; /* 기본: 진한 남색 텍스트 */
+          border: 1px solid transparent; /* 기본: 테두리 투명 */
+          border-radius: 0.375rem; /* rounded-md에 해당 */
+          text-decoration: none;
+          font-weight: 600; /* 폰트 굵기 조정 */
+          min-width: 36px; /* 버튼 최소 너비 설정 (숫자 1, 2 등 작아지는 것 방지) */
+          height: 36px; /* 버튼 높이 설정 */
+          box-sizing: border-box; /* 패딩과 테두리를 너비/높이에 포함 */
 
-    /* 페이지네이션 "처음", "이전", "다음", "마지막" 버튼용 스타일 */
-    .pagination-nav-button {
-        display: inline-block;
-        padding: 0.375rem 0.75rem;
-        background-color: transparent; /* 평소에는 배경 투명 */
-        color: #2F4160; /* 평소에는 진한 남색 텍스트 */
-        text-decoration: none;
-        border-radius: 0.375rem;
-        transition-property: background-color, color, border-color;
-        transition-duration: 200ms;
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        font-weight: 600; /* 폰트 굵기 조정 */
-        min-width: 36px; /* 버튼 최소 너비 설정 */
-        height: 36px; /* 버튼 높이 설정 */
-        box-sizing: border-box; /* 패딩과 테두리를 너비/높이에 포함 */
-        display: inline-flex; /* content 중앙 정렬 */
-        align-items: center;
-        justify-content: center;
-    }
-    .pagination-nav-button:hover {
-        background-color: #e0e0e0; /* 호버 시 연한 회색 배경 */
-        color: #2F4160; /* 호버 시 진한 남색 텍스트 유지 */
-        border-color: #e0e0e0; /* 호버 시 연한 회색 테두리 */
-    }
-    .pagination-nav-button.disabled {
-        opacity: 0.5; /* 약간 흐리게 */
-        cursor: default !important; /* 마우스 커서를 기본으로 변경하여 빨간색 동그라미 작대기 제거 */
-        background-color: transparent; /* 배경 투명 유지 */
-        color: #2F4160; /* 텍스트 색상 유지 */
-        border-color: transparent; /* 테두리 투명 유지 */
-    }
-    /* 비활성화된 버튼의 호버 효과도 연한 회색으로 */
-    .pagination-nav-button.disabled:hover {
-        background-color: #e0e0e0; /* 호버 시 연한 회색 배경 (비활성화 상태에서도) */
-        color: #2F4160; /* 호버 시 진한 남색 텍스트 유지 (비활성화 상태에서도) */
-        border-color: #e0e0e0; /* 호버 시 연한 회색 테두리 (비활성화 상태에서도) */
-    }
+          transition-property: background-color, color, border-color;
+          transition-duration: 200ms;
+          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 모든 페이지네이션 링크의 호버 상태 */
+        .pagination-item-base:hover {
+          background-color: #e0e0e0; /* 호버 시 연한 회색 배경 */
+          color: #2F4160; /* 호버 시 진한 남색 텍스트 유지 */
+          border-color: #e0e0e0; /* 호버 시 연한 회색 테두리 */
+        }
+
+        /* 활성 페이지 번호 스타일 */
+        .pagination-item-base.active {
+          font-weight: bold; /* font-bold에 해당 */
+          background-color: #4B4B4B; /* 진한 회색 배경 */
+          color: white; /* 흰색 텍스트 */
+          border-color: #4B4B4B; /* 진한 회색 테두리 */
+        }
+        /* 활성 페이지 버튼의 호버 효과 */
+        .pagination-item-base.active:hover {
+             background-color: #4B4B4B; /* 활성 상태에서 호버 시 진한 회색 배경 유지 */
+             color: white; /* 활성 상태에서 호버 시 흰색 텍스트 유지 */
+             border-color: #4B4B4B; /* 활성 상태에서 호버 시 진한 회색 테두리 유지 */
+        }
+
+
+        /* 비활성화된 버튼 스타일 */
+        .pagination-item-base.disabled {
+          opacity: 0.5; /* 약간 흐리게 */
+          cursor: default !important; /* 마우스 커서 변경 (금지 아이콘 제거) */
+          background-color: transparent; /* 배경 투명 유지 */
+          color: #2F4160; /* 텍스트 색상 유지 */
+          border-color: transparent; /* 테두리 투명 유지 */
+        }
+
+        /* 비활성화된 버튼의 호버 효과도 연한 회색으로 */
+        .pagination-item-base.disabled:hover {
+            background-color: #e0e0e0; /* 호버 시 연한 회색 배경 (비활성화 상태에서도) */
+            color: #2F4160; /* 호버 시 진한 남색 텍스트 유지 (비활성화 상태에서도) */
+            border-color: #e0e0e0; /* 호버 시 연한 회색 테두리 (비활성화 상태에서도) */
+        }
   </style>
 </head>
 <body class="bg-[#f3f4f6] text-[#2F4160] min-h-screen flex flex-col">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="flex-grow flex justify-center w-full">
-  <div class="flex-1 flex flex-col p-4 w-full max-w-7xl">
-    <main class="bg-white rounded-xl shadow-xl mx-auto flex-grow w-full p-8 box-border">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-[#2F4160]">자료실 목록</h1>
-        <div class="flex flex-col items-end space-y-2">
-          <div sec:authorize="hasRole('ADMIN')">
-            <a th:href="@{/admin}"
-               class="inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200">
-              관리자 페이지<i class="fas fa-arrow-right ml-2"></i>
-            </a>
-          </div>
-          <a th:href="@{/resource/chuga}"
-             class="bg-[#4B4B4B] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center">
-            <i class="fas fa-plus mr-2"></i>
-            자료 등록하기
-          </a>
-        </div>
-      </div>
+<div class="max-w-7xl w-full mx-auto bg-white p-8 rounded-xl shadow-lg mt-8">
+  <h1 class="text-3xl font-bold text-[#2F4160] mb-6 text-center">자료실 목록</h1>
 
-      <form class="search-form text-center mb-6 flex justify-center items-center space-x-2" th:action="@{/resource/admin/main}" method="get">
+  <div class="flex flex-col items-end space-y-4 mb-8">
+    <div>
+      <a th:href="@{/admin}"
+         class="inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200">
+        관리자 페이지<i class="fas fa-arrow-right ml-2"></i>
+      </a>
+    </div>
+    <a th:href="@{/resource/chuga}"
+       class="bg-[#4B4B4B] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center">
+      <i class="fas fa-plus mr-2"></i>
+      자료 등록하기
+    </a>
+  </div>
+
+  <form class="search-form text-center mb-6 flex justify-center items-center space-x-2" th:action="@{/resource/admin/main}" method="get">
         <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword} ?: ''"
                class="p-2 text-base w-[250px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]" />
         <button type="submit"
@@ -122,7 +103,7 @@
         </button>
       </form>
 
-      <table class="w-full border-collapse bg-gray-200 rounded-xl overflow-hidden shadow-md">
+  <table class="w-full border-collapse bg-gray-200 rounded-xl overflow-hidden shadow-md">
         <thead>
         <tr>
           <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">번호</th>
@@ -181,30 +162,39 @@
         </tbody>
       </table>
 
-      <div class="pagination flex justify-center items-center mt-8 space-x-2">
+  <div class="pb-8 mt-8">
+    <ul class="flex justify-center items-center space-x-2">
+      <li class="page-item">
         <a th:href="@{|/resource/admin/main?page=0&keyword=${keyword}|}"
-           th:classappend="${!resourcePage.hasPrevious()} ? 'disabled'"
-           class="pagination-nav-button">처음</a>
+           class="pagination-item-base"
+           th:classappend="${!resourcePage.hasPrevious()} ? ' disabled'">처음</a>
+      </li>
+      <li class="page-item">
         <a th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}"
-           th:classappend="${!resourcePage.hasPrevious()} ? 'disabled'"
-           class="pagination-nav-button">이전</a>
+           class="pagination-item-base"
+           th:classappend="${!resourcePage.hasPrevious()} ? ' disabled'">이전</a>
+      </li>
 
-        <span th:each="i : ${#numbers.sequence(0, resourcePage.totalPages - 1)}">
-                    <a th:href="@{|/resource/admin/main?page=${i}&keyword=${keyword}|}"
-                       th:text="${i + 1}"
-                       th:classappend="${i == resourcePage.number} ? 'active'"
-                       class="pagination-link-custom">1</a>
-                </span>
+      <li th:each="i : ${#numbers.sequence(0, resourcePage.totalPages - 1)}" class="page-item">
+        <a th:href="@{|/resource/admin/main?page=${i}&keyword=${keyword}|}"
+           th:text="${i + 1}"
+           class="pagination-item-base"
+           th:classappend="${i == resourcePage.number} ? ' active'">1</a>
+      </li>
 
+      <li class="page-item">
         <a th:href="@{|/resource/admin/main?page=${resourcePage.number + 1}&keyword=${keyword}|}"
-           th:classappend="${!resourcePage.hasNext()} ? 'disabled'"
-           class="pagination-nav-button">다음</a>
+           class="pagination-item-base"
+           th:classappend="${!resourcePage.hasNext()} ? ' disabled'">다음</a>
+      </li>
+      <li class="page-item">
         <a th:href="@{|/resource/admin/main?page=${resourcePage.totalPages - 1}&keyword=${keyword}|}"
-           th:classappend="${!resourcePage.hasNext()} ? 'disabled'"
-           class="pagination-nav-button">마지막</a>
-      </div>
-    </main>
+           class="pagination-item-base"
+           th:classappend="${!resourcePage.hasNext()} ? ' disabled'">마지막</a>
+      </li>
+    </ul>
   </div>
+
 </div>
 
 <script>
@@ -234,6 +224,5 @@
 </script>
 
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
-
 </body>
 </html>

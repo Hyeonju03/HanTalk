@@ -6,62 +6,111 @@
     <title>아이템 관리</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        /* 모든 페이지네이션 링크를 위한 기본 스타일 */
+        .pagination-item-base {
+            display: inline-flex; /* content를 중앙에 정렬하기 위해 inline-flex 사용 */
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem 0.75rem; /* py-1.5 px-3에 해당 */
+            border-radius: 0.375rem; /* rounded-md에 해당 */
+            text-decoration: none;
+            font-weight: 600;/* 폰트 굵기 조정 */
+            min-width: 36px; /* 버튼 최소 너비 설정 (숫자 1, 2 등 작아지는 것 방지) */
+            height: 36px; /* 버튼 높이 설정 */
+            box-sizing: border-box; /* 패딩과 테두리를 너비/높이에 포함 */
+            background-color: transparent; /* 기본: 배경 투명 */
+            color: #2F4160; /* 기본: 진한 남색 텍스트 */
+            border: 1px solid transparent; /* 기본: 테두리 투명 */
+            transition-property: background-color, color, border-color;
+            transition-duration: 200ms;
+            transition-timing-function:
+            cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* 모든 페이지네이션 링크의 호버 상태 */
+        .pagination-item-base:hover {
+            background-color: #e0e0e0; /* 호버 시 연한 회색 배경 */
+            color: #2F4160; /* 호버 시 진한 남색 텍스트 유지 */
+            border-color: #e0e0e0; /* 호버 시 연한 회색 테두리 */
+        } /* 활성 페이지 번호 스타일 */
+        .pagination-item-base.active {
+            background-color: #4B4B4B; /* 진한 회색 배경 */
+            color: white; /* 흰색 텍스트 */
+            border-color: #4B4B4B; /* 진한 회색 테두리 */
+        } /* 활성 페이지 버튼의 호버 효과 */
+        .pagination-item-base.active:hover {
+            background-color: #4B4B4B; /* 활성 상태에서 호버 시 진한 회색 배경 유지 */
+            color: white; /* 활성 상태에서 호버 시 흰색 텍스트 유지 */
+            border-color: #4B4B4B; /* 활성 상태에서 호버 시 진한 회색 테두리 유지 */
+        } /* 비활성화된 버튼 스타일 */
+        .pagination-item-base.disabled {
+            opacity: 0.5; /* 약간 흐리게 */
+            cursor: default !important; /* 마우스 커서 변경 (금지 아이콘 제거) */
+            background-color: transparent; /* 배경 투명 유지 */
+            color: #2F4160; /* 텍스트 색상 유지 */
+            border-color: transparent; /* 테두리 투명 유지 */
+        } /* 비활성화된 버튼의 호버 효과도 연한 회색으로 */
+        .pagination-item-base.disabled:hover {
+            background-color: #e0e0e0; /* 호버 시 연한 회색 배경 (비활성화 상태에서도) */
+            color: #2F4160; /* 호버 시 진한 남색 텍스트 유지 (비활성화 상태에서도) */
+            border-color: #e0e0e0; /* 호버 시 연한 회색 테두리 (비활성화 상태에서도) */
+        }
+    </style>
 </head>
 <body class="bg-[#f3f4f6] min-h-screen flex flex-col text-[#2F4160]">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
 <!-- 메인 컨테이너를 관리자 자료실 페이지와 동일한 크기로 변경 -->
-<div class="flex-grow flex justify-center w-full">
+<div class="flex-grow flex justify-center w-full mt-6">
     <main class="bg-white rounded-xl shadow-xl w-full max-w-7xl mx-auto flex-grow p-8 box-border">
 
-        <!-- 페이지 제목 및 버튼 섹션 -->
-        <div class="p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
-            <h2 class="text-3xl font-bold mb-4 text-center">아이템 관리</h2>
-            <div class="relative flex justify-center items-center min-h-[48px]">
-                <a href="/item/chuga" class="block w-fit bg-[#4B4B4B] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
-                    ➕ 아이템 추가
-                </a>
-                <a th:href="@{/admin}"
-                   class="absolute right-0 inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200">
-                    관리자 페이지<i class="fas fa-arrow-right ml-2"></i>
-                </a>
-            </div>
+        <h1 class="text-3xl font-bold text-[#2F4160] mb-6 text-center">아이템 관리</h1>
+
+        <div class="flex flex-col items-end space-y-4 mb-8">
+            <a th:href="@{/admin}"
+               class="inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200 flex items-center">
+                관리자 페이지<i class="fas fa-arrow-right ml-2"></i>
+            </a>
+            <a href="/item/chuga" class="bg-[#4B4B4B] text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300 flex items-center">
+                <i class="fas fa-plus mr-2"></i> 아이템 추가
+            </a>
         </div>
 
-        <div th:if="${message}" class="p-4 text-center text-green-700 bg-[#B5D0E3] rounded-b-xl">
+        <div th:if="${message}" class="p-4 text-center text-green-700 bg-[#B5D0E3] rounded-xl">
             [[${message}]]
         </div>
 
         <!-- 아이템 목록 테이블 -->
-        <div class="p-8 overflow-x-auto">
-            <table class="min-w-full bg-white border-collapse">
+        <div class="">
+            <table class="w-full border-collapse bg-gray-200 rounded-xl overflow-hidden shadow-md">
                 <thead>
                 <tr class="bg-gray-200 border-b border-[#E0E0E0]">
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">ID</th>
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">이름</th>
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/12">가격</th>
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">설명</th>
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">관리</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">ID</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">이름</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/12">가격</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">설명</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">관리</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="item : ${items}" class="border-b border-gray-200 hover:bg-gray-50">
-                    <td class="py-4 px-6 text-sm text-gray-800 text-center" th:text="${item.itemId}"></td>
-                    <td class="py-4 px-6 text-sm text-gray-800 w-1/6 text-center" th:text="${item.itemName}"></td>
-                    <td class="py-4 px-6 text-sm text-gray-800 w-1/12 text-center" th:text="${item.price}"></td>
-                    <td class="py-4 px-6 text-sm text-gray-800" th:text="${item.itemDescription}"></td>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:each="item : ${items}" class="cursor-pointer hover:bg-gray-50">
+                    <td class="py-4 px-6 text-sm text-gray-800 break-words text-center" th:text="${item.itemId}"></td>
+                    <td class="py-4 px-6 text-sm text-gray-800 break-words w-1/6 text-center" th:text="${item.itemName}"></td>
+                    <td class="py-4 px-6 text-sm text-gray-800 break-words w-1/12 text-center" th:text="${item.price}"></td>
+                    <td class="py-4 px-6 text-sm text-gray-800 break-words text-center" th:text="${item.itemDescription}"></td>
                     <td class="py-4 px-6 text-sm font-medium text-center">
                         <div class="flex justify-center items-center space-x-2">
                             <a th:href="@{'/item/sujung/' + ${item.itemId}}"
                                class="inline-flex items-center space-x-1 bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300 whitespace-nowrap">
                                 <i class="fas fa-edit"></i> <span>수정</span>
                             </a>
-                            <button type="button"
-                                    class="inline-flex items-center space-x-1 bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 whitespace-nowrap"
-                                    th:onclick="'confirmDelete(' + ${item.itemId} + ');'">
-                                <i class="fas fa-trash"></i> <span>삭제</span>
-                            </button>
+                            <a th:href="@{'/item/sakje/' + ${item.itemId}}"
+                               class="inline-flex items-center space-x-1 bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 whitespace-nowrap"
+                               onclick="return confirm('정말 이 아이템을 삭제하시겠습니까?');"
+                               title="삭제">
+                                <i class="fas fa-trash"></i> 삭제
+                            </a>
                         </div>
                     </td>
                 </tr>
@@ -69,12 +118,8 @@
             </table>
         </div>
 
-        <!-- 푸터와의 간격을 위해 비어 있는 div 유지 (optional) -->
-        <div class="p-8 flex justify-center border-t border-[#E0E0E0] rounded-b-xl bg-[#FDFBFF]">
-        </div>
-
         <!-- 페이지네이션 컨트롤 추가 -->
-        <div id="pagination-controls" class="flex flex-col md:flex-row justify-center items-center mt-6 space-y-4 md:space-y-0 md:space-x-4">
+        <div id="pagination-controls" class="flex flex-col md:flex-row justify-center items-center pb-8 mt-8 space-y-4 md:space-y-0 md:space-x-4">
             <!-- 페이지네이션 버튼이 여기에 동적으로 추가됩니다 -->
         </div>
 
@@ -109,62 +154,77 @@
             paginationWrapper.innerHTML = '';
             const pageCount = Math.ceil(allRows.length / rowsPerPage);
 
+            // <ul>
+            const ul = document.createElement('ul');
+            ul.className = "flex justify-center items-center space-x-2";
+
+            // 버튼 생성 함수 (중복 줄이기)
+            function createButton(label, disabledCondition, onClick, isPage = false, isActive = false) {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.textContent = label;
+
+                // 기본 클래스 (모든 버튼 공통)
+                a.className = "inline-flex items-center justify-center px-3 py-1.5 rounded-md no-underline font-semibold " +
+                              "min-w-[36px] h-[36px] box-border border text-sm transition-colors duration-200 ease-in-out";
+
+                if (disabledCondition) {
+                    // 비활성화 상태
+                    a.classList.add("bg-transparent", "text-[#2F4160]", "border-transparent", "opacity-50", "cursor-default", "pointer-events-none");
+                    a.classList.add("hover:bg-[#e0e0e0]", "hover:text-[#2F4160]", "hover:border-[#e0e0e0]");
+                } else if (isPage && isActive) {
+                    // 현재 페이지 (활성 상태)
+                    a.classList.add("bg-[#4B4B4B]", "text-white", "border-[#4B4B4B]", "cursor-default");
+                    a.classList.add("hover:bg-[#4B4B4B]", "hover:text-white", "hover:border-[#4B4B4B]");
+                } else {
+                    // 기본 버튼
+                    a.classList.add("bg-transparent", "text-[#2F4160]", "border-transparent");
+                    a.classList.add("hover:bg-[#e0e0e0]", "hover:text-[#2F4160]", "hover:border-[#e0e0e0]");
+
+                    a.href = "#";
+                    a.addEventListener("click", e => {
+                        e.preventDefault();
+                        onClick();
+                    });
+                }
+
+                li.appendChild(a);
+                return li;
+            }
+
+            // '처음' 버튼
+            ul.appendChild(createButton("처음", page === 1, () => {
+                currentPage = 1;
+                renderPage(currentPage);
+            }));
+
             // '이전' 버튼
-            const prevButton = document.createElement('a');
-            prevButton.textContent = '이전';
-            prevButton.className = `inline-flex items-center justify-center px-3 py-1.5 no-underline rounded-md transition-colors duration-200`;
-            if (page === 1) {
-                prevButton.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
-            } else {
-                prevButton.classList.add('bg-white', 'text-[#2F4160]', 'border', 'border-gray-300', 'hover:bg-[#f3f4f6]', 'hover:text-[#2F4160]');
-            }
-            if (page > 1) {
-                prevButton.href = '#'; // 실제 URL 대신 스크롤을 막는 임시 링크
-                prevButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    currentPage--;
-                    renderPage(currentPage);
-                });
-            }
-            paginationWrapper.appendChild(prevButton);
+            ul.appendChild(createButton("이전", page === 1, () => {
+                currentPage--;
+                renderPage(currentPage);
+            }));
 
             // 페이지 번호 버튼
             for (let i = 1; i <= pageCount; i++) {
-                const btn = document.createElement('a');
-                btn.textContent = i;
-                btn.className = `block w-8 h-8 flex items-center justify-center rounded-md no-underline transition-colors duration-200`;
-                if (i === page) {
-                    btn.classList.add('bg-[#B5D0E3]', 'text-white', 'font-bold');
-                } else {
-                    btn.classList.add('bg-white', 'text-[#2F4160]', 'border', 'border-gray-300', 'hover:bg-[#f3f4f6]', 'hover:text-[#2F4160]');
-                }
-                btn.href = '#'; // 실제 URL 대신 스크롤을 막는 임시 링크
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
+                ul.appendChild(createButton(i, false, () => {
                     currentPage = i;
                     renderPage(currentPage);
-                });
-                paginationWrapper.appendChild(btn);
+                }, true, i === page));
             }
 
             // '다음' 버튼
-            const nextButton = document.createElement('a');
-            nextButton.textContent = '다음';
-            nextButton.className = `inline-flex items-center justify-center px-3 py-1.5 no-underline rounded-md transition-colors duration-200`;
-            if (page === pageCount) {
-                nextButton.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
-            } else {
-                nextButton.classList.add('bg-white', 'text-[#2F4160]', 'border', 'border-gray-300', 'hover:bg-[#f3f4f6]', 'hover:text-[#2F4160]');
-            }
-            if (page < pageCount) {
-                nextButton.href = '#'; // 실제 URL 대신 스크롤을 막는 임시 링크
-                nextButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    currentPage++;
-                    renderPage(currentPage);
-                });
-            }
-            paginationWrapper.appendChild(nextButton);
+            ul.appendChild(createButton("다음", page === pageCount, () => {
+                currentPage++;
+                renderPage(currentPage);
+            }));
+
+            // '마지막' 버튼
+            ul.appendChild(createButton("마지막", page === pageCount, () => {
+                currentPage = pageCount;
+                renderPage(currentPage);
+            }));
+
+            paginationWrapper.appendChild(ul);
         }
 
         // 초기 페이지를 렌더링합니다.
