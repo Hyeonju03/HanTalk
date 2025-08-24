@@ -110,7 +110,7 @@
 
 
         <div class="p-8 overflow-x-auto">
-            <table class="min-w-full bg-white border-collapse">
+            <table class="w-full border-collapse bg-gray-200 rounded-xl overflow-hidden shadow-md">
                 <thead>
                 <tr class="bg-gray-200 border-b border-[#E0E0E0]">
                     <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">ID</th>
@@ -120,8 +120,8 @@
                     <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">관리</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="item : ${itemPage.content}" class="border-b border-gray-200 hover:bg-gray-50">
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:each="item : ${itemPage.content}" class="cursor-pointer hover:bg-gray-50">
                     <td class="py-4 px-6 text-sm text-gray-800 text-center" th:text="${item.itemId}"></td>
                     <td class="py-4 px-6 text-sm text-gray-800 w-1/6 text-center" th:text="${item.itemName}"></td>
                     <td class="py-4 px-6 text-sm text-gray-800 w-1/12 text-center" th:text="${item.price}"></td>
