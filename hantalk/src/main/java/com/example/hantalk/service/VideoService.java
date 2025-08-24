@@ -25,33 +25,6 @@ public class VideoService {
         return videoRepository.existsByVideoName(filename);
     }
 
-    // 🔍 제목으로 영상 검색
-    @Transactional(readOnly = true)
-    public List<VideoDTO> searchByTitle(String keyword) {
-        return videoRepository.findByTitleContaining(keyword)
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
-    // 🔍 내용으로 영상 검색
-    @Transactional(readOnly = true)
-    public List<VideoDTO> searchByContent(String keyword) {
-        return videoRepository.findByContentContaining(keyword)
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
-    // 🔍 제목 또는 내용으로 영상 검색
-    @Transactional(readOnly = true)
-    public List<VideoDTO> searchByTitleOrContent(String keyword) {
-        return videoRepository.findByTitleContainingOrContentContaining(keyword, keyword)
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
     // ✅ 영상 등록
     @Transactional
     public int createVideo(VideoDTO dto) {
@@ -77,13 +50,36 @@ public class VideoService {
         return toDto(video);
     }
 
-    // ✅ 전체 영상 목록 조회
+    // ✅ 전체 영상 목록 조회 (페이징 및 검색 기능 포함)
     @Transactional(readOnly = true)
-    public List<VideoDTO> getAllVideos() {
-        return videoRepository.findAll()
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public Page<VideoDTO> getPagedVideos(String keyword, String searchType, Pageable pageable) {
+        // 검색어 및 검색 유형에 따라 동적으로 쿼리 실행
+        Page<Video> videoPage;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            keyword = keyword.trim();
+            switch (searchType) {
+                case "title":
+                    videoPage = videoRepository.findByTitleContaining(keyword, pageable);
+                    break;
+                case "content":
+                    videoPage = videoRepository.findByContentContaining(keyword, pageable);
+                    break;
+                case "filename":
+                    videoPage = videoRepository.findByVideoNameContaining(keyword, pageable);
+                    break;
+                case "all":
+                default:
+                    // VideoRepository의 @Query 메서드와 일치하도록 수정
+                    videoPage = videoRepository.findByTitleOrContentOrVideoNameContaining(keyword, pageable);
+                    break;
+            }
+        } else {
+            // 키워드가 없으면 전체 목록 조회
+            videoPage = videoRepository.findAll(pageable);
+        }
+
+        // Entity Page를 DTO Page로 변환
+        return videoPage.map(this::toDto);
     }
 
     // ✅ 영상 삭제
@@ -114,34 +110,7 @@ public class VideoService {
         return video;
     }
 
-    public Page<Video> getPagedVideos(String keyword, String searchType, Pageable pageable) {
-        if (keyword != null) {
-            keyword = keyword.trim();
-        }
-        if (keyword == null || keyword.isEmpty()) {
-            return videoRepository.findAll(pageable);
-        }
-        switch (searchType) {
-            case "title":
-                return videoRepository.findByTitleContaining(keyword, pageable);
-            case "content":
-                return videoRepository.findByContentContaining(keyword, pageable);
-            case "filename":
-                return videoRepository.findByVideoNameContaining(keyword, pageable);
-            case "all":
-            default:
-                return videoRepository.findByTitleOrContentOrVideoNameContaining(keyword, pageable);
-        }
-    }
-
-    public Page<VideoDTO> searchVideos(String keyword, String searchType, Pageable pageable) {
-        Page<Video> videos = getPagedVideos(keyword, searchType, pageable);
-        return videos.map(this::toDto);  // Entity → DTO 변환
-    }
-
     public boolean existsByVideoName(String filename) {
         return videoRepository.existsByVideoName(filename);
     }
-
-
 }

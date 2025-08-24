@@ -6,25 +6,36 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface VideoRepository extends JpaRepository<Video, Integer> {
 
+    // ✅ 파일명으로 영상 존재 여부 확인
     boolean existsByVideoName(String videoName);
 
-    // 일반 검색 (페이징 없이 사용)
-    List<Video> findByTitleContaining(String keyword);
-    List<Video> findByContentContaining(String keyword);
-    List<Video> findByTitleContainingOrContentContaining(String keyword1, String keyword2);
+    // 🔍 제목으로 영상 검색 (페이징 포함)
+    Page<Video> findByTitleContaining(String title, Pageable pageable);
 
-    // 페이징 검색 (페이징 처리를 위한 메서드들)
-    Page<Video> findByTitleContaining(String keyword, Pageable pageable);
-    Page<Video> findByContentContaining(String keyword, Pageable pageable);
-    Page<Video> findByTitleContainingOrContentContaining(String keyword1, String keyword2, Pageable pageable);
-    Page<Video> findByVideoNameContaining(String keyword, Pageable pageable);
+    // 🔍 내용으로 영상 검색 (페이징 포함)
+    Page<Video> findByContentContaining(String content, Pageable pageable);
 
+    // 🔍 파일명으로 영상 검색 (페이징 포함)
+    Page<Video> findByVideoNameContaining(String videoName, Pageable pageable);
+
+    // 🔍 제목, 내용, 파일명으로 영상 검색 (페이징 포함)
     @Query("SELECT v FROM Video v WHERE " +
             "v.title LIKE %:keyword% OR v.content LIKE %:keyword% OR v.videoName LIKE %:keyword%")
     Page<Video> findByTitleOrContentOrVideoNameContaining(@Param("keyword") String keyword, Pageable pageable);
+
+    // 🔍 제목으로 영상 검색 (List 반환, 이전 코드에서 사용)
+    List<Video> findByTitleContaining(String title);
+
+    // 🔍 내용으로 영상 검색 (List 반환, 이전 코드에서 사용)
+    List<Video> findByContentContaining(String content);
+
+    // 🔍 제목 또는 내용으로 영상 검색 (List 반환, 이전 코드에서 사용)
+    List<Video> findByTitleContainingOrContentContaining(String title, String content);
 }

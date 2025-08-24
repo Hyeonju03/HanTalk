@@ -7,6 +7,7 @@ import com.example.hantalk.repository.UsersRepository;
 import com.example.hantalk.service.ItemShopService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,8 @@ public class ItemShopController {
         // ADMIN인 경우
         if ("ADMIN".equalsIgnoreCase(role)) {
             model.addAttribute("point", 0);
-            model.addAttribute("items", itemShopService.getAllItems());
+            // 모든 아이템을 가져오는 대신, 페이징된 데이터의 첫 페이지를 가져옵니다.
+            model.addAttribute("items", itemShopService.getItemList(0).getContent());
             model.addAttribute("isAdmin", true);
             return "item/shop";
         }
@@ -95,10 +97,20 @@ public class ItemShopController {
     }
 
 
-    // 관리자 - 아이템 목록 보기
+    // 관리자 - 아이템 목록 보기 (페이징 기능 추가)
     @GetMapping("/admin")
-    public String manageItems(Model model) {
-        model.addAttribute("items", itemShopService.getAllItems());
+    public String manageItems(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
+        Page<Item> itemPage = itemShopService.getItemList(page);
+        model.addAttribute("itemPage", itemPage);
+        model.addAttribute("items", itemPage.getContent());
+
+        // 페이지네이션 숫자 범위 계산 (현재 페이지를 중심으로 5개씩)
+        int startPage = Math.max(0, itemPage.getNumber() - 2);
+        int endPage = Math.min(itemPage.getTotalPages() - 1, itemPage.getNumber() + 2);
+
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
         return "item/admin";
     }
 

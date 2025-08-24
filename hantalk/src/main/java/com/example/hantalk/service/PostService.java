@@ -31,30 +31,15 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final String uploadDir = System.getProperty("user.dir") + "/uploads/postFiles";
 
-    // 허용된 파일 확장자 목록 정의
     private static final Set<String> ALLOWED_EXTENSIONS = new HashSet<>();
     static {
-        // 문서 파일
-        ALLOWED_EXTENSIONS.add("pdf");
-        ALLOWED_EXTENSIONS.add("doc");
-        ALLOWED_EXTENSIONS.add("docx");
-        ALLOWED_EXTENSIONS.add("xls");
-        ALLOWED_EXTENSIONS.add("xlsx");
-        ALLOWED_EXTENSIONS.add("ppt");
-        ALLOWED_EXTENSIONS.add("pptx");
-        ALLOWED_EXTENSIONS.add("hwp");
-        // 이미지 파일
-        ALLOWED_EXTENSIONS.add("jpg");
-        ALLOWED_EXTENSIONS.add("jpeg");
-        ALLOWED_EXTENSIONS.add("png");
-        ALLOWED_EXTENSIONS.add("gif");
-        // 기타
-        ALLOWED_EXTENSIONS.add("zip");
-        ALLOWED_EXTENSIONS.add("rar");
-        ALLOWED_EXTENSIONS.add("txt");
+        ALLOWED_EXTENSIONS.add("pdf"); ALLOWED_EXTENSIONS.add("doc"); ALLOWED_EXTENSIONS.add("docx");
+        ALLOWED_EXTENSIONS.add("xls"); ALLOWED_EXTENSIONS.add("xlsx"); ALLOWED_EXTENSIONS.add("ppt");
+        ALLOWED_EXTENSIONS.add("pptx"); ALLOWED_EXTENSIONS.add("hwp"); ALLOWED_EXTENSIONS.add("jpg");
+        ALLOWED_EXTENSIONS.add("jpeg"); ALLOWED_EXTENSIONS.add("png"); ALLOWED_EXTENSIONS.add("gif");
+        ALLOWED_EXTENSIONS.add("zip"); ALLOWED_EXTENSIONS.add("rar"); ALLOWED_EXTENSIONS.add("txt");
     }
 
-    // 게시물 등록
     @Transactional
     public PostDTO createPost(PostDTO dto) {
         Post post = toEntity(dto);
@@ -62,13 +47,11 @@ public class PostService {
         return toDto(savedPost);
     }
 
-    // 첨부파일을 포함한 게시물 등록
     @Transactional
     public PostDTO createPostWithFile(PostDTO dto, MultipartFile file) {
         String savedFileName = saveFile(file);
         if (savedFileName != null) {
             dto.setArchive(savedFileName);
-            // 원본 파일명을 DTO에 저장
             dto.setOriginalFileName(file.getOriginalFilename());
         }
         Post post = toEntity(dto);
@@ -76,16 +59,12 @@ public class PostService {
         return toDto(savedPost);
     }
 
-    // UUID 파일명으로 원본 파일명을 찾아주는 메서드
     public String getOriginalFileName(String savedFileName) {
-        int underscoreIndex = savedFileName.indexOf("_");
-        if (underscoreIndex != -1) {
-            return savedFileName.substring(underscoreIndex + 1);
-        }
-        return null;
+        return postRepository.findByArchive(savedFileName)
+                .map(Post::getOriginalFileName)
+                .orElse(null);
     }
 
-    // 게시물 수정
     @Transactional
     public PostDTO updatePost(int postId, PostDTO dto) {
         Post post = postRepository.findById(postId)
@@ -96,7 +75,6 @@ public class PostService {
         return toDto(post);
     }
 
-    // 첨부파일을 포함한 게시물 수정 (파일 삭제 옵션 추가)
     @Transactional
     public PostDTO updatePostWithFile(int postId, PostDTO dto, MultipartFile file, Boolean deleteFile) {
         Post post = postRepository.findById(postId)
@@ -120,41 +98,34 @@ public class PostService {
             post.setOriginalFileName(null);
         } else {
             post.setArchive(dto.getArchive());
+            post.setOriginalFileName(dto.getOriginalFileName());
         }
         return toDto(post);
     }
 
-    // 단일 게시물 조회 및 조회수 증가
     @Transactional
     public PostDTO getPost(int postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
-
         post.setViewCount(post.getViewCount() + 1);
-
         return toDto(post);
     }
 
-    // 게시물 삭제
     @Transactional
     public void deletePost(int postId) {
         postRepository.deleteById(postId);
     }
 
-    // 카테고리 ID로 게시물 검색 (List → Page로 변경)
     @Transactional(readOnly = true)
-    public Page<PostDTO> searchByCategory(int categoryId, Pageable pageable) {
+    public Page<PostDTO> searchByCategory(Integer categoryId, Pageable pageable) {
         Page<Post> posts = postRepository.findByCategory_CategoryId(categoryId, pageable);
         return posts.map(this::toDto);
     }
 
-    // ✅ 키워드, 검색 타입, 카테고리, 유저 번호, isAdmin으로 검색 (통합 메서드)
     @Transactional(readOnly = true)
-    public Page<PostDTO> searchPosts(int categoryId, String keyword, String searchType, Integer userNo, boolean isAdmin, Pageable pageable) {
+    public Page<PostDTO> searchPosts(Integer categoryId, String keyword, String searchType, Integer userNo, boolean isAdmin, Pageable pageable) {
         Page<Post> posts;
-
-        // ✅ case 1: 문의사항(ID 3) 게시판이고, 로그인한 사용자가 **관리자가 아닌 경우**
-        if (categoryId == 3 && userNo != null && !isAdmin) {
+        if (categoryId != null && categoryId == 3 && userNo != null && !isAdmin) {
             if (keyword == null || keyword.trim().isEmpty()) {
                 posts = postRepository.findByCategory_CategoryIdAndUsers_UserNo(categoryId, userNo, pageable);
             } else {
@@ -174,7 +145,26 @@ public class PostService {
                 }
             }
         }
-        // ✅ case 2: 관리자이거나, 그 외 일반 게시판인 경우
+        else if (categoryId == null && isAdmin) {
+            if (keyword == null || keyword.trim().isEmpty()) {
+                posts = postRepository.findAll(pageable);
+            } else {
+                switch (searchType) {
+                    case "title":
+                        posts = postRepository.findByTitleContaining(keyword, pageable);
+                        break;
+                    case "content":
+                        posts = postRepository.findByContentContaining(keyword, pageable);
+                        break;
+                    case "author":
+                        posts = postRepository.findByUsers_NicknameContaining(keyword, pageable);
+                        break;
+                    default:
+                        posts = postRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+                        break;
+                }
+            }
+        }
         else {
             if (keyword == null || keyword.trim().isEmpty()) {
                 posts = postRepository.findByCategory_CategoryId(categoryId, pageable);
@@ -198,7 +188,6 @@ public class PostService {
         return posts.map(this::toDto);
     }
 
-    // 홈 화면에 표시할 최신 게시물 리스트를 가져오는 메서드
     @Transactional(readOnly = true)
     public List<PostDTO> getLatestPosts(int categoryId, int count) {
         Pageable pageable = PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, "createDate"));
@@ -208,7 +197,6 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    // Entity → DTO 변환
     private PostDTO toDto(Post post) {
         PostDTO dto = new PostDTO();
         dto.setPostId(post.getPostId());
@@ -229,7 +217,6 @@ public class PostService {
         return dto;
     }
 
-    // DTO → Entity 변환
     private Post toEntity(PostDTO dto) {
         Post post = new Post();
         post.setPostId(dto.getPostId());
@@ -250,29 +237,23 @@ public class PostService {
         return post;
     }
 
-    // 파일 저장 로직
     private String saveFile(MultipartFile file) {
         try {
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
-
             String originalFilename = file.getOriginalFilename();
             if (originalFilename == null || originalFilename.isEmpty()) {
                 return null;
             }
-
             String fileExtension = getExtension(originalFilename);
             if (!ALLOWED_EXTENSIONS.contains(fileExtension)) {
                 throw new IllegalArgumentException("허용되지 않는 파일 확장자입니다: " + fileExtension);
             }
-
             String savedFileName = UUID.randomUUID().toString() + "_" + originalFilename;
-
             Path filePath = uploadPath.resolve(savedFileName);
             file.transferTo(filePath.toFile());
-
             return savedFileName;
         } catch (IOException e) {
             e.printStackTrace();
@@ -280,13 +261,11 @@ public class PostService {
         }
     }
 
-    // 파일 확장자 추출 메서드
     private String getExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf('.');
         return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1).toLowerCase();
     }
 
-    // 파일 삭제 로직 추가
     private void deleteFile(String fileName) {
         if (fileName != null && !fileName.isEmpty()) {
             Path filePath = Paths.get(uploadDir, fileName);

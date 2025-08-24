@@ -1,30 +1,104 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>아이템 관리</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        /* Tailwind CSS 메인 컬러 설정 (자료실 페이지 기준) */
+        :root {
+          --color-dark-navy: #2F4160;
+          --color-coral-pink: #F29DA0;
+          --color-soft-sky: #B5D0E3;
+        }
+        .bg-dark-navy { background-color: var(--color-dark-navy); }
+        .text-dark-navy { color: var(--color-dark-navy); }
+        .bg-coral-pink { background-color: var(--color-coral-pink); }
+        .text-coral-pink { color: var(--color-coral-pink); }
+        .bg-soft-sky { background-color: var(--color-soft-sky); }
+        .text-soft-sky { color: var(--color-soft-sky); }
+
+        /* 모든 페이지네이션 링크를 위한 기본 스타일 */
+        .pagination-item-base {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem 0.75rem;
+            background-color: transparent;
+            color: #2F4160;
+            border: 1px solid transparent;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-weight: 600;
+            min-width: 36px;
+            height: 36px;
+            box-sizing: border-box;
+            transition-property: background-color, color, border-color;
+            transition-duration: 200ms;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 모든 페이지네이션 링크의 호버 상태 */
+        .pagination-item-base:hover {
+            background-color: #e0e0e0;
+            color: #2F4160;
+            border-color: #e0e0e0;
+        }
+
+        /* 활성 페이지 번호 스타일 */
+        .pagination-item-base.active {
+            font-weight: bold;
+            background-color: #4B4B4B;
+            color: white;
+            border-color: #4B4B4B;
+        }
+
+        /* 활성 페이지 버튼의 호버 효과 */
+        .pagination-item-base.active:hover {
+            background-color: #4B4B4B;
+            color: white;
+            border-color: #4B4B4B;
+        }
+
+        /* 비활성화된 버튼 스타일 */
+        .pagination-item-base.disabled {
+            opacity: 0.5;
+            cursor: default !important;
+            background-color: transparent;
+            color: #2F4160;
+            border-color: transparent;
+        }
+
+        /* 비활성화된 버튼의 호버 효과 */
+        .pagination-item-base.disabled:hover {
+            background-color: transparent;
+            color: #2F4160;
+            border-color: transparent;
+        }
+    </style>
 </head>
 <body class="bg-[#f3f4f6] min-h-screen flex flex-col text-[#2F4160]">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<!-- 메인 컨테이너를 관리자 자료실 페이지와 동일한 크기로 변경 -->
 <div class="flex-grow flex justify-center w-full">
     <main class="bg-white rounded-xl shadow-xl w-full max-w-7xl mx-auto flex-grow p-8 box-border">
 
-        <!-- 페이지 제목 및 버튼 섹션 -->
-        <div class="p-8 bg-[#FDFBFF] border-b border-[#E0E0E0] rounded-t-xl">
-            <h2 class="text-3xl font-bold mb-4 text-center">아이템 관리</h2>
-            <div class="relative flex justify-center items-center min-h-[48px]">
-                <a href="/item/chuga" class="block w-fit bg-[#4B4B4B] text-white py-2 px-4 rounded-lg hover:bg-[#2F4160] transition duration-300">
-                    ➕ 아이템 추가
-                </a>
-                <a th:href="@{/admin}"
-                   class="absolute right-0 inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200">
-                    관리자 페이지<i class="fas fa-arrow-right ml-2"></i>
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-[#2F4160]">아이템 관리</h2>
+            <div class="flex flex-col items-end space-y-2">
+                <div sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin}"
+                       class="inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200">
+                        관리자 페이지<i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+                <a href="/item/chuga"
+                   class="bg-[#4B4B4B] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center">
+                    <i class="fas fa-plus mr-2"></i>
+                    아이템 추가
                 </a>
             </div>
         </div>
@@ -33,7 +107,6 @@
             [[${message}]]
         </div>
 
-        <!-- 아이템 목록 테이블 -->
         <div class="p-8 overflow-x-auto">
             <table class="min-w-full bg-white border-collapse">
                 <thead>
@@ -46,7 +119,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="item : ${items}" class="border-b border-gray-200 hover:bg-gray-50">
+                <tr th:each="item : ${itemPage.content}" class="border-b border-gray-200 hover:bg-gray-50">
                     <td class="py-4 px-6 text-sm text-gray-800 text-center" th:text="${item.itemId}"></td>
                     <td class="py-4 px-6 text-sm text-gray-800 w-1/6 text-center" th:text="${item.itemName}"></td>
                     <td class="py-4 px-6 text-sm text-gray-800 w-1/12 text-center" th:text="${item.price}"></td>
@@ -69,107 +142,41 @@
             </table>
         </div>
 
-        <!-- 푸터와의 간격을 위해 비어 있는 div 유지 (optional) -->
-        <div class="p-8 flex justify-center border-t border-[#E0E0E0] rounded-b-xl bg-[#FDFBFF]">
-        </div>
+        <div id="pagination-controls" class="flex justify-center items-center mt-6 space-x-2" th:if="${itemPage.totalPages > 1}">
+            <a th:href="@{|/item/admin?page=0|}"
+               th:classappend="${itemPage.number == 0} ? 'disabled'"
+               class="pagination-item-base">처음</a>
 
-        <!-- 페이지네이션 컨트롤 추가 -->
-        <div id="pagination-controls" class="flex flex-col md:flex-row justify-center items-center mt-6 space-y-4 md:space-y-0 md:space-x-4">
-            <!-- 페이지네이션 버튼이 여기에 동적으로 추가됩니다 -->
-        </div>
+            <a th:href="@{|/item/admin?page=${itemPage.number - 1}|}"
+               th:classappend="${!itemPage.hasPrevious()} ? 'disabled'"
+               class="pagination-item-base">이전</a>
 
+            <span th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                <a th:href="@{|/item/admin?page=${i}|}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == itemPage.number} ? 'active'"
+                   class="pagination-item-base">1</a>
+            </span>
+
+            <a th:href="@{|/item/admin?page=${itemPage.number + 1}|}"
+               th:classappend="${!itemPage.hasNext()} ? 'disabled'"
+               class="pagination-item-base">다음</a>
+
+            <a th:href="@{|/item/admin?page=${itemPage.totalPages - 1}|}"
+               th:classappend="${itemPage.number == itemPage.totalPages - 1} ? 'disabled'"
+               class="pagination-item-base">마지막</a>
+        </div>
     </main>
 </div>
 
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script>
-    // 페이지네이션 기능을 위한 JavaScript 코드
-    document.addEventListener("DOMContentLoaded", function() {
-        const tableBody = document.querySelector("tbody");
-        const allRows = Array.from(tableBody.querySelectorAll("tr"));
-        const paginationWrapper = document.getElementById("pagination-controls");
-
-        const rowsPerPage = 10;
-        let currentPage = 1;
-
-        function renderPage(page) {
-            const start = (page - 1) * rowsPerPage;
-            const end = start + rowsPerPage;
-
-            const paginatedRows = allRows.slice(start, end);
-
-            tableBody.innerHTML = '';
-            paginatedRows.forEach(row => tableBody.appendChild(row));
-
-            updatePaginationButtons(page);
+    function confirmDelete(itemId) {
+        if (confirm('정말 이 아이템을 삭제하시겠습니까?')) {
+            window.location.href = '/item/delete/' + itemId;
         }
-
-        function updatePaginationButtons(page) {
-            paginationWrapper.innerHTML = '';
-            const pageCount = Math.ceil(allRows.length / rowsPerPage);
-
-            // '이전' 버튼
-            const prevButton = document.createElement('a');
-            prevButton.textContent = '이전';
-            prevButton.className = `inline-flex items-center justify-center px-3 py-1.5 no-underline rounded-md transition-colors duration-200`;
-            if (page === 1) {
-                prevButton.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
-            } else {
-                prevButton.classList.add('bg-white', 'text-[#2F4160]', 'border', 'border-gray-300', 'hover:bg-[#f3f4f6]', 'hover:text-[#2F4160]');
-            }
-            if (page > 1) {
-                prevButton.href = '#'; // 실제 URL 대신 스크롤을 막는 임시 링크
-                prevButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    currentPage--;
-                    renderPage(currentPage);
-                });
-            }
-            paginationWrapper.appendChild(prevButton);
-
-            // 페이지 번호 버튼
-            for (let i = 1; i <= pageCount; i++) {
-                const btn = document.createElement('a');
-                btn.textContent = i;
-                btn.className = `block w-8 h-8 flex items-center justify-center rounded-md no-underline transition-colors duration-200`;
-                if (i === page) {
-                    btn.classList.add('bg-[#B5D0E3]', 'text-white', 'font-bold');
-                } else {
-                    btn.classList.add('bg-white', 'text-[#2F4160]', 'border', 'border-gray-300', 'hover:bg-[#f3f4f6]', 'hover:text-[#2F4160]');
-                }
-                btn.href = '#'; // 실제 URL 대신 스크롤을 막는 임시 링크
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    currentPage = i;
-                    renderPage(currentPage);
-                });
-                paginationWrapper.appendChild(btn);
-            }
-
-            // '다음' 버튼
-            const nextButton = document.createElement('a');
-            nextButton.textContent = '다음';
-            nextButton.className = `inline-flex items-center justify-center px-3 py-1.5 no-underline rounded-md transition-colors duration-200`;
-            if (page === pageCount) {
-                nextButton.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
-            } else {
-                nextButton.classList.add('bg-white', 'text-[#2F4160]', 'border', 'border-gray-300', 'hover:bg-[#f3f4f6]', 'hover:text-[#2F4160]');
-            }
-            if (page < pageCount) {
-                nextButton.href = '#'; // 실제 URL 대신 스크롤을 막는 임시 링크
-                nextButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    currentPage++;
-                    renderPage(currentPage);
-                });
-            }
-            paginationWrapper.appendChild(nextButton);
-        }
-
-        // 초기 페이지를 렌더링합니다.
-        renderPage(currentPage);
-    });
+    }
 </script>
 
 </body>
