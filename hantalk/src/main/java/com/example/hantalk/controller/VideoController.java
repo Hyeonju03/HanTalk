@@ -84,7 +84,8 @@ public class VideoController {
 
         // 한 페이지에 9개씩 보여주도록 size를 9로 변경
         Pageable pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "createDate"));
-        Page<VideoDTO> videoPage = videoService.searchVideos(keyword, searchType, pageable);
+        // videoService.getVideo를 videoService.getPagedVideos로 변경
+        Page<VideoDTO> videoPage = videoService.getPagedVideos(keyword, searchType, pageable);
 
         model.addAttribute("videoPage", videoPage);
         model.addAttribute("keyword", keyword);
@@ -107,8 +108,6 @@ public class VideoController {
             return "redirect:/login";
         }
 
-        /* boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");*/
-
         String role = SessionUtil.getRole(session);
         if (!"USER".equals(role) && !"ADMIN".equals(role)) {
             return "redirect:/login";
@@ -117,12 +116,7 @@ public class VideoController {
         VideoDTO video = videoService.getVideo(id);
         model.addAttribute("video", video);
         model.addAttribute("role", SessionUtil.getRole(session));
-        model.addAttribute("isAdmin", SessionUtil.hasRole(session, "ADMIN"));  // 이 부분 추가
-        /* model.addAttribute("isAdmin", isAdmin);*/
-
-/* if (isAdmin) { // 관리자면 관리자 상세 페이지로
-            return "redirect:/video/admin/view/" + id;
-        }*/
+        model.addAttribute("isAdmin", SessionUtil.hasRole(session, "ADMIN"));
         return "video/contentView";
     }
 
@@ -146,9 +140,15 @@ public class VideoController {
             return "redirect:/video/contentList";
         }
 
+        // 💡💡💡 추가된 부분: keyword가 null일 경우 빈 문자열로 초기화합니다. 💡💡💡
+        if (keyword == null) {
+            keyword = "";
+        }
+
         // 한 페이지에 9개씩 보여주도록 size를 9로 변경
         Pageable pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "createDate"));
-        Page<VideoDTO> videoPage = videoService.searchVideos(keyword, searchType, pageable);
+        // videoService.searchVideos 대신 getPagedVideos 호출
+        Page<VideoDTO> videoPage = videoService.getPagedVideos(keyword, searchType, pageable);
 
         model.addAttribute("videoPage", videoPage);
         model.addAttribute("keyword", keyword);
