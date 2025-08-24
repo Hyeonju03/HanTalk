@@ -115,52 +115,90 @@
     <section class="h-[75vh] w-full flex items-center justify-center">
         <div class="swiper mySwiper w-full h-full relative">
             <div class="swiper-wrapper">
+
                 <!-- 1. 기존의 메인 페이지 배너 (첫 번째 고정) -->
+                <style>
+                    .main-banner {
+                        position: relative;
+                        overflow: hidden;
+                        background: #FFF8E7; /* 아이보리 배경 */
+                    }
+
+                    /* 유체 애니메이션 */
+                    .main-banner::before {
+                        content: '';
+                        position: absolute;
+                        width: 250%;
+                        height: 250%;
+                        top: -75%;
+                        left: -75%;
+                        background: linear-gradient(
+                            135deg,
+                            transparent,
+                            #FF6B6B33,
+                            #F29DA033,
+                            #B6A6FF33,
+                            #6B88FF33,
+                            transparent
+                        );
+                        animation: wave 8s ease-in-out infinite;
+                        z-index: 0;
+                    }
+
+                    @keyframes wave {
+                        0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+                        25% { transform: translate(-30%, 30%) scale(1.2) rotate(10deg); }
+                        50% { transform: translate(30%, -30%) scale(1.4) rotate(-10deg); }
+                        75% { transform: translate(-15%, -15%) scale(1.3) rotate(5deg); }
+                        100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+                    }
+
+                    /* 그라데이션 텍스트 */
+                    .gradient-text {
+                        background: linear-gradient(90deg, #F29DA0, #6B88FF);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                    }
+
+                    /* 버튼 개선 */
+                    .fancy-btn {
+                        background: white;
+                        color: #F29DA0;
+                        font-weight: 600;
+                        padding: 1rem 2rem;
+                        border-radius: 9999px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                        border: 2px solid transparent;
+                        transition: all 0.3s ease;
+                    }
+
+                    .fancy-btn:hover {
+                        transform: scale(1.08);
+                        background: linear-gradient(90deg, #F29DA0, #6B88FF);
+                        color: white;
+                        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+                    }
+                </style>
+
+                <!-- 메인 페이지 배너 -->
                 <div class="swiper-slide main-banner">
-                    <div class="space-y-4 text-center flex flex-col items-center justify-center h-full">
-                        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-hantalk-navy">
-                            우리 모두를 위한 디지털 학습 공간
+                    <div class="space-y-6 text-center flex flex-col items-center justify-center h-full relative z-10">
+                        <h1 class="text-5xl sm:text-6xl md:text-7xl font-bold text-hantalk-navy">
+                            우리 모두를 위한 포근한 한글 배움터
                         </h1>
                         <p class="text-lg sm:text-xl md:text-2xl text-gray-700">
-                            재미있고 편한 학습의 시작, 지금 함께해요!
+                            복잡한 지식을 편안하고 즐겁게 배워보세요.
                         </p>
-                        <a href="/video/list" class="inline-block px-8 py-4 bg-white text-[#F29DA0] font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
-                            비디오 학습 시작하기
+                        <h2 class="text-4xl sm:text-5xl md:text-6xl font-bold text-hantalk-navy">
+                        <span class="gradient-text">"한톡!"</span>
+                        </h2>
+                        <a href="/study/contact" class="fancy-btn">
+                            학습 시작하기
                         </a>
                     </div>
                 </div>
 
-                <!--
-                 * 사용자의 요청에 따라 모든 배너의 내부 콘텐츠를 중앙으로 이동시켰습니다.
-                 * 기존의 flex-1 클래스를 제거하고 max-w-4xl과 mx-auto를 추가하여
-                 * 콘텐츠가 화면 중앙에 모이도록 했습니다.
-                 * px-8을 유지하여 모바일 화면에서도 적절한 패딩을 갖도록 했습니다.
-                 -->
 
-                <!-- 2. 게임 학습 관련 배너 -->
-                <div class="swiper-slide banner-point-new-3">
-                    <div class="flex items-center justify-center h-full px-8 md:px-24">
-                        <div class="flex items-center justify-center w-full max-w-4xl mx-auto">
-                            <div class="flex-1 text-left space-y-4">
-                                <h1 class="text-4xl sm:text-5xl font-bold text-white text-shadow-subtle">
-                                    게임하고<br>포인트 받자!
-                                </h1>
-                                <p class="text-lg sm:text-xl text-gray-800">
-                                    신나는 한글 게임도 즐기고<br>푸짐한 보상도 얻어가세요.
-                                </p>
-                                <a href="/game/main" class="inline-block px-8 py-4 bg-white text-[#D49000] font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
-                                    게임하러 가기
-                                </a>
-                            </div>
-                            <div class="flex-1 flex justify-center items-center relative">
-                                <!-- 투명한 배경 아이콘 -->
-                                <i class="fas fa-star text-[14rem] text-white opacity-40 transform rotate-12 absolute -right-8"></i>
-                                <!-- 메인 아이콘 -->
-                                <i class="fas fa-gamepad text-[12rem] text-white z-10 text-shadow-subtle"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- 3. 출석체크 관련 배너 -->
                 <div class="swiper-slide banner-attendance-new">
