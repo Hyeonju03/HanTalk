@@ -83,6 +83,7 @@
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
+
 <div class="flex-grow flex justify-center w-full">
     <main class="bg-white rounded-xl shadow-xl w-full max-w-7xl mx-auto flex-grow p-8 box-border">
 
@@ -103,19 +104,20 @@
             </div>
         </div>
 
-        <div th:if="${message}" class="p-4 text-center text-green-700 bg-[#B5D0E3] rounded-b-xl">
+        <div th:if="${message}" class="p-4 text-center text-green-700 bg-[#B5D0E3] rounded-xl">
             [[${message}]]
         </div>
+
 
         <div class="p-8 overflow-x-auto">
             <table class="min-w-full bg-white border-collapse">
                 <thead>
                 <tr class="bg-gray-200 border-b border-[#E0E0E0]">
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">ID</th>
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">이름</th>
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/12">가격</th>
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">설명</th>
-                    <th class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">관리</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">ID</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">이름</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/12">가격</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider">설명</th>
+                    <th scope="col" class="py-3 px-6 text-center text-sm font-semibold text-[#2F4160] uppercase tracking-wider w-1/6">관리</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -130,11 +132,12 @@
                                class="inline-flex items-center space-x-1 bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300 whitespace-nowrap">
                                 <i class="fas fa-edit"></i> <span>수정</span>
                             </a>
-                            <button type="button"
-                                    class="inline-flex items-center space-x-1 bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 whitespace-nowrap"
-                                    th:onclick="'confirmDelete(' + ${item.itemId} + ');'">
-                                <i class="fas fa-trash"></i> <span>삭제</span>
-                            </button>
+                            <a th:href="@{'/item/sakje/' + ${item.itemId}}"
+                               class="inline-flex items-center space-x-1 bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 whitespace-nowrap"
+                               onclick="return confirm('정말 이 아이템을 삭제하시겠습니까?');"
+                               title="삭제">
+                                <i class="fas fa-trash"></i> 삭제
+                            </a>
                         </div>
                     </td>
                 </tr>

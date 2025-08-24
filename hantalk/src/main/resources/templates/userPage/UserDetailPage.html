@@ -95,30 +95,33 @@
                     </button>
                 </div>
 
-                <div id="logContainer" style="display:none;" class="overflow-x-auto bg-white rounded-xl shadow-lg mt-4">
-                    <table class="log-table w-full border-collapse">
-                        <thead>
-                        <tr>
-                            <th>접속 URI</th>
-                            <th>메서드</th>
-                            <th>디바이스</th>
-                            <th>응답 코드</th>
-                            <th>처리 시간(ms)</th>
-                            <th>접속 일시</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="log : ${logList}">
-                            <td>[[${log.uri}]]</td>
-                            <td>[[${log.method}]]</td>
-                            <td>[[${log.device}]]</td>
-                            <td>[[${log.statusCode}]]</td>
-                            <td>[[${log.responseTime}]]</td>
-                            <td>[[${log.createDate}]]</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div id="logContainer" style="display:none;" class="bg-white rounded-xl shadow-lg mt-4">
+                    <div class="relative max-h-[520px] overflow-y-auto overflow-x-hidden">
+                        <table class="w-full border-collapse table-auto">
+                            <thead>
+                            <tr class="bg-[#2F3F5B]">
+                                <th class="sticky top-0 z-10 bg-[#2F3F5B] text-white px-4 py-3 text-left">접속 URI</th>
+                                <th class="sticky top-0 z-10 bg-[#2F3F5B] text-white px-4 py-3 text-left">메서드</th>
+                                <th class="sticky top-0 z-10 bg-[#2F3F5B] text-white px-4 py-3 text-left">디바이스</th>
+                                <th class="sticky top-0 z-10 bg-[#2F3F5B] text-white px-4 py-3 text-left">응답 코드</th>
+                                <th class="sticky top-0 z-10 bg-[#2F3F5B] text-white px-4 py-3 text-left">처리 시간(ms)</th>
+                                <th class="sticky top-0 z-10 bg-[#2F3F5B] text-white px-4 py-3 text-left">접속 일시</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="log : ${logList}" class="odd:bg-white even:bg-gray-50">
+                                <td class="px-4 py-2">[[${log.uri}]]</td>
+                                <td class="px-4 py-2">[[${log.method}]]</td>
+                                <td class="px-4 py-2">[[${log.device}]]</td>
+                                <td class="px-4 py-2">[[${log.statusCode}]]</td>
+                                <td class="px-4 py-2">[[${log.responseTime}]]</td>
+                                <td class="px-4 py-2">[[${log.createDate}]]</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>

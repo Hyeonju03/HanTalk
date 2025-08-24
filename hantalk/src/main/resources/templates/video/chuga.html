@@ -7,7 +7,6 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
   <script th:inline="javascript">
     // Tailwind CSS 메인 컬러 설정
     tailwind.config = {
@@ -37,9 +36,12 @@
     }
   </style>
 </head>
-<body class="bg-gray-200 font-sans antialiased">
-<div class="container mx-auto p-8 md:p-10 max-w-2xl bg-white rounded-2xl shadow-2xl mt-12 mb-12">
-  <h1 class="text-3xl font-bold text-dark-navy mb-8 text-center">영상 업로드</h1>
+<body class="bg-[#f3f4f6] font-sans antialiased min-h-screen flex flex-col justify-between">
+
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+
+<div class="max-w-7xl w-1/2 mx-auto bg-white p-8 rounded-xl shadow-lg mt-6">
+  <h1 class="text-3xl font-bold text-[#2F4160] mb-6 text-center">영상 업로드</h1>
 
   <form id="uploadForm" th:action="@{/video/admin/chugaProc}" method="post" enctype="multipart/form-data" class="space-y-8">
 
@@ -89,6 +91,8 @@
 
 <!-- 토스트 메시지 UI (초기에 숨겨져 있음) -->
 <div id="toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 w-80 z-50"></div>
+
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 <script>
   // 토스트 메시지 표시 함수
@@ -153,6 +157,5 @@
   });
 </script>
 
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
 </body>
 </html>

@@ -82,15 +82,13 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 flex flex-col min-h-screen">
+<body class="bg-[#f3f4f6] p-8 font-sans antialiased min-h-screen flex flex-col">
 
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<main class="flex-1 container mx-auto px-4 py-8">
-    <!-- 카드 섹션 배경 컨테이너 -->
-    <div class="video-section">
-        <!-- 상단 버튼 + 검색 -->
-        <h1 class="text-3xl font-extrabold text-center mb-8 text-gray-700">영상 목록</h1>
+<div class="max-w-7xl w-full mx-auto bg-white p-8 rounded-xl shadow-lg mt-8">
+    <h1 class="text-3xl font-bold text-[#2F4160] mb-6 text-center">영상 목록</h1>
+
         <div class="max-w-screen-xl mx-auto mb-8 flex flex-col md:flex-row items-center justify-between gap-6 px-4">
             <div class="flex gap-2">
                 <!-- '전체 영상' 버튼을 자바스크립트 함수 호출로 변경 -->
@@ -147,7 +145,7 @@
         <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-white rounded-xl shadow-inner no-results">
             <p class="text-xl font-medium text-main-dark">검색 결과가 없습니다.</p>
         </div>
-    </div>
+
 
     <!-- 디자인이 통일된 페이지네이션 -->
     <div class="pagination flex justify-center items-center mt-8 space-x-2" th:if="${videoPage.totalPages > 1}">
@@ -165,7 +163,7 @@
            class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">다음</a>
     </div>
 
-</main>
+</div>
 
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
