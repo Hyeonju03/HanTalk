@@ -5,46 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="419a6c6d-c0d4-408b-9fff-ab9ea09dafeb" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.data" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.framework.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.loader.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.wasm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/hantalk.main.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/controller/CommentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/controller/CommentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/controller/PostController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/repository/PostRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/repository/PostRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/service/CommentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/service/CommentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/service/PostService.java" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/service/PostService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hantalk/src/main/resources/templates/post/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/resources/templates/post/view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/ResourceFile/841fab90-e3a4-411b-863a-8ff0051fb28d.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/ResourceFile/a372dd06-d6a8-46ac-b0f2-1c14b53b84eb.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/ResourceFile/ba8e73cf-fed9-462e-b17b-bafb730bd33d.pptx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/ResourceFile/cb67817f-99da-471c-a58d-94b55e700da2.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/ResourceFile/d4ba85c5-d5f4-4ae4-ab7c-6fe721c1f6f4.xls" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/ResourceFile/d6893a23-6c9f-4ee6-b147-c41d4bca4b1a.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/fileUpload/0d986035-9535-46b6-ba54-13e5154fbb64_2조 프로젝트 제안서 초안.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/fileUpload/56c1e893-180a-436c-9660-5e60eebe0bbc_7.9 수업.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/frames/3f3abbf0-07c3-4adf-8d4f-beae1a5cf62d_hn.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/frames/7853a357-a3e3-4e9f-8fdc-bde0dc6b863e_dongurami.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/frames/cf4b43c9-e3cb-44bb-9fee-a26a23fc15e7_fad15b34-b849-4f78-858b-55667274cc6a_star.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/frames/eb4e43b8-7b41-4b7f-b9b5-d020000859f1_hn.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/frames/ed221be1-62ba-4fbc-be15-01326f378bf0_yellow.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/images/3b47f9d2-5d6e-4b07-9466-6da9528f8d02_아야핑.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/images/644a3071-8e80-48ec-b517-7460eabddcd6_찌릿핑.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/images/799b77b7-d491-48e2-9571-e2fb257386fc_아휴핑.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/images/82907d99-5a5f-44dd-acfd-82855686f964_공주핑.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/images/b38da038-6e88-44e7-b1ec-a2f35d6255cb_공주핑.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/images/c5dcabf8-ab81-4818-bcbc-93bc66441a8d_나르핑.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/images/c8f4a769-afb8-4794-ac2b-6f5dd7803a3a_아야핑.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/postFiles/5e98a9a8-7593-4043-bf24-3568d6d29752.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/postFiles/71a61d09-7765-4242-84e4-ca50c959e1f5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/postFiles/84fab56f-7bb2-4bd8-b9e9-a87da2be3fc3.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/postFiles/cb1e38c8-ef87-4bdf-8c1c-77ae71395c15.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/videos/바리스타.mp4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/videos/지게차.mp4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploads/videos/펫시터.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/controller/GameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/controller/GameController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +29,9 @@
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
       <state>
+        <task path="$PROJECT_DIR$/hantalk">
+          <activation />
+        </task>
         <projects_view>
           <tree_state>
             <expand>
@@ -73,27 +46,100 @@
       </state>
     </system>
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="31aL5Jiu2OdbKdqfSSfUSCUnieI" />
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "yus",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Gradle.hantalk [:com.example.hantalk.HantalkApplication.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.hantalk.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/lsy/HanTalk&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\lsy\HanTalk\hantalk\src\main\resources\static\unity-builds\game3" />
+      <recent name="C:\lsy\HanTalk\hantalk\src\main\resources\static\unity-builds\game3\Build" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\lsy\HanTalk\hantalk\src\main\resources\static\unity-builds\game3\Build" />
+      <recent name="C:\lsy\HanTalk\hantalk\src\main\resources\static\unity-builds\game3" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.HantalkApplication">
+    <configuration name="HantalkApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.hantalk.HantalkApplication" />
+      <module name="hantalk.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.hantalk.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="hantalk" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/hantalk" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="HanTalk" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="HanTalk" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.HantalkApplication" />
+        <item itemvalue="Gradle.hantalk" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="디폴트 작업">
       <changelist id="419a6c6d-c0d4-408b-9fff-ab9ea09dafeb" name="변경" comment="" />
