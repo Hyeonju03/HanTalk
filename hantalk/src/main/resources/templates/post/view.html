@@ -59,7 +59,7 @@
                     class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
                     th:onclick="|confirmDelete(${post.postId}, ${post.category.categoryId})|"><i class="fas fa-trash"></i>삭제</button>
 
-            <a th:href="@{|/post/list/${post.category.categoryId}|}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">목록</a>
+            <a th:href="${isAdmin ? '/post/admin' : '/post/list/' + post.category.categoryId}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">목록</a>
         </div>
         <hr class="my-8">
         <div class="comments-section" th:if="${post.category.categoryId != 1}">

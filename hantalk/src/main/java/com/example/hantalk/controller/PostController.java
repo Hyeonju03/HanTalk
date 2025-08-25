@@ -87,8 +87,7 @@ public class PostController {
         return "post/list";
     }
 
-    // ✅ 관리자 전용: 모든 게시물 목록 페이지
-    // URL: /post/admin으로 수정
+    // 관리자 전용: 모든 게시물 목록 페이지
     @GetMapping("/admin")
     public String adminListPost(
             @RequestParam(value = "categoryId", required = false) Integer categoryId,
@@ -152,6 +151,11 @@ public class PostController {
         category.setCategoryId(categoryId);
         postDTO.setCategory(category);
         model.addAttribute("post", postDTO);
+
+        // isAdmin 정보를 모델에 담아 HTML로 전달
+        boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");
+        model.addAttribute("isAdmin", isAdmin);
+
         return "post/insert";
     }
 
@@ -187,7 +191,13 @@ public class PostController {
                 createdPost = postService.createPost(postDTO);
             }
 
-            return "redirect:/post/view/" + createdPost.getPostId();
+            // 관리자 여부에 따라 다른 페이지로 리다이렉트
+            if (isAdmin) {
+                return "redirect:/post/admin";
+            } else {
+                return "redirect:/post/view/" + createdPost.getPostId();
+            }
+
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", "파일 업로드 오류: " + e.getMessage());
             return "redirect:/post/insert/" + categoryId;
@@ -207,6 +217,7 @@ public class PostController {
         PostDTO post = postService.getPost(postId);
         Integer loginUserNo = SessionUtil.getLoginUserNo(session);
         boolean isAdmin = SessionUtil.hasRole(session, "ADMIN");
+        model.addAttribute("isAdmin", isAdmin);
 
         if (loginUserNo == null) {
             return "redirect:/user/login";
@@ -260,14 +271,21 @@ public class PostController {
             }
 
             postService.updatePostWithFile(postId, postDTO, file, deleteFile);
-            return "redirect:/post/view/" + postId;
+
+            // 관리자 여부에 따라 다른 페이지로 리다이렉트
+            if (isAdmin) {
+                return "redirect:/post/admin";
+            } else {
+                return "redirect:/post/view/" + postId;
+            }
+
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", "파일 업로드 오류: " + e.getMessage());
             return "redirect:/post/update/" + postId;
         }
     }
 
-    // ✅ 게시물 삭제 처리 (DELETE)
+    // 게시물 삭제 처리 (DELETE)
     @DeleteMapping("/deleteProc/{postId}")
     public ResponseEntity<String> deleteProc(@PathVariable int postId, HttpSession session) {
         if (!SessionUtil.isLoggedIn(session)) {
