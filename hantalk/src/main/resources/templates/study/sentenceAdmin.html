@@ -80,13 +80,11 @@
         <div sec:authorize="hasRole('ADMIN')">
             <a th:href="@{/admin}"
                class="inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200 flex items-center">
-                관리자 페이지 <i class="fas fa-arrow-right ml-2"></i> <!-- 화살표 아이콘 추가 -->
-            </a>
+                관리자 페이지 <i class="fas fa-arrow-right ml-2"></i> </a>
         </div>
         <a th:href="@{'/study/sentenceInsert'}"
            class="bg-[#4B4B4B] text-white font-medium py-2 px-6 rounded-lg shadow-md hover:bg-[#2F4160] transition-colors duration-300 flex items-center">
-            <i class="fas fa-plus mr-2"></i> <!-- Font Awesome 아이콘 추가 -->
-            문장 추가
+            <i class="fas fa-plus mr-2"></i> 문장 추가
         </a>
     </div>
 
@@ -95,87 +93,86 @@
                class="p-2 text-base w-[250px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
         <button type="submit"
                 class="bg-[#4B4B4B] text-white py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 ml-2">
-            <i class="fas fa-search mr-1"></i>검색 <!-- Font Awesome 아이콘 추가 -->
-        </button>
+            <i class="fas fa-search mr-1"></i>검색 </button>
     </form>
 
     <table class="w-full border-collapse bg-gray-200 rounded-xl overflow-hidden shadow-md">
         <thead>
-            <tr class="bg-gray-200 border-b border-[#E0E0E0]">
-                <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider w-1/12">순번</th>
-                <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider w-1/6">문장</th>
-                <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">의미</th>
-                <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider w-1/6">등록일</th>
-                <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider w-1/6">관리</th>
-            </tr>
+        <tr class="bg-gray-200 border-b border-[#E0E0E0]">
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider w-1/12">순번</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider w-1/6">문장</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">의미</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider w-1/6">등록일</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider w-1/6">관리</th>
+        </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-            <tr th:if="${paging.content == null || paging.content.isEmpty()}">
-                <td colspan="5" class="py-12 text-center text-gray-500">
-                    문장 데이터가 존재하지 않습니다.
-                </td>
-            </tr>
-            <tr th:each="sentence, loop : ${paging.content}" class="cursor-pointer hover:bg-gray-50">
-                <td th:text="${paging.number * paging.size + loop.count}" class="py-4 px-6 text-sm text-gray-800 break-words text-center"></td>
-                <td th:text="${sentence.munjang.replace('^',' ')}" class="py-4 px-6 text-sm text-gray-800 w-1/6 break-words text-center"></td>
-                <td th:text="${sentence.description}" class="py-4 px-6 text-sm text-gray-800 break-words"></td>
-                <td th:text="${#temporals.format(sentence.createDate, 'yyyy-MM-dd')}" class="py-4 px-6 text-sm text-gray-800 break-words w-1/6 text-center"></td>
-                <td class="py-4 px-6 text-sm font-medium text-center">
-                    <div class="flex justify-center items-center space-x-2">
-                        <a th:href="@{'/study/sentenceUpdate/' + ${sentence.sentenceId}(page=${paging.number}, kw=${kw})}"
-                           class="inline-flex items-center space-x-1 bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300 whitespace-nowrap">
-                            <i class="fas fa-edit"></i> 수정
-                        </a>
-                        <button type="button"
-                                class="inline-flex items-center space-x-1 bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 whitespace-nowrap"
-                                th:onclick="'return confirm(\'정말 이 문장을 삭제하시겠습니까?\') ? window.location.href=\'' + @{|/study/sentenceDelete/${sentence.sentenceId}?page=${paging.number}&kw=${kw}|} + '\' : false;'">
-                            <i class="fas fa-trash"></i> 삭제
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
+        <tr th:if="${paging.content == null || paging.content.isEmpty()}">
+            <td colspan="5" class="py-12 text-center text-gray-500">
+                문장 데이터가 존재하지 않습니다.
+            </td>
+        </tr>
+        <tr th:each="sentence, loop : ${paging.content}" class="cursor-pointer hover:bg-gray-50">
+            <td th:text="${paging.number * paging.size + loop.count}" class="py-4 px-6 text-sm text-gray-800 break-words text-center"></td>
+            <td th:text="${sentence.munjang.replace('^',' ')}" class="py-4 px-6 text-sm text-gray-800 w-1/6 break-words text-center"></td>
+            <td th:text="${sentence.description}" class="py-4 px-6 text-sm text-gray-800 break-words"></td>
+            <td th:text="${#temporals.format(sentence.createDate, 'yyyy-MM-dd')}" class="py-4 px-6 text-sm text-gray-800 break-words w-1/6 text-center"></td>
+            <td class="py-4 px-6 text-sm font-medium text-center">
+                <div class="flex justify-center items-center space-x-2">
+                    <a th:href="@{'/study/sentenceUpdate/' + ${sentence.sentenceId}(page=${paging.number}, kw=${kw})}"
+                       class="inline-flex items-center space-x-1 bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300 whitespace-nowrap">
+                        <i class="fas fa-edit"></i> 수정
+                    </a>
+                    <button type="button"
+                            class="inline-flex items-center space-x-1 bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 whitespace-nowrap"
+                            th:onclick="'return confirm(\'정말 이 문장을 삭제하시겠습니까?\') ? window.location.href=\'' + @{|/study/sentenceDelete/${sentence.sentenceId}?page=${paging.number}&kw=${kw}|} + '\' : false;'">
+                        <i class="fas fa-trash"></i> 삭제
+                    </button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
     </table>
 
     <div th:if="${!paging.isEmpty()}" class="pb-8 mt-8">
-        <ul class="flex justify-center items-center space-x-2">
-            <li class="page-item">
-                <a class="pagination-item-base"
-                   th:href="${paging.hasPrevious} ? @{|?page=0&kw=${kw}|} : '#'"
-                   th:classappend="${!paging.hasPrevious} ? 'disabled'"
-                   th:attrappend="onclick=${!paging.hasPrevious} ? 'event.preventDefault();' : ''">처음</a>
-            </li>
-            <li class="page-item">
-                <a class="pagination-item-base"
-                   th:href="${paging.hasPrevious} ? @{|?page=${paging.number - 1}&kw=${kw}|} : '#'"
-                   th:classappend="${!paging.hasPrevious} ? 'disabled'"
-                   th:attrappend="onclick=${!paging.hasPrevious} ? 'event.preventDefault();' : ''">이전</a>
-            </li>
+        <div th:with="startPage=${paging.number / 5 * 5}, endPage=${T(java.lang.Math).min(paging.totalPages - 1, paging.number / 5 * 5 + 4)}">
+            <ul class="flex justify-center items-center space-x-2">
+                <li class="page-item">
+                    <a class="pagination-item-base"
+                       th:href="${paging.hasPrevious} ? @{|?page=0&kw=${kw}|} : '#'"
+                       th:classappend="${!paging.hasPrevious} ? 'disabled'"
+                       th:attrappend="onclick=${!paging.hasPrevious} ? 'event.preventDefault();' : ''">처음</a>
+                </li>
+                <li class="page-item">
+                    <a class="pagination-item-base"
+                       th:href="${paging.hasPrevious} ? @{|?page=${paging.number - 1}&kw=${kw}|} : '#'"
+                       th:classappend="${!paging.hasPrevious} ? 'disabled'"
+                       th:attrappend="onclick=${!paging.hasPrevious} ? 'event.preventDefault();' : ''">이전</a>
+                </li>
 
-            <li th:each="page: ${#numbers.sequence(0, paging.totalPages - 1)}">
-                <a th:href="@{|?page=${page}&kw=${kw}|}" th:text="${page + 1}"
-                   th:classappend="${page == paging.number} ? 'active' : ''" class="pagination-item-base"></a>
-            </li>
+                <li th:each="page: ${#numbers.sequence(startPage, endPage)}">
+                    <a th:href="@{|?page=${page}&kw=${kw}|}" th:text="${page + 1}"
+                       th:classappend="${page == paging.number} ? 'active' : ''" class="pagination-item-base"></a>
+                </li>
 
-            <li class="page-item">
-                <a class="pagination-item-base"
-                   th:href="${paging.hasNext} ? @{|?page=${paging.number + 1}&kw=${kw}|} : '#'"
-                   th:classappend="${!paging.hasNext} ? 'disabled'"
-                   th:attrappend="onclick=${!paging.hasNext} ? 'event.preventDefault();' : ''">다음</a>
-            </li>
-            <li class="page-item">
-                <a class="pagination-item-base"
-                   th:href="${paging.hasNext} ? @{|?page=${paging.totalPages - 1}&kw=${kw}|} : '#'"
-                   th:classappend="${!paging.hasNext} ? 'disabled'"
-                   th:attrappend="onclick=${!paging.hasNext} ? 'event.preventDefault();' : ''">마지막</a>
-            </li>
-        </ul>
+                <li class="page-item">
+                    <a class="pagination-item-base"
+                       th:href="${paging.hasNext} ? @{|?page=${paging.number + 1}&kw=${kw}|} : '#'"
+                       th:classappend="${!paging.hasNext} ? 'disabled'"
+                       th:attrappend="onclick=${!paging.hasNext} ? 'event.preventDefault();' : ''">다음</a>
+                </li>
+                <li class="page-item">
+                    <a class="pagination-item-base"
+                       th:href="${paging.hasNext} ? @{|?page=${paging.totalPages - 1}&kw=${kw}|} : '#'"
+                       th:classappend="${!paging.hasNext} ? 'disabled'"
+                       th:attrappend="onclick=${!paging.hasNext} ? 'event.preventDefault();' : ''">마지막</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
-<!-- 푸터 삽입 -->
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
-<!-- Custom message box and deletion script -->
 <script>
     // Custom message box function (from previous immersives)
     function showCustomMessage(message, type = 'info') {
