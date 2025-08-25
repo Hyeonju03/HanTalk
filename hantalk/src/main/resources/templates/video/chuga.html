@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관리자 강의 업로드</title>
 
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- jQuery CDN -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script th:inline="javascript">
+  <script>
     // Tailwind CSS 메인 컬러 설정
     tailwind.config = {
         theme: {
@@ -41,7 +41,7 @@
 <div class="container mx-auto p-8 md:p-10 max-w-2xl bg-white rounded-2xl shadow-2xl mt-12 mb-12">
   <h1 class="text-3xl font-bold text-dark-navy mb-8 text-center">영상 업로드</h1>
 
-  <form id="uploadForm" th:action="@{/video/admin/chugaProc}" method="post" enctype="multipart/form-data" class="space-y-8">
+  <form id="uploadForm" action="/video/admin/chugaProc" method="post" enctype="multipart/form-data" class="space-y-8">
 
     <!-- 제목 입력 필드 -->
     <div class="space-y-2">
@@ -72,13 +72,21 @@
       </div>
     </div>
 
+    <!-- 미리보기 컨테이너 -->
+    <!-- 영상만 남도록 제목과 파일명 표시 p 태그를 제거했습니다. -->
+    <div id="videoPreviewContainer" class="space-y-4 mt-6 hidden">
+      <div class="rounded-lg overflow-hidden shadow-lg border-2 border-gray-300">
+        <video id="videoPreview" controls class="w-full h-auto max-h-[12rem] bg-gray-900"></video>
+      </div>
+    </div>
+
     <!-- 버튼 그룹 -->
     <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8 pt-6 border-t border-gray-200">
       <button type="submit" id="submitBtn"
               class="w-full sm:w-auto px-8 py-3 rounded-lg text-white font-semibold shadow-lg bg-dark-navy hover:bg-opacity-95 transition-all duration-200 hover:shadow-xl">
         업로드
       </button>
-      <a th:href="@{/video/admin/list}"
+      <a href="/video/admin/list"
          class="w-full sm:w-auto text-center px-8 py-3 rounded-lg text-dark-navy font-semibold shadow-lg bg-gray-300 hover:bg-gray-400 transition-all duration-200 hover:shadow-xl">
         &larr; 목록으로
       </a>
@@ -111,12 +119,23 @@
 
     $('#fileInput').on('change', function () {
       const file = this.files[0];
+      const videoPreviewContainer = $('#videoPreviewContainer');
+      const videoPreview = $('#videoPreview')[0]; // DOM 요소로 접근
+
       if (!file) {
+        // 파일 선택이 취소된 경우
         $('#fileCheckResult').text('');
         $('#submitBtn').prop('disabled', false);
         isDuplicate = false;
+        videoPreviewContainer.addClass('hidden');
+        videoPreview.src = ''; // 미리보기 비디오 소스 초기화
         return;
       }
+
+      // 파일 미리보기 로직
+      const fileURL = URL.createObjectURL(file);
+      videoPreview.src = fileURL;
+      videoPreviewContainer.removeClass('hidden');
 
       const filename = file.name;
 
@@ -153,6 +172,7 @@
   });
 </script>
 
-<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<!-- th:replace는 Thymeleaf 문법이므로 제외 -->
+<!-- <div th:replace="~{fragments/footer :: footerFragment}"></div> -->
 </body>
 </html>

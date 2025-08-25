@@ -125,8 +125,9 @@
           <div class="px-6 py-4 text-sm text-gray-500 overflow-hidden flex-1 min-w-0" th:title="${video.content}">
             <div th:text="${video.content}" class="w-full line-clamp-2">설명</div>
           </div>
+          <!-- 파일명에 줄바꿈이 제대로 되도록 break-all 적용 -->
           <div class="px-6 py-4 text-sm text-gray-500 overflow-hidden flex-1 min-w-0" th:title="${video.videoName}">
-            <div th:text="${video.videoName}" class="w-full line-clamp-2">파일명</div>
+            <div th:text="${video.videoName}" class="w-full line-clamp-2 break-all">파일명</div>
           </div>
           <div class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap w-[10%] flex-none" th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</div>
           <div class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap w-[10%] flex-none" th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}">수정일</div>
