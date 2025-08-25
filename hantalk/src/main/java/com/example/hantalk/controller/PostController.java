@@ -42,11 +42,6 @@ public class PostController {
 
     private final String uploadDir = System.getProperty("user.dir") + "/uploads/postFiles";
 
-    private String getExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf('.');
-        return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1).toLowerCase();
-    }
-
     private static final int NOTICE_CATEGORY_ID = 1;
     private static final int COMMUNITY_CATEGORY_ID = 2;
     private static final int INQUIRY_CATEGORY_ID = 3;
@@ -61,6 +56,7 @@ public class PostController {
     }
 
     // 게시물 목록 페이지 (카테고리별 조회)
+    // URL: /post/list/{categoryId}
     @GetMapping("/list/{categoryId}")
     public String listPost(
             @PathVariable int categoryId,
@@ -78,10 +74,7 @@ public class PostController {
         Integer loginUserNo = SessionUtil.getLoginUserNo(session);
 
         Pageable pageable = PageRequest.of(page, 7, Sort.by(Sort.Direction.DESC, "createDate"));
-        Page<PostDTO> postPage;
-
-        // isAdmin 값을 함께 전달하여 관리자는 모든 문의사항을 볼 수 있도록 로직 수정
-        postPage = postService.searchPosts(categoryId, keyword, searchType, loginUserNo, isAdmin, pageable);
+        Page<PostDTO> postPage = postService.searchPosts(categoryId, keyword, searchType, loginUserNo, isAdmin, pageable);
 
         model.addAttribute("postPage", postPage);
         model.addAttribute("keyword", keyword);
@@ -92,6 +85,37 @@ public class PostController {
         model.addAttribute("isAdmin", isAdmin);
 
         return "post/list";
+    }
+
+    // ✅ 관리자 전용: 모든 게시물 목록 페이지
+    // URL: /post/admin으로 수정
+    @GetMapping("/admin")
+    public String adminListPost(
+            @RequestParam(value = "categoryId", required = false) Integer categoryId,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "searchType", defaultValue = "titleAndContent") String searchType,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            HttpSession session,
+            Model model) {
+
+        if (!SessionUtil.hasRole(session, "ADMIN")) {
+            return "redirect:/user/login?error=no_permission";
+        }
+
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createDate"));
+        Page<PostDTO> postPage = postService.searchPosts(categoryId, keyword, searchType, null, true, pageable);
+
+        List<Category> categories = categoryService.getAllCategories();
+        model.addAttribute("categories", categories);
+
+        model.addAttribute("postPage", postPage);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("isAdmin", true);
+        model.addAttribute("isEmpty", postPage.isEmpty());
+        model.addAttribute("categoryId", categoryId);
+
+        return "post/admin";
     }
 
     // 게시물 상세 페이지
@@ -108,7 +132,7 @@ public class PostController {
             model.addAttribute("loginUserNo", loginUserNo);
             model.addAttribute("isAdmin", SessionUtil.hasRole(session, "ADMIN"));
         } catch (IllegalArgumentException e) {
-            return "redirect:/error/404"; // 존재하지 않는 게시물에 대한 예외 처리
+            return "redirect:/error/404";
         }
         return "post/view";
     }
@@ -188,12 +212,11 @@ public class PostController {
             return "redirect:/user/login";
         }
 
-        if (post.getCategory().getCategoryId() == NOTICE_CATEGORY_ID && !isAdmin) {
-            return "redirect:/post/view/" + postId + "?error=no_permission";
-        }
-        if ((post.getCategory().getCategoryId() == COMMUNITY_CATEGORY_ID || post.getCategory().getCategoryId() == INQUIRY_CATEGORY_ID)
-                && !isAdmin && !loginUserNo.equals(post.getUsers().getUserNo())) {
-            return "redirect:/post/view/" + postId + "?error=no_permission";
+        if (!isAdmin && !loginUserNo.equals(post.getUsers().getUserNo())) {
+            // 관리자가 아니면서 작성자가 아닌 경우
+            if (post.getCategory().getCategoryId() == NOTICE_CATEGORY_ID || post.getCategory().getCategoryId() == INQUIRY_CATEGORY_ID) {
+                return "redirect:/post/view/" + postId + "?error=no_permission";
+            }
         }
 
         model.addAttribute("post", post);
@@ -222,12 +245,10 @@ public class PostController {
                 return "redirect:/user/login";
             }
 
-            if (existingPost.getCategory().getCategoryId() == NOTICE_CATEGORY_ID && !isAdmin) {
-                return "redirect:/post/view/" + postId + "?error=no_permission";
-            }
-            if ((existingPost.getCategory().getCategoryId() == COMMUNITY_CATEGORY_ID || existingPost.getCategory().getCategoryId() == INQUIRY_CATEGORY_ID)
-                    && !isAdmin && !loginUserNo.equals(existingPost.getUsers().getUserNo())) {
-                return "redirect:/post/view/" + postId + "?error=no_permission";
+            if (!isAdmin && !loginUserNo.equals(existingPost.getUsers().getUserNo())) {
+                if (existingPost.getCategory().getCategoryId() == NOTICE_CATEGORY_ID || existingPost.getCategory().getCategoryId() == INQUIRY_CATEGORY_ID) {
+                    return "redirect:/post/view/" + postId + "?error=no_permission";
+                }
             }
 
             if (file != null && !file.isEmpty()) {
@@ -246,7 +267,7 @@ public class PostController {
         }
     }
 
-    // 게시물 삭제 처리 (DELETE)
+    // ✅ 게시물 삭제 처리 (DELETE)
     @DeleteMapping("/deleteProc/{postId}")
     public ResponseEntity<String> deleteProc(@PathVariable int postId, HttpSession session) {
         if (!SessionUtil.isLoggedIn(session)) {
@@ -260,12 +281,11 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 정보가 유효하지 않습니다.");
         }
 
-        if ((existingPost.getCategory().getCategoryId() == NOTICE_CATEGORY_ID || existingPost.getCategory().getCategoryId() == INQUIRY_CATEGORY_ID)
-                && !isAdmin) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다.");
-        }
-        if (existingPost.getCategory().getCategoryId() == COMMUNITY_CATEGORY_ID && !isAdmin && !loginUserNo.equals(existingPost.getUsers().getUserNo())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다.");
+        if (!isAdmin && !loginUserNo.equals(existingPost.getUsers().getUserNo())) {
+            // 관리자가 아니면서 작성자가 아닌 경우
+            if (existingPost.getCategory().getCategoryId() == NOTICE_CATEGORY_ID || existingPost.getCategory().getCategoryId() == INQUIRY_CATEGORY_ID) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다.");
+            }
         }
 
         postService.deletePost(postId);
@@ -292,7 +312,6 @@ public class PostController {
         }
 
         String encodedFileName = UriUtils.encode(originalFileName, StandardCharsets.UTF_8);
-        //filename*=UTF-8'' 인코딩된 파일명만 사용
         String contentDisposition = "attachment; filename*=UTF-8''" + encodedFileName;
 
         return ResponseEntity.ok()

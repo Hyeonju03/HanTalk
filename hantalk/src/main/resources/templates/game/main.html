@@ -2,12 +2,208 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게임 선택</title>
+    <!-- Tailwind CSS CDN을 포함하여 스타일링을 적용합니다 -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .bg-main-dark { background-color: #2F4160; }
+        .text-main-dark { color: #2F4160; }
+        .bg-accent-pink { background-color: #F29DA0; }
+        .text-accent-pink { color: #F29DA0; }
+        .bg-soft-blue { background-color: #B5D0E3; }
+        .text-soft-blue { color: #B5D0E3; }
+        .hover-bg-soft-blue:hover { background-color: #B5D0E3; }
+        .hover-text-accent-pink:hover { color: #F29DA0; }
+        .container-custom { max-width: 1000px; }
+
+        /* 배경용 캔버스 */
+        #bgCanvas {
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: -1;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, #f3f4f6, #ffffff);
+        }
+
+        /* 아이템 카드 hover 효과 */
+        .card-hover-effect {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .card-hover-effect:hover {
+          transform: translateY(-6px) scale(1.02);
+          box-shadow: 0 15px 30px rgba(250, 243, 217, 0.7);
+        }
+
+        /* 빛나는 테두리 효과 (더 부드러운 색상으로 변경) */
+        .card-hover-effect:hover:before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #F29DA0, #B5D0E3, #F29DA0); /* 분홍색-파란색 그라데이션 */
+            background-size: 400% 400%;
+            z-index: -1;
+            animation: glowing 1.5s ease-in-out infinite;
+        }
+
+        @keyframes glowing {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 애니메이션 효과 추가 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'custom-pink': '#F29DA0',
+                        'custom-blue': '#B5D0E3',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
+<body class="bg-gradient-to-br from-gray-100 to-gray-50 min-h-screen flex flex-col text-[#2F4160]">
+
+<!-- 배경 캔버스 -->
+<canvas id="bgCanvas"></canvas>
+
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<!--여기서 /game/game1로 가는 거 필요함 (이제 개임이 뭐가 있냐에 따라서 추가)-->
+<main class="flex-grow flex justify-center p-8">
+    <div class="container-custom w-full">
+        <div class="bg-white/80 backdrop-blur-md rounded-xl shadow-2xl py-16 px-12 relative z-10 border border-gray-200 flex flex-col justify-start min-h-[80vh]">
+            <!-- 페이지 제목 -->
+            <div class="text-center mb-10">
+                <h1 class="text-4xl font-extrabold text-main-dark animate-fadeInUp">원하는 게임을 선택해 보세요!</h1>
+                <br>
+                <br>
+                <br>
+            </div>
+
+            <!-- 카드 컨테이너 -->
+            <div class="grid md:grid-cols-2 gap-8 items-stretch">
+                <!-- 타이핑 게임 카드 -->
+                <a href="/game/game1" class="block group animate-fadeInUp" style="animation-delay: 0.2s;">
+                    <div class="bg-custom-blue text-white py-24 px-8 rounded-xl shadow-xl transform transition-transform duration-300 hover:scale-105 flex flex-col items-center text-center h-full">
+                        <!-- 키보드 아이콘 -->
+                        <i class="fa-solid fa-keyboard text-custom-blue group-hover:text-white transition-colors duration-300 text-6xl mb-4"></i>
+                        <h2 class="text-3xl font-bold mb-2">타이핑 게임</h2>
+                        <p class="text-gray-100">빠르고 정확하게 한글을 입력하며 실력을 키워보세요!</p>
+                    </div>
+                </a>
+
+                <!-- 달리기 게임 카드 -->
+                <a href="/game/game2" class="block group animate-fadeInUp" style="animation-delay: 0.4s;">
+                    <div class="bg-custom-pink text-white py-24 px-8 rounded-xl shadow-xl transform transition-transform duration-300 hover:scale-105 flex flex-col items-center text-center h-full">
+                        <!-- 달리는 사람 아이콘 (Font Awesome 사용) -->
+                        <i class="fa-solid fa-person-running text-custom-pink group-hover:text-white transition-colors duration-300 text-6xl mb-4"></i>
+                        <h2 class="text-3xl font-bold mb-2">달리기 게임</h2>
+                        <p class="text-gray-100">단어 퀴즈를 맞히고 달려보세요! 목표까지 도달하며 한글을 마스터하세요!</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="py-4 text-gray-500 text-center text-sm bg-gray-100" th:replace="~{fragments/footer :: footerFragment}"></div>
+
+<!-- 배경 및 상호작용 스크립트 -->
+<script>
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let particlesArray = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    // 다이아몬드/보석 모양을 그리는 함수
+    function drawDiamond(ctx, x, y, size, color) {
+        ctx.beginPath();
+        // 다이아몬드 상단 부분
+        ctx.moveTo(x, y - size);
+        ctx.lineTo(x + size * 0.6, y);
+        ctx.lineTo(x, y + size);
+        ctx.lineTo(x - size * 0.6, y);
+        ctx.closePath();
+
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.6;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+    }
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 5 + 3; // 크기 조정
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.color = Math.random() > 0.5 ? "#F29DA0" : "#B5D0E3"; // 기존 색상 사용
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+      draw() {
+        // 배경 파티클은 다이아몬드/보석 모양으로 그립니다.
+        drawDiamond(ctx, this.x, this.y, this.size, this.color);
+      }
+    }
+
+    // 초기 배경 파티클 생성
+    for (let i = 0; i < 150; i++) {
+      particlesArray.push(new Particle());
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particlesArray.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+</script>
 </body>
 </html>

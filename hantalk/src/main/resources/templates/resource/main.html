@@ -27,7 +27,7 @@
       <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword} ?: ''"
              class="p-2 text-base w-[250px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]" />
       <button type="submit"
-              class="bg-[#B5D0E3] hover:bg-[#2F4160] text-white py-2 px-4 rounded-lg font-semibold transition duration-300">
+              class="bg-[#B5D0E3] hover:bg-[#8DAAC1] text-white py-2 px-4 rounded-lg font-semibold transition duration-300">
         검색
       </button>
     </form>
@@ -79,7 +79,7 @@
 
     <div class="pagination flex justify-center items-center mt-8 space-x-2">
       <a th:if="${resourcePage.hasPrevious()}"
-         th:href="@{|/resource/admin/main?page=${resourcePage.number - 1}&keyword=${keyword}|}"
+         th:href="@{|/resource/main?page=${resourcePage.number - 1}&keyword=${keyword}|}"
          class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">이전</a>
 
       <a th:each="i : ${#numbers.sequence(0, resourcePage.totalPages - 1)}"

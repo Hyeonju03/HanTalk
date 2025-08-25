@@ -9,6 +9,10 @@ import com.example.hantalk.repository.UserItemRepository;
 import com.example.hantalk.repository.UsersRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,9 +34,13 @@ public class ItemShopService {
         return items;
     }
 
-    // 관리자 - 전체 아이템 목록
-    public List<Item> getAllItems() {
-        return itemRepository.findAll();
+    // 관리자 - 페이징된 아이템 목록 (새로 추가된 메소드)
+    public Page<Item> getItemList(int page) {
+        // 아이템 ID를 기준으로 내림차순 정렬 (최신 아이템이 먼저 보이도록)
+        Sort sort = Sort.by(Sort.Direction.DESC, "itemId");
+        // 페이지당 10개의 아이템을 표시하도록 설정
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        return itemRepository.findAll(pageable);
     }
 
     // 단일 아이템 조회

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판 관리자 페이지</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        /* 테이블 행 클릭 시 URL 이동을 위한 커서 스타일 */
+        .table-row-clickable {
+            cursor: pointer;
+        }
+
+        /* 모든 페이지네이션 링크를 위한 기본 스타일 */
+        .pagination-item-base {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem 0.75rem;
+            background-color: transparent;
+            color: #2F4160;
+            border: 1px solid transparent;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-weight: 600;
+            min-width: 36px;
+            height: 36px;
+            box-sizing: border-box;
+            transition-property: background-color, color, border-color;
+            transition-duration: 200ms;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 모든 페이지네이션 링크의 호버 상태 */
+        .pagination-item-base:hover {
+            background-color: #e0e0e0;
+            color: #2F4160;
+            border-color: #e0e0e0;
+        }
+
+        /* 활성 페이지 번호 스타일 */
+        .pagination-item-base.active {
+            font-weight: bold;
+            background-color: #4B4B4B;
+            color: white;
+            border-color: #4B4B4B;
+        }
+
+        /* 활성 페이지 버튼의 호버 효과 */
+        .pagination-item-base.active:hover {
+            background-color: #4B4B4B;
+            color: white;
+            border-color: #4B4B4B;
+        }
+
+        /* 비활성화된 버튼 스타일 */
+        .pagination-item-base.disabled {
+            opacity: 0.5;
+            cursor: default !important;
+            background-color: transparent;
+            color: #2F4160;
+            border-color: transparent;
+        }
+
+        /* 비활성화된 버튼의 호버 효과 */
+        .pagination-item-base.disabled:hover {
+            background-color: transparent;
+            color: #2F4160;
+            border-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-[#f3f4f6] text-[#2F4160] min-h-screen flex flex-col">
+
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+
+<div class="flex-grow flex justify-center w-full">
+    <div class="flex-1 flex flex-col p-4 w-full max-w-7xl">
+        <main class="bg-white rounded-xl shadow-xl mx-auto flex-grow w-full p-8 box-border">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-[#2F4160]">게시물 목록</h1>
+                <div class="flex flex-col items-end space-y-2">
+                    <div sec:authorize="hasRole('ADMIN')">
+                        <a th:href="@{/admin}"
+                           class="inline-block bg-[#2F4160] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#4B4B4B] transition-colors duration-200">
+                            관리자 페이지<i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                    <!-- 관리자용 게시물 등록은 공지사항(categoryId=1)으로 연결하도록 예시 설정 -->
+                    <a th:href="@{/post/insert/1}"
+                       class="bg-[#4B4B4B] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300 shadow-md flex items-center">
+                        <i class="fas fa-plus mr-2"></i>
+                        게시물 등록하기
+                    </a>
+                </div>
+            </div>
+
+            <form class="search-form text-center mb-6 flex justify-center items-center space-x-2" th:action="@{/post/admin}" method="get">
+                <div class="flex items-center space-x-2">
+                    <!-- 카테고리 선택 드롭다운 추가 -->
+                    <select name="categoryId" class="p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+                        <option value="" th:selected="${categoryId == null}">전체 카테고리</option>
+                        <option th:each="category : ${categories}"
+                                th:value="${category.categoryId}"
+                                th:text="${category.categoryName}"
+                                th:selected="${category.categoryId == categoryId}">
+                        </option>
+                    </select>
+
+                    <select name="searchType" class="p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]">
+                        <option value="titleAndContent" th:selected="${searchType == 'titleAndContent'}">제목 + 내용</option>
+                        <option value="title" th:selected="${searchType == 'title'}">제목</option>
+                        <option value="content" th:selected="${searchType == 'content'}">내용</option>
+                        <option value="author" th:selected="${searchType == 'author'}">작성자</option>
+                    </select>
+                    <input type="text" name="keyword" placeholder="검색어 입력" th:value="${keyword} ?: ''"
+                           class="p-2 text-base w-[250px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#B5D0E3]" />
+                    <button type="submit"
+                            class="bg-[#4B4B4B] text-white py-2 px-6 rounded-lg hover:bg-[#2F4160] transition duration-300">
+                        <i class="fas fa-search mr-1"></i>
+                        검색
+                    </button>
+                </div>
+            </form>
+
+            <table class="w-full border-collapse bg-gray-200 rounded-xl overflow-hidden shadow-md">
+                <thead>
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">번호</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">카테고리</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">제목</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">첨부파일</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">작성자</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">작성일</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-[#2F4160] uppercase tracking-wider">관리</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:each="post, iterStat : ${postPage.content}"
+                    th:attr="data-url=@{'/post/view/' + ${post.postId}}"
+                    onclick="goToDetail(this)"
+                    class="cursor-pointer hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm text-gray-800 break-words text-center" th:text="${postPage.number * postPage.size + iterStat.index + 1}">1</td>
+                    <td class="px-6 py-4 text-sm text-gray-800 break-words text-center" th:text="${post.category.categoryName}">공지사항</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900 break-words text-center" th:text="${post.title}">제목</td>
+                    <td class="px-6 py-4 text-sm text-center">
+                        <span th:if="${post.archive != null and !#strings.isEmpty(post.archive)}" class="text-[#2F4160]">
+                           <i class="fas fa-paperclip"></i>
+                        </span>
+                        <span th:if="${post.archive == null or #strings.isEmpty(post.archive)}" class="text-gray-400">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-800 break-words text-center" th:text="${post.users.nickname}">관리자</td>
+                    <td class="px-6 py-4 text-sm text-gray-800 break-words text-center" th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd')}">2025-08-01</td>
+                    <td class="px-6 py-4 text-sm font-medium text-center">
+                        <div class="flex justify-center items-center space-x-2">
+                            <a th:href="@{'/post/update/' + ${post.postId}}"
+                               class="bg-[#4B4B4B] text-white font-semibold py-1 px-3 rounded-lg hover:bg-[#2F4160] transition duration-300"
+                               onclick="event.stopPropagation();"><i class="fas fa-edit"></i> 수정</a>
+                            <button type="button"
+                                    class="bg-red-500 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 ml-2"
+                                    th:onclick="'event.stopPropagation(); deletePost(' + ${post.postId} + ');'">
+                                <i class="fas fa-trash"></i> 삭제
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${postPage.content.size() == 0}">
+                    <td colspan="7" class="text-center p-4 text-gray-600">검색 결과가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination flex justify-center items-center mt-8 space-x-2">
+                <a th:href="@{/post/admin(page=0, keyword=${keyword}, searchType=${searchType}, categoryId=${categoryId})}"
+                   th:classappend="${!postPage.hasPrevious()} ? 'disabled'"
+                   class="pagination-item-base">처음</a>
+                <a th:href="@{/post/admin(page=${postPage.number - 1}, keyword=${keyword}, searchType=${searchType}, categoryId=${categoryId})}"
+                   th:classappend="${!postPage.hasPrevious()} ? 'disabled'"
+                   class="pagination-item-base">이전</a>
+
+                <span th:each="i : ${#numbers.sequence(0, postPage.totalPages - 1)}">
+                    <a th:href="@{/post/admin(page=${i}, keyword=${keyword}, searchType=${searchType}, categoryId=${categoryId})}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == postPage.number} ? 'active'"
+                       class="pagination-item-base">1</a>
+                </span>
+
+                <a th:href="@{/post/admin(page=${postPage.number + 1}, keyword=${keyword}, searchType=${searchType}, categoryId=${categoryId})}"
+                   th:classappend="${!postPage.hasNext()} ? 'disabled'"
+                   class="pagination-item-base">다음</a>
+                <a th:href="@{/post/admin(page=${postPage.totalPages - 1}, keyword=${keyword}, searchType=${searchType}, categoryId=${categoryId})}"
+                   th:classappend="${!postPage.hasNext()} ? 'disabled'"
+                   class="pagination-item-base">마지막</a>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    function deletePost(postId) {
+        if (confirm('정말 이 게시물을 삭제하시겠습니까?')) {
+            fetch('/post/deleteProc/' + postId, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('삭제가 완료되었습니다.');
+                    window.location.reload(); // 성공 시 페이지 새로고침
+                } else {
+                    return response.text().then(text => {
+                        alert('삭제 실패: ' + text);
+                    });
+                }
+            })
+            .catch(error => {
+                alert('삭제 중 오류가 발생했습니다: ' + error.message);
+            });
+        }
+    }
+
+    function goToDetail(row) {
+        const url = row.getAttribute('data-url');
+        if (url) {
+            window.location.href = url;
+        }
+    }
+</script>
+
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
+
+</body>
+</html>

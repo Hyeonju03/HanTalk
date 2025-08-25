@@ -15,12 +15,12 @@
         <a href="/game/main" class="inline-block bg-[#B5D0E3] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#93b4cc] transition-colors duration-200">
             돌아가기
         </a>
-        <div id="unity-container" class="w-full flex flex-col justify-center items-center mt-4">
-            <div id="loading-bar" class="w-1/2 h-5 bg-[#444] rounded-lg overflow-hidden mb-2">
-                <div id="loading-bar-progress" class="h-full bg-green-500 transition-all duration-300 ease-in-out"></div>
+        <div id="unity-container" class="w-full flex flex-col justify-center items-center mt-4 gap-2">
+            <div id="loading-bar" class="w-1/2 h-5 bg-[#444] rounded-lg overflow-hidden">
+                <div id="loading-bar-progress" class="h-full w-0 bg-green-500 transition-all duration-300 ease-in-out"></div>
             </div>
             <div id="loading-text" class="text-white">Loading...</div>
-            <canvas id="unity-canvas" class="w-full aspect-video border-2 border-white hidden"></canvas>
+            <canvas id="unity-canvas" class="hidden w-full aspect-video border-2 border-white box-border"></canvas>
         </div>
     </div>
 </main>
@@ -89,6 +89,15 @@
                 window.unityInstance.SendMessage('InputManager', 'SubmitInputFromWeb', text);
             }
             externalInput.value = '';
+        }
+        if (e.key === ' ') {
+            e.preventDefault();
+            let currentKey = externalInput.value;
+            console.log("현재:" + currentKey + ".");
+            let newKey = currentKey + ' ';
+            console.log("스페이스:" + newKey + ".");
+
+            externalInput.value = newKey;
         }
     });
 

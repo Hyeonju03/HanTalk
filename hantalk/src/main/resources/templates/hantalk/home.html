@@ -4,26 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HanTalk - 홈</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 아이콘을 사용하기 위한 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" xintegrity="sha512-KfkfwYDsLkIlwQp6LF8yXpTz9b4u4gN4s0Bf3z6S/Jt5p4Mh4yT8oVfR9R4wW5g4r+Q1DkM5Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <style>
-        /* Swiper의 사용자 정의 스타일입니다. */
+        /* Swiper의 사용자 정의 스타일 */
         .swiper {
             width: 100%;
             height: 100%;
         }
-        /* Swiper-slide의 그라데이션을 설정합니다. */
-        .swiper-slide {
+        /* 첫 번째 메인 배너: 기존의 부드러운 그라데이션 유지 */
+        .swiper-slide.main-banner {
             background: linear-gradient(135deg, #F29DA0 0%, #B5D0E3 100%);
         }
+
+        /*
+         * 사용자의 요청에 따라 모든 배너의 그라데이션 색상을 파스텔 톤으로 변경했습니다.
+         */
+
+        /* 게임 학습 관련 배너: 더 부드러운 노란색 그라데이션 */
+        .swiper-slide.banner-point-new-3 {
+            background: linear-gradient(135deg, #FFF5C6 0%, #FFDDA6 100%);
+        }
+        /* 출석체크 관련 배너: 더 부드러운 보라색 그라데이션 */
+        /* 요청에 따라 포인트 상점 배너 색상과 교체 */
+        .swiper-slide.banner-attendance-new {
+            background: linear-gradient(135deg, #B2E8E7 0%, #64B8C1 100%);
+        }
+        /* 포인트 상점 관련 배너: 더 부드러운 청록색 그라데이션 */
+        /* 요청에 따라 출석체크 배너 색상과 교체 */
+        .swiper-slide.banner-point-new-1 {
+            background: linear-gradient(135deg, #DDC3E3 0%, #A276B6 100%);
+        }
+        /* 새로운 응원 배너: 더 부드러운 파란색 그라데이션 */
+        /* 요청에 따라 원래 색상으로 복구 */
+        .swiper-slide.banner-cheer {
+            background: linear-gradient(135deg, #C2D4F0 0%, #99B2D8 100%);
+        }
+
+        /* 텍스트 색상 및 그림자 효과 */
         .text-hantalk-navy {
             color: #2F4160;
+        }
+        .text-shadow-subtle {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         /* 클릭 영역 확장을 위한 스타일 추가 */
         .clickable-div {
             cursor: pointer;
             position: relative;
-            padding: 0.5rem 0; /* 클릭 영역을 넓히기 위해 패딩 추가 */
+            padding: 0.5rem 0;
+            transition: background-color 0.2s ease-in-out;
         }
         .clickable-div a {
             position: absolute;
@@ -36,60 +71,206 @@
         .clickable-div .content {
             z-index: 20;
             position: relative;
-            pointer-events: none; /* 하위 요소의 클릭 이벤트를 비활성화하여 부모 div의 클릭을 유도 */
+            pointer-events: none;
         }
         /* hover 효과를 위한 스타일 추가 */
         .clickable-div:hover {
-            background-color: #f3f4f6; /* 회색 배경으로 변경 */
+            background-color: #f3f4f6;
+        }
+        /* 배너 네비게이션 버튼 색상 조정 */
+        .swiper-button-next, .swiper-button-prev {
+            color: #2F4160 !important;
+        }
+        /* 배너 페이지네이션 점 색상 조정 */
+        .swiper-pagination-bullet-active {
+            background: #2F4160 !important;
+        }
+
+        /*
+         * 애니메이션 효과를 위한 CSS입니다.
+         * 모든 배너의 내용을 0.5초마다 아주 미세하게 확대/축소하여
+         * 사용자에게 흥미를 유발하는 펄스 효과를 줍니다.
+         */
+        @keyframes pulse-effect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+            100% { transform: scale(1); }
+        }
+
+        /*
+         * 첫 번째 배너를 제외한 모든 배너 슬라이드에 애니메이션을 적용합니다.
+         * 아이콘과 텍스트가 포함된 내부 컨테이너에 적용하여 효과가 눈에 띄게 합니다.
+         */
+        .swiper-slide:not(.main-banner) > div {
+            animation: pulse-effect 2s infinite ease-in-out;
         }
     </style>
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 </head>
 <body>
 
 <div th:replace="~{fragments/header :: headerFragment(isLoggedIn=${isLoggedIn})}"></div>
 
 <main class="w-full flex-grow">
+    <!-- 새롭게 개선된 배너 섹션 -->
     <section class="h-[75vh] w-full flex items-center justify-center">
         <div class="swiper mySwiper w-full h-full relative">
             <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                    <div class="space-y-4 text-center flex flex-col items-center justify-center h-full">
-                        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-hantalk-navy">
-                            우리 모두를 위한 디지털 학습 공간
+
+                <!-- 1. 기존의 메인 페이지 배너 (첫 번째 고정) -->
+                <style>
+                    .main-banner {
+                        position: relative;
+                        overflow: hidden;
+                        background: #FFF8E7; /* 아이보리 배경 */
+                    }
+
+                    /* 유체 애니메이션 */
+                    .main-banner::before {
+                        content: '';
+                        position: absolute;
+                        width: 250%;
+                        height: 250%;
+                        top: -75%;
+                        left: -75%;
+                        background: linear-gradient(
+                            135deg,
+                            transparent,
+                            #FF6B6B33,
+                            #F29DA033,
+                            #B6A6FF33,
+                            #6B88FF33,
+                            transparent
+                        );
+                        animation: wave 8s ease-in-out infinite;
+                        z-index: 0;
+                    }
+
+                    @keyframes wave {
+                        0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+                        25% { transform: translate(-30%, 30%) scale(1.2) rotate(10deg); }
+                        50% { transform: translate(30%, -30%) scale(1.4) rotate(-10deg); }
+                        75% { transform: translate(-15%, -15%) scale(1.3) rotate(5deg); }
+                        100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+                    }
+
+                    /* 그라데이션 텍스트 */
+                    .gradient-text {
+                        background: linear-gradient(90deg, #F29DA0, #6B88FF);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                    }
+
+                    /* 버튼 개선 */
+                    .fancy-btn {
+                        background: white;
+                        color: #F29DA0;
+                        font-weight: 600;
+                        padding: 1rem 2rem;
+                        border-radius: 9999px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                        border: 2px solid transparent;
+                        transition: all 0.3s ease;
+                    }
+
+                    .fancy-btn:hover {
+                        transform: scale(1.08);
+                        background: linear-gradient(90deg, #F29DA0, #6B88FF);
+                        color: white;
+                        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+                    }
+                </style>
+
+                <!-- 메인 페이지 배너 -->
+                <div class="swiper-slide main-banner">
+                    <div class="space-y-6 text-center flex flex-col items-center justify-center h-full relative z-10">
+                        <h1 class="text-5xl sm:text-6xl md:text-7xl font-bold text-hantalk-navy">
+                            우리 모두를 위한 포근한 한글 배움터
                         </h1>
                         <p class="text-lg sm:text-xl md:text-2xl text-gray-700">
-                            재미있고 편한 학습의 시작, 지금 함께해요!
+                            복잡한 지식을 편안하고 즐겁게 배워보세요.
                         </p>
-                        <a th:href="@{/hantalk/home}" class="inline-block px-8 py-4 bg-white text-[#F29DA0] font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
-                            강의 시작하기
+                        <h2 class="text-4xl sm:text-5xl md:text-6xl font-bold text-hantalk-navy">
+                        <span class="gradient-text">"한톡!"</span>
+                        </h2>
+                        <a href="/study/contact" class="fancy-btn">
+                            학습 시작하기
                         </a>
                     </div>
                 </div>
-                <div class="swiper-slide">
-                    <div class="space-y-4 text-center flex flex-col items-center justify-center h-full">
-                        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-hantalk-navy">
-                            재미있는 한글 학습의 첫걸음
-                        </h1>
-                        <p class="text-lg sm:text-xl md:text-2xl text-gray-700">
-                            다양한 게임과 콘텐츠로 한글을 마스터하세요!
-                        </p>
-                        <a th:href="@{/study/main}" class="inline-block px-8 py-4 bg-white text-[#2F4160] font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
-                            학습 페이지로 이동
-                        </a>
+
+
+
+                <!-- 3. 출석체크 관련 배너 -->
+                <div class="swiper-slide banner-attendance-new">
+                    <div class="flex items-center justify-center h-full px-8 md:px-24">
+                        <div class="flex items-center justify-center w-full max-w-4xl mx-auto">
+                            <div class="flex-1 text-left space-y-4">
+                                <h1 class="text-4xl sm:text-5xl font-bold text-white text-shadow-subtle">
+                                    한톡<br> 출석체크 이벤트
+                                </h1>
+                                <p class="text-lg sm:text-xl text-gray-800">
+                                    매일매일 출석체크하고<br>다양한 혜택을 받아보세요!
+                                </p>
+                                <a href="/user/calendar" class="inline-block px-8 py-4 bg-white text-[#183D43] font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+                                    출석체크 바로가기
+                                </a>
+                            </div>
+                            <div class="flex-1 flex justify-center items-center relative">
+                                <!-- 투명한 배경 아이콘 -->
+                                <i class="fas fa-calendar-check text-[14rem] text-white opacity-40 transform rotate-12 absolute -right-8"></i>
+                                <!-- 메인 아이콘 -->
+                                <i class="fas fa-gift text-[12rem] text-white z-10 text-shadow-subtle"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="swiper-slide">
-                    <div class="space-y-4 text-center flex flex-col items-center justify-center h-full">
-                        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-hantalk-navy">
-                            커뮤니티에서 함께 성장해요
-                        </h1>
-                        <p class="text-lg sm:text-xl md:text-2xl text-gray-700">
-                            서로의 노하우를 공유하고 질문을 주고받을 수 있어요.
-                        </p>
-                        <a th:href="@{/post/list/2}" class="inline-block px-8 py-4 bg-white text-[#2F4160] font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
-                            커뮤니티로 이동
-                        </a>
+
+                <!-- 4. 포인트 상점 관련 배너 -->
+                <div class="swiper-slide banner-point-new-1">
+                    <div class="flex items-center justify-center h-full px-8 md:px-24">
+                        <div class="flex items-center justify-center w-full max-w-4xl mx-auto">
+                            <div class="flex-1 text-left space-y-4">
+                                <h1 class="text-4xl sm:text-5xl font-bold text-white text-shadow-subtle">
+                                    포인트로<br>프로필 꾸미기
+                                </h1>
+                                <p class="text-lg sm:text-xl text-gray-800">
+                                    나만의 개성을 담아<br>특별한 프로필을 만들어 보세요.
+                                </p>
+                                <a href="/item/shop" class="inline-block px-8 py-4 bg-white text-[#2F4160] font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+                                    상점 바로가기
+                                </a>
+                            </div>
+                            <div class="flex-1 flex justify-center items-center relative">
+                                <!-- 투명한 배경 아이콘 -->
+                                <i class="fas fa-gem text-[14rem] text-white opacity-40 transform -rotate-12 absolute -right-8"></i>
+                                <!-- 메인 아이콘 -->
+                                <i class="fas fa-magic text-[12rem] text-white z-10 text-shadow-subtle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. 한국어 공부 응원 배너 -->
+                <div class="swiper-slide banner-cheer">
+                    <div class="flex flex-col items-center justify-center h-full text-center space-y-8 px-8 md:px-24">
+                        <div class="flex flex-col items-center justify-center w-full max-w-4xl mx-auto">
+                            <div class="relative flex justify-center items-center w-full">
+                                <!-- 투명한 배경 아이콘의 위치를 조정했습니다. -->
+                                <!-- -translate-x-16과 -translate-y-16으로 살짝 더 왼쪽 위로 이동시켰습니다. -->
+                                <i class="fas fa-thumbs-up text-[14rem] text-white opacity-40 absolute transform -rotate-12 -translate-x-16 -translate-y-16 z-10"></i>
+                                <!-- 메인 아이콘의 위치를 조정했습니다. -->
+                                <!-- translate-x-8을 추가하여 살짝 오른쪽으로 이동시켰습니다. -->
+                                <i class="fas fa-heart text-[12rem] text-white z-20 text-shadow-subtle transform translate-x-8"></i>
+                            </div>
+                            <div class="space-y-4">
+                                <h1 class="text-4xl sm:text-5xl font-bold text-white text-shadow-subtle">
+                                    여러분의 한국어 공부를<br>한톡이 응원합니다!
+                                </h1>
+                                <p class="text-lg sm:text-xl text-gray-800">
+                                    한 걸음 한 걸음 나아가는<br>모든 분들을 응원합니다.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,37 +280,41 @@
         </div>
     </section>
 
+    <!-- 메인 서비스 섹션에 원래의 배경 색상과 폰트 색상을 다시 적용했습니다. -->
     <section class="container mx-auto px-4 py-12 mt-12 flex flex-col md:flex-row justify-center items-center gap-8">
 
-        <a th:href="@{/video/list}" class="w-full md:w-1/3 max-w-sm p-8 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center transition-all duration-500 transform hover:scale-105 hover:shadow-2xl
-    bg-gradient-to-br from-blue-100 to-indigo-100 border border-transparent hover:border-blue-400">
+        <a th:href="@{/video/list}" class="w-full md:w-1/3 max-w-sm p-8 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center transition-all duration-500 transform hover:scale-105 hover:shadow-2xl bg-gradient-to-br from-blue-100 to-indigo-100 border border-transparent hover:border-blue-400">
+            <!-- 아이콘 색상도 원래 색상으로 되돌렸습니다. -->
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-blue-500 mb-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9L16 12l-6 4.5z"/>
             </svg>
+            <!-- 텍스트 색상도 원래 색상으로 되돌렸습니다. -->
             <h2 class="text-3xl font-extrabold text-gray-800 mb-2">강의</h2>
             <p class="text-gray-600 mb-4 text-sm">
                 트렌디한 강의를 빠르게 만나보세요!
             </p>
         </a>
 
-        <a th:href="@{/study/main}" class="w-full md:w-1/3 max-w-sm p-8 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center transition-all duration-500 transform hover:scale-105 hover:shadow-2xl
-    bg-gradient-to-br from-teal-100 to-green-100 border border-transparent hover:border-teal-400">
+        <a th:href="@{/study/main}" class="w-full md:w-1/3 max-w-sm p-8 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center transition-all duration-500 transform hover:scale-105 hover:shadow-2xl bg-gradient-to-br from-teal-100 to-green-100 border border-transparent hover:border-teal-400">
+            <!-- 아이콘 색상도 원래 색상으로 되돌렸습니다. -->
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-teal-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path d="M12 14l9-5-9-5-9 5 9 5z" />
                 <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
             </svg>
+            <!-- 텍스트 색상도 원래 색상으로 되돌렸습니다. -->
             <h2 class="text-3xl font-extrabold text-gray-800 mb-2">학습</h2>
             <p class="text-gray-600 mb-4 text-sm">
                 새롭고 즐거운 방법으로 한글을 배워보세요!
             </p>
         </a>
 
-        <a th:href="@{/resource/main}" class="w-full md:w-1/3 max-w-sm p-8 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center transition-all duration-500 transform hover:scale-105 hover:shadow-2xl
-    bg-gradient-to-br from-pink-100 to-purple-100 border border-transparent hover:border-pink-400">
+        <a th:href="@{/resource/main}" class="w-full md:w-1/3 max-w-sm p-8 rounded-3xl shadow-xl flex flex-col items-center text-center justify-center transition-all duration-500 transform hover:scale-105 hover:shadow-2xl bg-gradient-to-br from-pink-100 to-purple-100 border border-transparent hover:border-pink-400">
+            <!-- 아이콘 색상도 원래 색상으로 되돌렸습니다. -->
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-pink-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
+            <!-- 텍스트 색상도 원래 색상으로 되돌렸습니다. -->
             <h2 class="text-3xl font-extrabold text-gray-800 mb-2">자료실</h2>
             <p class="text-gray-600 mb-4 text-sm">
                 학습에 도움이 되는 자료를 자유롭게 내려받아요!
@@ -138,8 +323,17 @@
     </section>
 
     <section class="container mx-auto px-4 py-8 mt-12 flex flex-col md:flex-row justify-center items-start space-y-8 md:space-y-0 md:space-x-8">
+        <!-- 공지사항 섹션 -->
         <div class="w-full md:w-1/2 flex flex-col">
-            <h2 class="text-2xl font-bold text-hantalk-navy mb-4">공지사항</h2>
+            <!-- 제목과 바로가기 버튼을 감싸는 div에 px-4 추가 -->
+            <div class="flex justify-between items-center mb-4 px-4">
+                <h2 class="text-2xl font-bold text-hantalk-navy">공지사항</h2>
+                <!-- '+ 바로가기' 버튼 추가 -->
+                <!-- th:href는 Thymeleaf 구문으로 실제 링크는 서버에서 처리됩니다. -->
+                <a th:href="@{/post/list/1}" class="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                    <span class="mr-1">+</span>바로가기
+                </a>
+            </div>
             <div class="bg-white p-6 rounded-2xl shadow-xl space-y-2">
                 <div th:each="notice : ${notices}" class="clickable-div flex justify-between items-center">
                     <a th:href="@{/post/view/__${notice.postId}__}"></a>
@@ -149,8 +343,17 @@
             </div>
         </div>
 
+        <!-- 커뮤니티 섹션 -->
         <div class="w-full md:w-1/2 flex flex-col">
-            <h2 class="text-2xl font-bold text-hantalk-navy mb-4">커뮤니티</h2>
+            <!-- 제목과 바로가기 버튼을 감싸는 div에 px-4 추가 -->
+            <div class="flex justify-between items-center mb-4 px-4">
+                <h2 class="text-2xl font-bold text-hantalk-navy">커뮤니티</h2>
+                <!-- '+ 바로가기' 버튼 추가 -->
+                <!-- th:href는 Thymeleaf 구문으로 실제 링크는 서버에서 처리됩니다. -->
+                <a th:href="@{/post/list/2}" class="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                    <span class="mr-1">+</span>바로가기
+                </a>
+            </div>
             <div class="bg-white p-6 rounded-2xl shadow-xl space-y-2">
                 <div th:each="post : ${communityPosts}" class="clickable-div flex justify-between items-center">
                     <a th:href="@{/post/view/__${post.postId}__}"></a>
@@ -162,14 +365,9 @@
     </section>
 </main>
 
-<div th:if="${session.isAdmin}" class="container mx-auto px-4 py-8 mt-12 text-center">
-    <a th:href="@{/admin}" class="inline-block px-8 py-4 bg-[#2F4160] text-white font-semibold rounded-full shadow-lg hover:bg-[#4B4B4B] transition duration-300 transform hover:scale-105">
-        관리자 페이지
-    </a>
-</div>
-
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
+<!-- Swiper JS -->
 <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {

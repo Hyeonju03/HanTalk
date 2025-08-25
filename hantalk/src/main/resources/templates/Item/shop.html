@@ -153,10 +153,10 @@
 
             <div class="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                 <div class="flex justify-center sm:justify-start space-x-4">
-                    <button id="show-frames-btn" class="bg-soft-blue hover:bg-main-dark text-white font-bold py-2 px-6 rounded-full transition-colors duration-300">
+                    <button id="show-frames-btn" class="p-4 rounded-xl font-bold transition-all duration-300 transform scale-100 hover:scale-105" style="background-color: #B5D0E3; color: #2F4160;">
                         프로필 프레임
                     </button>
-                    <button id="show-images-btn" class="bg-soft-blue hover:bg-main-dark text-white font-bold py-2 px-6 rounded-full transition-colors duration-300">
+                    <button id="show-images-btn" class="p-4 rounded-xl font-bold transition-all duration-300 transform scale-100 hover:scale-105" style="background-color: #fff; color: #B5D0E3;">
                         프로필 이미지
                     </button>
                 </div>
@@ -461,15 +461,15 @@
         const showImagesBtn = document.getElementById('show-images-btn');
 
         function setActiveButton(button) {
-            // 모든 버튼의 활성화 클래스 제거
-            showFramesBtn.classList.remove('bg-main-dark', 'text-white');
-            showFramesBtn.classList.add('bg-soft-blue', 'text-white');
-            showImagesBtn.classList.remove('bg-main-dark', 'text-white');
-            showImagesBtn.classList.add('bg-soft-blue', 'text-white');
+            // 모든 버튼의 스타일 초기화 (비활성화 상태)
+            showFramesBtn.style.backgroundColor = '#fff';
+            showFramesBtn.style.color = '#B5D0E3';
+            showImagesBtn.style.backgroundColor = '#fff';
+            showImagesBtn.style.color = '#B5D0E3';
 
-            // 클릭된 버튼에 활성화 클래스 추가
-            button.classList.remove('bg-soft-blue');
-            button.classList.add('bg-main-dark', 'text-white');
+            // 클릭된 버튼에 활성화 스타일 적용
+            button.style.backgroundColor = '#B5D0E3';
+            button.style.color = '#2F4160';
         }
 
         // 초기 상태: 프레임 섹션만 보이고 이미지 섹션은 숨기기

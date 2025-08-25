@@ -6,6 +6,7 @@
     <title>학습 메뉴 선택</title>
     <!-- Tailwind CSS CDN을 포함하여 스타일링을 적용합니다 -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         .bg-main-dark { background-color: #2F4160; }
         .text-main-dark { color: #2F4160; }
@@ -109,24 +110,20 @@
             <!-- 카드 컨테이너 -->
             <div class="grid md:grid-cols-2 gap-8 items-stretch">
                 <!-- 게임 학습 카드 (하늘색 테마) -->
-                <a href="/game/main" class="block card-hover-effect group animate-fadeInUp" style="animation-delay: 0.2s;">
-                    <div class="bg-custom-blue text-white py-24 px-8 rounded-xl shadow-xl transform transition-transform duration-300 flex flex-col items-center text-center h-full">
-                        <!-- 게임 컨트롤러 아이콘 -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mb-4 text-custom-blue group-hover:text-white transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-4 9h2a1 1 0 011 1v2a1 1 0 01-1 1H8a1 1 0 01-1-1v-2a1 1 0 011-1zm6 0h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1v-2a1 1 0 011-1zM11 8h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1V9a1 1 0 011-1z"/>
-                        </svg>
+                <a href="/game/main" class="block group animate-fadeInUp" style="animation-delay: 0.2s;">
+                    <div class="bg-custom-blue text-white py-24 px-8 rounded-xl shadow-xl transform transition-transform duration-300 hover:scale-105 flex flex-col items-center text-center h-full">
+                        <!-- 게임 컨트롤러 아이콘 (Font Awesome 사용) -->
+                        <i class="fa-solid fa-gamepad text-custom-blue group-hover:text-white transition-colors duration-300 text-6xl mb-4"></i>
                         <h2 class="text-3xl font-bold mb-2">게임 학습</h2>
                         <p class="text-gray-100">게임으로 재미있게 한글을 배워보세요!</p>
                     </div>
                 </a>
 
                 <!-- 한글 테스트 카드 (분홍색 테마) -->
-                <a href="/study/main" class="block card-hover-effect group animate-fadeInUp" style="animation-delay: 0.4s;">
-                    <div class="bg-custom-pink text-white py-24 px-8 rounded-xl shadow-xl transform transition-transform duration-300 flex flex-col items-center text-center h-full">
-                        <!-- 시험/체크리스트 아이콘 -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mb-4 text-custom-pink group-hover:text-white transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM16 18H8v-2h8v2zm0-4H8v-2h8v2zM14 8V4l4 4h-4z"/>
-                        </svg>
+                <a href="/study/main" class="block group animate-fadeInUp" style="animation-delay: 0.4s;">
+                    <div class="bg-custom-pink text-white py-24 px-8 rounded-xl shadow-xl transform transition-transform duration-300 hover:scale-105 flex flex-col items-center text-center h-full">
+                        <!-- 시험/체크리스트 아이콘 (Font Awesome 사용) -->
+                        <i class="fa-solid fa-book-open text-custom-pink group-hover:text-white transition-colors duration-300 text-6xl mb-4"></i>
                         <h2 class="text-3xl font-bold mb-2">한글 테스트</h2>
                         <p class="text-gray-100">실력 향상을 위한 다양한 테스트를 풀어보세요!</p>
                     </div>
