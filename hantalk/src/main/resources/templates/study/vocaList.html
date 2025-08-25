@@ -2,11 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HanTalk - 단어 목록</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <style>
     /* Custom text shadow for titles */
     .text-shadow-custom {
@@ -17,16 +19,27 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        /* 페이지 번호 버튼의 너비와 높이를 고정 */
         width: 40px;
         height: 40px;
         border-radius: 9999px;
         transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
         transition-duration: 150ms;
     }
+    /* 텍스트가 있는 페이지네이션 링크를 위한 스타일 (예: 처음, 이전, 다음, 마지막) */
+    .pagination .text-link {
+        width: auto; /* 너비를 자동으로 설정 */
+        min-width: 80px; /* 최소 너비를 보장하여 텍스트가 좁아지지 않도록 함 */
+        padding: 0 16px; /* 좌우 패딩을 추가 */
+    }
     .pagination .active a {
         background-color: #F29DA0; /* 코랄 핑크 */
         color: #ffffff; /* 흰색 */
         pointer-events: none;
+    }
+    .pagination .disabled {
+        opacity: 0.5;
+        cursor: default;
     }
 
   </style>
@@ -97,31 +110,48 @@
     </table>
   </div>
 
+  <!-- 페이지네이션 수정 -->
   <div th:if="${paging != null && !paging.isEmpty()}" class="flex justify-center mt-8">
-    <ul class="flex gap-2 pagination">
-      <li th:if="${paging.hasPrevious}">
-        <a th:href="@{|?page=${paging.number - 1}&kw=${kw}|}"
-           class="border text-white hover:bg-opacity-80"
-           style="background-color: #2F4160; border-color: #2F4160;">
-          이전
-        </a>
-      </li>
-      <li th:each="page: ${#numbers.sequence(0, paging.totalPages - 1)}"
-          th:classappend="${page == paging.number} ? 'active'">
-        <a th:href="@{|?page=${page}&kw=${kw}|}"
-           th:text="${page + 1}"
-           class="border"
-           style="border-color: #2F4160; color: #2F4160; hover-bg-color: #B5D0E3;">
-        </a>
-      </li>
-      <li th:if="${paging.hasNext}">
-        <a th:href="@{|?page=${paging.number + 1}&kw=${kw}|}"
-           class="border text-white hover:bg-opacity-80"
-           style="background-color: #2F4160; border-color: #2F4160;">
-          다음
-        </a>
-      </li>
-    </ul>
+    <div th:with="startPage=${paging.number / 10 * 10}, endPage=${T(java.lang.Math).min(paging.totalPages - 1, paging.number / 10 * 10 + 9)}">
+      <ul class="flex gap-2 pagination">
+        <li th:classappend="${!paging.hasPrevious} ? 'disabled'">
+          <a th:href="@{|?page=0&kw=${kw}|}"
+             class="border text-white hover:bg-opacity-80 text-link"
+             style="background-color: #2F4160; border-color: #2F4160;">
+            처음
+          </a>
+        </li>
+        <li th:classappend="${!paging.hasPrevious} ? 'disabled'">
+          <a th:href="${paging.hasPrevious} ? @{|?page=${paging.number - 1}&kw=${kw}|} : '#'"
+             class="border text-white hover:bg-opacity-80 text-link"
+             style="background-color: #2F4160; border-color: #2F4160;">
+            이전
+          </a>
+        </li>
+        <li th:each="page: ${#numbers.sequence(startPage, endPage)}"
+            th:classappend="${page == paging.number} ? 'active'">
+          <a th:href="@{|?page=${page}&kw=${kw}|}"
+             th:text="${page + 1}"
+             class="border"
+             style="border-color: #2F4160; color: #2F4160; hover-bg-color: #B5D0E3;">
+          </a>
+        </li>
+        <li th:classappend="${!paging.hasNext} ? 'disabled'">
+          <a th:href="${paging.hasNext} ? @{|?page=${paging.number + 1}&kw=${kw}|} : '#'"
+             class="border text-white hover:bg-opacity-80 text-link"
+             style="background-color: #2F4160; border-color: #2F4160;">
+            다음
+          </a>
+        </li>
+        <li th:classappend="${!paging.hasNext} ? 'disabled'">
+          <a th:href="@{|?page=${paging.totalPages - 1}&kw=${kw}|}"
+             class="border text-white hover:bg-opacity-80 text-link"
+             style="background-color: #2F4160; border-color: #2F4160;">
+            마지막
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 
 </main>
