@@ -195,7 +195,7 @@
                                     <i class="fas fa-edit mr-1"></i> 수정
                                 </a>
                                 <button type="button"
-                                        th:attr="onclick='deleteVideo(' + ${video.videoId} + ')'"
+                                        th:attr="onclick='deleteVideo(' + ${video.videoId} + ', ' + ${videoPage.number} + ', ' + ${videoPage.content.size()} + ')'"
                                         class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-all duration-300 flex items-center"
                                         title="삭제">
                                     <i class="fas fa-trash-alt mr-1"></i> 삭제
@@ -241,7 +241,7 @@
         document.getElementById('searchForm').submit();
     }
 
-   function deleteVideo(videoId) {
+   function deleteVideo(videoId, currentPage, currentSize) {
         if (!confirm("정말로 이 영상을 삭제하시겠습니까?")) return;
 
         fetch("/video/admin/" + videoId, {
@@ -253,7 +253,17 @@
             return res.text();
         })
         .then(msg => {
-            window.location.reload();
+            const newSize = currentSize - 1;
+            let targetPage = currentPage;
+
+            if (newSize === 0 && currentPage > 0) {
+                targetPage = currentPage - 1;
+            }
+
+            // 검색 조건과 함께 새로운 페이지로 이동
+            const searchType = document.getElementById('searchType').value;
+            const keyword = document.getElementById('keyword').value;
+            window.location.href = `/video/admin/list?page=${targetPage}&searchType=${searchType}&keyword=${keyword}`;
         })
         .catch(err => {
             alert(err);

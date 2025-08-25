@@ -146,7 +146,7 @@ public class VideoController {
         }
 
         // 한 페이지에 9개씩 보여주도록 size를 9로 변경
-        Pageable pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "createDate"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createDate"));
         // videoService.searchVideos 대신 getPagedVideos 호출
         Page<VideoDTO> videoPage = videoService.getPagedVideos(keyword, searchType, pageable);
 
