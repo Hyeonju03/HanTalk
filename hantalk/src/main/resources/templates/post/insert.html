@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시물 작성</title>
-    <!-- Google Fonts & Tailwind CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 
@@ -52,7 +50,7 @@
                         class="bg-[#4B4B4B] hover:bg-[#2F4160] text-white font-bold py-2 px-6 rounded-lg transition duration-200 flex items-center">
                     <i class="fas fa-edit mr-2"></i>등록
                 </button>
-                <a th:href="@{|/post/list/${post.category.categoryId}|}"
+                <a th:href="${isAdmin ? '/post/admin' : '/post/list/' + post.category.categoryId}"
                    class="bg-white text-[#2F4160] border border-[#E0E0E0] font-bold py-2 px-6 rounded-lg hover:bg-gray-50 transition duration-200 flex items-center">
                     <i class="fas fa-list-ul mr-2"></i>목록으로
                 </a>
