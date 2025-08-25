@@ -10,12 +10,9 @@
         <module name="hantalk.main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="17" />
   </component>
   <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="hantalk" options="-parameters" />
-      <module name="hantalk.main" options="-parameters" />
-      <module name="hantalk.test" options="-parameters" />
-    </option>
+    <option name="ADDITIONAL_OPTIONS_STRING" value="-parameters" />
   </component>
 </project>
