@@ -27,6 +27,11 @@ public class ItemShopService {
     private final UserItemRepository userItemRepository;
     private final UsersRepository usersRepository;
 
+    // 아이템 전체 조회
+    public List<Item> getAllItems() {
+        return itemRepository.findAll();
+    }
+
     // 사용자에게 보여줄 전체 아이템 목록 + 보유 여부 체크
     public List<Item> getAllItemsWithUserInfo(Users user) {
         List<Item> items = itemRepository.findAll();

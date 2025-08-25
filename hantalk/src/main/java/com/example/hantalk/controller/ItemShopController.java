@@ -28,6 +28,7 @@ public class ItemShopController {
     private final UsersRepository userRepository;
 
 
+
     // 아이템 상점 페이지 조회
     @GetMapping("/shop")
     public String showShop(HttpSession session, Model model) {
@@ -45,8 +46,8 @@ public class ItemShopController {
         // ADMIN인 경우
         if ("ADMIN".equalsIgnoreCase(role)) {
             model.addAttribute("point", 0);
-            // 모든 아이템을 가져오는 대신, 페이징된 데이터의 첫 페이지를 가져옵니다.
-            model.addAttribute("items", itemShopService.getItemList(0).getContent());
+            // ✅ 수정: 모든 아이템(프레임 + 이미지)을 다 불러와서 뷰에 전달
+            model.addAttribute("items", itemShopService.getAllItems());
             model.addAttribute("isAdmin", true);
             return "item/shop";
         }
@@ -97,7 +98,7 @@ public class ItemShopController {
     }
 
 
-    // 관리자 - 아이템 목록 보기 (페이징 기능 추가)
+    // 관리자 - 아이템 목록 보기
     @GetMapping("/admin")
     public String manageItems(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
         Page<Item> itemPage = itemShopService.getItemList(page);
