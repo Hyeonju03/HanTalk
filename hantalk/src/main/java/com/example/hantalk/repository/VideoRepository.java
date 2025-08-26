@@ -4,6 +4,7 @@ import com.example.hantalk.entity.Video;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -30,6 +31,12 @@ public interface VideoRepository extends JpaRepository<Video, Integer> {
             "v.title LIKE %:keyword% OR v.content LIKE %:keyword% OR v.videoName LIKE %:keyword%")
     Page<Video> findByTitleOrContentOrVideoNameContaining(@Param("keyword") String keyword, Pageable pageable);
 
+    // 특정 비디오의 조회수를 1 증가시키는 쿼리 (update문)
+    // @Modifying 어노테이션은 데이터 변경 쿼리임을 명시합니다.
+    @Modifying
+    @Query("UPDATE Video v SET v.viewHit = v.viewHit + 1 WHERE v.videoId = :videoId")
+    void incrementViewHit(@Param("videoId") int videoId);
+
     // 🔍 제목으로 영상 검색 (List 반환, 이전 코드에서 사용)
     List<Video> findByTitleContaining(String title);
 
@@ -38,4 +45,5 @@ public interface VideoRepository extends JpaRepository<Video, Integer> {
 
     // 🔍 제목 또는 내용으로 영상 검색 (List 반환, 이전 코드에서 사용)
     List<Video> findByTitleContainingOrContentContaining(String title, String content);
+
 }

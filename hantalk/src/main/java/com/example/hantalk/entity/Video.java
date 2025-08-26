@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @EntityListeners(value = {AuditingEntityListener.class})
 @Entity
@@ -35,4 +36,10 @@ public class Video {
     @LastModifiedDate
     @Column(name="update_date")
     private LocalDateTime updateDate;
+
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int viewHit = 0;
+
+    @OneToMany(mappedBy = "video", cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
+    private List<Favorite_video> favoriteVideoList;
 }
