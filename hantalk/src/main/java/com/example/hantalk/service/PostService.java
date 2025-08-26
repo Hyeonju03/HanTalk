@@ -103,11 +103,17 @@ public class PostService {
         return toDto(post);
     }
 
-    @Transactional
-    public PostDTO getPost(int postId) {
+    @Transactional(readOnly = true)
+    public PostDTO getPost(Integer postId) {
+
+        // 1. 게시물 조회
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
-        post.setViewCount(post.getViewCount() + 1);
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시물입니다. ID: " + postId));
+
+        // 2. 조회수만 별도의 쿼리로 증가 (updateDate 갱신 방지)
+        postRepository.updateViewCount(postId);
+
+        // 3. DTO로 변환하여 반환
         return toDto(post);
     }
 

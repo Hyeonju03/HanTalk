@@ -4,9 +4,11 @@ import com.example.hantalk.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -65,4 +67,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     // 파일 이름으로 게시물 찾기
     Optional<Post> findByArchive(String archive);
+
+    @Transactional
+    @Modifying
+    @Query("update Post p set p.viewCount = p.viewCount + 1 where p.postId = :postId")
+    void updateViewCount(@Param("postId") Integer postId);
 }
