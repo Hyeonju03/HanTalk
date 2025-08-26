@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" class="transition-colors duration-500" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,171 +7,229 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .bg-main-dark { background-color: #2F4160; }
-        .text-main-dark { color: #2F4160; }
-        .bg-accent-pink { background-color: #F29DA0; }
-        .text-accent-pink { color: #F29DA0; }
-        .bg-soft-blue { background-color: #B5D0E3; }
-        .text-soft-blue { color: #B5D0E3; }
-
-        .all-videos-btn-hover:hover {
-            background-color: #2F4160;
-            color: #ffffff;
+        :root {
+            /* 라이트 모드 기본 색상 변수 */
+            --bg-body: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-section: rgba(181, 208, 227, 0.1);
+            --text-primary: #2F4160;
+            --text-secondary: #6b7280;
+            --border-color: rgba(181, 208, 227, 0.3);
+            --shadow-color: rgba(0, 0, 0, 0.1);
         }
-        .favorite-btn-hover:hover {
-            background-color: #F29DA0;
-            color: #ffffff;
+
+        .dark {
+            --bg-body: #1a202c;
+            --bg-card: #2d3748;
+            --bg-section: rgba(45, 55, 72, 0.3);
+            --text-primary: #f7fafc;
+            --text-secondary: #a0aec0;
+            --border-color: rgba(69, 81, 102, 0.5);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
         }
 
         .video-card {
             transition: all 0.3s ease;
             border-radius: 1rem;
-            border: 1px solid rgba(181, 208, 227, 0.3);
-            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
         }
 
         .video-card:hover {
-            border-color: #2F4160;
+            border-color: var(--text-primary);
             transform: scale(1.03);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 20px var(--shadow-color);
+        }
+
+        .upgraded-btn {
+            color: var(--text-primary);
+            box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .upgraded-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .all-videos-btn-hover:hover {
+            background-color: #2F4160;
+            color: #ffffff;
+        }
+
+        .favorite-btn-hover:hover {
+            background-color: #F29DA0;
+            color: #ffffff;
         }
 
         .play-icon-overlay {
             transition: background 0.3s ease, transform 0.3s ease;
-            font-size: 3rem;
-            text-shadow: 0 0 5px rgba(0,0,0,0.4);
         }
         .thumbnail-link:hover .play-icon-overlay {
             background-color: rgba(0, 0, 0, 0.3);
             transform: scale(1.1);
         }
+        .play-icon-svg {
+            width: 3.5rem;
+            height: 3.5rem;
+            fill: currentColor;
+            filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.12));
+        }
 
         .video-section {
-            background-color: rgba(181, 208, 227, 0.1);
+            background-color: var(--bg-section);
             padding: 3rem 1.5rem;
             border-radius: 1.5rem;
-            border: 1px solid rgba(181, 208, 227, 0.3);
+            border: 1px solid var(--border-color);
         }
 
-        /* 찜한 영상 표시 - 테두리 및 재생 버튼 색상 효과 제거 */
-        .favorite-video {
-            /*border-color: #F29DA0;
-            transform: scale(1.03);*/
-        }
-        .favorite-video .play-icon-overlay {
-            /*color: #F29DA0;*/
-        }
-
-        /* 찜하기 버튼 스타일 수정 */
-        .favorite-btn {
-            text-shadow: 0px 1px 3px rgba(0,0,0,0.5);
-            color: #ffffff; /* 기본 하트 색상을 다시 흰색으로 변경 */
-        }
-        .favorite-btn-active {
-            color: #EF4444; /* Tailwind red-500 */
-        }
-
-        /* 여러 줄 텍스트 말줄임표 CSS */
         .clamp-2-lines {
             display: -webkit-box;
-            -webkit-line-clamp: 2; /* 두 줄로 제한 */
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            word-break: break-all; /* 이 부분 추가 */
+            word-break: break-all;
+        }
+
+        /* 다크 모드에서 조회수 글자색을 흰색으로 고정 */
+        .dark .views-placeholder {
+            color: white;
         }
     </style>
 </head>
-<body class="bg-[#f3f4f6] font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-[var(--bg-body)] font-sans antialiased min-h-screen flex flex-col transition-colors duration-500">
 
+<!-- Thymeleaf fragments assumed to be here -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
+<div class="max-w-7xl w-full mx-auto bg-[var(--bg-card)] p-8 rounded-xl shadow-lg mt-8 transition-colors duration-500">
+    <h1 class="text-3xl font-bold text-[var(--text-primary)] mb-6 text-center">
+        <span th:if="${isFavorite}">찜한 영상 목록</span>
+        <span th:unless="${isFavorite}">영상 목록</span>
+    </h1>
 
-<div class="max-w-7xl w-full mx-auto bg-white p-8 rounded-xl shadow-lg mt-8">
-    <h1 class="text-3xl font-bold text-[#2F4160] mb-6 text-center">영상 목록</h1>
-
-        <div class="max-w-screen-xl mx-auto mb-8 flex flex-col md:flex-row items-center justify-between gap-6 px-4">
-            <div class="flex gap-2">
-                <!-- '전체 영상' 버튼을 자바스크립트 함수 호출로 변경 -->
-                <a href="javascript:void(0)" onclick="showAllVideos()" class="px-6 py-2 bg-white text-main-dark font-semibold rounded-lg shadow-md all-videos-btn-hover transition duration-300">
-                    전체 영상
-                </a>
-                <!-- 찜한 영상 링크를 자바스크립트 함수 호출로 변경 -->
-                <a href="javascript:void(0)" onclick="filterFavorites()" class="px-6 py-2 bg-white text-accent-pink font-semibold rounded-lg shadow-md favorite-btn-hover transition duration-300">
-                    찜한 영상
-                </a>
-            </div>
-            <form method="get" th:action="@{/video/list}" class="flex gap-2 w-full md:w-auto">
-                <select name="searchType" class="flex-shrink p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark">
-                    <option value="title" th:selected="${searchType == 'title'}">제목</option>
-                    <option value="content" th:selected="${searchType == 'content'}">내용</option>
-                    <option value="all" th:selected="${searchType == 'all'}">제목 + 내용</option>
-                </select>
-                <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력"
-                       class="flex-grow min-w-0 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark" />
-                <button type="submit"
-                        class="px-6 py-2 bg-accent-pink text-white font-semibold rounded-lg shadow-md hover:bg-accent-pink transition duration-300">
-                    검색
-                </button>
-            </form>
-        </div>
-        <div class="video-list-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-
-            <a th:each="video, stat : ${videoPage.content}"
-               th:href="@{/video/view/{id}(id=${video.videoId})}"
-               class="video-card relative p-4 flex flex-col cursor-pointer"
-               th:data-video-id="${video.videoId}">
-
-                <div class="thumbnail-link relative block w-full aspect-video overflow-hidden rounded-lg mb-3">
-                    <video class="video-thumbnail w-full h-full object-cover pointer-events-none" muted playsinline preload="metadata">
-                        <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
-                        영상 태그를 지원하지 않는 브라우저입니다.
-                    </video>
-                    <div class="play-icon-overlay absolute inset-0 flex items-center justify-center text-5xl text-white pointer-events-none">▶</div>
-                </div>
-
-
-                <div class="flex items-start justify-between">
-                    <strong class="video-title text-lg font-bold text-gray-900 leading-tight mb-1 min-w-0 flex-grow">
-
-                        <span th:text="${video.title}" class="no-underline text-main-dark transition duration-300 clamp-2-lines">영상 제목</span>
-                    </strong>
-
-                    <span class="favorite-btn text-2xl cursor-pointer z-20 ml-2" th:data-video-id="${video.videoId}" onclick="event.preventDefault(); event.stopPropagation();">♡</span>
-                </div>
-
-                <p class="text-sm text-gray-500 invisible h-0">공간 확보를 위한 빈 태그</p>
+    <div class="max-w-screen-xl mx-auto mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex flex-wrap gap-2 justify-center">
+            <a href="/video/list" class="px-6 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold rounded-lg all-videos-btn-hover transition duration-300 upgraded-btn">
+                전체 영상
             </a>
+            <a href="/video/list?isFavorite=true" class="px-6 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold rounded-lg favorite-btn-hover transition duration-300 upgraded-btn">
+                찜한 영상
+            </a>
+
+            <button id="theme-toggle" class="px-4 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold rounded-lg upgraded-btn transition duration-300 flex items-center gap-2">
+                <span class="sr-only">테마 변경</span>
+                <i class="fas fa-sun block dark:hidden"></i>
+                <i class="fas fa-moon hidden dark:block"></i>
+            </button>
         </div>
 
-        <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-white rounded-xl shadow-inner no-results">
-            <p class="text-xl font-medium text-main-dark">검색 결과가 없습니다.</p>
-        </div>
+        <!-- 찜한 영상 목록에서는 검색창을 숨김 -->
+        <form th:unless="${isFavorite}" method="get" th:action="@{/video/list}" class="flex flex-wrap gap-2 w-full md:w-auto">
+            <select name="searchType" class="flex-shrink p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                <option value="title" th:selected="${searchType == 'title'}" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">제목</option>
+                <option value="content" th:selected="${searchType == 'content'}" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">내용</option>
+                <option value="all" th:selected="${searchType == 'all'}" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">제목 + 내용</option>
+            </select>
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력"
+                   class="flex-grow min-w-0 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark dark:bg-gray-700 text-gray-800 dark:text-gray-200" />
 
+            <button type="submit"
+                    class="bg-[#B5D0E3] hover:bg-[#8DAAC1] text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                검색
+            </button>
+        </form>
+    </div>
 
-    <!-- 디자인이 통일된 페이지네이션 -->
+    <div class="video-list-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+        <a th:each="video, stat : ${videoPage.content}"
+           th:href="@{/video/view/{id}(id=${video.videoId})}"
+           class="video-card relative p-4 flex flex-col cursor-pointer"
+           th:data-video-id="${video.videoId}">
+
+            <div class="thumbnail-link relative block w-full aspect-video overflow-hidden rounded-lg mb-3">
+                <video class="video-thumbnail w-full h-full object-cover pointer-events-none" muted playsinline preload="metadata">
+                    <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
+                    영상 태그를 지원하지 않는 브라우저입니다.
+                </video>
+                <!-- 기존 '▶'를 깔끔한 SVG 아이콘으로 대체 -->
+                <div class="play-icon-overlay absolute inset-0 flex items-center justify-center text-white pointer-events-none">
+                    <svg class="play-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M5.25 5.653c0-.856.917-1.341 1.697-.969l10.992 5.653a1.5 1.5 0 010 2.7l-10.992 5.653c-.78.372-1.697-.113-1.697-.969V5.653z" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex items-start justify-between">
+                <div class="flex-grow min-w-0">
+                    <strong class="video-title text-xl font-bold text-gray-900 dark:text-white leading-tight mb-1">
+                        <span th:text="${video.title}" class="no-underline text-[var(--text-primary)] transition duration-300 clamp-2-lines">영상 제목</span>
+                    </strong>
+                    <div class="views-placeholder text-base font-bold text-gray-700 mt-1">
+                        조회수 <span th:text="${video.viewHit}">0</span>
+                    </div>
+                </div>
+
+                <button class="favorite-btn text-2xl cursor-pointer z-20 ml-2"
+                        th:data-video-id="${video.videoId}"
+                        onclick="event.preventDefault(); event.stopPropagation(); toggleFavorite(event, this.dataset.videoId);">
+                    <!-- 빈 하트 (초기 상태) -->
+                    <svg class="heart-empty w-6 h-6 fill-current text-gray-400" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <!-- 채워진 하트 (찜했을 때) -->
+                    <svg class="heart-filled w-6 h-6 fill-current text-red-500 hidden" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </button>
+            </div>
+        </a>
+    </div>
+
+    <!-- 찜한 영상이 없을 때 메시지 표시 -->
+    <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-[var(--bg-card)] rounded-xl shadow-inner no-results">
+        <p class="text-xl font-medium text-[var(--text-primary)]">
+            <span th:if="${isFavorite}">찜한 영상이 없습니다.</span>
+            <span th:unless="${isFavorite}">검색 결과가 없습니다.</span>
+        </p>
+    </div>
+
+    <!-- 수정: 이제 찜한 영상 목록에서도 페이지네이션을 표시합니다 -->
     <div class="pagination flex justify-center items-center mt-8 space-x-2" th:if="${videoPage.totalPages > 1}">
         <a th:if="${videoPage.hasPrevious()}"
-           th:href="@{|/video/list?page=${videoPage.number - 1}&keyword=${keyword}|}"
-           class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">이전</a>
+           th:href="@{|/video/list?page=${videoPage.number - 1}&isFavorite=${isFavorite}|}"
+           class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[var(--text-primary)] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">이전</a>
 
         <a th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}"
-           th:href="@{|/video/list?page=${i}&keyword=${keyword}|}" th:text="${i + 1}"
-           th:classappend="${i == videoPage.number} ? 'bg-[#B5D0E3] text-white font-bold' : 'bg-white text-[#2F4160] border border-gray-300'"
+           th:href="@{|/video/list?page=${i}${isFavorite ? '&isFavorite=true' : ''}${isFavorite ? '' : '&keyword=' + keyword}|}"
+           th:text="${i + 1}"
+           th:classappend="${i == videoPage.number} ? 'bg-[#B5D0E3] text-white font-bold' : 'bg-white text-[var(--text-primary)] border border-gray-300'"
            class="block w-8 h-8 flex items-center justify-center rounded-md no-underline transition-colors duration-200 hover:bg-[#f3f4f6] hover:text-[#2F4160]"></a>
 
         <a th:if="${videoPage.hasNext()}"
-           th:href="@{|/video/list?page=${videoPage.number + 1}&keyword=${keyword}|}"
-           class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">다음</a>
+           th:href="@{|/video/list?page=${videoPage.number + 1}&isFavorite=${isFavorite}|}"
+           class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[var(--text-primary)] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">다음</a>
     </div>
 
 </div>
 
+<div id="message-box" class="fixed bottom-5 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white font-bold hidden opacity-0 transition-opacity duration-300 z-[60]"></div>
+
 <div th:replace="~{fragments/footer :: footerFragment}"></div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // 썸네일 동영상 재생 로직: 마우스를 올리면 1초 지점에서 재생
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const loggedInUserNo = [[${userId}]];
+    const isFavoritePage = [[${isFavorite}]];
+
+    // 비디오 카드에 마우스를 올렸을 때 썸네일 동영상 재생 로직을 설정하는 함수
+    function setupVideoCardEvents() {
         document.querySelectorAll('.video-card').forEach(card => {
             const video = card.querySelector('video');
             if (video) {
@@ -181,114 +239,147 @@
                 });
                 card.addEventListener('mouseleave', () => {
                     video.pause();
-                    video.currentTime = 1;
+                    video.currentTime = 10;
                 });
             }
         });
+    }
 
-        // 비디오 모달 로직
-        const modal = document.createElement('div');
-        modal.id = 'videoModal';
-        modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden';
-        document.body.appendChild(modal);
+    function showMessage(message, type = 'success') {
+        const msgBox = document.getElementById('message-box');
+        msgBox.textContent = message;
+        msgBox.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white font-bold z-[60]';
 
-        document.querySelectorAll('.video-card a').forEach(link => {
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                const videoSrc = link.querySelector('video source').src;
-                modal.innerHTML = `
-                    <div class="relative w-11/12 md:w-2/3 lg:w-1/2 bg-black rounded-lg p-4">
-                        <button id="closeModal" class="absolute top-2 right-2 text-white text-2xl">&times;</button>
-                        <video src="${videoSrc}" controls autoplay class="w-full rounded-lg"></video>
-                    </div>`;
-                modal.classList.remove('hidden');
+        if (type === 'success') {
+            msgBox.classList.add('bg-green-500');
+        } else {
+            msgBox.classList.add('bg-red-500');
+        }
 
-                document.getElementById('closeModal').addEventListener('click', () => {
-                    modal.classList.add('hidden');
-                    modal.innerHTML = '';
-                });
+        msgBox.classList.remove('hidden');
+        msgBox.classList.remove('opacity-0');
+
+        setTimeout(() => {
+            msgBox.classList.add('opacity-0');
+            setTimeout(() => {
+                msgBox.classList.add('hidden');
+                msgBox.classList.remove('bg-green-500', 'bg-red-500');
+            }, 300); // fade out 애니메이션 시간
+        }, 3000);
+    }
+
+    async function toggleFavorite(event, videoId) {
+        const btn = event.currentTarget;
+        const heartEmpty = btn.querySelector('.heart-empty');
+        const heartFilled = btn.querySelector('.heart-filled');
+        const isCurrentlyFavorite = !heartFilled.classList.contains('hidden');
+
+        const url = '/video/favorite';
+        const method = isCurrentlyFavorite ? 'DELETE' : 'POST'; // 찜 취소는 DELETE, 찜하기는 POST
+
+        const payload = { userId: loggedInUserNo, videoId: videoId };
+
+        if (isCurrentlyFavorite) {
+            heartEmpty.classList.remove('hidden');
+            heartFilled.classList.add('hidden');
+        } else {
+            heartEmpty.classList.add('hidden');
+            heartFilled.classList.remove('hidden');
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             });
-        });
 
-        // 찜하기 기능 로직: 로컬 스토리지를 이용해 찜한 영상 목록 관리
-        document.querySelectorAll('.favorite-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation(); // 카드 클릭 이벤트와 중복 방지
-                const videoId = e.target.getAttribute('data-video-id');
-                let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-                const videoCard = e.target.closest('.video-card');
-
-                if (favorites.includes(videoId)) {
-                    // 찜 해제: 배열에서 제거하고 하트 색상 변경
-                    favorites = favorites.filter(id => id !== videoId);
-                    e.target.innerHTML = '♡';
-                    e.target.classList.remove('favorite-btn-active');
-                    videoCard.classList.remove('favorite-video');
+            if (!response.ok) {
+                console.error('Failed to toggle favorite status:', response.statusText);
+                showMessage('⚠️ 찜 상태 변경 실패! 서버 오류를 확인해주세요.', 'error');
+                // UI 롤백
+                if (isCurrentlyFavorite) {
+                    heartEmpty.classList.add('hidden');
+                    heartFilled.classList.remove('hidden');
                 } else {
-                    // 찜하기: 배열에 추가하고 하트 색상 변경
-                    favorites.push(videoId);
-                    e.target.innerHTML = '♥';
-                    e.target.classList.add('favorite-btn-active');
-                    videoCard.classList.add('favorite-video');
+                    heartEmpty.classList.remove('hidden');
+                    heartFilled.classList.add('hidden');
                 }
-                localStorage.setItem('favorites', JSON.stringify(favorites));
-            });
-        });
+            } else {
+                const action = isCurrentlyFavorite ? '찜 취소' : '찜하기';
+                showMessage(`✅ ${action}가 완료되었습니다!`, 'success');
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+            showMessage('⚠️ 네트워크 오류 발생! 연결 상태를 확인해주세요.', 'error');
+            // UI 롤백
+            if (isCurrentlyFavorite) {
+                heartEmpty.classList.add('hidden');
+                heartFilled.classList.remove('hidden');
+            } else {
+                heartEmpty.classList.remove('hidden');
+                heartFilled.classList.add('hidden');
+            }
+        }
+    }
 
-        // 페이지 로딩 시 찜한 영상 상태 반영
-        function loadFavorites() {
-            const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-            document.querySelectorAll('.video-card').forEach(card => {
-                const videoId = card.getAttribute('data-video-id');
-                const favBtn = card.querySelector('.favorite-btn');
-                if (favBtn) {
-                    if (favorites.includes(videoId)) {
-                        favBtn.innerHTML = '♥';
-                        favBtn.classList.add('favorite-btn-active');
-                        card.classList.add('favorite-video');
-                    } else {
-                        favBtn.innerHTML = '♡';
-                        favBtn.classList.remove('favorite-btn-active');
-                        card.classList.remove('favorite-video');
+    async function updateFavoriteIcons() {
+        const videoCards = document.querySelectorAll('.video-card');
+        const videoIds = Array.from(videoCards).map(card => card.dataset.videoId);
+
+        for (const videoId of videoIds) {
+            try {
+                const response = await fetch(`/video/favorite/check/${videoId}`);
+                if (response.ok) {
+                    const isFavorite = await response.json();
+                    const heartBtn = document.querySelector(`.favorite-btn[data-video-id='${videoId}']`);
+                    if (heartBtn) {
+                        const heartEmpty = heartBtn.querySelector('.heart-empty');
+                        const heartFilled = heartBtn.querySelector('.heart-filled');
+
+                        if (isFavorite) {
+                            heartEmpty.classList.add('hidden');
+                            heartFilled.classList.remove('hidden');
+                        } else {
+                            heartEmpty.classList.remove('hidden');
+                            heartFilled.classList.add('hidden');
+                        }
                     }
                 }
-            });
-        }
-        loadFavorites();
-
-        // '찜한 영상' 버튼 클릭 시 찜한 영상만 표시
-        window.filterFavorites = function() {
-            const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-            const videoCards = document.querySelectorAll('.video-card');
-            let hasFavorites = false;
-
-            videoCards.forEach(card => {
-                const videoId = card.getAttribute('data-video-id');
-                if (favorites.includes(videoId)) {
-                    card.style.display = 'flex';
-                    hasFavorites = true;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            const noResults = document.querySelector('.no-results');
-            if (noResults) {
-                noResults.style.display = hasFavorites ? 'none' : 'block';
+            } catch (error) {
+                console.error(`Error checking favorite status for video ${videoId}:`, error);
             }
         }
+    }
 
-        // '전체 영상' 버튼 클릭 시 모든 영상 표시
-        window.showAllVideos = function() {
-            document.querySelectorAll('.video-card').forEach(card => {
-                card.style.display = 'flex';
-            });
-            const noResults = document.querySelector('.no-results');
-            if (noResults) {
-                noResults.style.display = 'none';
-            }
+    function setupDarkModeToggle() {
+        const toggleBtn = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark' || (!currentTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
         }
+
+        toggleBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const newTheme = html.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        setupVideoCardEvents();
+        updateFavoriteIcons();
+        setupDarkModeToggle();
     });
+
+    window.toggleFavorite = toggleFavorite;
+    window.showMessage = showMessage;
+
+    /*]]>*/
 </script>
 </body>
 </html>

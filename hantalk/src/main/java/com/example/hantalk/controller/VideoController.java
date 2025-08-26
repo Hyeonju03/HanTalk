@@ -3,10 +3,13 @@ package com.example.hantalk.controller;
 import com.example.hantalk.SessionUtil;
 import com.example.hantalk.dto.VideoDTO;
 import com.example.hantalk.service.VideoService;
+import com.example.hantalk.dto.FavoriteVideoDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -39,12 +43,10 @@ public class VideoController {
         if (filename == null || filename.trim().isEmpty()) {
             return false;
         }
-
         File file = new File(UPLOAD_PATH + filename);
         return file.exists();
     }
 
-    // 관리자 메인 페이지 (변동 없음)
     @GetMapping("/admin/main")
     public String adminMain(HttpSession session, Model model) {
         if (!SessionUtil.isLoggedIn(session)) {
@@ -52,24 +54,21 @@ public class VideoController {
         }
         String role = SessionUtil.getRole(session);
         if (!"ADMIN".equals(role)) {
-            return "redirect:/video/list"; // 통합된 목록 페이지로 리다이렉트
+            return "redirect:/video/list";
         }
         model.addAttribute("role", role);
         return "video/main";
     }
 
-    // 영상 목록 통합 (사용자 & 관리자)
     @GetMapping("/list")
-    public String list(
+    public Object list(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "searchType", defaultValue = "title") String searchType,
             @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "isFavorite", defaultValue = "false") boolean isFavorite, // 찜한 영상 목록 요청 여부
             HttpSession session,
-            Model model) {
-
-        if(keyword == null){
-            keyword = "";
-        }
+            Model model,
+            HttpServletRequest request) {
 
         if (!SessionUtil.isLoggedIn(session)) {
             return "redirect:/login";
@@ -80,49 +79,66 @@ public class VideoController {
             return "redirect:/login";
         }
 
+        Integer userId = SessionUtil.getLoginUserNo(session);
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        Page<VideoDTO> videoPage;
+
+        // 찜한 영상 전체 목록을 요청한 경우
+        if (isFavorite) {
+            List<VideoDTO> favoriteVideos = videoService.getFavoriteVideos(userId);
+            // List를 Page 객체로 변환 (페이지네이션 기능을 이용하기 위함)
+            Pageable pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "createDate"));
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), favoriteVideos.size());
+            Page<VideoDTO> favoritePage = new PageImpl<>(favoriteVideos.subList(start, end), pageable, favoriteVideos.size());
+            videoPage = favoritePage;
+            model.addAttribute("isFavorite", true);
+        } else {
+            // 일반 영상 목록을 요청한 경우 (기존 로직 유지)
+            if (keyword == null) {
+                keyword = "";
+            }
+            Pageable pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "createDate"));
+            videoPage = videoService.getPagedVideos(keyword, searchType, pageable);
+            model.addAttribute("isFavorite", false);
+        }
+
+        String requestedWith = request.getHeader("X-Requested-With");
+        if ("XMLHttpRequest".equals(requestedWith)) {
+            return new ResponseEntity<>(videoPage, HttpStatus.OK);
+        }
+
         boolean isAdmin = "ADMIN".equalsIgnoreCase(role);
-
-        // 한 페이지에 9개씩 보여주도록 size를 9로 변경
-        Pageable pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "createDate"));
-        // videoService.getVideo를 videoService.getPagedVideos로 변경
-        Page<VideoDTO> videoPage = videoService.getPagedVideos(keyword, searchType, pageable);
-
         model.addAttribute("videoPage", videoPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("searchType", searchType);
         model.addAttribute("role", role);
-        model.addAttribute("isAdmin", isAdmin); // isAdmin 모델 속성을 추가
+        model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isEmpty", videoPage.isEmpty());
-
-        return "video/list"; // 'list.html' 단일 뷰 반환
+        model.addAttribute("userId", userId);
+        return "video/list";
     }
 
-
-    /* =========================
-       사용자 영상 상세
-       - 관리자면 관리자 뷰로 리다이렉트
-    ========================== */
     @GetMapping("/contentView/{id}")
     public String userView(@PathVariable int id, HttpSession session, Model model) {
         if (!SessionUtil.isLoggedIn(session)) {
             return "redirect:/login";
         }
-
         String role = SessionUtil.getRole(session);
         if (!"USER".equals(role) && !"ADMIN".equals(role)) {
             return "redirect:/login";
         }
 
-        VideoDTO video = videoService.getVideo(id);
+        VideoDTO video = videoService.getVideoAndIncrementView(id);
         model.addAttribute("video", video);
         model.addAttribute("role", SessionUtil.getRole(session));
         model.addAttribute("isAdmin", SessionUtil.hasRole(session, "ADMIN"));
         return "video/contentView";
     }
 
-    /* =========================
-       관리자 영상 목록
-    ========================== */
     @GetMapping("/admin/list")
     public String adminList(
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -131,23 +147,14 @@ public class VideoController {
             HttpSession session,
             Model model) {
 
-        // ✅ 관리자만 접근 가능하도록 역할 확인
         if (!SessionUtil.isLoggedIn(session) || !SessionUtil.hasRole(session, "ADMIN")) {
             return "redirect:/login";
         }
-
-        if (!SessionUtil.hasRole(session, "ADMIN")) {
-            return "redirect:/video/contentList";
-        }
-
-        // 💡💡💡 추가된 부분: keyword가 null일 경우 빈 문자열로 초기화합니다. 💡💡💡
         if (keyword == null) {
             keyword = "";
         }
 
-        // 한 페이지에 9개씩 보여주도록 size를 9로 변경
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createDate"));
-        // videoService.searchVideos 대신 getPagedVideos 호출
         Page<VideoDTO> videoPage = videoService.getPagedVideos(keyword, searchType, pageable);
 
         model.addAttribute("videoPage", videoPage);
@@ -155,11 +162,9 @@ public class VideoController {
         model.addAttribute("searchType", searchType);
         model.addAttribute("role", "ADMIN");
         model.addAttribute("isEmpty", videoPage.isEmpty());
-
-        return "video/admin"; // 'admin.html' 뷰 반환
+        return "video/admin";
     }
 
-    // 영상 상세 통합 (사용자 & 관리자)
     @GetMapping("/view/{id}")
     public String view(@PathVariable int id, HttpSession session, Model model) {
         if (!SessionUtil.isLoggedIn(session)) {
@@ -171,31 +176,23 @@ public class VideoController {
         }
 
         boolean isAdmin = "ADMIN".equalsIgnoreCase(role);
-
-        VideoDTO video = videoService.getVideo(id);
+        VideoDTO video = videoService.getVideoAndIncrementView(id);
         model.addAttribute("video", video);
         model.addAttribute("role", role);
-        model.addAttribute("isAdmin", isAdmin); // isAdmin 모델 속성을 추가
-
-        return "video/view"; // 'view.html' 단일 뷰 반환
+        model.addAttribute("isAdmin", isAdmin);
+        return "video/view";
     }
 
-    // 관리자 영상 업로드 폼 (URL 유지)
     @GetMapping("/admin/chuga")
     public String adminUploadForm(HttpSession session, Model model) {
         if (!SessionUtil.isLoggedIn(session) || !SessionUtil.hasRole(session, "ADMIN")) {
             return "redirect:/login";
         }
-        if (!SessionUtil.hasRole(session, "ADMIN")) {
-            return "redirect:/video/contentList";
-        }
-
         model.addAttribute("video", new VideoDTO());
         model.addAttribute("role", SessionUtil.getRole(session));
         return "video/chuga";
     }
 
-    // 관리자 영상 업로드 처리 (URL 유지)
     @PostMapping("/admin/chugaProc")
     public String adminUploadProc(
             HttpSession session,
@@ -219,7 +216,6 @@ public class VideoController {
 
         String uploadDir = UPLOAD_PATH;
         String originalFilename = file.getOriginalFilename();
-
         File existingFile = new File(uploadDir + originalFilename);
         if (existingFile.exists()) {
             model.addAttribute("error", "이미 동일한 영상 파일명이 존재합니다. 다른 이름으로 변경하세요.");
@@ -228,7 +224,6 @@ public class VideoController {
         }
 
         file.transferTo(new File(uploadDir, originalFilename));
-
         VideoDTO dto = new VideoDTO();
         dto.setTitle(title);
         dto.setContent(content);
@@ -238,24 +233,17 @@ public class VideoController {
         return "redirect:/video/view/" + createdId;
     }
 
-    // 관리자 영상 수정 폼 (URL 유지)
     @GetMapping("/admin/sujung/{id}")
     public String adminEditForm(@PathVariable int id, HttpSession session, Model model) {
         if (!SessionUtil.isLoggedIn(session) || !SessionUtil.hasRole(session, "ADMIN")) {
             return "redirect:/login";
         }
-
-        if (!SessionUtil.hasRole(session, "ADMIN")) {
-            return "redirect:/video/contentList";
-        }
-
         VideoDTO video = videoService.getVideo(id);
         model.addAttribute("video", video);
         model.addAttribute("role", SessionUtil.getRole(session));
         return "video/sujung";
     }
 
-    // 관리자 영상 수정 처리 (URL 유지)
     @PostMapping("/admin/sujungProc")
     public String adminUpdateProc(
             HttpSession session,
@@ -268,10 +256,6 @@ public class VideoController {
         if (!SessionUtil.isLoggedIn(session) || !SessionUtil.hasRole(session, "ADMIN")) {
             return "redirect:/login";
         }
-        if (!SessionUtil.hasRole(session, "ADMIN")) {
-            return "redirect:/video/contentList";
-        }
-
         String uploadDir = UPLOAD_PATH;
         File dir = new File(uploadDir);
         if (!dir.exists()) dir.mkdirs();
@@ -293,18 +277,15 @@ public class VideoController {
         dto.setTitle(title);
         dto.setContent(content);
         dto.setVideoName(savedFilename);
-
         videoService.updateVideo(dto);
-        return "redirect:/video/admin/list?page=" + page; // 목록 페이지 URL 통일
+        return "redirect:/video/admin/list?page=" + page;
     }
 
-    // 관리자 영상 삭제 (URL 유지)
     @DeleteMapping("/admin/{id}")
     public ResponseEntity<String> adminDelete(@PathVariable int id, HttpSession session) {
         if (!SessionUtil.isLoggedIn(session) || !SessionUtil.hasRole(session, "ADMIN")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("로그인이 필요합니다.");
         }
-
         VideoDTO video = videoService.getVideo(id);
         String savedFilename = video.getVideoName();
 
@@ -318,19 +299,65 @@ public class VideoController {
     private String getUniqueFileName(String uploadDir, String originalFilename) {
         String baseName = FilenameUtils.getBaseName(originalFilename);
         String extension = FilenameUtils.getExtension(originalFilename);
-
         baseName = baseName.replaceAll("[^a-zA-Z0-9가-힣_\\-()]", "_");
-
         String newFilename = baseName + "." + extension;
         int count = 1;
-
         File file = new File(uploadDir, newFilename);
         while (file.exists()) {
             newFilename = baseName + "(" + count + ")." + extension;
             file = new File(uploadDir, newFilename);
             count++;
         }
-
         return newFilename;
+    }
+
+    @GetMapping("/favorites")
+    @ResponseBody
+    public ResponseEntity<List<VideoDTO>> favoriteVideos(HttpSession session) {
+        if (!SessionUtil.isLoggedIn(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Integer userId = SessionUtil.getLoginUserNo(session);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<VideoDTO> favoriteVideos = videoService.getFavoriteVideos(userId);
+        return ResponseEntity.ok(favoriteVideos);
+    }
+
+    @PostMapping("/favorite")
+    @ResponseBody
+    public ResponseEntity<Void> addFavorite(@RequestBody FavoriteVideoDto favoriteDto, HttpSession session) {
+        Integer sessionUserId = SessionUtil.getLoginUserNo(session);
+        if (!SessionUtil.isLoggedIn(session) || sessionUserId == null || !sessionUserId.equals(favoriteDto.getUserId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        videoService.addFavoriteVideo(favoriteDto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/favorite")
+    @ResponseBody
+    public ResponseEntity<Void> removeFavorite(@RequestBody FavoriteVideoDto favoriteDto, HttpSession session) {
+        Integer sessionUserId = SessionUtil.getLoginUserNo(session);
+        if (!SessionUtil.isLoggedIn(session) || sessionUserId == null || !sessionUserId.equals(favoriteDto.getUserId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        videoService.removeFavoriteVideo(favoriteDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/favorite/check/{videoId}")
+    @ResponseBody
+    public ResponseEntity<Boolean> isFavorite(@PathVariable int videoId, HttpSession session) {
+        if (!SessionUtil.isLoggedIn(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+        }
+        Integer userId = SessionUtil.getLoginUserNo(session);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+        }
+        boolean isFavorite = videoService.isVideoFavorite(userId, videoId);
+        return ResponseEntity.ok(isFavorite);
     }
 }

@@ -179,14 +179,14 @@
                         <div class="px-6 py-4 text-sm font-medium text-gray-900 overflow-hidden flex-1 min-w-0 text-center" th:title="${video.title}">
                             <div th:text="${video.title}" class="w-full line-clamp-2">제목</div>
                         </div>
-                        <div class="px-6 py-4 text-sm text-gray-500 overflow-hidden flex-1 min-w-0 text-center" th:title="${video.content}">
+                        <div class="px-6 py-4 text-sm text-gray-900 overflow-hidden flex-1 min-w-0 text-center" th:title="${video.content}">
                             <div th:text="${video.content}" class="w-full line-clamp-2">설명</div>
                         </div>
-                        <div class="px-6 py-4 text-sm text-gray-500 overflow-hidden flex-1 min-w-0 text-center" th:title="${video.videoName}">
+                        <div class="px-6 py-4 text-sm text-gray-900 overflow-hidden flex-1 min-w-0 text-center" th:title="${video.videoName}">
                             <div th:text="${video.videoName}" class="w-full line-clamp-2">파일명</div>
                         </div>
-                        <div class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap w-[10%] flex-none text-center" th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</div>
-                        <div class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap w-[10%] flex-none text-center" th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}">수정일</div>
+                        <div class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap w-[10%] flex-none text-center" th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}">등록일</div>
+                        <div class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap w-[10%] flex-none text-center" th:text="${video.updateDate != null ? #temporals.format(video.updateDate, 'yyyy-MM-dd') : ''}">수정일</div>
                         <div class="px-6 py-4 text-sm font-medium whitespace-nowrap w-48 flex-none text-center" onclick="event.stopPropagation()">
                             <div class="flex space-x-1 justify-center">
                                 <a th:href="@{/video/admin/sujung/{id}(id=${video.videoId}, page=${videoPage.number}, searchType=${searchType}, keyword=${keyword})}"
