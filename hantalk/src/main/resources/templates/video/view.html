@@ -27,25 +27,6 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
-    .spinner {
-        border: 4px solid #E5E7EB;
-        border-top: 4px solid #FF7800; /* accent-orange */
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s cubic-bezier(0.5, 0.5, 0.5, 0.5) infinite;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 20;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
     .play-button-container {
         position: absolute;
         top: 50%;
@@ -160,12 +141,11 @@
       </div>
     </div>
     <div id="videoContainer" class="relative w-full mb-8 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center" style="aspect-ratio: 16 / 9;">
-      <div id="loadingSpinner" class="spinner"></div>
-      <video id="videoPlayer" width="100%" height="100%" controls class="w-full h-full object-cover hidden">
+      <video id="videoPlayer" width="100%" height="100%" controls class="w-full h-full object-cover">
         <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4">
         이 브라우저는 video 태그를 지원하지 않습니다.
       </video>
-      <div id="playButtonOverlay" class="play-button-container hidden">
+      <div id="playButtonOverlay" class="play-button-container">
         <div class="play-btn"></div>
       </div>
     </div>
@@ -181,15 +161,9 @@
 <script>
   const videoPlayer = document.getElementById('videoPlayer');
   const playButtonOverlay = document.getElementById('playButtonOverlay');
-  const loadingSpinner = document.getElementById('loadingSpinner');
   const copyLinkBtn = document.getElementById('copyLinkBtn');
   const copySuccessMsg = document.getElementById('copySuccessMsg');
 
-  videoPlayer.addEventListener('loadeddata', () => {
-      loadingSpinner.classList.add('hidden');
-      videoPlayer.classList.remove('hidden');
-      playButtonOverlay.classList.remove('hidden');
-  });
 
   playButtonOverlay.addEventListener('click', () => {
       videoPlayer.play();
