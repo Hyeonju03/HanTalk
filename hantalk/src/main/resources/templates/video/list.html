@@ -7,7 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
         body {
+            font-family: 'Noto Sans KR', sans-serif;
             background-color: #f3f4f6;
             color: #2F4160;
         }
@@ -57,7 +59,7 @@
             width: 3.5rem;
             height: 3.5rem;
             fill: currentColor;
-            filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.12));
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
         }
 
         .video-section {
@@ -98,7 +100,6 @@
             </a>
         </div>
 
-        <!-- 찜한 영상 목록에서는 검색창을 숨김 -->
         <form th:unless="${isFavorite}" method="get" th:action="@{/video/list}" class="flex flex-wrap gap-2 w-full md:w-auto">
             <select name="searchType" class="flex-shrink p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark bg-white text-gray-800">
                 <option value="title" th:selected="${searchType == 'title'}" class="bg-white text-gray-800">제목</option>
@@ -122,11 +123,12 @@
            th:data-video-id="${video.videoId}">
 
             <div class="thumbnail-link relative block w-full aspect-video overflow-hidden rounded-lg mb-3">
-                <video class="video-thumbnail w-full h-full object-cover pointer-events-none" muted playsinline preload="metadata">
+                <video class="video-thumbnail w-full h-full object-cover pointer-events-none"
+                       muted playsinline
+                       preload="metadata">
                     <source th:src="@{'/videos/' + ${video.videoName}}" type="video/mp4" />
                     영상 태그를 지원하지 않는 브라우저입니다.
                 </video>
-                <!-- 기존 '▶'를 깔끔한 SVG 아이콘으로 대체 -->
                 <div class="play-icon-overlay absolute inset-0 flex items-center justify-center text-white pointer-events-none">
                     <svg class="play-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M5.25 5.653c0-.856.917-1.341 1.697-.969l10.992 5.653a1.5 1.5 0 010 2.7l-10.992 5.653c-.78.372-1.697-.113-1.697-.969V5.653z" />
@@ -147,11 +149,9 @@
                 <button class="favorite-btn text-2xl cursor-pointer z-20 ml-2"
                         th:data-video-id="${video.videoId}"
                         onclick="event.preventDefault(); event.stopPropagation(); toggleFavorite(event, this.dataset.videoId);">
-                    <!-- 빈 하트 (초기 상태) -->
                     <svg class="heart-empty w-6 h-6 fill-current text-gray-400" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
-                    <!-- 채워진 하트 (찜했을 때) -->
                     <svg class="heart-filled w-6 h-6 fill-current text-red-500 hidden" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
@@ -160,7 +160,6 @@
         </a>
     </div>
 
-    <!-- 찜한 영상이 없을 때 메시지 표시 -->
     <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-white rounded-xl shadow-inner no-results">
         <p class="text-xl font-medium text-[#2F4160]">
             <span th:if="${isFavorite}">찜한 영상이 없습니다.</span>
@@ -168,7 +167,6 @@
         </p>
     </div>
 
-    <!-- 수정: 이제 찜한 영상 목록에서도 페이지네이션을 표시합니다 -->
     <div class="pagination flex justify-center items-center mt-8 space-x-2" th:if="${videoPage.totalPages > 1}">
         <a th:if="${videoPage.hasPrevious()}"
            th:href="@{|/video/list?page=${videoPage.number - 1}&isFavorite=${isFavorite}|}"
@@ -184,7 +182,6 @@
            th:href="@{|/video/list?page=${videoPage.number + 1}&isFavorite=${isFavorite}|}"
            class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">다음</a>
     </div>
-
 </div>
 
 <div id="message-box" class="fixed bottom-5 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white font-bold hidden opacity-0 transition-opacity duration-300 z-[60]"></div>
@@ -196,23 +193,7 @@
     const loggedInUserNo = [[${userId}]];
     const isFavoritePage = [[${isFavorite}]];
 
-    // 비디오 카드에 마우스를 올렸을 때 썸네일 동영상 재생 로직
-    function setupVideoCardEvents() {
-        document.querySelectorAll('.video-card').forEach(card => {
-            const video = card.querySelector('video');
-            if (video) {
-                card.addEventListener('mouseenter', () => {
-                    video.currentTime = 1;
-                    video.play();
-                });
-                card.addEventListener('mouseleave', () => {
-                    video.pause();
-                    video.currentTime = 1;
-                });
-            }
-        });
-    }
-
+    // 메시지 알림창을 표시하는 함수
     function showMessage(message, type = 'success') {
         const msgBox = document.getElementById('message-box');
         msgBox.textContent = message;
@@ -225,17 +206,20 @@
         }
 
         msgBox.classList.remove('hidden');
-        msgBox.classList.remove('opacity-0');
+        setTimeout(() => {
+            msgBox.style.opacity = '1';
+        }, 10); // Transition start
 
         setTimeout(() => {
-            msgBox.classList.add('opacity-0');
+            msgBox.style.opacity = '0';
             setTimeout(() => {
                 msgBox.classList.add('hidden');
                 msgBox.classList.remove('bg-green-500', 'bg-red-500');
-            }, 300); // fade out 애니메이션 시간
+            }, 300); // fade out animation time
         }, 3000);
     }
 
+    // 찜하기 상태를 토글하는 함수
     async function toggleFavorite(event, videoId) {
         const btn = event.currentTarget;
         const heartEmpty = btn.querySelector('.heart-empty');
@@ -243,17 +227,12 @@
         const isCurrentlyFavorite = !heartFilled.classList.contains('hidden');
 
         const url = '/video/favorite';
-        const method = isCurrentlyFavorite ? 'DELETE' : 'POST'; // 찜 취소는 DELETE, 찜하기는 POST
-
+        const method = isCurrentlyFavorite ? 'DELETE' : 'POST';
         const payload = { userId: loggedInUserNo, videoId: videoId };
 
-        if (isCurrentlyFavorite) {
-            heartEmpty.classList.remove('hidden');
-            heartFilled.classList.add('hidden');
-        } else {
-            heartEmpty.classList.add('hidden');
-            heartFilled.classList.remove('hidden');
-        }
+        // 즉시 UI 업데이트
+        heartEmpty.classList.toggle('hidden', !isCurrentlyFavorite);
+        heartFilled.classList.toggle('hidden', isCurrentlyFavorite);
 
         try {
             const response = await fetch(url, {
@@ -263,71 +242,87 @@
             });
 
             if (!response.ok) {
-                console.error('Failed to toggle favorite status:', response.statusText);
+                // 오류 발생 시 UI 롤백
+                heartEmpty.classList.toggle('hidden');
+                heartFilled.classList.toggle('hidden');
                 showMessage('⚠️ 찜 상태 변경 실패! 서버 오류를 확인해주세요.', 'error');
-                // UI 롤백
-                if (isCurrentlyFavorite) {
-                    heartEmpty.classList.add('hidden');
-                    heartFilled.classList.remove('hidden');
-                } else {
-                    heartEmpty.classList.remove('hidden');
-                    heartFilled.classList.add('hidden');
-                }
             } else {
                 const action = isCurrentlyFavorite ? '찜 취소' : '찜하기';
                 showMessage(`✅ ${action}가 완료되었습니다!`, 'success');
             }
         } catch (error) {
             console.error('Error toggling favorite:', error);
+            // 네트워크 오류 시 UI 롤백
+            heartEmpty.classList.toggle('hidden');
+            heartFilled.classList.toggle('hidden');
             showMessage('⚠️ 네트워크 오류 발생! 연결 상태를 확인해주세요.', 'error');
-            // UI 롤백
-            if (isCurrentlyFavorite) {
-                heartEmpty.classList.add('hidden');
-                heartFilled.classList.remove('hidden');
-            } else {
-                heartEmpty.classList.remove('hidden');
-                heartFilled.classList.add('hidden');
-            }
         }
     }
 
+    // 페이지 로드 시 찜 상태를 체크하고 아이콘 업데이트
     async function updateFavoriteIcons() {
+        if (!loggedInUserNo || isFavoritePage) {
+            // 로그인 상태가 아니거나 찜한 영상 페이지일 경우 별도 처리 필요 없음
+            return;
+        }
+
         const videoCards = document.querySelectorAll('.video-card');
         const videoIds = Array.from(videoCards).map(card => card.dataset.videoId);
 
-        for (const videoId of videoIds) {
-            try {
-                const response = await fetch(`/video/favorite/check/${videoId}`);
-                if (response.ok) {
-                    const isFavorite = await response.json();
-                    const heartBtn = document.querySelector(`.favorite-btn[data-video-id='${videoId}']`);
+        try {
+            const response = await fetch(`/video/favorite/check?userId=${loggedInUserNo}&videoIds=${videoIds.join(',')}`);
+            if (response.ok) {
+                const favoriteStatusMap = await response.json();
+                videoCards.forEach(card => {
+                    const videoId = card.dataset.videoId;
+                    const isFavorite = favoriteStatusMap[videoId];
+                    const heartBtn = card.querySelector('.favorite-btn');
                     if (heartBtn) {
                         const heartEmpty = heartBtn.querySelector('.heart-empty');
                         const heartFilled = heartBtn.querySelector('.heart-filled');
-
-                        if (isFavorite) {
-                            heartEmpty.classList.add('hidden');
-                            heartFilled.classList.remove('hidden');
-                        } else {
-                            heartEmpty.classList.remove('hidden');
-                            heartFilled.classList.add('hidden');
-                        }
+                        heartEmpty.classList.toggle('hidden', isFavorite);
+                        heartFilled.classList.toggle('hidden', !isFavorite);
                     }
-                }
-            } catch (error) {
-                console.error(`Error checking favorite status for video ${videoId}:`, error);
+                });
             }
+        } catch (error) {
+            console.error('Error updating favorite icons:', error);
         }
     }
 
+    // 페이지 로드 시 썸네일
+    function setThumbnailTime() {
+        document.querySelectorAll('.video-card video').forEach(video => {
+            const thumbnailTime = 2;
+            video.addEventListener('loadeddata', () => {
+                video.currentTime = thumbnailTime;
+            }, { once: true });
+        });
+    }
+
+    // 비디오 카드에 마우스를 올렸을 때 동영상 재생 로직
+    function setupVideoCardEvents() {
+        document.querySelectorAll('.video-card').forEach(card => {
+            const video = card.querySelector('video');
+            if (video) {
+                card.addEventListener('mouseenter', () => {
+                    video.play();
+                });
+                card.addEventListener('mouseleave', () => {
+                    video.pause();
+                    video.currentTime = 2;
+                });
+            }
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
+        setThumbnailTime();
         setupVideoCardEvents();
         updateFavoriteIcons();
     });
 
     window.toggleFavorite = toggleFavorite;
-    window.showMessage = showMessage;
-
     /*]]>*/
 </script>
 </body>
