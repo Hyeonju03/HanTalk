@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" class="transition-colors duration-500" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,54 +7,33 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            /* 라이트 모드 기본 색상 변수 */
-            --bg-body: #f3f4f6;
-            --bg-card: #ffffff;
-            --bg-section: rgba(181, 208, 227, 0.1);
-            --text-primary: #2F4160;
-            --text-secondary: #6b7280;
-            --border-color: rgba(181, 208, 227, 0.3);
-            --shadow-color: rgba(0, 0, 0, 0.1);
-        }
-
-        .dark {
-            --bg-body: #1a202c;
-            --bg-card: #2d3748;
-            --bg-section: rgba(45, 55, 72, 0.3);
-            --text-primary: #f7fafc;
-            --text-secondary: #a0aec0;
-            --border-color: rgba(69, 81, 102, 0.5);
-            --shadow-color: rgba(0, 0, 0, 0.3);
-        }
-
         body {
-            background-color: var(--bg-body);
-            color: var(--text-primary);
+            background-color: #f3f4f6;
+            color: #2F4160;
         }
 
         .video-card {
             transition: all 0.3s ease;
             border-radius: 1rem;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-card);
+            border: 1px solid rgba(181, 208, 227, 0.3);
+            background-color: #ffffff;
         }
 
         .video-card:hover {
-            border-color: var(--text-primary);
+            border-color: #2F4160;
             transform: scale(1.03);
-            box-shadow: 0 12px 20px var(--shadow-color);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
         }
 
         .upgraded-btn {
-            color: var(--text-primary);
-            box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            color: #2F4160;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: all 0.2s ease-in-out;
         }
 
         .upgraded-btn:hover {
             transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         .all-videos-btn-hover:hover {
@@ -82,10 +61,10 @@
         }
 
         .video-section {
-            background-color: var(--bg-section);
+            background-color: rgba(181, 208, 227, 0.1);
             padding: 3rem 1.5rem;
             border-radius: 1.5rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(181, 208, 227, 0.3);
         }
 
         .clamp-2-lines {
@@ -96,49 +75,38 @@
             text-overflow: ellipsis;
             word-break: break-all;
         }
-
-        /* 다크 모드에서 조회수 글자색을 흰색으로 고정 */
-        .dark .views-placeholder {
-            color: white;
-        }
     </style>
 </head>
-<body class="bg-[var(--bg-body)] font-sans antialiased min-h-screen flex flex-col transition-colors duration-500">
+<body class="bg-[#f3f4f6] font-sans antialiased min-h-screen flex flex-col">
 
 <!-- Thymeleaf fragments assumed to be here -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<div class="max-w-7xl w-full mx-auto bg-[var(--bg-card)] p-8 rounded-xl shadow-lg mt-8 transition-colors duration-500">
-    <h1 class="text-3xl font-bold text-[var(--text-primary)] mb-6 text-center">
+<div class="max-w-7xl w-full mx-auto bg-white p-8 rounded-xl shadow-lg mt-8">
+    <h1 class="text-3xl font-bold text-[#2F4160] mb-6 text-center">
         <span th:if="${isFavorite}">찜한 영상 목록</span>
         <span th:unless="${isFavorite}">영상 목록</span>
     </h1>
 
     <div class="max-w-screen-xl mx-auto mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex flex-wrap gap-2 justify-center">
-            <a href="/video/list" class="px-6 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold rounded-lg all-videos-btn-hover transition duration-300 upgraded-btn">
+            <a href="/video/list" class="px-6 py-2 bg-white text-gray-800 font-semibold rounded-lg all-videos-btn-hover transition duration-300 upgraded-btn">
                 전체 영상
             </a>
-            <a href="/video/list?isFavorite=true" class="px-6 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold rounded-lg favorite-btn-hover transition duration-300 upgraded-btn">
+            <a href="/video/list?isFavorite=true" class="px-6 py-2 bg-white text-gray-800 font-semibold rounded-lg favorite-btn-hover transition duration-300 upgraded-btn">
                 찜한 영상
             </a>
-
-            <button id="theme-toggle" class="px-4 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold rounded-lg upgraded-btn transition duration-300 flex items-center gap-2">
-                <span class="sr-only">테마 변경</span>
-                <i class="fas fa-sun block dark:hidden"></i>
-                <i class="fas fa-moon hidden dark:block"></i>
-            </button>
         </div>
 
         <!-- 찜한 영상 목록에서는 검색창을 숨김 -->
         <form th:unless="${isFavorite}" method="get" th:action="@{/video/list}" class="flex flex-wrap gap-2 w-full md:w-auto">
-            <select name="searchType" class="flex-shrink p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                <option value="title" th:selected="${searchType == 'title'}" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">제목</option>
-                <option value="content" th:selected="${searchType == 'content'}" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">내용</option>
-                <option value="all" th:selected="${searchType == 'all'}" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">제목 + 내용</option>
+            <select name="searchType" class="flex-shrink p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark bg-white text-gray-800">
+                <option value="title" th:selected="${searchType == 'title'}" class="bg-white text-gray-800">제목</option>
+                <option value="content" th:selected="${searchType == 'content'}" class="bg-white text-gray-800">내용</option>
+                <option value="all" th:selected="${searchType == 'all'}" class="bg-white text-gray-800">제목 + 내용</option>
             </select>
             <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 입력"
-                   class="flex-grow min-w-0 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark dark:bg-gray-700 text-gray-800 dark:text-gray-200" />
+                   class="flex-grow min-w-0 p-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-main-dark text-gray-800" />
 
             <button type="submit"
                     class="bg-[#B5D0E3] hover:bg-[#8DAAC1] text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
@@ -168,8 +136,8 @@
 
             <div class="flex items-start justify-between">
                 <div class="flex-grow min-w-0">
-                    <strong class="video-title text-xl font-bold text-gray-900 dark:text-white leading-tight mb-1">
-                        <span th:text="${video.title}" class="no-underline text-[var(--text-primary)] transition duration-300 clamp-2-lines">영상 제목</span>
+                    <strong class="video-title text-xl font-bold text-gray-900 leading-tight mb-1">
+                        <span th:text="${video.title}" class="no-underline text-[#2F4160] transition duration-300 clamp-2-lines">영상 제목</span>
                     </strong>
                     <div class="views-placeholder text-base font-bold text-gray-700 mt-1">
                         조회수 <span th:text="${video.viewHit}">0</span>
@@ -193,8 +161,8 @@
     </div>
 
     <!-- 찜한 영상이 없을 때 메시지 표시 -->
-    <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-[var(--bg-card)] rounded-xl shadow-inner no-results">
-        <p class="text-xl font-medium text-[var(--text-primary)]">
+    <div th:if="${videoPage.totalElements == 0}" class="text-center p-12 bg-white rounded-xl shadow-inner no-results">
+        <p class="text-xl font-medium text-[#2F4160]">
             <span th:if="${isFavorite}">찜한 영상이 없습니다.</span>
             <span th:unless="${isFavorite}">검색 결과가 없습니다.</span>
         </p>
@@ -204,17 +172,17 @@
     <div class="pagination flex justify-center items-center mt-8 space-x-2" th:if="${videoPage.totalPages > 1}">
         <a th:if="${videoPage.hasPrevious()}"
            th:href="@{|/video/list?page=${videoPage.number - 1}&isFavorite=${isFavorite}|}"
-           class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[var(--text-primary)] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">이전</a>
+           class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">이전</a>
 
         <a th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}"
            th:href="@{|/video/list?page=${i}${isFavorite ? '&isFavorite=true' : ''}${isFavorite ? '' : '&keyword=' + keyword}|}"
            th:text="${i + 1}"
-           th:classappend="${i == videoPage.number} ? 'bg-[#B5D0E3] text-white font-bold' : 'bg-white text-[var(--text-primary)] border border-gray-300'"
+           th:classappend="${i == videoPage.number} ? 'bg-[#B5D0E3] text-white font-bold' : 'bg-white text-[#2F4160] border border-gray-300'"
            class="block w-8 h-8 flex items-center justify-center rounded-md no-underline transition-colors duration-200 hover:bg-[#f3f4f6] hover:text-[#2F4160]"></a>
 
         <a th:if="${videoPage.hasNext()}"
            th:href="@{|/video/list?page=${videoPage.number + 1}&isFavorite=${isFavorite}|}"
-           class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[var(--text-primary)] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">다음</a>
+           class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">다음</a>
     </div>
 
 </div>
@@ -228,7 +196,7 @@
     const loggedInUserNo = [[${userId}]];
     const isFavoritePage = [[${isFavorite}]];
 
-    // 비디오 카드에 마우스를 올렸을 때 썸네일 동영상 재생 로직을 설정하는 함수
+    // 비디오 카드에 마우스를 올렸을 때 썸네일 동영상 재생 로직
     function setupVideoCardEvents() {
         document.querySelectorAll('.video-card').forEach(card => {
             const video = card.querySelector('video');
@@ -239,7 +207,7 @@
                 });
                 card.addEventListener('mouseleave', () => {
                     video.pause();
-                    video.currentTime = 10;
+                    video.currentTime = 1;
                 });
             }
         });
@@ -352,28 +320,9 @@
         }
     }
 
-    function setupDarkModeToggle() {
-        const toggleBtn = document.getElementById('theme-toggle');
-        const html = document.documentElement;
-
-        const currentTheme = localStorage.getItem('theme');
-        if (currentTheme === 'dark' || (!currentTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
-        } else {
-            html.classList.remove('dark');
-        }
-
-        toggleBtn.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            const newTheme = html.classList.contains('dark') ? 'dark' : 'light';
-            localStorage.setItem('theme', newTheme);
-        });
-    }
-
     document.addEventListener("DOMContentLoaded", function () {
         setupVideoCardEvents();
         updateFavoriteIcons();
-        setupDarkModeToggle();
     });
 
     window.toggleFavorite = toggleFavorite;

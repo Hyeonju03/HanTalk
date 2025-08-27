@@ -7,56 +7,28 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* 사용자 정의 CSS 변수와 클래스 기반 다크 모드 */
-    :root {
-        --bg-color: #f9fafb;
-        --text-color: #4A5568;
-        --card-bg: #ffffff;
-        --border-color: #E5E7EB;
-        --dark-navy: #2F4160;
-        --soft-sky: #B5D0E3;
-        --btn-bg: #f3f4f6;
-        --btn-hover-bg: #e5e7eb;
-        --shadow-color: rgba(0, 0, 0, 0.1);
-    }
-
-    .dark-mode {
-        --bg-color: #121212;
-        --text-color: #e0e0e0;
-        --card-bg: #131B2B;
-        --border-color: #4a5568;
-        --dark-navy: #E0E0E0;
-        --soft-sky: #B5D0E3;
-        --btn-bg: #2d3748;
-        --btn-hover-bg: #4a5568;
-        --shadow-color: rgba(0, 0, 0, 0.5);
-    }
-
     body {
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        transition: background-color 0.5s ease, color 0.5s ease;
+        background-color: #f9fafb;
+        color: #4A5568;
     }
 
     .card {
-        background-color: var(--card-bg);
-        border-color: var(--border-color);
-        transition: background-color 0.5s ease, border-color 0.5s ease;
-        box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+        background-color: #ffffff;
+        border-color: #E5E7EB;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
     }
 
-    .action-button, #theme-toggle {
+    .action-button {
         transition: all 0.2s ease-in-out;
     }
 
     .action-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px var(--shadow-color);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
-    /* Video loading spinner with a more modern feel */
     .spinner {
-        border: 4px solid var(--border-color);
+        border: 4px solid #E5E7EB;
         border-top: 4px solid #FF7800; /* accent-orange */
         border-radius: 50%;
         width: 50px;
@@ -74,7 +46,6 @@
         100% { transform: rotate(360deg); }
     }
 
-    /* Updated play button container style */
     .play-button-container {
         position: absolute;
         top: 50%;
@@ -116,32 +87,12 @@
         animation: fadeIn 0.8s ease-out forwards;
     }
 
-    #theme-toggle {
-        background-color: var(--btn-bg);
-        color: var(--text-color);
-        border: 1px solid var(--border-color);
-        padding: 10px;
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-        width: 44px; /* 버튼 크기 통일 */
-        height: 44px; /* 버튼 크기 통일 */
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    #theme-toggle:hover {
-        transform: scale(1.1);
-    }
-
     .copy-success {
         position: absolute;
         top: -30px;
         left: 50%;
         transform: translateX(-50%);
-        background-color: var(--dark-navy);
+        background-color: #2F4160;
         color: white;
         padding: 4px 8px;
         border-radius: 6px;
@@ -149,7 +100,7 @@
         opacity: 0;
         transition: opacity 0.5s ease-out;
         white-space: nowrap;
-        pointer-events: none; /* Make sure it doesn't interfere with clicks */
+        pointer-events: none;
     }
 
     .copy-success.show {
@@ -159,84 +110,51 @@
 </head>
 <body class="font-sans flex flex-col min-h-screen">
 
-<!-- 즉시 실행 스크립트로 localStorage 또는 시스템 설정에 따라 테마를 적용 -->
-<script>
-  (function() {
-      const body = document.body;
-      const themeIcon = document.getElementById('theme-icon');
-      const currentTheme = localStorage.getItem('theme');
-
-      if (currentTheme === 'dark') {
-          body.classList.add('dark-mode');
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          body.classList.add('dark-mode');
-      }
-
-      // 아이콘 초기 상태 설정
-      if (body.classList.contains('dark-mode')) {
-          if (themeIcon) {
-              themeIcon.classList.remove('fa-moon');
-              themeIcon.classList.add('fa-sun');
-          }
-      } else {
-          if (themeIcon) {
-              themeIcon.classList.remove('fa-sun');
-              themeIcon.classList.add('fa-moon');
-          }
-      }
-  })();
-</script>
-
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
-<main class="flex-1 px-4 py-10 transition-colors duration-500">
-  <div class="card rounded-3xl shadow-2xl p-8 md:p-12 border max-w-screen-xl mx-auto transition-all duration-500 ease-in-out animate-fadeIn">
+<main class="flex-1 px-4 py-10">
+  <div class="card rounded-3xl shadow-2xl p-8 md:p-12 border max-w-screen-xl mx-auto animate-fadeIn">
     <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-8">
       <div class="sm:w-3/4 sm:pr-4">
-        <h1 class="text-3xl md:text-4xl font-extrabold mb-2 leading-tight break-words" style="color: var(--dark-navy);">
+        <h1 class="text-3xl md:text-4xl font-extrabold mb-2 leading-tight break-words text-[#2F4160]">
           <span th:text="${video.title}">제목</span>
         </h1>
-        <div class="flex flex-wrap items-center text-sm md:text-sm" style="color: var(--text-color);">
+        <div class="flex flex-wrap items-center text-sm md:text-sm text-[#4A5568]">
           <div class="flex items-center">
-            <i class="fas fa-calendar-alt mr-1" style="color: var(--soft-sky);"></i>
+            <i class="fas fa-calendar-alt mr-1 text-[#B5D0E3]"></i>
             <span>등록일</span>
             <span th:text="${#temporals.format(video.createDate, 'yyyy-MM-dd')}" class="ml-1"></span>
           </div>
           <div th:if="${video.updateDate != null}" class="flex items-center">
-            <span class="text-xl px-3 font-light" style="color: var(--border-color);">|</span>
+            <span class="text-xl px-3 font-light text-[#E5E7EB]">|</span>
           </div>
           <div th:if="${video.updateDate != null}" class="flex items-center">
-            <i class="fas fa-edit mr-1" style="color: var(--soft-sky);"></i>
+            <i class="fas fa-edit mr-1 text-[#B5D0E3]"></i>
             <span>수정일</span>
             <span th:text="${#temporals.format(video.updateDate, 'yyyy-MM-dd')}" class="ml-1"></span>
           </div>
           <div class="flex items-center">
-            <span class="text-xl px-3 font-light" style="color: var(--border-color);">|</span>
+            <span class="text-xl px-3 font-light text-[#E5E7EB]">|</span>
           </div>
           <div class="flex items-center">
-            <i class="fas fa-eye mr-1" style="color: var(--soft-sky);"></i>
+            <i class="fas fa-eye mr-1 text-[#B5D0E3]"></i>
             <span>조회수</span>
             <span th:text="${video.viewHit != null ? video.viewHit : 0}" class="ml-1"></span>
           </div>
         </div>
       </div>
       <div class="mt-4 sm:mt-0 flex flex-wrap gap-2 flex-shrink-0">
-        <!-- 테마 토글 버튼을 다른 버튼들과 함께 배치하여 일관성을 높였습니다. -->
-        <button id="theme-toggle" aria-label="Toggle dark mode">
-          <i id="theme-icon" class="fas fa-moon"></i>
-        </button>
-        <a id="copyLinkBtn" class="action-button inline-flex items-center justify-center px-4 py-2 text-dark-navy font-semibold rounded-full shadow-md transition duration-300 relative" style="background-color: var(--btn-bg);">
+        <a id="copyLinkBtn" class="action-button inline-flex items-center justify-center px-4 py-2 text-[#2F4160] font-semibold rounded-full shadow-md transition duration-300 relative bg-[#f3f4f6]">
           <i class="fas fa-link mr-2"></i> 링크 복사
           <span id="copySuccessMsg" class="copy-success">복사됨!</span>
         </a>
-        <!-- 모든 버튼의 스타일을 일관성 있게 변경했습니다. -->
-        <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}" class="action-button inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-full shadow-md transition duration-300 relative" style="background-color: var(--dark-navy);">
+        <a th:if="${isAdmin}" th:href="@{/video/admin/sujung/{id}(id=${video.videoId})}" class="action-button inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-full shadow-md transition duration-300 relative bg-[#2F4160]">
           <span class="mr-2">✏️</span> 영상 수정
         </a>
-        <a th:if="${isAdmin}" th:href="@{/video/admin/list}" class="action-button inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-full shadow-md transition duration-300 relative" style="background-color: var(--dark-navy);">
+        <a th:if="${isAdmin}" th:href="@{/video/admin/list}" class="action-button inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-full shadow-md transition duration-300 relative bg-[#2F4160]">
           <i class="fas fa-bars mr-2"></i> 관리자페이지
         </a>
-        <a th:unless="${isAdmin}" th:href="@{/video/list}" class="action-button inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-full shadow-md transition duration-300 relative" style="background-color: var(--dark-navy);">
+        <a th:unless="${isAdmin}" th:href="@{/video/list}" class="action-button inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-full shadow-md transition duration-300 relative bg-[#2F4160]">
           <i class="fas fa-bars mr-2"></i> 목록으로
         </a>
       </div>
@@ -251,9 +169,9 @@
         <div class="play-btn"></div>
       </div>
     </div>
-    <div class="border-t pt-6 pl-4" style="border-color: var(--border-color);">
-      <h2 class="text-xl md:text-2xl font-bold mb-3" style="color: var(--dark-navy);">영상 설명</h2>
-      <p class="leading-relaxed whitespace-pre-wrap" th:text="${video.content}" style="color: var(--text-color);">설명</p>
+    <div class="border-t pt-6 pl-4 border-[#E5E7EB]">
+      <h2 class="text-xl md:text-2xl font-bold mb-3 text-[#2F4160]">영상 설명</h2>
+      <p class="leading-relaxed whitespace-pre-wrap text-[#4A5568]" th:text="${video.content}">설명</p>
     </div>
   </div>
 </main>
@@ -266,9 +184,6 @@
   const loadingSpinner = document.getElementById('loadingSpinner');
   const copyLinkBtn = document.getElementById('copyLinkBtn');
   const copySuccessMsg = document.getElementById('copySuccessMsg');
-  const themeToggle = document.getElementById('theme-toggle');
-  const themeIcon = document.getElementById('theme-icon');
-  const body = document.body;
 
   videoPlayer.addEventListener('loadeddata', () => {
       loadingSpinner.classList.add('hidden');
@@ -299,25 +214,6 @@
           copySuccessMsg.classList.remove('show');
       }, 1500);
   }
-
-  // 다크 모드 토글 로직
-  themeToggle.addEventListener('click', () => {
-      body.classList.toggle('dark-mode');
-
-      if (body.classList.contains('dark-mode')) {
-          localStorage.setItem('theme', 'dark');
-          if (themeIcon) {
-              themeIcon.classList.remove('fa-moon');
-              themeIcon.classList.add('fa-sun');
-          }
-      } else {
-          localStorage.setItem('theme', 'light');
-          if (themeIcon) {
-              themeIcon.classList.remove('fa-sun');
-              themeIcon.classList.add('fa-moon');
-          }
-      }
-  });
 </script>
 </body>
 </html>
