@@ -23,6 +23,11 @@ public class GameController {
         return "game/main";
     }
 
+    @GetMapping("/testmeta")
+    public String showBusPage(HttpSession session, Model model) {
+        return "game/testmeta";
+    }
+
     @GetMapping("/game1")
     public String showGamePage(HttpSession session, Model model) {
         return "game/game1";
