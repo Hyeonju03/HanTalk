@@ -81,7 +81,6 @@
 </head>
 <body class="bg-[#f3f4f6] font-sans antialiased min-h-screen flex flex-col">
 
-<!-- Thymeleaf fragments assumed to be here -->
 <div th:replace="~{fragments/header :: headerFragment}"></div>
 
 <div class="max-w-7xl w-full mx-auto bg-white p-8 rounded-xl shadow-lg mt-8">
@@ -118,9 +117,11 @@
 
     <div class="video-list-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
         <a th:each="video, stat : ${videoPage.content}"
-           th:href="@{/video/view/{id}(id=${video.videoId})}"
-           class="video-card relative p-4 flex flex-col cursor-pointer"
-           th:data-video-id="${video.videoId}">
+           href="#"
+           class="video-card relative p-4 flex flex-col cursor-pointer card-link"
+           th:data-video-id="${video.videoId}"
+           th:data-is-admin="${isAdmin}"
+           th:data-is-favorite="${isFavorite}">
 
             <div class="thumbnail-link relative block w-full aspect-video overflow-hidden rounded-lg mb-3">
                 <video class="video-thumbnail w-full h-full object-cover pointer-events-none"
@@ -142,7 +143,7 @@
                         <span th:text="${video.title}" class="no-underline text-[#2F4160] transition duration-300 clamp-2-lines">영상 제목</span>
                     </strong>
                     <div class="views-placeholder text-base font-bold text-gray-700 mt-1">
-                        조회수 <span th:text="${video.viewHit}">0</span>
+                        조회수 <span th:text="${video.viewHit}" th:id="'viewHit-' + ${video.videoId}">0</span>
                     </div>
                 </div>
 
@@ -173,7 +174,7 @@
            class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-[#2F4160] no-underline rounded-md border border-gray-300 hover:bg-[#f3f4f6] hover:text-[#2F4160] transition-colors duration-200">이전</a>
 
         <a th:each="i : ${#numbers.sequence(0, videoPage.totalPages - 1)}"
-           th:href="@{|/video/list?page=${i}${isFavorite ? '&isFavorite=true' : ''}${isFavorite ? '' : '&keyword=' + keyword}|}"
+           th:href="@{|/video/list?page=${i}${isFavorite ? '&isFavorite=true' : ''}${isFavorite ? '' : '&keyword=' + keyword + '&searchType=' + searchType}|}"
            th:text="${i + 1}"
            th:classappend="${i == videoPage.number} ? 'bg-[#B5D0E3] text-white font-bold' : 'bg-white text-[#2F4160] border border-gray-300'"
            class="block w-8 h-8 flex items-center justify-center rounded-md no-underline transition-colors duration-200 hover:bg-[#f3f4f6] hover:text-[#2F4160]"></a>
@@ -193,30 +194,38 @@
     const loggedInUserNo = [[${userId}]];
     const isFavoritePage = [[${isFavorite}]];
 
+    // 메시지 숨기기 타이머 ID를 저장할 변수
+    let messageTimeout;
+
     // 메시지 알림창을 표시하는 함수
     function showMessage(message, type = 'success') {
+        // 기존 타이머가 있다면 취소
+        clearTimeout(messageTimeout);
+
         const msgBox = document.getElementById('message-box');
         msgBox.textContent = message;
-        msgBox.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white font-bold z-[60]';
+        msgBox.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 p-4 rounded-lg font-bold text-white z-[60]'; // text-white 추가
+        msgBox.classList.remove('bg-green-500', 'bg-red-500', 'bg-gray-700', 'hidden');
 
         if (type === 'success') {
             msgBox.classList.add('bg-green-500');
+        } else if (type === 'info') {
+            msgBox.classList.add('bg-gray-700');
         } else {
             msgBox.classList.add('bg-red-500');
         }
 
-        msgBox.classList.remove('hidden');
         setTimeout(() => {
             msgBox.style.opacity = '1';
         }, 10); // Transition start
 
-        setTimeout(() => {
+        // 메시지 숨기기 타이머 설정
+        messageTimeout = setTimeout(() => {
             msgBox.style.opacity = '0';
             setTimeout(() => {
                 msgBox.classList.add('hidden');
-                msgBox.classList.remove('bg-green-500', 'bg-red-500');
             }, 300); // fade out animation time
-        }, 3000);
+        }, 3500);
     }
 
     // 찜하기 상태를 토글하는 함수
@@ -226,13 +235,19 @@
         const heartFilled = btn.querySelector('.heart-filled');
         const isCurrentlyFavorite = !heartFilled.classList.contains('hidden');
 
+        if (isCurrentlyFavorite) {
+            // 현재 찜한 상태 -> 찜 취소
+            heartEmpty.classList.remove('hidden');
+            heartFilled.classList.add('hidden');
+        } else {
+            // 현재 찜하지 않은 상태 -> 찜하기
+            heartEmpty.classList.add('hidden');
+            heartFilled.classList.remove('hidden');
+        }
+
         const url = '/video/favorite';
         const method = isCurrentlyFavorite ? 'DELETE' : 'POST';
         const payload = { userId: loggedInUserNo, videoId: videoId };
-
-        // 즉시 UI 업데이트
-        heartEmpty.classList.toggle('hidden', !isCurrentlyFavorite);
-        heartFilled.classList.toggle('hidden', isCurrentlyFavorite);
 
         try {
             const response = await fetch(url, {
@@ -243,39 +258,68 @@
 
             if (!response.ok) {
                 // 오류 발생 시 UI 롤백
-                heartEmpty.classList.toggle('hidden');
-                heartFilled.classList.toggle('hidden');
+                if (isCurrentlyFavorite) {
+                    // 찜 취소 실패 -> 다시 채워진 하트로
+                    heartEmpty.classList.add('hidden');
+                    heartFilled.classList.remove('hidden');
+                } else {
+                    // 찜하기 실패 -> 다시 빈 하트로
+                    heartEmpty.classList.remove('hidden');
+                    heartFilled.classList.add('hidden');
+                }
                 showMessage('⚠️ 찜 상태 변경 실패! 서버 오류를 확인해주세요.', 'error');
             } else {
                 const action = isCurrentlyFavorite ? '찜 취소' : '찜하기';
-                showMessage(`✅ ${action}가 완료되었습니다!`, 'success');
+                const messageType = isCurrentlyFavorite ? 'info' : 'success';
+                showMessage(`✅ ${action}가 완료되었습니다!`, messageType);
+
+                if (isFavoritePage && isCurrentlyFavorite) {
+                    const cardToRemove = btn.closest('.video-card');
+                    if (cardToRemove) {
+                        cardToRemove.remove();
+                    }
+                }
             }
         } catch (error) {
             console.error('Error toggling favorite:', error);
             // 네트워크 오류 시 UI 롤백
-            heartEmpty.classList.toggle('hidden');
-            heartFilled.classList.toggle('hidden');
+            if (isCurrentlyFavorite) {
+                heartEmpty.classList.add('hidden');
+                heartFilled.classList.remove('hidden');
+            } else {
+                heartEmpty.classList.remove('hidden');
+                heartFilled.classList.add('hidden');
+            }
             showMessage('⚠️ 네트워크 오류 발생! 연결 상태를 확인해주세요.', 'error');
         }
     }
 
-    // 페이지 로드 시 찜 상태를 체크하고 아이콘 업데이트
     async function updateFavoriteIcons() {
-        if (!loggedInUserNo || isFavoritePage) {
-            // 로그인 상태가 아니거나 찜한 영상 페이지일 경우 별도 처리 필요 없음
+        if (!loggedInUserNo) {
             return;
         }
 
         const videoCards = document.querySelectorAll('.video-card');
-        const videoIds = Array.from(videoCards).map(card => card.dataset.videoId);
 
-        try {
-            const response = await fetch(`/video/favorite/check?userId=${loggedInUserNo}&videoIds=${videoIds.join(',')}`);
-            if (response.ok) {
-                const favoriteStatusMap = await response.json();
-                videoCards.forEach(card => {
-                    const videoId = card.dataset.videoId;
-                    const isFavorite = favoriteStatusMap[videoId];
+        if (isFavoritePage) {
+            videoCards.forEach(card => {
+                const heartBtn = card.querySelector('.favorite-btn');
+                if (heartBtn) {
+                    const heartEmpty = heartBtn.querySelector('.heart-empty');
+                    const heartFilled = heartBtn.querySelector('.heart-filled');
+                    heartEmpty.classList.add('hidden');
+                    heartFilled.classList.remove('hidden');
+                }
+            });
+            return;
+        }
+
+        for (const card of videoCards) {
+            const videoId = card.dataset.videoId;
+            try {
+                const response = await fetch(`/video/favorite/check/${videoId}`);
+                if (response.ok) {
+                    const isFavorite = await response.json();
                     const heartBtn = card.querySelector('.favorite-btn');
                     if (heartBtn) {
                         const heartEmpty = heartBtn.querySelector('.heart-empty');
@@ -283,14 +327,13 @@
                         heartEmpty.classList.toggle('hidden', isFavorite);
                         heartFilled.classList.toggle('hidden', !isFavorite);
                     }
-                });
+                }
+            } catch (error) {
+                console.error(`Error checking favorite status for video ${videoId}:`, error);
             }
-        } catch (error) {
-            console.error('Error updating favorite icons:', error);
         }
     }
 
-    // 페이지 로드 시 썸네일
     function setThumbnailTime() {
         document.querySelectorAll('.video-card video').forEach(video => {
             const thumbnailTime = 2;
@@ -316,10 +359,52 @@
         });
     }
 
+    function setupCardLinkEvents() {
+        document.querySelectorAll('.card-link').forEach(link => {
+            link.addEventListener('click', async (event) => {
+                event.preventDefault(); // 기본 링크 이동 동작 방지
+
+                const videoId = event.currentTarget.getAttribute('data-video-id');
+                const isAdmin = event.currentTarget.getAttribute('data-is-admin') === 'true';
+                const isFavorite = event.currentTarget.getAttribute('data-is-favorite') === 'true';
+                const viewHitSpan = document.getElementById('viewHit-' + videoId);
+
+                try {
+                    const response = await fetch('/video/increment-view/' + videoId, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (viewHitSpan) {
+                            viewHitSpan.textContent = data.viewHit;
+                        }
+                    } else {
+                        console.error('Failed to increment view count.');
+                    }
+                } catch (error) {
+                    console.error('Error during view count update:', error);
+                } finally {
+                    let redirectUrl;
+                    if (isFavorite) {
+                        redirectUrl = '/video/contentView/' + videoId;
+                    } else if (isAdmin) {
+                        redirectUrl = '/video/view/' + videoId;
+                    } else {
+                        redirectUrl = '/video/view/' + videoId;
+                    }
+                    window.location.href = redirectUrl;
+                }
+            });
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         setThumbnailTime();
         setupVideoCardEvents();
         updateFavoriteIcons();
+        setupCardLinkEvents();
     });
 
     window.toggleFavorite = toggleFavorite;
