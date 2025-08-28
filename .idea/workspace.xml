@@ -14,7 +14,17 @@
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< Updated upstream
       <change beforePath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/controller/GameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/controller/GameController.java" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.data" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.data" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.framework.js" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.framework.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.wasm" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.wasm" afterDir="false" />
+<<<<<<< Updated upstream
+      <change beforePath="$PROJECT_DIR$/hantalk/src/main/resources/templates/game/game3.html" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/resources/templates/game/game3.html" afterDir="false" />
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
