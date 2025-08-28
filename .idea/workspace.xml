@@ -5,16 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="419a6c6d-c0d4-408b-9fff-ab9ea09dafeb" name="변경" comment="">
-      <change afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.data" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.framework.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.loader.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.wasm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/controller/GameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/java/com/example/hantalk/controller/GameController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.data" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.data" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.framework.js" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.framework.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.wasm" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/resources/static/unity-builds/game3/Build/WebGL.wasm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hantalk/src/main/resources/templates/game/game3.html" beforeDir="false" afterPath="$PROJECT_DIR$/hantalk/src/main/resources/templates/game/game3.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,16 +67,16 @@
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;lsy&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/lsy/HanTalk&quot;
+    &quot;last_opened_file_path&quot;: &quot;C:/lsy/HanTalk/hantalk/src/main/resources/static/unity-builds/game3/Build&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\lsy\HanTalk\hantalk\src\main\resources\static\unity-builds\game3" />
       <recent name="C:\lsy\HanTalk\hantalk\src\main\resources\static\unity-builds\game3\Build" />
+      <recent name="C:\lsy\HanTalk\hantalk\src\main\resources\static\unity-builds\game3" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\lsy\HanTalk\hantalk\src\main\resources\static\unity-builds\game3\Build" />
