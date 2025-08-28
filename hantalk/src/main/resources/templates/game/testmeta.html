@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>TestMeta</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+
+<main class="w-full flex justify-center items-center">
+  <div class="w-full max-w-7xl flex flex-col items-end p-5">
+    <a href="/game/main" class="inline-block bg-[#B5D0E3] text-white py-2 px-4 rounded-lg shadow-md hover:bg-[#93b4cc] transition-colors duration-200">
+      돌아가기
+    </a>
+    <div id="unity-container" class="w-full flex flex-col justify-center items-center mt-4 gap-2">
+      <div id="loading-bar" class="w-1/2 h-5 bg-[#444] rounded-lg overflow-hidden">
+        <div id="loading-bar-progress" class="h-full w-0 bg-green-500 transition-all duration-300 ease-in-out"></div>
+      </div>
+      <div id="loading-text" class="text-white">Loading...</div>
+      <canvas id="unity-canvas" class="hidden w-full aspect-video border-2 border-white box-border"></canvas>
+    </div>
+  </div>
+</main>
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
+<script>
+  const buildDir  = "/unity-builds/TestBuild/Build"; // 폴더
+  const buildName = "TestBuild";                      // 파일 접두어
+
+  const loaderUrl = `${buildDir}/${buildName}.loader.js`;
+  const config = {
+    dataUrl:       `${buildDir}/${buildName}.data.unityweb`,
+    frameworkUrl:  `${buildDir}/${buildName}.framework.js.unityweb`,
+    codeUrl:       `${buildDir}/${buildName}.wasm.unityweb`,
+    streamingAssetsUrl: "/unity-builds/TestBuild/StreamingAssets",
+    companyName: "YourCompany",
+    productName: "YourProduct",
+    productVersion: "1.0"
+  };
+
+  const canvas = document.getElementById("unity-canvas");
+  const loadingBar = document.getElementById("loading-bar-progress");
+  const loadingText = document.getElementById("loading-text");
+  const externalInput = document.getElementById("external-input");
+
+  const script = document.createElement("script");
+  script.src = loaderUrl;
+  script.onload = () => {
+    createUnityInstance(canvas, config, (progress) => {
+      loadingBar.style.width = (progress * 100).toFixed(0) + "%";
+      loadingText.textContent = `Loading... ${(progress * 100).toFixed(0)}%`;
+    }).then(u => {
+      window.unityInstance = u;
+      loadingText.classList.add('hidden');
+      document.getElementById("loading-bar").classList.add('hidden');
+      canvas.classList.remove('hidden');
+      canvas.tabIndex = -1;
+      externalInput?.focus();
+    }).catch(console.error);
+  };
+  document.body.appendChild(script);
+</script>
+
+</body>
+</html>
